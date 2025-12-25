@@ -54,18 +54,24 @@ export const CreateRoutine = () => {
   const handleAddExercise = () => {
     if (!ejercicioId) return alert("Selecciona un ejercicio");
 
-    // VALIDACIÓN: Evitar negativos o vacíos
-    // Convertimos a Float (decimal) el peso y a Int (entero) las series/reps
-    const pesoFinal = parseFloat(peso.toString().replace(',', '.')); // Cambiamos coma por punto
+    // Convertimos los valores
+    const pesoFinal = parseFloat(peso.toString().replace(',', '.')); 
     const seriesFinal = parseInt(series.toString());
     const repsFinal = parseInt(reps.toString());
 
+    // Validaciones básicas (negativos)
     if (seriesFinal <= 0 || repsFinal <= 0 || pesoFinal < 0) {
       return alert("Los valores deben ser mayores a 0");
     }
     
-    // Validar que sea un número real (no NaN)
     if (isNaN(pesoFinal)) return alert("El peso debe ser un número válido");
+
+    // --- NUEVA VALIDACIÓN HULK ---
+    // Si el peso es 1000 o más (tiene 4 dígitos enteros), mostramos el mensaje.
+    if (pesoFinal >= 1000) {
+       return alert("¿Vas a poder levantar ese Peso? ¿Sos HULK? 🟢💪");
+    }
+    // -----------------------------
 
     const ejercicioNombre = ejercicios.find(e => e.id === parseInt(ejercicioId))?.nombre;
 
@@ -74,7 +80,7 @@ export const CreateRoutine = () => {
       nombreEjercicio: ejercicioNombre,
       series: seriesFinal,
       repeticiones: repsFinal,
-      peso: pesoFinal 
+      peso: pesoFinal
     };
 
     setDetalles([...detalles, nuevoDetalle]);
@@ -82,7 +88,7 @@ export const CreateRoutine = () => {
     // Resetear inputs
     setSeries(4);
     setReps(10);
-    setPeso(""); 
+    setPeso("");
   };
 
   // Función cuando el usuario escribe en el buscador

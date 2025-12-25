@@ -17,9 +17,11 @@ export const Home = () => {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Tarjeta: Mis Rutinas (Para todos) */}
-          <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer border-l-4 border-green-500">
+          <div 
+          onClick={() => navigate("/my-routines")}
+          className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer border-l-4 border-green-500">
             <h3 className="text-xl font-bold mb-2">Mis Rutinas</h3>
-            <p className="text-gray-500 text-sm">Ver las rutinas asignadas para hoy.</p>
+            <p className="text-gray-500 text-sm">Ver las rutinas asignadas</p>
           </div>
 
           {/* Tarjeta: Crear Rutina (Solo Entrenadores) */}
