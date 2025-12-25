@@ -3,6 +3,7 @@ import { Login } from "./Pages/Login";
 import { CreateRoutine } from "./Pages/CreateRoutine";
 import { Home } from "./Pages/Home";
 import { CreateUser } from "./Pages/CreateUser";
+import { Profile } from "./Pages/Profile";
 
 function App() {
   return (
@@ -23,6 +24,9 @@ function App() {
 
         {/* Ruta para Crear Usuario */}
         <Route path="/create-user" element={<CreateUser />} />
+
+        {/* Ruta para Perfil de Usuario */}
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );
