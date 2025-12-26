@@ -4,6 +4,8 @@ import { CreateRoutine } from "./Pages/CreateRoutine";
 import { Home } from "./Pages/Home";
 import { CreateUser } from "./Pages/CreateUser";
 import { Profile } from "./Pages/Profile";
+import { MyRoutines } from "./Pages/MyRoutines";
+import { DeleteRoutine } from "./Pages/DeleteRoutine";
 
 function App() {
   return (
@@ -15,8 +17,7 @@ function App() {
         {/* Ruta del Login */}
         <Route path="/login" element={<Login />} />
 
-        {/* Ruta Home (Placeholder para cuando loguees) */}
-        {/*<Route path="/home" element={<h1 className="text-center mt-10 text-2xl">¡Bienvenido al Gimnasio!</h1>} />*/}
+        {/* Ruta Home */}
         <Route path="/home" element={<Home />} />
         
         {/* Ruta para Crear Rutina */}
@@ -27,6 +28,13 @@ function App() {
 
         {/* Ruta para Perfil de Usuario */}
         <Route path="/profile" element={<Profile />} />
+
+        {/* Ruta para Mis Rutinas */}
+        <Route path="/my-routines" element={<MyRoutines />} />
+
+        {/* Ruta para Eliminar Rutina */}
+        <Route path="/delete-routine" element={<DeleteRoutine />} />
+        
       </Routes>
     </BrowserRouter>
   );
