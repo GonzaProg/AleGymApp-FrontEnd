@@ -1,14 +1,30 @@
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const token = localStorage.getItem("token");
 
-  const handleLogout = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita que el click se propague al contenedor del perfil
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    try {
+      // 1. Avisar al Backend que nos vamos (para guardar ultimaConexion)
+      if (token) {
+        await axios.post("http://localhost:3000/api/users/logout", {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+    } catch (error) {
+      // Si falla (ej: el token ya expiró), no importa, cerramos sesión igual en el front
+      console.error("Error al registrar salida en servidor", error);
+    } finally {
+      // 2. Borrar datos locales (SIEMPRE se ejecuta, falle o no el backend)
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+    }
   };
 
   return (

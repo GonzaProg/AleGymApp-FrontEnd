@@ -35,6 +35,17 @@ export const Home = () => {
             </div>
           )}
 
+          {/* ELIMINAR RUTINA (Solo Entrenador) */}
+          {isEntrenador && (
+            <div 
+              onClick={() => navigate("/delete-routine")}
+              className="bg-red-500 text-white p-6 rounded-lg shadow-md hover:bg-red-600 transition cursor-pointer"
+            >
+              <h3 className="text-xl font-bold mb-2">🗑️ Borrar Rutina</h3>
+              <p className="text-red-100 text-sm">Buscar un alumno y eliminar rutinas antiguas.</p>
+            </div>
+          )}
+
           {/* Tarjeta: REGISTRAR USUARIO (Visible para Entrenador y Admin) */}
           {isEntrenador && (
             <div 
