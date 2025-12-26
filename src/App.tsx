@@ -4,6 +4,7 @@ import { CreateRoutine } from "./Pages/CreateRoutine";
 import { Home } from "./Pages/Home";
 import { CreateUser } from "./Pages/CreateUser";
 import { Profile } from "./Pages/Profile";
+import { MyRoutines } from "./Pages/MyRoutines";
 
 function App() {
   return (
@@ -27,6 +28,9 @@ function App() {
 
         {/* Ruta para Perfil de Usuario */}
         <Route path="/profile" element={<Profile />} />
+
+        {/* Ruta para Mis Rutinas */}
+        <Route path="/my-routines" element={<MyRoutines />} />
       </Routes>
     </BrowserRouter>
   );
