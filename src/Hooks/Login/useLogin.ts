@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../API/axios";
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -25,10 +25,10 @@ export const useLogin = () => {
     setError(null);
 
     try {
-      // 1. Llamada al Backend
-      const response = await axios.post("http://localhost:3000/api/auth/login", {
+      // 1. Llamada a la API (URL relativa)
+      const response = await api.post("/api/auth/login", {
         email: email,
-        contraseña: password, // Asegúrate de que coincida con el backend
+        contraseña: password,
       });
 
       // 2. Guardar Token y Usuario
@@ -37,7 +37,6 @@ export const useLogin = () => {
       localStorage.setItem("user", JSON.stringify(user));
 
       // 3. Feedback y Redirección
-      // (Opcional: Podrías quitar el alert para una UX más fluida, pero lo dejamos como pediste)
       alert(`Bienvenido ${user.nombre}`);
       navigate("/home"); 
 

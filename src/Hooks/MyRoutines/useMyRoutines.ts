@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../API/axios"; 
 
 export const useMyRoutines = () => {
-  const token = localStorage.getItem("token");
+  // Nota: Ya no necesitamos recuperar el token aquí manualmente
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   // --- ESTADOS ---
@@ -15,9 +15,8 @@ export const useMyRoutines = () => {
   useEffect(() => {
     const fetchRutinas = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/rutinas/usuario/${user.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        // Llamada limpia sin host ni headers manuales
+        const res = await api.get(`/api/rutinas/usuario/${user.id}`);
         setRutinas(res.data);
       } catch (error) {
         console.error("Error al cargar rutinas", error);
@@ -27,7 +26,7 @@ export const useMyRoutines = () => {
     };
 
     if (user.id) fetchRutinas();
-  }, [user.id, token]);
+  }, [user.id]);
 
   // --- FUNCIONES AUXILIARES ---
   const closeModal = () => setSelectedRoutine(null);
@@ -54,12 +53,11 @@ export const useMyRoutines = () => {
     }
   };
 
-  // --- RETORNAMOS LO QUE LA VISTA NECESITA ---
   return {
     rutinas,
     loading,
     selectedRoutine,
-    setSelectedRoutine, // Necesitamos este setter para abrir el modal al clickear la card
+    setSelectedRoutine,
     videoUrl,
     closeModal,
     closeVideo,

@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../API/axios"; 
 
 export const useDeleteRoutine = () => {
-  const token = localStorage.getItem("token");
-
   // --- ESTADOS ---
   const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
   const [rutinas, setRutinas] = useState<any[]>([]);
@@ -14,20 +12,18 @@ export const useDeleteRoutine = () => {
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any>(null);
 
-  // 1. Cargar lista de alumnos al iniciar
+  // 1. Cargar lista de alumnos
   useEffect(() => {
     const fetchAlumnos = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/users/alumnos", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get("/api/users/alumnos");
         setTodosLosAlumnos(res.data);
       } catch (error) {
         console.error("Error cargando alumnos", error);
       }
     };
     fetchAlumnos();
-  }, [token]);
+  }, []);
 
   // 2. Lógica del Buscador
   const handleSearchChange = (text: string) => {
@@ -43,7 +39,7 @@ export const useDeleteRoutine = () => {
       setSugerencias([]);
       setMostrarSugerencias(false);
       setAlumnoSeleccionado(null);
-      setRutinas([]); // Limpiamos rutinas si borra el nombre
+      setRutinas([]);
     }
   };
 
@@ -52,11 +48,8 @@ export const useDeleteRoutine = () => {
     setAlumnoSeleccionado(alumno);
     setMostrarSugerencias(false);
 
-    // Cargar rutinas de este alumno
     try {
-      const res = await axios.get(`http://localhost:3000/api/rutinas/usuario/${alumno.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get(`/api/rutinas/usuario/${alumno.id}`);
       setRutinas(res.data);
     } catch (error) {
       console.error("Error cargando rutinas", error);
@@ -70,11 +63,8 @@ export const useDeleteRoutine = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:3000/api/rutinas/${rutinaId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/rutinas/${rutinaId}`);
 
-      // Actualizamos la lista visualmente quitando la eliminada
       setRutinas(rutinas.filter(r => r.id !== rutinaId));
       alert("Rutina eliminada.");
     } catch (error) {
@@ -83,14 +73,13 @@ export const useDeleteRoutine = () => {
     }
   };
 
-  // Retornamos lo que la vista necesita
   return {
     busqueda,
     sugerencias,
     mostrarSugerencias,
     alumnoSeleccionado,
     rutinas,
-    setMostrarSugerencias, // Necesario para el onFocus del input
+    setMostrarSugerencias,
     handleSearchChange,
     handleSelectAlumno,
     handleDelete
