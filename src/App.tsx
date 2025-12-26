@@ -5,6 +5,7 @@ import { Home } from "./Pages/Home";
 import { CreateUser } from "./Pages/CreateUser";
 import { Profile } from "./Pages/Profile";
 import { MyRoutines } from "./Pages/MyRoutines";
+import { DeleteRoutine } from "./Pages/DeleteRoutine";
 
 function App() {
   return (
@@ -31,6 +32,10 @@ function App() {
 
         {/* Ruta para Mis Rutinas */}
         <Route path="/my-routines" element={<MyRoutines />} />
+
+        {/* Ruta para Eliminar Rutina */}
+        <Route path="/delete-routine" element={<DeleteRoutine />} />
+        
       </Routes>
     </BrowserRouter>
   );
