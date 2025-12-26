@@ -2,19 +2,24 @@ import React from "react";
 
 interface CardProps {
   children: React.ReactNode;
-  title?: string; // Título opcional de la tarjeta
-  className?: string; // Para agregar clases extra si hace falta
+  title?: string; 
+  className?: string; 
   onClick?: () => void;
 }
 
 export const Card = ({ children, title, className = "", onClick }: CardProps) => {
   const isInteractive = !!onClick;
   
+  const defaultStyles = className.includes("bg-") 
+    ? "" // Si trae color, no ponemos nada base
+    : "bg-white border-gray-100"; // Si no trae, ponemos blanco y borde gris
+
   return (
     <div 
       onClick={onClick}
       className={`
-        bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden
+        rounded-xl shadow-lg border overflow-hidden
+        ${defaultStyles}
         ${isInteractive ? "cursor-pointer hover:shadow-2xl transition duration-300 transform hover:-translate-y-1" : ""}
         ${className}
       `}
