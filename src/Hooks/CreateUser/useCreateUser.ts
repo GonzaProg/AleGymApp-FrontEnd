@@ -1,12 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../API/axios"; 
 
 export const useCreateUser = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
   
-  // Obtenemos el usuario actual para saber si es Admin
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdmin = currentUser.rol === "Admin";
 
@@ -17,10 +15,9 @@ export const useCreateUser = () => {
     nombreUsuario: "",
     email: "",
     contraseña: "",
-    rol: "Alumno" // Por defecto creamos Alumnos
+    rol: "Alumno"
   });
 
-  // Manejador genérico para inputs y selects
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
@@ -29,7 +26,6 @@ export const useCreateUser = () => {
   };
 
   const handleSubmit = async () => {
-    // Validación simple
     if (!formData.email || !formData.contraseña || !formData.nombreUsuario) {
       return alert("Por favor completa los campos obligatorios");
     }
@@ -37,17 +33,14 @@ export const useCreateUser = () => {
     try {
       let url = "";
       
-      // Lógica para decidir a qué endpoint llamar
+      // Usamos rutas relativas
       if (formData.rol === "Entrenador") {
-        url = "http://localhost:3000/api/auth/crear-entrenador";
+        url = "/api/auth/crear-entrenador";
       } else {
-        // Asumimos que es Alumno
-        url = "http://localhost:3000/api/auth/register";
+        url = "/api/auth/register";
       }
 
-      await axios.post(url, formData, {
-        headers: { Authorization: `Bearer ${token}` } // Importante para crear entrenadores
-      });
+      await api.post(url, formData);
 
       alert(`Usuario ${formData.nombreUsuario} creado con éxito!`);
       navigate("/home");
@@ -57,7 +50,6 @@ export const useCreateUser = () => {
     }
   };
 
-  // Función para cancelar y volver
   const handleCancel = () => navigate("/home");
 
   return {

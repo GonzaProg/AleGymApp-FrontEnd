@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../API/axios"; 
 
 export const useCreateRoutine = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  // El token lo maneja axios internamente ahora
 
   // --- DATOS ---
   const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
@@ -32,19 +32,18 @@ export const useCreateRoutine = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        
-        const resEjercicios = await axios.get("http://localhost:3000/api/ejercicios", config);
+        // Peticiones limpias
+        const resEjercicios = await api.get("/api/ejercicios");
         setEjercicios(resEjercicios.data);
 
-        const resAlumnos = await axios.get("http://localhost:3000/api/users/alumnos", config);
+        const resAlumnos = await api.get("/api/users/alumnos");
         setTodosLosAlumnos(resAlumnos.data);
       } catch (error) {
         console.error("Error cargando datos", error);
       }
     };
     fetchData();
-  }, [token]);
+  }, []);
 
   // 2. LOGICA DEL BUSCADOR
   const handleSearchChange = (text: string) => {
@@ -69,7 +68,7 @@ export const useCreateRoutine = () => {
     setMostrarSugerencias(false);
   };
 
-  // 3. LOGICA DE INPUTS (Validaciones de negativos en tiempo real)
+  // 3. LOGICA DE INPUTS
   const handleSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value);
     if (val < 0) return;
@@ -100,7 +99,6 @@ export const useCreateRoutine = () => {
     }
     if (isNaN(pesoFinal)) return alert("El peso debe ser un número válido");
 
-    // VALIDACIÓN HULK
     if (pesoFinal >= 1000) {
       return alert("¿Vas a poder levantar ese Peso? ¿Sos HULK? 🟢💪");
     }
@@ -136,9 +134,7 @@ export const useCreateRoutine = () => {
         detalles
       };
 
-      await axios.post("http://localhost:3000/api/rutinas", body, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post("/api/rutinas", body);
 
       alert("Rutina creada con éxito!");
       navigate("/home");
@@ -147,26 +143,21 @@ export const useCreateRoutine = () => {
     }
   };
 
-  // Retornamos todo lo que la vista necesita
   return {
-    // Datos
     ejercicios,
     busqueda,
     sugerencias,
     mostrarSugerencias,
     nombreRutina,
     detalles,
-    // Inputs del form detalle
     ejercicioId,
     series,
     reps,
     peso,
-    // Setters simples
     setNombreRutina,
     setEjercicioId,
     setMostrarSugerencias,
-    setDetalles, // Para borrar items de la lista
-    // Handlers complejos
+    setDetalles,
     handleSearchChange,
     handleSelectAlumno,
     handleSeriesChange,

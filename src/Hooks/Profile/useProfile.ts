@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../API/axios"; 
 
 export const useProfile = () => {
-  const token = localStorage.getItem("token");
-  // Obtenemos ID del localStorage de forma segura
   const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
   const localId = storedUser.id;
 
@@ -29,7 +27,7 @@ export const useProfile = () => {
     confirmPassword: ""
   });
 
-  // 1. CARGAR DATOS AL INICIAR
+  // 1. CARGAR DATOS
   useEffect(() => {
     if (storedUser) {
       setUserData(storedUser);
@@ -45,12 +43,10 @@ export const useProfile = () => {
   }, []);
 
   // --- HANDLERS PARA INPUTS ---
-  // Helper para actualizar campos del perfil sin escribir lógica en el JSX
   const handleEditChange = (field: string, value: string) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Helper para actualizar campos de password
   const handlePassChange = (field: string, value: string) => {
     setPassForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -70,9 +66,8 @@ export const useProfile = () => {
   // --- GUARDAR PERFIL (DATOS) ---
   const handleSaveProfile = async () => {
     try {
-      const res = await axios.put(`http://localhost:3000/api/users/${localId}`, editForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Usamos api.put
+      const res = await api.put(`/api/users/${localId}`, editForm);
 
       const updatedUser = { ...userData, ...res.data };
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -96,9 +91,8 @@ export const useProfile = () => {
     }
     
     try {
-      await axios.patch(`http://localhost:3000/api/users/${localId}/password`, passForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Usamos api.patch
+      await api.patch(`/api/users/${localId}/password`, passForm);
       
       alert("Contraseña modificada con éxito.");
       setShowPasswordSection(false);
@@ -108,24 +102,20 @@ export const useProfile = () => {
     }
   };
 
-  // Función para cancelar cambio de contraseña y limpiar form
   const handleCancelPassword = () => {
     setShowPasswordSection(false);
     setPassForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
   };
 
   return {
-    // Estados
     loading,
     userData,
     isEditingProfile,
     editForm,
     showPasswordSection,
     passForm,
-    // Setters simples
     setIsEditingProfile,
     setShowPasswordSection,
-    // Handlers
     handleEditChange,
     handlePassChange,
     handleImageUpload,
