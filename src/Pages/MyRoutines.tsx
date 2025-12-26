@@ -12,6 +12,9 @@ export const MyRoutines = () => {
   // ESTADO PARA EL MODAL (Rutina seleccionada)
   const [selectedRoutine, setSelectedRoutine] = useState<any>(null);
 
+  // ESTADO PARA EL VIDEO URL
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchRutinas = async () => {
       try {
@@ -29,8 +32,39 @@ export const MyRoutines = () => {
     if (user.id) fetchRutinas();
   }, [user.id, token]);
 
-  // Función para cerrar el modal (click afuera o botón cerrar)
+  // Función para cerrar el modal de rutina
   const closeModal = () => setSelectedRoutine(null);
+
+  // --- FUNCIÓN MEJORADA PARA DETECTAR YOUTUBE ---
+  const getEmbedUrl = (url: string) => {
+    if (!url) return null;
+    
+    // Expresión regular potente para capturar el ID de:
+    // 1. youtube.com/watch?v=ID
+    // 2. youtube.com/shorts/ID  <-- (Muy importante para demos de gym)
+    // 3. youtu.be/ID
+    // 4. youtube.com/embed/ID
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+    const match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+      const videoId = match[2];
+      // Retornamos el link de embed con autoplay y bucle
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1`;
+    }
+
+    return null; 
+  };
+
+  const handleOpenVideo = (url: string) => {
+    const embed = getEmbedUrl(url);
+    if (embed) {
+      setVideoUrl(embed);
+    } else {
+      // Solo si NO es youtube lo abrimos afuera (ej: link de drive)
+      window.open(url, "_blank");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 pb-10">
@@ -53,28 +87,26 @@ export const MyRoutines = () => {
             {rutinas.map((rutina) => (
               <div 
                 key={rutina.id} 
-                onClick={() => setSelectedRoutine(rutina)} // <--- ABRIR MODAL
+                onClick={() => setSelectedRoutine(rutina)}
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300 border border-gray-100 cursor-pointer transform hover:-translate-y-1"
               >
                 <div className="bg-green-600 p-4 text-white">
                   <h3 className="text-xl font-bold truncate">{rutina.nombreRutina}</h3>
                   <div className="flex justify-between text-xs mt-1 text-green-100">
-                    {/* Aquí ahora se verá el nombre real gracias al backend fix */}
                     <span>Profe: {rutina.entrenador}</span> 
                     <span>{new Date(rutina.fechaCreacion).toLocaleDateString()}</span>
                   </div>
                 </div>
                 
-                {/* Previsualización rápida (solo 2 o 3 ejercicios) */}
                 <div className="p-4">
                   <p className="text-sm text-gray-500 mb-2 font-bold">Resumen:</p>
                   {rutina.detalles && rutina.detalles.length > 0 ? (
                     <ul className="space-y-2">
                       {rutina.detalles.slice(0, 3).map((d: any, i: number) => (
-                         <li key={i} className="text-sm text-gray-700 flex justify-between">
-                            <span>• {d.ejercicio.nombre}</span>
-                            <span className="text-gray-400 text-xs">{d.series}x{d.repeticiones}</span>
-                         </li>
+                          <li key={i} className="text-sm text-gray-700 flex justify-between">
+                             <span>• {d.ejercicio.nombre}</span>
+                             <span className="text-gray-400 text-xs">{d.series}x{d.repeticiones}</span>
+                          </li>
                       ))}
                       {rutina.detalles.length > 3 && (
                         <li className="text-xs text-green-600 font-bold mt-2 text-center">
@@ -96,14 +128,12 @@ export const MyRoutines = () => {
         )}
       </div>
 
-      {/* === MODAL DE PANTALLA COMPLETA === */}
+      {/* === MODAL DE RUTINA (PANTALLA COMPLETA) === */}
       {selectedRoutine && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black bg-opacity-60 backdrop-blur-sm animate-fade-in">
           
-          {/* Contenedor del Modal */}
           <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             
-            {/* Cabecera Modal */}
             <div className="bg-green-700 p-6 text-white flex justify-between items-start">
               <div>
                 <h2 className="text-3xl font-bold">{selectedRoutine.nombreRutina}</h2>
@@ -122,7 +152,6 @@ export const MyRoutines = () => {
               </button>
             </div>
 
-            {/* Cuerpo Modal (Scrollable) */}
             <div className="p-6 overflow-y-auto bg-gray-50 flex-1">
               <h3 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Plan de Entrenamiento</h3>
               
@@ -131,20 +160,24 @@ export const MyRoutines = () => {
                   {selectedRoutine.detalles.map((detalle: any, index: number) => (
                     <div key={index} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
                       
-                      {/* Información del Ejercicio */}
+                      {/* Info Ejercicio */}
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                            <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">#{index + 1}</span>
                            <h4 className="text-lg font-bold text-gray-800">{detalle.ejercicio.nombre}</h4>
                         </div>
+                        {/* Botón Ver Demostración */}
                         {detalle.ejercicio.urlVideo && (
-                           <a href={detalle.ejercicio.urlVideo} target="_blank" rel="noreferrer" className="text-blue-500 text-xs hover:underline">
-                             🎥 Ver Video Explicativo
-                           </a>
+                           <button 
+                             onClick={() => handleOpenVideo(detalle.ejercicio.urlVideo)}
+                             className="text-blue-600 text-sm font-bold flex items-center gap-1 hover:underline mt-1 bg-blue-50 px-2 py-1 rounded"
+                           >
+                             ▶ Ver Demostración
+                           </button>
                         )}
                       </div>
 
-                      {/* Detalles Númericos (Series, Reps, Peso) */}
+                      {/* Datos Numéricos */}
                       <div className="flex gap-4 text-center">
                         <div className="bg-gray-100 p-2 rounded w-20">
                           <p className="text-xs text-gray-500 uppercase font-bold">Series</p>
@@ -168,7 +201,6 @@ export const MyRoutines = () => {
               )}
             </div>
 
-            {/* Pie del Modal */}
             <div className="p-4 bg-white border-t flex justify-end">
               <button 
                 onClick={closeModal}
@@ -177,10 +209,40 @@ export const MyRoutines = () => {
                 Cerrar
               </button>
             </div>
-
           </div>
         </div>
       )}
+
+      {/* === MODAL DE VIDEO === */}
+      {videoUrl && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center animate-fade-in">
+          
+          {/* Botón Cerrar Video */}
+          <button 
+            onClick={() => setVideoUrl(null)}
+            className="absolute top-5 right-5 text-white bg-gray-800 bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center hover:bg-red-600 transition"
+          >
+            <span className="text-2xl font-bold">&times;</span>
+          </button>
+
+          {/* Reproductor Responsive */}
+          <div className="w-full max-w-5xl aspect-video px-4">
+             <iframe 
+               src={videoUrl} 
+               title="Demostración"
+               className="w-full h-full rounded-xl shadow-2xl border-4 border-gray-800"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+               allowFullScreen
+             ></iframe>
+          </div>
+          
+          <p className="text-gray-400 mt-4 text-sm animate-pulse">
+            Toca la X arriba a la derecha para volver a la rutina
+          </p>
+
+        </div>
+      )}
+
     </div>
   );
 };
