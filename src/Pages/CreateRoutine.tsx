@@ -20,7 +20,7 @@ export const CreateRoutine = () => {
         
         {/* COLUMNA 1: Datos y Buscador */}
         <Card title="1. Datos Generales">
-          <Input label="Nombre de Rutina" value={nombreRutina} onChange={e => setNombreRutina(e.target.value)} placeholder="Ej: Hipertrofia..." />
+          <Input label="Nombre de Rutina" value={nombreRutina} onChange={e => setNombreRutina(e.target.value)} placeholder="Ej: Lunes: Pecho, Triceps, Hombros" />
           
           <div className="relative">
             <Input 

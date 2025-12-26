@@ -2,23 +2,29 @@ import React from "react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLSelectElement> {
   label?: string;
-  as?: "input" | "select"; // Para reutilizar estilos en selects
-  children?: React.ReactNode; // Para las opciones del select
+  as?: "input" | "select";
+  children?: React.ReactNode;
 }
 
 export const Input = ({ label, as = "input", className = "", children, ...props }: InputProps) => {
-  const inputStyles = "w-full border p-2 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none transition bg-white";
+  // Quitamos 'bg-white' de los estilos base para poder controlarlo desde fuera
+  const baseStyles = "w-full border p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none transition";
+  // Si no viene ninguna clase de fondo externa, usamos bg-white por defecto (para el resto de la app)
+  const defaultBg = className.includes("bg-") ? "" : "bg-white text-gray-800 border-gray-300";
+
+  const finalStyles = `${baseStyles} ${defaultBg} ${className}`;
 
   return (
-    <div className={`mb-4 ${className}`}>
-      {label && <label className="block text-sm font-bold text-gray-600 uppercase tracking-wide">{label}</label>}
+    <div className="mb-4">
+      {/* El label ahora se controla desde fuera en el Login, pero lo dejamos aquí por compatibilidad */}
+      {label && !className.includes("bg-") && <label className="block text-sm font-bold text-gray-600 uppercase tracking-wide">{label}</label>}
       
       {as === "select" ? (
-        <select className={inputStyles} {...(props as any)}>
+        <select className={finalStyles} {...(props as any)}>
           {children}
         </select>
       ) : (
-        <input className={inputStyles} {...props} />
+        <input className={finalStyles} {...props} />
       )}
     </div>
   );
