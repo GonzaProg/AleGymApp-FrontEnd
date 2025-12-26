@@ -1,64 +1,58 @@
-import { useNavigate } from "react-router-dom";
-import { Navbar } from "../Components/Navbar";
+import { useHome } from "../Hooks/Home/useHome";
+import { PageLayout } from "../Components/UI/PageLayout";
+import { Card } from "../Components/UI/Card";
 
 export const Home = () => {
-  const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const isEntrenador = user.rol === "Entrenador" || user.rol === "Admin";
+  const { user, isEntrenador, goToMyRoutines, goToCreateRoutine, goToDeleteRoutine, goToCreateUser } = useHome();
+
+  // Estilo base para las tarjetas de acción (Botones gigantes de colores)
+  const actionCardStyle = "p-6 rounded-lg shadow-md transition cursor-pointer hover:shadow-lg transform hover:-translate-y-1";
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      
-      <div className="container mx-auto p-4 mt-10">
-        <h1 className="text-3xl font-bold text-gray-800">Hola, {user.nombre} 👋</h1>
-        <p className="text-gray-600 mt-2">Bienvenido a tu panel de control.</p>
+    <PageLayout>
+      <h1 className="text-3xl font-bold text-gray-800">Hola, {user.nombre} 👋</h1>
+      <p className="text-gray-600 mt-2 mb-8">Bienvenido a tu panel de control.</p>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Tarjeta: Mis Rutinas (Para todos) */}
-          <div 
-          onClick={() => navigate("/my-routines")}
-          className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer border-l-4 border-green-500">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* === CAMBIO AQUÍ: Ocultar si es Entrenador === */}
+        {/* Solo mostramos "Mis Rutinas" si NO es entrenador (es decir, es Alumno) */}
+        {!isEntrenador && (
+          <Card onClick={goToMyRoutines} className="border-l-4 border-green-500 hover:shadow-xl transition cursor-pointer">
             <h3 className="text-xl font-bold mb-2">Mis Rutinas</h3>
             <p className="text-gray-500 text-sm">Ver las rutinas asignadas</p>
-          </div>
+          </Card>
+        )}
 
-          {/* Tarjeta: Crear Rutina (Solo Entrenadores) */}
-          {isEntrenador && (
+        {/* Tarjetas de Acción (Solo visibles para Entrenadores y Admins) */}
+        {isEntrenador && (
+          <>
             <div 
-              onClick={() => navigate("/create-routine")}
-              className="bg-green-600 text-white p-6 rounded-lg shadow-md hover:bg-green-700 transition cursor-pointer"
+              onClick={goToCreateRoutine}
+              className={`${actionCardStyle} bg-green-600 text-white hover:bg-green-700`}
             >
               <h3 className="text-xl font-bold mb-2">+ Crear Nueva Rutina</h3>
               <p className="text-green-100 text-sm">Asignar ejercicios a un alumno.</p>
             </div>
-          )}
 
-          {/* ELIMINAR RUTINA (Solo Entrenador) */}
-          {isEntrenador && (
             <div 
-              onClick={() => navigate("/delete-routine")}
-              className="bg-red-500 text-white p-6 rounded-lg shadow-md hover:bg-red-600 transition cursor-pointer"
+              onClick={goToDeleteRoutine}
+              className={`${actionCardStyle} bg-red-500 text-white hover:bg-red-600`}
             >
               <h3 className="text-xl font-bold mb-2">🗑️ Borrar Rutina</h3>
-              <p className="text-red-100 text-sm">Buscar un alumno y eliminar rutinas antiguas.</p>
+              <p className="text-red-100 text-sm">Buscar un alumno y eliminar rutinas.</p>
             </div>
-          )}
 
-          {/* Tarjeta: REGISTRAR USUARIO (Visible para Entrenador y Admin) */}
-          {isEntrenador && (
             <div 
-              onClick={() => navigate("/create-user")}
-              className="bg-blue-600 text-white p-6 rounded-lg shadow-md hover:bg-blue-700 transition cursor-pointer"
+              onClick={goToCreateUser}
+              className={`${actionCardStyle} bg-blue-600 text-white hover:bg-blue-700`}
             >
               <h3 className="text-xl font-bold mb-2">👤 Nuevo Usuario</h3>
-              <p className="text-blue-100 text-sm">Registrar un nuevo Usuario en el sistema.</p>
+              <p className="text-blue-100 text-sm">Registrar un nuevo Usuario.</p>
             </div>
-          )}
-
-        </div>
+          </>
+        )}
       </div>
-    </div>
+    </PageLayout>
   );
 };

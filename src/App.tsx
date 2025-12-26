@@ -17,8 +17,7 @@ function App() {
         {/* Ruta del Login */}
         <Route path="/login" element={<Login />} />
 
-        {/* Ruta Home (Placeholder para cuando loguees) */}
-        {/*<Route path="/home" element={<h1 className="text-center mt-10 text-2xl">¡Bienvenido al Gimnasio!</h1>} />*/}
+        {/* Ruta Home */}
         <Route path="/home" element={<Home />} />
         
         {/* Ruta para Crear Rutina */}

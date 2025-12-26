@@ -55,7 +55,7 @@ export const Navbar = () => {
 
             {/* 2. Texto (Oculto en celular muy pequeño, visible en demás) */}
             <div className="hidden sm:block text-right">
-              <p className="text-sm font-bold leading-tight">{user.nombre}</p>
+              <p className="text-sm font-bold leading-tight">{user.nombreUsuario}</p>
               <p className="text-xs text-green-200">{user.rol}</p>
             </div>
           </div>
