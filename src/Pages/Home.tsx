@@ -6,14 +6,14 @@ import fondoGym from "../assets/GymFondo.jpg";
 export const Home = () => {
   const { user, isEntrenador, goToMyRoutines, goToCreateRoutine, goToDeleteRoutine, goToCreateUser } = useHome();
 
-  // NUEVO ESTILO MÁS TRANSPARENTE Y BORROSO
+  // ESTILO MÁS TRANSPARENTE Y BORROSO
   // bg-opacity-70, backdrop-blur-md, borde sutil
   const actionCardStyle = "p-6 rounded-lg shadow-lg transition cursor-pointer hover:shadow-2xl transform hover:-translate-y-1 backdrop-blur-md border border-white/30";
 
   return (
     <PageLayout backgroundImage={fondoGym}>
       
-      <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+      <h1 style={{marginTop:"90px"}}className="text-4xl font-bold text-white drop-shadow-lg">
         Hola, {user.nombre} 👋
       </h1>
       <p className="text-gray-100 mt-2 mb-8 text-lg drop-shadow-md">
@@ -22,7 +22,6 @@ export const Home = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Mis Rutinas (Alumno) - También la hacemos un poco transparente */}
         {!isEntrenador && (
           <Card onClick={goToMyRoutines} className="border-l-4 border-green-500 hover:shadow-xl transition cursor-pointer bg-white/70 backdrop-blur-sm">
             <h3 className="text-xl font-bold mb-2 text-gray-800">Mis Rutinas</h3>
