@@ -1,30 +1,47 @@
-import React from "react";
+import React from 'react';
 
+// Definimos los tipos para que acepte propiedades tanto de input como de select
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLSelectElement> {
   label?: string;
-  as?: "input" | "select";
-  children?: React.ReactNode;
+  labelClassName?: string;
+  as?: "input" | "select" | "textarea"; // Propiedad para decirle qué ser
+  children?: React.ReactNode; // Necesario para poner las <option> dentro del select
 }
 
-export const Input = ({ label, as = "input", className = "", children, ...props }: InputProps) => {
-  // Quitamos 'bg-white' de los estilos base para poder controlarlo desde fuera
-  const baseStyles = "w-full border p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none transition";
-  // Si no viene ninguna clase de fondo externa, usamos bg-white por defecto (para el resto de la app)
-  const defaultBg = className.includes("bg-") ? "" : "bg-white text-gray-800 border-gray-300";
+export const Input = ({ 
+  label, 
+  labelClassName = "", 
+  className = "", 
+  as = "input", // Por defecto se comporta como input normal
+  children,
+  ...props 
+}: InputProps) => {
 
-  const finalStyles = `${baseStyles} ${defaultBg} ${className}`;
+  // Estilos base compartidos
+  const baseClasses = `w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all ${className}`;
 
   return (
-    <div className="mb-4">
-      {/* El label ahora se controla desde fuera en el Login, pero lo dejamos aquí por compatibilidad */}
-      {label && !className.includes("bg-") && <label className="block text-sm font-bold text-gray-600 uppercase tracking-wide">{label}</label>}
-      
+    <div className="w-full">
+      {label && (
+        <label className={`block mb-1 text-sm font-bold ${labelClassName || "text-gray-700"}`}>
+          {label}
+        </label>
+      )}
+
+      {/* LÓGICA CONDICIONAL: Si as="select", renderiza un menú desplegable */}
       {as === "select" ? (
-        <select className={finalStyles} {...(props as any)}>
+        <select 
+          className={baseClasses}
+          {...(props as any)} // "as any" evita conflictos estrictos de TypeScript entre input/select
+        >
           {children}
         </select>
       ) : (
-        <input className={finalStyles} {...props} />
+        // Si no, renderiza el input de texto normal
+        <input
+          className={baseClasses}
+          {...(props as any)}
+        />
       )}
     </div>
   );
