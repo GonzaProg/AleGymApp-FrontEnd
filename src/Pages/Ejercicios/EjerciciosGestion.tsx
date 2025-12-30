@@ -1,71 +1,30 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EjerciciosApi } from '../../API/Ejercicios/EjerciciosApi';
 import { Navbar } from '../../Components/Navbar';
 import fondoGym from '../../assets/Fondo-CreateRoutine.png';
-
-interface Ejercicio {
-    id: number;
-    nombre: string;
-    urlVideo?: string;
-}
+import { useEjerciciosGestion } from '../../Hooks/Ejercicios/useEjerciciosGestion';
 
 export const EjerciciosGestion = () => {
     const navigate = useNavigate();
-    const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
-    const [loading, setLoading] = useState(true);
     
-    // Edición Inline
-    const [editId, setEditId] = useState<number | null>(null);
-    const [editForm, setEditForm] = useState({ nombre: '', urlVideo: '' });
+    // --- USAMOS EL HOOK AQUÍ ---
+    // Toda la lógica y estados vienen de useEjerciciosCrud
+    const { 
+        ejercicios, 
+        loading, 
+        editingId, 
+        editForm, 
+        handleDelete, 
+        startEdit, 
+        cancelEdit, 
+        saveEdit, 
+        handleEditInputChange 
+    } = useEjerciciosGestion();
 
-    // Estilos de Inputs para Edición (Más pequeños)
+    // Estilos de Inputs para Edición
     const editInputClass = "bg-black/50 border border-green-500/50 text-white text-sm p-2 rounded w-full focus:outline-none";
-
-    const fetchEjercicios = async () => {
-        try {
-            const data = await EjerciciosApi.getAll();
-            setEjercicios(data);
-        } catch (error) {
-            console.error("Error", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchEjercicios();
-    }, []);
-
-    // --- LÓGICA CRUD ---
-    const handleDelete = async (id: number) => {
-        if(!window.confirm("¿Estás seguro de eliminar este ejercicio?")) return;
-        try {
-            await EjerciciosApi.delete(id);
-            setEjercicios(prev => prev.filter(e => e.id !== id));
-        } catch (error) {
-            alert("Error al eliminar");
-        }
-    };
-
-    const startEdit = (ejercicio: Ejercicio) => {
-        setEditId(ejercicio.id);
-        setEditForm({ nombre: ejercicio.nombre, urlVideo: ejercicio.urlVideo || '' });
-    };
-
-    const saveEdit = async (id: number) => {
-        try {
-            const actualizado = await EjerciciosApi.update(id, editForm);
-            setEjercicios(prev => prev.map(e => (e.id === id ? actualizado : e)));
-            setEditId(null);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Error al actualizar");
-        }
-    };
 
     return (
         <div className="relative min-h-screen font-sans bg-gray-900 text-gray-200">
-             {/* --- FONDO FIJO --- */}
              <div
                 className="fixed inset-0 z-0"
                 style={{
@@ -82,7 +41,6 @@ export const EjerciciosGestion = () => {
             <div className="relative z-10 pt-28 pb-10 px-4 w-full flex justify-center">
                 <div className="w-full max-w-6xl space-y-6">
                     
-                    {/* Header: Título y Botón Crear */}
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <h2 className="text-4xl font-black text-white tracking-tight drop-shadow-lg">
                             Gestión <span className="text-green-500">Ejercicios</span>
@@ -95,9 +53,7 @@ export const EjerciciosGestion = () => {
                         </button>
                     </div>
 
-                    {/* Tarjeta Tabla */}
                     <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl overflow-hidden relative">
-                        {/* Decoración */}
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/50 to-green-500/50"></div>
 
                         <div className="overflow-x-auto">
@@ -116,7 +72,7 @@ export const EjerciciosGestion = () => {
                                         <tr><td colSpan={3} className="p-8 text-center text-gray-400">No hay ejercicios registrados.</td></tr>
                                     ) : (
                                         ejercicios.map((ej) => {
-                                            const isEditing = editId === ej.id;
+                                            const isEditing = editingId === ej.id; // Usamos editingId del hook
                                             return (
                                                 <tr key={ej.id} className="hover:bg-white/5 transition-colors group">
                                                     
@@ -125,8 +81,8 @@ export const EjerciciosGestion = () => {
                                                         {isEditing ? (
                                                             <input 
                                                                 className={editInputClass}
-                                                                value={editForm.nombre}
-                                                                onChange={(e) => setEditForm({...editForm, nombre: e.target.value})}
+                                                                value={editForm.nombre} // Usamos editForm del hook
+                                                                onChange={(e) => handleEditInputChange('nombre', e.target.value)}
                                                                 autoFocus
                                                             />
                                                         ) : (
@@ -140,7 +96,7 @@ export const EjerciciosGestion = () => {
                                                             <input 
                                                                 className={editInputClass}
                                                                 value={editForm.urlVideo}
-                                                                onChange={(e) => setEditForm({...editForm, urlVideo: e.target.value})}
+                                                                onChange={(e) => handleEditInputChange('urlVideo', e.target.value)}
                                                                 placeholder="URL del video"
                                                             />
                                                         ) : (
@@ -157,7 +113,7 @@ export const EjerciciosGestion = () => {
                                                         {isEditing ? (
                                                             <>
                                                                 <button onClick={() => saveEdit(ej.id)} className="bg-green-600/20 text-green-500 hover:bg-green-600 hover:text-white px-3 py-1 rounded-lg text-sm border border-green-500/30 transition-all">Guardar</button>
-                                                                <button onClick={() => setEditId(null)} className="bg-gray-700 text-gray-300 hover:bg-gray-600 px-3 py-1 rounded-lg text-sm transition-all">Cancelar</button>
+                                                                <button onClick={cancelEdit} className="bg-gray-700 text-gray-300 hover:bg-gray-600 px-3 py-1 rounded-lg text-sm transition-all">Cancelar</button>
                                                             </>
                                                         ) : (
                                                             <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
@@ -186,6 +142,16 @@ export const EjerciciosGestion = () => {
                             </table>
                         </div>
                     </div>
+                    
+                    <div className="mt-8">
+                        <button 
+                            onClick={() => navigate('/ejercicios')}
+                            className="text-gray-400 hover:text-white flex items-center gap-2 transition-colors text-sm font-bold uppercase tracking-widest"
+                        >
+                            ⬅ Volver al Menú
+                        </button>
+                    </div>
+
                 </div>
             </div>
         </div>

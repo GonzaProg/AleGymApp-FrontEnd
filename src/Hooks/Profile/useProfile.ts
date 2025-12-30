@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
-import api from "../../API/axios"; 
+import { useAuthUser } from "../useAuthUser"; // 1. Hook de Auth
+import { UsuarioApi, type UpdateProfileDTO, type ChangePasswordDTO } from "../../API/Usuarios/UsuarioApi"; // 2. API
 
 export const useProfile = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const localId = storedUser.id;
+  // 1. Obtenemos datos del contexto (Reemplaza el JSON.parse manual)
+  const { currentUser } = useAuthUser();
+  const localId = currentUser?.id;
 
   // --- ESTADOS DE VISTA ---
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<any>(null);
   
   // --- ESTADOS DE EDICIÓN PERFIL ---
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editForm, setEditForm] = useState({
+  
+  // Inicializamos con tipos seguros
+  const [editForm, setEditForm] = useState<UpdateProfileDTO>({
     nombre: "",
     apellido: "",
     nombreUsuario: "",
@@ -27,23 +30,22 @@ export const useProfile = () => {
     confirmPassword: ""
   });
 
-  // 1. CARGAR DATOS
+  // 1. CARGAR DATOS (Cuando currentUser esté listo)
   useEffect(() => {
-    if (storedUser) {
-      setUserData(storedUser);
+    if (currentUser) {
       setEditForm({
-        nombre: storedUser.nombre || "",
-        apellido: storedUser.apellido || "",
-        nombreUsuario: storedUser.nombreUsuario || "",
-        email: storedUser.email || "",
-        fotoPerfil: storedUser.fotoPerfil || ""
+        nombre: currentUser.nombre || "",
+        apellido: currentUser.apellido || "", // Asumiendo que tu interfaz User tiene apellido
+        nombreUsuario: currentUser.nombreUsuario || "", // Asumiendo propiedad
+        email: currentUser.email || "", // Asumiendo propiedad
+        fotoPerfil: currentUser.fotoPerfil || "" // Asumiendo propiedad
       });
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  }, [currentUser]);
 
   // --- HANDLERS PARA INPUTS ---
-  const handleEditChange = (field: string, value: string) => {
+  const handleEditChange = (field: keyof UpdateProfileDTO, value: string) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -63,19 +65,25 @@ export const useProfile = () => {
     }
   };
 
-  // --- GUARDAR PERFIL (DATOS) ---
+  // --- GUARDAR PERFIL ---
   const handleSaveProfile = async () => {
-    try {
-      // Usamos api.put
-      const res = await api.put(`/api/users/${localId}`, editForm);
+    if (!localId) return;
 
-      const updatedUser = { ...userData, ...res.data };
+    try {
+      // 2. Llamada limpia a la API
+      const data = await UsuarioApi.update(localId, editForm);
+
+      // Actualizamos LocalStorage para mantener la sesión sincronizada
+      // (Combinamos los datos viejos con los nuevos que devolvió la API)
+      const updatedUser = { ...currentUser, ...data };
       localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUserData(updatedUser);
+      
       setIsEditingProfile(false);
       
       alert("Datos actualizados correctamente");
+      // Recargamos para que useAuthUser lea los nuevos datos del storage
       window.location.reload(); 
+
     } catch (error: any) {
       alert(error.response?.data?.error || "Error al actualizar");
     }
@@ -83,6 +91,8 @@ export const useProfile = () => {
 
   // --- GUARDAR CONTRASEÑA ---
   const handleChangePassword = async () => {
+    if (!localId) return;
+
     if (!passForm.currentPassword || !passForm.newPassword || !passForm.confirmPassword) {
       return alert("Todos los campos de contraseña son obligatorios");
     }
@@ -91,8 +101,14 @@ export const useProfile = () => {
     }
     
     try {
-      // Usamos api.patch
-      await api.patch(`/api/users/${localId}/password`, passForm);
+      // Preparar DTO
+      const passwordData: ChangePasswordDTO = {
+          currentPassword: passForm.currentPassword,
+          newPassword: passForm.newPassword
+      };
+
+      // 3. Llamada limpia a la API
+      await UsuarioApi.changePassword(localId, passwordData);
       
       alert("Contraseña modificada con éxito.");
       setShowPasswordSection(false);
@@ -109,7 +125,7 @@ export const useProfile = () => {
 
   return {
     loading,
-    userData,
+    userData: currentUser, // Retornamos currentUser directo del contexto
     isEditingProfile,
     editForm,
     showPasswordSection,

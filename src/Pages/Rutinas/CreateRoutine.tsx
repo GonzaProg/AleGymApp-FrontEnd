@@ -1,8 +1,8 @@
-import { useCreateRoutine } from "../Hooks/CreateRoutine/useCreateRoutine";
-import { Navbar } from "../Components/Navbar"; 
-import { Input } from "../Components/UI/Input";
-import { Button } from "../Components/UI/Button";
-import fondoGym from "../assets/Fondo-CreateRoutine.png"; 
+import { useCreateRoutine } from "../../Hooks/CreateRoutine/useCreateRoutine";
+import { Navbar } from "../../Components/Navbar"; 
+import { Input } from "../../Components/UI/Input";
+import { Button } from "../../Components/UI/Button";
+import fondoGym from "../../assets/Fondo-CreateRoutine.png"; 
 
 export const CreateRoutine = () => {
   const {

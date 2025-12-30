@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../API/axios"; 
+// Importamos nuestras APIs limpias
+import { EjerciciosApi } from "../../API/Ejercicios/EjerciciosApi";
+import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
+import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 
 export const useCreateRoutine = () => {
   const navigate = useNavigate();
-  // El token lo maneja axios internamente ahora
 
   // --- DATOS ---
   const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
@@ -28,16 +30,16 @@ export const useCreateRoutine = () => {
   // --- LISTA FINAL ---
   const [detalles, setDetalles] = useState<any[]>([]);
 
-  // 1. CARGAR DATOS INICIALES
+  // 1. CARGAR DATOS INICIALES (Ahora usando APIs)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Peticiones limpias
-        const resEjercicios = await api.get("/api/ejercicios");
-        setEjercicios(resEjercicios.data);
+        // Llamadas limpias sin rutas hardcodeadas
+        const dataEjercicios = await EjerciciosApi.getAll();
+        setEjercicios(dataEjercicios);
 
-        const resAlumnos = await api.get("/api/users/alumnos");
-        setTodosLosAlumnos(resAlumnos.data);
+        const dataAlumnos = await UsuarioApi.getAlumnos();
+        setTodosLosAlumnos(dataAlumnos);
       } catch (error) {
         console.error("Error cargando datos", error);
       }
@@ -45,11 +47,11 @@ export const useCreateRoutine = () => {
     fetchData();
   }, []);
 
-  // 2. LOGICA DEL BUSCADOR
+  // 2. LOGICA DEL BUSCADOR (Sin cambios)
   const handleSearchChange = (text: string) => {
     setBusqueda(text);
     if (text.length > 0) {
-      const filtrados = todosLosAlumnos.filter(alumno => {
+      const filtrados = todosLosAlumnos.filter((alumno) => {
         const nombreCompleto = `${alumno.nombre} ${alumno.apellido}`.toLowerCase();
         return nombreCompleto.includes(text.toLowerCase());
       });
@@ -68,7 +70,7 @@ export const useCreateRoutine = () => {
     setMostrarSugerencias(false);
   };
 
-  // 3. LOGICA DE INPUTS
+  // 3. LOGICA DE INPUTS (Sin cambios)
   const handleSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value);
     if (val < 0) return;
@@ -86,11 +88,11 @@ export const useCreateRoutine = () => {
     setPeso(e.target.value);
   };
 
-  // 4. AGREGAR EJERCICIO A LISTA
+  // 4. AGREGAR EJERCICIO (Sin cambios)
   const handleAddExercise = () => {
     if (!ejercicioId) return alert("Selecciona un ejercicio");
 
-    const pesoFinal = parseFloat(peso.toString().replace(',', '.'));
+    const pesoFinal = parseFloat(peso.toString().replace(",", "."));
     const seriesFinal = parseInt(series.toString());
     const repsFinal = parseInt(reps.toString());
 
@@ -103,25 +105,23 @@ export const useCreateRoutine = () => {
       return alert("¿Vas a poder levantar ese Peso? ¿Sos HULK? 🟢💪");
     }
 
-    const ejercicioNombre = ejercicios.find(e => e.id === parseInt(ejercicioId))?.nombre;
+    const ejercicioNombre = ejercicios.find((e) => e.id === parseInt(ejercicioId))?.nombre;
 
     const nuevoDetalle = {
       ejercicioId: parseInt(ejercicioId),
       nombreEjercicio: ejercicioNombre,
       series: seriesFinal,
       repeticiones: repsFinal,
-      peso: pesoFinal
+      peso: pesoFinal,
     };
 
     setDetalles([...detalles, nuevoDetalle]);
-    
-    // Reset inputs
     setSeries(4);
     setReps(10);
     setPeso("");
   };
 
-  // 5. GUARDAR EN BACKEND
+  // 5. GUARDAR EN BACKEND (Ahora usando RutinasApi)
   const handleSubmit = async () => {
     if (!alumnoId || !nombreRutina || detalles.length === 0) {
       return alert("Completa todos los datos y agrega al menos un ejercicio");
@@ -131,15 +131,18 @@ export const useCreateRoutine = () => {
       const body = {
         usuarioAlumnoId: parseInt(alumnoId),
         nombreRutina,
-        detalles
+        detalles,
       };
 
-      await api.post("/api/rutinas", body);
+      // Llamada limpia
+      await RutinasApi.create(body);
 
       alert("Rutina creada con éxito!");
       navigate("/home");
     } catch (error: any) {
-      alert(error.response?.data?.error || "Error al crear rutina");
+      // Manejo de error mejorado
+      const msg = error.response?.data?.error || error.response?.data?.message || "Error al crear rutina";
+      alert(msg);
     }
   };
 
@@ -164,6 +167,6 @@ export const useCreateRoutine = () => {
     handleRepsChange,
     handlePesoChange,
     handleAddExercise,
-    handleSubmit
+    handleSubmit,
   };
 };

@@ -1,13 +1,33 @@
-import { useProfile } from "../Hooks/Profile/useProfile";
-import { Navbar } from "../Components/Navbar";
-import { Input } from "../Components/UI/Input";
-import { Button } from "../Components/UI/Button";
-import fondoPerfil from "../assets/Fondo-Perfil.png";
+import { useProfile } from "../../Hooks/Profile/useProfile";
+import { Navbar } from "../../Components/Navbar";
+import { Input } from "../../Components/UI/Input";
+import { Button } from "../../Components/UI/Button";
+import fondoPerfil from "../../assets/Fondo-Perfil.png";
 
 export const Profile = () => {
-  const { loading, userData, isEditingProfile, editForm, showPasswordSection, passForm, setIsEditingProfile, setShowPasswordSection, handleEditChange, handlePassChange, handleImageUpload, handleSaveProfile, handleChangePassword, handleCancelPassword } = useProfile();
+  const { 
+    loading, 
+    userData, // Esto puede ser null
+    isEditingProfile, 
+    editForm, 
+    showPasswordSection, 
+    passForm, 
+    setIsEditingProfile, 
+    setShowPasswordSection, 
+    handleEditChange, 
+    handlePassChange, 
+    handleImageUpload, 
+    handleSaveProfile, 
+    handleChangePassword, 
+    handleCancelPassword 
+  } = useProfile();
 
+  // 1. Loading State
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-300">Cargando...</div>;
+
+  // 2. Error/Empty State (SI YA CARGÓ PERO userData SIGUE SIENDO NULL)
+  // Esto soluciona el error de TypeScript porque si pasa este punto, userData existe.
+  if (!userData) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-red-400">Error: No se pudo cargar el usuario.</div>;
 
   return (
     <div className="relative min-h-screen font-sans bg-gray-900 text-gray-200">
@@ -29,7 +49,6 @@ export const Profile = () => {
       {/* --- CONTENEDOR PRINCIPAL --- */}
       <div style={{marginTop:"20px"}} className="relative z-10 pt-28 pb-10 px-4 w-full flex justify-center">
         
-        {/* max-w-2xl (antes era lg) */}
         <div className="w-full max-w-2xl space-y-8">
 
           {/* --- CARD PERFIL --- */}
@@ -41,10 +60,15 @@ export const Profile = () => {
               
               <div className="relative flex justify-center -mt-20 mb-6">
                 <div className="w-32 h-32 rounded-full border-[6px] border-gray-800 bg-gray-700 shadow-2xl overflow-hidden relative group z-10">
-                  {userData?.fotoPerfil || editForm.fotoPerfil ? (
+                  
+                  {/* Aquí usamos Optional Chaining (?.) por seguridad extra */}
+                  {userData.fotoPerfil || editForm.fotoPerfil ? (
                     <img src={isEditingProfile ? editForm.fotoPerfil : userData.fotoPerfil} alt="Perfil" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-6xl text-gray-400 font-bold">{userData?.nombre?.charAt(0)}</div>
+                    <div className="w-full h-full flex items-center justify-center text-6xl text-gray-400 font-bold">
+                        {/* userData ya está garantizado no null por el if de arriba */}
+                        {userData.nombre?.charAt(0)}
+                    </div>
                   )}
 
                   {isEditingProfile && (
@@ -99,6 +123,7 @@ export const Profile = () => {
           </div>
 
           {/* --- CARD SEGURIDAD --- */}
+          {/* El resto del código sigue igual, userData ya es seguro de usar */}
           <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-8">
             {!showPasswordSection ? (
               <div className="flex justify-between items-center">

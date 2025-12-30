@@ -1,7 +1,7 @@
-import { useMyRoutines } from "../Hooks/MyRoutines/useMyRoutines";
-import { Navbar } from "../Components/Navbar"; 
-import { Button } from "../Components/UI/Button";
-import fondoGym from "../assets/Fondo-MyRoutines.png"; 
+import { useMyRoutines } from "../../Hooks/MyRoutines/useMyRoutines";
+import { Navbar } from "../../Components/Navbar"; 
+import { Button } from "../../Components/UI/Button";
+import fondoGym from "../../assets/Fondo-MyRoutines.png"; 
 
 export const MyRoutines = () => {
   const { rutinas, loading, selectedRoutine, setSelectedRoutine, videoUrl, closeModal, closeVideo, handleOpenVideo } = useMyRoutines();

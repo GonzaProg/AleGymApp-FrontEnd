@@ -1,8 +1,8 @@
-import { useDeleteRoutine } from "../Hooks/DeleteRoutine/useDeleteRoutine";
-import { Navbar } from "../Components/Navbar"; 
-import { Input } from "../Components/UI/Input";
-import { Button } from "../Components/UI/Button";
-import fondoGym from "../assets/Fondo-DeleteRoutine.png"; 
+import { useDeleteRoutine } from "../../Hooks/DeleteRoutine/useDeleteRoutine";
+import { Navbar } from "../../Components/Navbar"; 
+import { Input } from "../../Components/UI/Input";
+import { Button } from "../../Components/UI/Button";
+import fondoGym from "../../assets/Fondo-DeleteRoutine.png"; 
 
 export const DeleteRoutine = () => {
   const { busqueda, sugerencias, mostrarSugerencias, alumnoSeleccionado, rutinas, setMostrarSugerencias, handleSearchChange, handleSelectAlumno, handleDelete } = useDeleteRoutine();

@@ -1,8 +1,8 @@
-import { useCreateUser } from "../Hooks/CreateUser/useCreateUser";
-import { Navbar } from "../Components/Navbar"; // Asumo que tienes este componente basado en el ejemplo anterior
-import { Input } from "../Components/UI/Input";
-import { Button } from "../Components/UI/Button";
-import fondoUser from "../assets/Fondo-CreateUser.png"; // Importamos la nueva imagen
+import { useCreateUser } from "../../Hooks/CreateUser/useCreateUser";
+import { Navbar } from "../../Components/Navbar"; // Asumo que tienes este componente basado en el ejemplo anterior
+import { Input } from "../../Components/UI/Input";
+import { Button } from "../../Components/UI/Button";
+import fondoUser from "../../assets/Fondo-CreateUser.png"; // Importamos la nueva imagen
 
 export const CreateUser = () => {
   const { formData, isAdmin, handleChange, handleSubmit, handleCancel } = useCreateUser();

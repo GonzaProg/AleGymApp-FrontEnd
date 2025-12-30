@@ -1,35 +1,22 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { EjerciciosApi } from '../../API/Ejercicios/EjerciciosApi';
-import { Navbar } from '../../Components/Navbar'; // Asegúrate de importar tu Navbar
-import fondoGym from '../../assets/Fondo-CreateRoutine.png'; // Usamos el mismo fondo que tu referencia
+import { Navbar } from '../../Components/Navbar';
+import fondoGym from '../../assets/Fondo-CreateRoutine.png';
+import { useEjerciciosCrear } from '../../Hooks/Ejercicios/useEjerciciosCrear'; 
 
 export const EjerciciosCrear = () => {
-    const navigate = useNavigate();
-    const [form, setForm] = useState({ nombre: '', urlVideo: '' });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    
+    const { 
+        form, 
+        loading, 
+        error, 
+        handleInputChange, 
+        handleSubmit, 
+        handleCancel 
+    } = useEjerciciosCrear();
 
-    // --- ESTILOS REUTILIZADOS DEL REFERENTE ---
+    // --- ESTILOS VISUALES ---
     const darkInputClass = "w-full bg-black/30 border border-white/10 text-white focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500";
     const darkLabelClass = "block text-gray-400 text-xs uppercase font-bold tracking-wider mb-2";
     const cardClass = "w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-8 relative overflow-hidden";
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-
-        try {
-            await EjerciciosApi.create(form);
-            navigate('/ejercicios/gestion'); 
-        } catch (err: any) {
-            const msg = err.response?.data?.error || err.message || "Error al crear";
-            setError(msg);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <div className="relative min-h-screen font-sans bg-gray-900 text-gray-200">
@@ -76,10 +63,11 @@ export const EjerciciosCrear = () => {
                                 <label className={darkLabelClass}>Nombre del Ejercicio</label>
                                 <input 
                                     type="text"
+                                    name="nombre" // IMPORTANTE: name coincide con la propiedad del estado
                                     className={darkInputClass}
                                     placeholder="Ej: Press de Banca Plano"
                                     value={form.nombre}
-                                    onChange={e => setForm({...form, nombre: e.target.value})}
+                                    onChange={handleInputChange}
                                     required
                                 />
                             </div>
@@ -88,17 +76,18 @@ export const EjerciciosCrear = () => {
                                 <label className={darkLabelClass}>URL Video (Opcional)</label>
                                 <input 
                                     type="text"
+                                    name="urlVideo" // IMPORTANTE
                                     className={darkInputClass}
                                     placeholder="https://youtube.com/..."
                                     value={form.urlVideo}
-                                    onChange={e => setForm({...form, urlVideo: e.target.value})}
+                                    onChange={handleInputChange}
                                 />
                             </div>
 
                             <div className="pt-4 flex gap-4">
                                 <button 
                                     type="button" 
-                                    onClick={() => navigate(-1)}
+                                    onClick={handleCancel}
                                     className="flex-1 bg-gray-700/50 hover:bg-gray-700 text-gray-300 font-bold py-3 rounded-xl border border-white/5 transition-all"
                                 >
                                     Cancelar
