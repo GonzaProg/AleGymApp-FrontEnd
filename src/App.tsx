@@ -6,6 +6,9 @@ import { CreateUser } from "./Pages/CreateUser";
 import { Profile } from "./Pages/Profile";
 import { MyRoutines } from "./Pages/MyRoutines";
 import { DeleteRoutine } from "./Pages/DeleteRoutine";
+import { EjerciciosPage } from "./Pages/Ejercicios/EjerciciosPage";
+import { EjerciciosCrear } from './Pages/Ejercicios/EjerciciosCrear';
+import { EjerciciosGestion } from './Pages/Ejercicios/EjerciciosGestion';
 
 function App() {
   return (
@@ -34,6 +37,13 @@ function App() {
 
         {/* Ruta para Eliminar Rutina */}
         <Route path="/delete-routine" element={<DeleteRoutine />} />
+
+        {/* Rutas para Ejercicios */}
+        <Route path="/ejercicios" element={<EjerciciosPage/>} />
+        <Route path="/ejercicios/crear" element={<EjerciciosCrear />} />
+        <Route path="/ejercicios/gestion" element={<EjerciciosGestion />} />
+
+
         
       </Routes>
     </BrowserRouter>
