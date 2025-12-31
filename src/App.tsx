@@ -1,11 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "./Pages/Login";
-import { CreateRoutine } from "./Pages/CreateRoutine";
+import { CreateRoutine } from "./Pages/Rutinas/CreateRoutine";
 import { Home } from "./Pages/Home";
-import { CreateUser } from "./Pages/CreateUser";
-import { Profile } from "./Pages/Profile";
-import { MyRoutines } from "./Pages/MyRoutines";
-import { DeleteRoutine } from "./Pages/DeleteRoutine";
+import { CreateUser } from "./Pages/Usuarios/CreateUser";
+import { Profile } from "./Pages/Usuarios/Profile";
+import { MyRoutines } from "./Pages/Rutinas/MyRoutines";
+import { DeleteRoutine } from "./Pages/Rutinas/DeleteRoutine";
+import { EjerciciosPage } from "./Pages/Ejercicios/EjerciciosPage";
+import { EjerciciosCrear } from './Pages/Ejercicios/EjerciciosCrear';
+import { EjerciciosGestion } from './Pages/Ejercicios/EjerciciosGestion';
 
 function App() {
   return (
@@ -34,6 +37,13 @@ function App() {
 
         {/* Ruta para Eliminar Rutina */}
         <Route path="/delete-routine" element={<DeleteRoutine />} />
+
+        {/* Rutas para Ejercicios */}
+        <Route path="/ejercicios" element={<EjerciciosPage/>} />
+        <Route path="/ejercicios/crear" element={<EjerciciosCrear />} />
+        <Route path="/ejercicios/gestion" element={<EjerciciosGestion />} />
+
+
         
       </Routes>
     </BrowserRouter>
