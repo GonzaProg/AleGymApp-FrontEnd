@@ -1,28 +1,38 @@
 import api from '../axios';
 
+export interface Ejercicio {
+    id: number;
+    nombre: string;
+    urlVideo?: string;
+    fechaActualizacion?: Date;
+}
+
+export interface EjercicioDTO {
+    nombre: string;
+    urlVideo?: string;
+}
+
 export const EjerciciosApi = {
     // 1. Obtener todos
-    getAll: async () => {
-        // Axios ya pone la BaseURL y el Token por nosotros
-        const response = await api.get('api/ejercicios'); 
+    getAll: async (): Promise<Ejercicio[]> => {
+        const response = await api.get('/ejercicios'); 
         return response.data;
     },
 
-    // 2. Crear (Admin)
-    create: async (data: { nombre: string; urlVideo?: string }) => {
-        const response = await api.post('api/ejercicios', data);
+    // 2. Crear
+    create: async (data: EjercicioDTO): Promise<Ejercicio> => {
+        const response = await api.post('/ejercicios', data);
         return response.data;
     },
 
-    // 3. Modificar (Admin)
-    update: async (id: number, data: { nombre?: string; urlVideo?: string }) => {
-        const response = await api.put(`api/ejercicios/${id}`, data);
+    // 3. Modificar
+    update: async (id: number, data: Partial<EjercicioDTO>): Promise<Ejercicio> => {
+        const response = await api.put(`/ejercicios/${id}`, data);
         return response.data;
     },
 
-    // 4. Eliminar (Admin)
-    delete: async (id: number) => {
-        const response = await api.delete(`api/ejercicios/${id}`);
-        return response.data;
+    // 4. Eliminar
+    delete: async (id: number): Promise<void> => {
+        await api.delete(`/ejercicios/${id}`);
     }
 };
