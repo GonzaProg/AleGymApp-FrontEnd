@@ -12,7 +12,6 @@ export const Login = () => {
   return (
     <PageLayout centered showNavbar={false} backgroundImage={fondoLogin}>
       
-      {/* Usamos AuthStyles.glassCard */}
       <Card className={LoginStyles.glassCard}> 
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white drop-shadow-md">Gym App</h1>

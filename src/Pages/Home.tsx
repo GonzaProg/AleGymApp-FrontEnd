@@ -2,13 +2,10 @@ import { useHome } from "../Hooks/Home/useHome";
 import { PageLayout } from "../Components/UI/PageLayout";
 import { Card } from "../Components/UI/Card";
 import fondoGym from "../assets/GymFondo.jpg"; 
+import { HomeStyles } from "../Styles/HomeStyles";
 
 export const Home = () => {
-  // Agregamos goToExercises al destructuring
-  const { user, isEntrenador, goToMyRoutines, goToCreateRoutine, goToDeleteRoutine, goToCreateUser, goToExercises } = useHome();
-
-  // ESTILO MÁS TRANSPARENTE Y BORROSO
-  const actionCardStyle = "p-6 rounded-lg shadow-lg transition cursor-pointer hover:shadow-2xl transform hover:-translate-y-1 backdrop-blur-md border border-white/30";
+  const { user, isEntrenador, goToMyRoutines, goToCreateRoutine, goToDeleteRoutine, goToCreateUser, goToExercises } = useHome();  
 
   return (
     <PageLayout backgroundImage={fondoGym}>
@@ -20,7 +17,6 @@ export const Home = () => {
         Bienvenido a tu panel de control.
       </p>
 
-      {/* Ajustamos el grid para que soporte más columnas si hay espacio en pantallas grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         
         {!isEntrenador && (
@@ -35,16 +31,16 @@ export const Home = () => {
           <>
             <div 
               onClick={goToCreateRoutine}
-              className={`${actionCardStyle} bg-green-600/50 text-white hover:bg-green-600/90`}
+              className={`${HomeStyles.actionCardStyle} bg-green-600/50 text-white hover:bg-green-600/90`}
             >
               <h3 className="text-xl font-bold mb-2">+ Crear Nueva Rutina</h3>
               <p className="text-green-100 text-sm">Asignar ejercicios a un alumno.</p>
             </div>
 
-            {/* --- NUEVA TARJETA: EJERCICIOS (Color Púrpura) --- */}
+            {/* EJERCICIOS */}
             <div 
               onClick={goToExercises}
-              className={`${actionCardStyle} bg-purple-600/50 text-white hover:bg-purple-600/90`}
+              className={`${HomeStyles.actionCardStyle} bg-purple-600/50 text-white hover:bg-purple-600/90`}
             >
               <h3 className="text-xl font-bold mb-2">🏋️ Catálogo Ejercicios</h3>
               <p className="text-purple-100 text-sm">Gestionar lista de ejercicios y videos.</p>
@@ -52,7 +48,7 @@ export const Home = () => {
 
             <div 
               onClick={goToDeleteRoutine}
-              className={`${actionCardStyle} bg-red-500/50 text-white hover:bg-red-500/90`}
+              className={`${HomeStyles.actionCardStyle} bg-red-500/50 text-white hover:bg-red-500/90`}
             >
               <h3 className="text-xl font-bold mb-2">🗑️ Borrar Rutina</h3>
               <p className="text-red-100 text-sm">Buscar un alumno y eliminar rutinas.</p>
@@ -60,7 +56,7 @@ export const Home = () => {
 
             <div 
               onClick={goToCreateUser}
-              className={`${actionCardStyle} bg-blue-600/50 text-white hover:bg-blue-600/90`}
+              className={`${HomeStyles.actionCardStyle} bg-blue-600/50 text-white hover:bg-blue-600/90`}
             >
               <h3 className="text-xl font-bold mb-2">👤 Nuevo Usuario</h3>
               <p className="text-blue-100 text-sm">Registrar un nuevo Usuario.</p>

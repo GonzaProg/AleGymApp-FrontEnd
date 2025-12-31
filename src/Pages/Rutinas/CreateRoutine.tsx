@@ -3,6 +3,7 @@ import { Navbar } from "../../Components/Navbar";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import fondoGym from "../../assets/Fondo-CreateRoutine.png"; 
+import { AppStyles } from "../../Styles/AppStyles";
 
 export const CreateRoutine = () => {
   const {
@@ -12,45 +13,35 @@ export const CreateRoutine = () => {
     handleSearchChange, handleSelectAlumno, handleSeriesChange, handleRepsChange, handlePesoChange, handleAddExercise, handleSubmit
   } = useCreateRoutine();
 
-  // Clases comunes para inputs en modo oscuro
-  const darkInputClass = "bg-black/30 border-white/10 text-white focus:border-green-500/50 p-3";
-  const darkLabelClass = "text-gray-400 text-xs uppercase font-bold tracking-wider";
-
   return (
-    <div className="relative min-h-screen font-sans bg-gray-900 text-gray-200">
+    <div className={AppStyles.pageContainer}>
       
-      {/* --- FONDO FIJO ESTILO PERFIL --- */}
+      {/* FONDO */}
       <div
-        className="fixed inset-0 z-0"
+        className={AppStyles.fixedBackground}
         style={{
           backgroundImage: `url(${fondoGym})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-          filter: 'brightness(0.3) contrast(1.1)' 
+          filter: 'brightness(0.8) contrast(1.1)' 
         }}
       />
 
       <Navbar />
 
-      {/* --- CONTENEDOR PRINCIPAL --- */}
-      <div className="relative z-10 pt-28 pb-10 px-4 w-full flex justify-center">
+      <div className={AppStyles.contentContainer}>
         <div className="w-full max-w-5xl space-y-6">
             
-          {/* Título Principal */}
-          <h2 className="text-4xl font-black text-white mb-8 tracking-tight drop-shadow-lg">
-            Nueva <span className="text-green-500">Rutina</span>
+          <h2 className={AppStyles.title}>
+            Nueva <span className={AppStyles.highlight}>Rutina</span>
           </h2>
       
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* --- COLUMNA 1: DATOS --- */}
-            <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-6 space-y-6 relative overflow-hidden">
-               {/* Banner decorativo superior */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500/50 to-transparent"></div>
-              
-               <h3 className="text-xl font-bold text-white border-b border-white/10 pb-3 flex items-center gap-2">
-                  <span className="bg-green-600/20 text-green-500 py-1 px-3 rounded-lg text-sm">1</span> Datos Generales
+            <div className={AppStyles.glassCard}>
+               <div className={AppStyles.gradientDivider}></div>
+               
+               <h3 className={AppStyles.sectionTitle}>
+                  <span className={AppStyles.numberBadge}>1</span> Datos Generales
                </h3>
 
               <Input 
@@ -58,25 +49,25 @@ export const CreateRoutine = () => {
                 value={nombreRutina} 
                 onChange={e => setNombreRutina(e.target.value)} 
                 placeholder="Ej: Lunes: Pecho, Triceps..." 
-                className={darkInputClass}
-                labelClassName={darkLabelClass}
+                className={AppStyles.inputDark}
+                labelClassName={AppStyles.label}
               />
               
-              <div className="relative">
+              <div className="relative mt-4">
                 <Input 
                   label="Buscar Alumno" 
                   value={busqueda} 
                   onChange={e => handleSearchChange(e.target.value)} 
                   onFocus={() => busqueda && setMostrarSugerencias(true)}
                   placeholder="Escribe el nombre..."
-                  className={darkInputClass}
-                  labelClassName={darkLabelClass}
+                  className={AppStyles.inputDark}
+                  labelClassName={AppStyles.label}
                 />
                 {mostrarSugerencias && sugerencias.length > 0 && (
-                  <ul className="absolute z-20 w-full backdrop-blur-xl bg-gray-900/95 border border-white/10 rounded-xl shadow-2xl mt-1 max-h-60 overflow-y-auto overflow-x-hidden thin-scrollbar">
+                  <ul className={AppStyles.suggestionsList}>
                     {sugerencias.map((alumno) => (
-                      <li key={alumno.id} onClick={() => handleSelectAlumno(alumno)} className="p-3 hover:bg-green-600/20 cursor-pointer border-b border-white/5 transition-colors flex items-center gap-3 group">
-                        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-white border border-white/10 group-hover:border-green-500/50">
+                      <li key={alumno.id} onClick={() => handleSelectAlumno(alumno)} className={AppStyles.suggestionItem}>
+                        <div className={AppStyles.avatarSmall}>
                           {alumno.nombre.charAt(0)}
                         </div>
                         <span className="font-medium text-gray-200 group-hover:text-white">{alumno.nombre} {alumno.apellido}</span>
@@ -88,12 +79,11 @@ export const CreateRoutine = () => {
             </div>
 
             {/* --- COLUMNA 2: AGREGAR EJERCICIOS --- */}
-            <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-6 space-y-6 relative overflow-hidden">
-              {/* Banner decorativo superior */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500/50 to-transparent"></div>
+            <div className={AppStyles.glassCard}>
+              <div className={AppStyles.gradientDivider}></div>
 
-              <h3 className="text-xl font-bold text-white border-b border-white/10 pb-3 flex items-center gap-2">
-                  <span className="bg-green-600/20 text-green-500 py-1 px-3 rounded-lg text-sm">2</span> Agregar Ejercicios
+              <h3 className={AppStyles.sectionTitle}>
+                  <span className={AppStyles.numberBadge}>2</span> Agregar Ejercicios
               </h3>
               
               <Input 
@@ -101,21 +91,21 @@ export const CreateRoutine = () => {
                 label="Seleccionar Ejercicio" 
                 value={ejercicioId} 
                 onChange={e => setEjercicioId(e.target.value)}
-                className={`${darkInputClass} appearance-none`} // appearance-none ayuda a estilos de select en algunos browsers
-                labelClassName={darkLabelClass}
+                className={`${AppStyles.inputDark} appearance-none`}
+                labelClassName={AppStyles.label}
               >
                   <option value="" className="text-gray-800">-- Elige un ejercicio --</option>
                   {ejercicios.map(ej => <option key={ej.id} value={ej.id} className="text-gray-800">{ej.nombre}</option>)}
               </Input>
 
-              <div className="grid grid-cols-3 gap-4">
-                <Input label="Series" type="number" min="1" value={series} onChange={handleSeriesChange} className={`${darkInputClass} text-center font-bold`} labelClassName={darkLabelClass} />
-                <Input label="Reps" type="number" min="1" value={reps} onChange={handleRepsChange} className={`${darkInputClass} text-center font-bold`} labelClassName={darkLabelClass} />
-                <Input label="Peso (kg)" type="number" step="0.5" value={peso} onChange={handlePesoChange} className={`${darkInputClass} text-center font-bold`} labelClassName={darkLabelClass} placeholder="0" />
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                <Input label="Series" type="number" min="1" value={series} onChange={handleSeriesChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
+                <Input label="Reps" type="number" min="1" value={reps} onChange={handleRepsChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
+                <Input label="Peso (kg)" type="number" step="0.5" value={peso} onChange={handlePesoChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} placeholder="0" />
               </div>
 
-              <div className="pt-2">
-                <Button variant="info" fullWidth onClick={handleAddExercise} className="bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/30 border border-green-500/20 font-bold tracking-wide py-3 rounded-xl">
+              <div className="pt-4">
+                <Button variant="info" fullWidth onClick={handleAddExercise} className={AppStyles.btnPrimary}>
                   + AGREGAR A LA LISTA
                 </Button>
               </div>
@@ -123,11 +113,10 @@ export const CreateRoutine = () => {
           </div>
 
           {/* --- RESUMEN --- */}
-          <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-6 space-y-6 relative overflow-hidden">
-             {/* Banner decorativo superior */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500/50 to-transparent"></div>
+          <div className={AppStyles.glassCard}>
+             <div className={AppStyles.gradientDivider}></div>
 
-             <div className="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+             <div className={AppStyles.sectionTitle}>
                 <span className="text-2xl">📋</span>
                 <h3 className="text-xl font-bold text-white">Resumen de Rutina</h3>
              </div>
@@ -139,9 +128,8 @@ export const CreateRoutine = () => {
               </div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-white/10">
-                {/* TABLA OSCURA */}
                 <table className="min-w-full text-sm text-left">
-                  <thead className="bg-black/40 text-gray-300 uppercase text-xs font-bold tracking-wider">
+                  <thead className={AppStyles.tableHeader}>
                     <tr>
                       <th className="p-4">Ejercicio</th>
                       <th className="p-4 text-center">Series</th>
@@ -151,8 +139,8 @@ export const CreateRoutine = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {detalles.map((d, index) => (
-                      <tr key={index} className="hover:bg-white/5 transition-colors">
+                    {detalles.map((d: any, index: number) => (
+                      <tr key={index} className={AppStyles.tableRow}>
                         <td className="p-4 font-medium text-white">{d.nombreEjercicio}</td>
                         <td className="p-4 text-center text-gray-300 font-bold">{d.series}</td>
                         <td className="p-4 text-center text-gray-300 font-bold">{d.repeticiones}</td>
@@ -160,7 +148,7 @@ export const CreateRoutine = () => {
                         <td className="p-4 text-right">
                           <button 
                             onClick={() => setDetalles(detalles.filter((_, i) => i !== index))} 
-                            className="text-red-500/70 hover:text-red-400 bg-red-500/10 hover:bg-red-500/20 p-2 rounded-lg transition-all group"
+                            className="text-red-500/70 hover:text-red-400 bg-red-600/50 hover:bg-red-500/20 p-2 rounded-lg transition-all group"
                             title="Eliminar ejercicio"
                           >
                             🗑️ <span className="hidden group-hover:inline text-xs ml-1">Borrar</span>
@@ -175,9 +163,10 @@ export const CreateRoutine = () => {
 
             <div className="mt-8 flex justify-end border-t border-white/10 pt-6">
               <Button 
+                variant="info"
                 onClick={handleSubmit} 
                 size="lg" 
-                className={`bg-green-600 hover:bg-green-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-green-900/20 border border-green-500/20 tracking-wider text-lg transition-all hover:scale-105 ${detalles.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`${AppStyles.btnPrimary} px-8 py-4 text-lg ${detalles.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                 disabled={detalles.length === 0}
               >
                  ✅ CONFIRMAR RUTINA
