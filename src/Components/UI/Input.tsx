@@ -37,7 +37,6 @@ export const Input = ({
           {children}
         </select>
       ) : (
-        // Si no, renderiza el input de texto normal
         <input
           className={baseClasses}
           {...(props as any)}

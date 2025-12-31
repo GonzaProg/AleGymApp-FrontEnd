@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../API/axios"; 
+import { useAuthUser } from "../useAuthUser"; 
+import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi"; 
 
 export const useCreateUser = () => {
   const navigate = useNavigate();
   
-  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const isAdmin = currentUser.rol === "Admin";
+  const { isAdmin } = useAuthUser();
 
   // --- ESTADOS DEL FORMULARIO ---
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateUserDTO>({
     nombre: "",
     apellido: "",
     nombreUsuario: "",
@@ -17,6 +17,8 @@ export const useCreateUser = () => {
     contraseña: "",
     rol: "Alumno"
   });
+
+  const [loading, setLoading] = useState(false); // Agregamos estado de carga
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -30,23 +32,26 @@ export const useCreateUser = () => {
       return alert("Por favor completa los campos obligatorios");
     }
 
-    try {
-      let url = "";
-      
-      // Usamos rutas relativas
-      if (formData.rol === "Entrenador") {
-        url = "/api/auth/crear-entrenador";
-      } else {
-        url = "/api/auth/register";
-      }
+    // Validación de seguridad (Frontend): Solo admin puede crear Entrenadores
+    if (formData.rol === "Entrenador" && !isAdmin) {
+        return alert("No tienes permisos para crear un Entrenador.");
+    }
 
-      await api.post(url, formData);
+    setLoading(true);
+
+    try {
+      // --- LLAMADA A LA API LIMPIA ---
+      await AuthApi.createUser(formData);
 
       alert(`Usuario ${formData.nombreUsuario} creado con éxito!`);
       navigate("/home");
 
     } catch (error: any) {
-      alert(error.response?.data?.error || "Error al crear usuario");
+      // Manejo de errores
+      const msg = error.response?.data?.error || error.response?.data?.message || "Error al crear usuario";
+      alert(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,6 +60,7 @@ export const useCreateUser = () => {
   return {
     formData,
     isAdmin,
+    loading,
     handleChange,
     handleSubmit,
     handleCancel

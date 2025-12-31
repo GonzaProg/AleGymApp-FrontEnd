@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Vite expone las variables de entorno en import.meta.env
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const api = axios.create({
     baseURL: baseURL,
