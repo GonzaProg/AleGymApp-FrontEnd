@@ -4,7 +4,7 @@ import { UsuarioApi, type UpdateProfileDTO, type ChangePasswordDTO } from "../..
 
 // LEEMOS LAS VARIABLES DEL .ENV
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_PRESET;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const API_URL_CLOUDINARY = import.meta.env.VITE_API_URL_CLOUDINARY;
 
 export const useProfile = () => {
