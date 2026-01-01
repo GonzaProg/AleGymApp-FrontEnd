@@ -3,14 +3,18 @@ import { Navbar } from '../../Components/Navbar';
 import fondoGym from '../../assets/Fondo-CreateRoutine.png';
 import { useEjerciciosGestion } from '../../Hooks/Ejercicios/useEjerciciosGestion';
 import { AppStyles } from '../../Styles/AppStyles';
-import { EjerciciosGestionStyles, EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles'; // Alias TableStyles para que sea corto
+import { EjerciciosGestionStyles, EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
+import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
 
 export const EjerciciosGestion = () => {
     const navigate = useNavigate();
     
+    // RECIBIR LOS NUEVOS ESTADOS DEL HOOK
     const { 
-        ejercicios, loading, editingId, editForm, 
-        handleDelete, startEdit, cancelEdit, saveEdit, handleEditInputChange 
+        ejercicios, loading, uploading, editingId, editForm, selectedFile,
+        videoUrl,
+        handleDelete, startEdit, cancelEdit, saveEdit, handleEditInputChange, handleFileChange,
+        handleOpenVideo, closeVideo 
     } = useEjerciciosGestion();
 
     return (
@@ -28,12 +32,12 @@ export const EjerciciosGestion = () => {
                     
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <h2 className={AppStyles.title.replace("text-center", "")}> {/* Reutilizamos y quitamos center */}
+                        <h2 className={AppStyles.title.replace("text-center", "")}>
                             Gestión <span className={AppStyles.highlight}>Ejercicios</span>
                         </h2>
                         <button 
                             onClick={() => navigate('/ejercicios/crear')}
-                            className={`${AppStyles.btnPrimary} flex items-center gap-2 px-6 flex-none w-auto`} // Ajuste de flex
+                            className={`${AppStyles.btnPrimary} flex items-center gap-2 px-6 flex-none w-auto`}
                         >
                             <span>+</span> Nuevo Ejercicio
                         </button>
@@ -48,7 +52,7 @@ export const EjerciciosGestion = () => {
                                 <thead className={TableStyles.tableHeaderRow}>
                                     <tr>
                                         <th className={TableStyles.th}>Nombre</th>
-                                        <th className={TableStyles.th}>Video URL</th>
+                                        <th className={TableStyles.th}>Video</th>
                                         <th className={`${TableStyles.th} text-right`}>Acciones</th>
                                     </tr>
                                 </thead>
@@ -80,17 +84,33 @@ export const EjerciciosGestion = () => {
                                                     {/* VIDEO */}
                                                     <td className={TableStyles.td}>
                                                         {isEditing ? (
-                                                            <input 
-                                                                className={TableStyles.editInput}
-                                                                value={editForm.urlVideo}
-                                                                onChange={(e) => handleEditInputChange('urlVideo', e.target.value)}
-                                                                placeholder="URL del video"
-                                                            />
+                                                            <div className="flex flex-col gap-1">
+                                                                <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white text-xs py-2 px-3 rounded flex items-center justify-center gap-2 w-full transition-all">
+                                                                    <span>{selectedFile ? '📁' : '📤'}</span>
+                                                                    <span>{selectedFile ? 'Video Seleccionado' : 'Cambiar Video'}</span>
+                                                                    <input 
+                                                                        type="file" 
+                                                                        accept="video/*" 
+                                                                        className="hidden" 
+                                                                        onChange={handleFileChange}
+                                                                    />
+                                                                </label>
+                                                                {selectedFile ? (
+                                                                    <span className="text-xs text-green-400 truncate max-w-[200px]">Nuevo: {selectedFile.name}</span>
+                                                                ) : (
+                                                                    <span className="text-xs text-gray-400 truncate max-w-[200px]">
+                                                                        {editForm.urlVideo ? 'Mantiene video actual' : 'Sin video actualmente'}
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         ) : (
                                                             ej.urlVideo ? (
-                                                                <a href={ej.urlVideo} target="_blank" rel="noreferrer" className={TableStyles.videoLink}>
+                                                                <button 
+                                                                    onClick={() => handleOpenVideo(ej.urlVideo!)} 
+                                                                    className={TableStyles.videoLink}
+                                                                >
                                                                     📺 Ver Video
-                                                                </a>
+                                                                </button>
                                                             ) : <span className="text-gray-600 text-sm italic">Sin video</span>
                                                         )}
                                                     </td>
@@ -98,18 +118,26 @@ export const EjerciciosGestion = () => {
                                                     {/* ACCIONES */}
                                                     <td className={`${TableStyles.td} text-right space-x-2`}>
                                                         {isEditing ? (
-                                                            <>
-                                                                <button onClick={() => saveEdit(ej.id)} className={`${TableStyles.actionBtnBase} ${TableStyles.btnSave}`}>Guardar</button>
-                                                                <button onClick={cancelEdit} className={`${TableStyles.actionBtnBase} ${TableStyles.btnCancel}`}>Cancelar</button>
-                                                            </>
+                                                            <div className="flex justify-end gap-2">
+                                                                <button 
+                                                                    onClick={() => saveEdit(ej.id)} 
+                                                                    disabled={uploading}
+                                                                    className={`${TableStyles.actionBtnBase} ${TableStyles.btnSave} disabled:opacity-50 disabled:cursor-wait`}
+                                                                >
+                                                                    {uploading ? 'Subiendo...' : 'Guardar'}
+                                                                </button>
+                                                                <button 
+                                                                    onClick={cancelEdit} 
+                                                                    disabled={uploading}
+                                                                    className={`${TableStyles.actionBtnBase} ${TableStyles.btnCancel} disabled:opacity-50`}
+                                                                >
+                                                                    Cancelar
+                                                                </button>
+                                                            </div>
                                                         ) : (
                                                             <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                                <button onClick={() => startEdit(ej)} className={`${TableStyles.btnIconBase} ${TableStyles.btnEdit}`} title="Editar">
-                                                                    ✏️
-                                                                </button>
-                                                                <button onClick={() => handleDelete(ej.id)} className={`${TableStyles.btnIconBase} ${TableStyles.btnDelete}`} title="Eliminar">
-                                                                    🗑️
-                                                                </button>
+                                                                <button onClick={() => startEdit(ej)} className={`${TableStyles.btnIconBase} ${TableStyles.btnEdit}`} title="Editar">✏️</button>
+                                                                <button onClick={() => handleDelete(ej.id)} className={`${TableStyles.btnIconBase} ${TableStyles.btnDelete}`} title="Eliminar">🗑️</button>
                                                             </div>
                                                         )}
                                                     </td>
@@ -130,6 +158,25 @@ export const EjerciciosGestion = () => {
 
                 </div>
             </div>
+
+            {/* 4. AQUI AGREGAMOS EL MODAL DE VIDEO (IGUAL QUE EN MYROUTINES) */}
+            {videoUrl && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
+                    <div className="relative w-full max-w-4xl aspect-video bg-black rounded-2xl shadow-2xl overflow-hidden border border-white/10">
+                        {/* Botón cerrar */}
+                        <button 
+                            onClick={closeVideo} 
+                            className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-black/50 hover:bg-red-500/80 rounded-full text-white text-xl font-bold transition-all"
+                        >
+                            &times;
+                        </button>
+                        
+                        {/* Componente de Video */}
+                        <VideoEjercicio url={videoUrl} />
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
