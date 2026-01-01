@@ -40,7 +40,7 @@ export const Profile = () => {
         className={AppStyles.fixedBackground}
         style={{
           backgroundImage: `url(${fondoPerfil})`,
-          filter: 'brightness(0.4) contrast(1.1)' 
+          filter: 'brightness(0.8) contrast(1.1)' 
         }}
       />
 
