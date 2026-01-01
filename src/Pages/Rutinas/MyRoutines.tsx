@@ -4,6 +4,7 @@ import { Button } from "../../Components/UI/Button";
 import fondoGym from "../../assets/Fondo-MyRoutines.png"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
+import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
 
 export const MyRoutines = () => {
   const { rutinas, loading, selectedRoutine, setSelectedRoutine, videoUrl, closeModal, closeVideo, handleOpenVideo } = useMyRoutines();
@@ -43,7 +44,7 @@ export const MyRoutines = () => {
 
           ) : (
             
-            /* --- GRID DE RUTINAS --- */
+            /*  GRID DE RUTINAS  */
             <div className={MyRoutinesStyles.grid}>
               {rutinas.map((rutina) => (
                 <div 
@@ -95,7 +96,7 @@ export const MyRoutines = () => {
         </div>
       </div>
 
-      {/* --- MODAL DETALLE --- */}
+      {/*  MODAL DETALLE  */}
       {selectedRoutine && (
         <div className={AppStyles.modalOverlay}>
            <div className={AppStyles.modalContent}>
@@ -155,16 +156,21 @@ export const MyRoutines = () => {
         </div>
       )}
       
-      {/* --- MODAL VIDEO --- */}
+      {/*  MODAL VIDEO  */}
       {videoUrl && (
         <div className={MyRoutinesStyles.videoContainer}>
            <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
              <span className="text-2xl font-bold">&times;</span>
            </button>
-           <div className="w-full max-w-5xl aspect-video px-4">
-             <iframe src={videoUrl} title="Video" className="w-full h-full rounded-2xl shadow-2xl border border-white/10" allow="autoplay; encrypted-media" allowFullScreen></iframe>
+           
+           <div className="w-full max-w-4xl aspect-video px-4">
+             {/* 2. REEMPLAZAMOS EL IFRAME POR EL COMPONENTE */}
+             <VideoEjercicio url={videoUrl} />
            </div>
-           <p className="text-gray-500 mt-6 text-sm animate-pulse">Toca la X para volver</p>
+           
+           <p className="text-gray-500 mt-6 text-sm animate-pulse">
+              Toca la X para volver
+           </p>
         </div>
       )}
 
