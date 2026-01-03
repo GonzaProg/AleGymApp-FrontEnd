@@ -9,6 +9,7 @@ import { DeleteRoutine } from "./Pages/Rutinas/DeleteRoutine";
 import { EjerciciosPage } from "./Pages/Ejercicios/EjerciciosPage";
 import { EjerciciosCrear } from './Pages/Ejercicios/EjerciciosCrear';
 import { EjerciciosGestion } from './Pages/Ejercicios/EjerciciosGestion';
+import { CreateNotification } from "./Pages/Notificaciones/CreateNotification";
 
 function App() {
   return (
@@ -43,8 +44,9 @@ function App() {
         <Route path="/ejercicios/crear" element={<EjerciciosCrear />} />
         <Route path="/ejercicios/gestion" element={<EjerciciosGestion />} />
 
+        {/* Ruta para Crear Notificación (Broadcast) */}
+        <Route path="/notifications/create" element={<CreateNotification />} />
 
-        
       </Routes>
     </BrowserRouter>
   );
