@@ -16,7 +16,7 @@ export const CreateNotification = () => {
     if (!form.titulo.trim() || !form.mensaje.trim()) return;
     
     await sendBroadcast(form.titulo, form.mensaje);
-    navigate("/home"); // Volver al inicio tras enviar
+    navigate("/home");
   };
 
   return (
@@ -25,7 +25,7 @@ export const CreateNotification = () => {
         className={AppStyles.fixedBackground}
         style={{
           backgroundImage: `url(${fondoNotificaciones})`,
-          filter: "brightness(0.6) contrast(1.1)",
+          filter: "brightness(0.8) contrast(1.1)",
         }}
       />
 

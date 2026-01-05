@@ -100,6 +100,13 @@ export const useProfile = () => {
   // GUARDAR PERFIL (Lógica Principal)
   const handleSaveProfile = async () => {
     if (!localId) return;
+
+    // Validación de Email 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (editForm.email && !emailRegex.test(editForm.email)) {
+        return alert("⚠️ El formato del correo electrónico no es válido.");
+    }
+
     setLoading(true);
 
     try {
