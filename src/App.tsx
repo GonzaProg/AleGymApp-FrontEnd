@@ -9,6 +9,9 @@ import { DeleteRoutine } from "./Pages/Rutinas/DeleteRoutine";
 import { EjerciciosPage } from "./Pages/Ejercicios/EjerciciosPage";
 import { EjerciciosCrear } from './Pages/Ejercicios/EjerciciosCrear';
 import { EjerciciosGestion } from './Pages/Ejercicios/EjerciciosGestion';
+import { CreateNotification } from "./Pages/Notificaciones/CreateNotification";
+import { ForgotPassword } from "./Pages/Auth/ForgotPassword";
+import { ResetPassword } from "./Pages/Auth/ResetPassword";
 
 function App() {
   return (
@@ -43,8 +46,13 @@ function App() {
         <Route path="/ejercicios/crear" element={<EjerciciosCrear />} />
         <Route path="/ejercicios/gestion" element={<EjerciciosGestion />} />
 
+        {/* Ruta para Crear Notificación (Broadcast) */}
+        <Route path="/notifications/create" element={<CreateNotification />} />
 
-        
+        {/* Rutas de Autenticación */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
       </Routes>
     </BrowserRouter>
   );

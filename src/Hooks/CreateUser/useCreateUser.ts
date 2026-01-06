@@ -8,7 +8,7 @@ export const useCreateUser = () => {
   
   const { isAdmin } = useAuthUser();
 
-  // --- ESTADOS DEL FORMULARIO ---
+  //  ESTADOS DEL FORMULARIO 
   const [formData, setFormData] = useState<CreateUserDTO>({
     nombre: "",
     apellido: "",
@@ -28,11 +28,18 @@ export const useCreateUser = () => {
   };
 
   const handleSubmit = async () => {
+    // Validar campos vacíos
     if (!formData.email || !formData.contraseña || !formData.nombreUsuario) {
       return alert("Por favor completa los campos obligatorios");
     }
 
-    // Validación de seguridad (Frontend): Solo admin puede crear Entrenadores
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+        return alert("⚠️ Por favor ingresa una dirección de correo válida (ej: usuario@email.com)");
+    }
+
+    // Validación de seguridad: Solo admin puede crear Entrenadores
     if (formData.rol === "Entrenador" && !isAdmin) {
         return alert("No tienes permisos para crear un Entrenador.");
     }
@@ -40,16 +47,15 @@ export const useCreateUser = () => {
     setLoading(true);
 
     try {
-      // --- LLAMADA A LA API LIMPIA ---
+      //  LLAMADA A LA API LIMPIA 
       await AuthApi.createUser(formData);
 
       alert(`Usuario ${formData.nombreUsuario} creado con éxito!`);
       navigate("/home");
 
     } catch (error: any) {
-      // Manejo de errores
       const msg = error.response?.data?.error || error.response?.data?.message || "Error al crear usuario";
-      alert(msg);
+      alert("❌ Error: " + msg);
     } finally {
       setLoading(false);
     }
