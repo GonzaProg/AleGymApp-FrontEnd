@@ -28,6 +28,12 @@ export interface LoginResponse {
     };
 }
 
+// DTO para Reset Password
+export interface ResetPasswordDTO {
+    token: string;
+    nuevaContrasena: string;
+}
+
 export const AuthApi = {
     // La API decide la URL basada en el rol
     createUser: async (data: CreateUserDTO) => {
@@ -48,6 +54,18 @@ export const AuthApi = {
 
     login: async (credentials: LoginDTO): Promise<LoginResponse> => {
         const response = await api.post('/auth/login', credentials);
+        return response.data;
+    },
+
+    // Solicitar correo de recuperación
+    forgotPassword: async (email: string) => {
+        const response = await api.post('/auth/forgot-password', { email });
+        return response.data;
+    },
+
+    // Establecer la nueva contraseña
+    resetPassword: async (data: ResetPasswordDTO) => {
+        const response = await api.post('/auth/reset-password', data);
         return response.data;
     }
 }
