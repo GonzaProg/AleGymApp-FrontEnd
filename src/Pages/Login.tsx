@@ -5,6 +5,7 @@ import { Input } from "../Components/UI/Input";
 import { Button } from "../Components/UI/Button";
 import fondoLogin from "../assets/Fondo-Login.png";
 import { LoginStyles } from "../Styles/LoginStyles";
+import { Link } from "react-router-dom";
 
 export const Login = () => {
   const { email, password, error, handleEmailChange, handlePasswordChange, handleLogin } = useLogin();
@@ -27,7 +28,7 @@ export const Login = () => {
                value={email} 
                onChange={handleEmailChange} 
                required 
-               className={LoginStyles.inputDark} // <--- Reutilizamos
+               className={LoginStyles.inputDark}
              />
           </div>
 
@@ -55,9 +56,17 @@ export const Login = () => {
           </Button>
         </form>
         
-        <p className="text-xs text-center text-gray-400 mt-8">
-          ¿Olvidaste tu contraseña? Contacta a tu entrenador.
-        </p>
+        <div className="mt-8 text-center flex flex-col gap-2">
+          <Link 
+            to="/forgot-password" 
+            className="text-sm text-gray-400 hover:text-green-400 transition-colors cursor-pointer">
+              ¿Olvidaste tu contraseña?
+          </Link>
+
+          <p className="text-xs text-gray-500">
+            Si tienes problemas, contacta a tu entrenador.
+          </p>
+        </div>
       </Card>
 
     </PageLayout>
