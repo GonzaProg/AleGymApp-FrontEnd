@@ -29,8 +29,9 @@ export const useAuthUser = () => {
                 setCurrentUser(userObj);
                 
                 // Determinamos roles
-                setIsAdmin(userObj.rol === "Admin");
-                setIsEntrenador(userObj.rol === "Entrenador"); 
+                const admin = userObj.rol === "Admin";
+                setIsAdmin(admin);
+                setIsEntrenador(userObj.rol === "Entrenador" || admin); 
 
             } catch (error) {
                 console.error("Error sesión:", error);
