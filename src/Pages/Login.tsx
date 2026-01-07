@@ -3,7 +3,7 @@ import { PageLayout } from "../Components/UI/PageLayout";
 import { Card } from "../Components/UI/Card";
 import { Input } from "../Components/UI/Input";
 import { Button } from "../Components/UI/Button";
-import fondoLogin from "../assets/Fondo-Login.png";
+import fondoLogin from "../assets/Fondo-Login.jpg";
 import { LoginStyles } from "../Styles/LoginStyles";
 import { Link } from "react-router-dom";
 

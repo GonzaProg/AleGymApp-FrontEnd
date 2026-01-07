@@ -2,7 +2,7 @@ import { useDeleteRoutine } from "../../Hooks/DeleteRoutine/useDeleteRoutine";
 import { Navbar } from "../../Components/Navbar"; 
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
-import fondoGym from "../../assets/Fondo-DeleteRoutine.png"; 
+import fondoGym from "../../assets/Fondo-DeleteRoutine.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { DeleteRoutineStyles } from "../../Styles/DeleteRoutineStyles";
 

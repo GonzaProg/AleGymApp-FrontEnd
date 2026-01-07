@@ -1,7 +1,7 @@
 import { useMyRoutines } from "../../Hooks/MyRoutines/useMyRoutines";
 import { Navbar } from "../../Components/Navbar"; 
 import { Button } from "../../Components/UI/Button";
-import fondoGym from "../../assets/Fondo-MyRoutines.png"; 
+import fondoGym from "../../assets/Fondo-MyRoutines.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 

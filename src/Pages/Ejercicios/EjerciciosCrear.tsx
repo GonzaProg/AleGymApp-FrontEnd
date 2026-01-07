@@ -1,5 +1,5 @@
 import { Navbar } from '../../Components/Navbar';
-import fondoGym from '../../assets/Fondo-CreateRoutine.png';
+import fondoGym from '../../assets/Fondo-CreateRoutine.jpg';
 import { useEjerciciosCrear } from '../../Hooks/Ejercicios/useEjerciciosCrear'; 
 import { AppStyles } from '../../Styles/AppStyles';
 
