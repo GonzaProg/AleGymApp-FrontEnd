@@ -14,6 +14,7 @@ export const useHome = () => {
   const goToCreateUser = () => navigate("/create-user");
   const goToExercises = () => navigate("/ejercicios");
   const goToCreateNotification = () => navigate("/notifications/create");
+  const goToPlans = () => navigate("/planes");
 
   return {
     user,
@@ -23,6 +24,7 @@ export const useHome = () => {
     goToDeleteRoutine,
     goToCreateUser,
     goToExercises,
-    goToCreateNotification
+    goToCreateNotification,
+    goToPlans
   };
 };
