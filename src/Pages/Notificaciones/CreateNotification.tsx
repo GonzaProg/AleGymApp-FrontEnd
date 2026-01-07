@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "../../Components/Navbar";
 import { useNotificaciones } from "../../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../../Styles/AppStyles";
-import fondoNotificaciones from "../../assets/Fondo-Notificaciones.png";
+import fondoNotificaciones from "../../assets/Fondo-Notificaciones.jpg";
 
 export const CreateNotification = () => {
   const navigate = useNavigate();

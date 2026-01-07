@@ -2,7 +2,7 @@ import { useCreateUser } from "../../Hooks/CreateUser/useCreateUser";
 import { Navbar } from "../../Components/Navbar"; 
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
-import fondoUser from "../../assets/Fondo-CreateUser.png"; 
+import fondoUser from "../../assets/Fondo-CreateUser.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles"; 
 
 export const CreateUser = () => {
@@ -91,7 +91,7 @@ export const CreateUser = () => {
                     <Button 
                         variant="ghost" 
                         onClick={handleCancel}
-                        className={AppStyles.btnSecondary + " border-transparent hover:border-white/10"}
+                        className={AppStyles.btnSecondary + " hover:text-white"}
                     >
                         Cancelar
                     </Button>

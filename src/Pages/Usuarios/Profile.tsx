@@ -2,7 +2,7 @@ import { useProfile } from "../../Hooks/Profile/useProfile";
 import { Navbar } from "../../Components/Navbar";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
-import fondoPerfil from "../../assets/Fondo-Perfil.png";
+import fondoPerfil from "../../assets/Fondo-Perfil.jpg";
 import { AppStyles } from "../../Styles/AppStyles"; 
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
 

@@ -5,7 +5,7 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
 import { useResetPassword } from "../../Hooks/Auth/useResetPassword";
-import fondoLogin from "../../assets/Fondo-Login.png";
+import fondoLogin from "../../assets/Fondo-Login.jpg";
 
 export const ResetPassword = () => {
   const { 
