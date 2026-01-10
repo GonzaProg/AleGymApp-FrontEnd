@@ -38,10 +38,9 @@ export const PlansManager = () => {
       
       {/* 1. FONDO FIJO */}
       <div
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        className={AppStyles.fixedBackground}
         style={{
-          backgroundImage: `url(${fondoMiPlan})`,
-          filter: "brightness(0.7)",
+          backgroundImage: `url(${fondoMiPlan})`
         }}
       />
 
@@ -58,9 +57,9 @@ export const PlansManager = () => {
           <div className="w-full">
             {/* Encabezado Admin */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 w-full">
-              <div className="mb-4 md:mb-0">
-                <h1 className={AppStyles.title.replace("text-center", "text-left")}>Planes y Membresías</h1>
-                <p className="text-gray-300 text-left">Gestiona las suscripciones del gimnasio</p>
+              <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
+                <h1 className={AppStyles.title}>Planes y Membresías</h1>
+                <p className={AppStyles.subtitle}>Gestiona las suscripciones del gimnasio</p>
               </div>
               <Button onClick={openCreateModal} className={AppStyles.btnPrimary}>
                 + NUEVO PLAN
@@ -106,7 +105,7 @@ export const PlansManager = () => {
 
                     <Button 
                       onClick={() => openSubscribeModal(plan)}
-                      className={`${AppStyles.btnSecondary} w-full mt-auto border-green-500/30 hover:bg-green-600 hover:text-white group-hover:shadow-lg transition-all`}
+                      className={`${AppStyles.btnPrimary} w-full mt-auto border-green-500/30 hover:bg-green-600 hover:text-white group-hover:shadow-lg transition-all`}
                     >
                       👤 ASIGNAR A ALUMNO
                     </Button>
@@ -159,9 +158,9 @@ export const PlansManager = () => {
           /* 👤 VISTA DE ALUMNO (Solo visualización) */
           <div className="w-full">
             {/* 1. Encabezado Alumno - Alineado a la izquierda */}
-            <div className="mb-8 w-full text-left">
-              <h1 style={{marginTop:"30px"}} className={AppStyles.title.replace("text-center", "text-left")}>Mi Plan</h1>
-              <p className="text-gray-300 text-base text-left">Estado de tu suscripción actual</p>
+            <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
+              <h1 className={AppStyles.title}>Mi Plan</h1>
+              <p className={AppStyles.subtitle}>Estado de tu suscripción actual</p>
             </div>
 
             {/* 2. Tarjeta de Plan Activo - Ancha y alineada */}

@@ -9,7 +9,6 @@ import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio'
 export const EjerciciosGestion = () => {
     const navigate = useNavigate();
     
-    // RECIBIR LOS NUEVOS ESTADOS DEL HOOK
     const { 
         ejercicios, loading, uploading, editingId, editForm, selectedFile,
         videoUrl,
@@ -21,8 +20,7 @@ export const EjerciciosGestion = () => {
         <div className={AppStyles.pageContainer}>
              <div
                 className={AppStyles.fixedBackground}
-                style={{ backgroundImage: `url(${fondoGym})`,
-                filter: 'brightness(0.8) contrast(1.1)'  }}
+                style={{ backgroundImage: `url(${fondoGym})` }}
             />
 
             <Navbar />
@@ -33,7 +31,7 @@ export const EjerciciosGestion = () => {
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <h2 className={AppStyles.title.replace("text-center", "")}>
-                            Gestión <span className={AppStyles.highlight}>Ejercicios</span>
+                            Gestión Ejercicios
                         </h2>
                         <button 
                             onClick={() => navigate('/ejercicios/crear')}
