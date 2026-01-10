@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 
-interface User {
+export interface User {
     id?: number;
     nombre?: string;
     apellido?: string;
     nombreUsuario?: string;
     email?: string;
     fotoPerfil?: string;
-    rol: string; // "Admin", "Entrenador", "Alumno"
+    rol: string; 
     token?: string;
 }
 
 export const useAuthUser = () => {
-    // Definimos los permisos
+    // 1. AGREGAMOS EL ESTADO DE CARGA (Inicia en true)
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [isEntrenador, setIsEntrenador] = useState<boolean>(false);
     
@@ -35,6 +37,7 @@ export const useAuthUser = () => {
 
             } catch (error) {
                 console.error("Error sesión:", error);
+                // Si falla el parseo, reseteamos permisos
                 setIsAdmin(false);
                 setIsEntrenador(false);
                 setCurrentUser(null);
@@ -43,12 +46,17 @@ export const useAuthUser = () => {
         
         if (tokenStr) setToken(tokenStr);
 
+        // 2. FINALIZAMOS LA CARGA
+        // Esto asegura que ya leímos el localStorage (haya datos o no)
+        setIsLoading(false);
+
     }, []);
 
     return { 
         isAdmin,
         isEntrenador, 
         currentUser,
-        token 
+        token,
+        isLoading // 3. RETORNAMOS LA PROPIEDAD
     };
 };

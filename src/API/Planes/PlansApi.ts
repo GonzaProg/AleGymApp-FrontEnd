@@ -39,5 +39,17 @@ export const PlansApi = {
     subscribeUser: async (userId: number, planId: number) => {
         const response = await api.post('/planes/suscribir', { userId, planId });
         return response.data;
+    },
+
+    // 6. Renovar Plan (Solo Admin/Entrenador)
+    renewPlan: async (userId: number) => {
+        const response = await api.post('/planes/renovar', { userId });
+        return response.data;
+    },
+
+    // 7. Cancelar Plan (Solo Admin/Entrenador)
+    cancelPlan: async (userId: number) => {
+        const response = await api.post('/planes/cancelar', { userId });
+        return response.data;
     }
 };

@@ -15,8 +15,7 @@ export const CreateUser = () => {
       <div
         className={AppStyles.fixedBackground}
         style={{
-          backgroundImage: `url(${fondoUser})`,
-          filter: 'brightness(0.6) contrast(1.1)' 
+          backgroundImage: `url(${fondoUser})`
         }}
       />
 
@@ -27,11 +26,13 @@ export const CreateUser = () => {
         <div className="w-full max-w-2xl">
           
             {/* Título */}
-            <div className="mb-6 text-center justify-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight drop-shadow-lg">
-                    Registrar <span className={AppStyles.highlight}>Nuevo Usuario</span>
+            <div className={AppStyles.headerContainer}>
+                <h2 className={AppStyles.title}>
+                    Registrar Nuevo Usuario
                 </h2>
-                <p className="text-gray-300 text-sm mt-2 font-medium">Completa los datos para dar de alta un acceso.</p>
+                <p className={AppStyles.subtitle}>
+                    Completa los datos para dar de alta un acceso.
+                </p>
             </div>
 
             {/* TARJETA */}

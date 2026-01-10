@@ -4,19 +4,19 @@ import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { useAuthUser } from "../useAuthUser";
 
 export const usePlans = () => {
-    // --- ESTADOS DE DATOS ---
+    //  ESTADOS DE DATOS 
     const [planes, setPlanes] = useState<PlanDTO[]>([]);
     const [myPlan, setMyPlan] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     
-    // --- ESTADOS DE BUSQUEDA DE ALUMNOS  ---
+    //  ESTADOS DE BUSQUEDA DE ALUMNOS  
     const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
     const [busqueda, setBusqueda] = useState("");
     const [sugerencias, setSugerencias] = useState<any[]>([]);
     const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
     const [alumnoSeleccionadoId, setAlumnoSeleccionadoId] = useState<number | null>(null);
 
-    // --- ESTADOS DE UI ---
+    //  ESTADOS DE UI 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<PlanDTO | null>(null);
@@ -54,7 +54,7 @@ export const usePlans = () => {
         }
     };
 
-    // --- LOGICA DE BUSCADOR (La misma de CreateRoutine) ---
+    //  LOGICA DE BUSCADOR (La misma de CreateRoutine) 
     const handleSearchChange = (text: string) => {
         setBusqueda(text);
         if (text.length > 0) {

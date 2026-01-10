@@ -24,8 +24,7 @@ export const CreateNotification = () => {
       <div
         className={AppStyles.fixedBackground}
         style={{
-          backgroundImage: `url(${fondoNotificaciones})`,
-          filter: "brightness(0.8) contrast(1.1)",
+          backgroundImage: `url(${fondoNotificaciones})`
         }}
       />
 
@@ -33,9 +32,17 @@ export const CreateNotification = () => {
 
       <div className={AppStyles.contentContainer}>
         <div className="w-full max-w-2xl">
-          <h2 className={AppStyles.title}>
-            Nueva <span className={AppStyles.highlight}>Notificación</span> 📢
-          </h2>
+          
+          <div className={AppStyles.headerContainer}>
+            <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
+                <span className={AppStyles.title}>
+                    Nueva Notificación
+                </span>
+                <span className="ml-3 text-white">
+                    📢
+                </span>
+            </h2>
+            </div>
 
           <div className={AppStyles.glassCard}>
             <div className={AppStyles.gradientDivider}></div>

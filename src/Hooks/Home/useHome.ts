@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { useAuthUser } from "../useAuthUser"; 
 
 export const useHome = () => {
   const navigate = useNavigate();
   
-  // Lógica de datos
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const isEntrenador = user.rol === "Entrenador" || user.rol === "Admin";
+  // 1. Extraemos isLoading también
+  const { currentUser, isEntrenador, isAdmin, isLoading } = useAuthUser();
 
-  // Lógica de navegación (Handlers)
   const goToMyRoutines = () => navigate("/my-routines");
   const goToCreateRoutine = () => navigate("/create-routine");
   const goToDeleteRoutine = () => navigate("/delete-routine");
@@ -15,16 +14,20 @@ export const useHome = () => {
   const goToExercises = () => navigate("/ejercicios");
   const goToCreateNotification = () => navigate("/notifications/create");
   const goToPlans = () => navigate("/planes");
+  const goToRenew = () => navigate("/planes/renovar-gestion");
 
   return {
-    user,
+    user: currentUser, 
     isEntrenador,
+    isAdmin,
+    isLoading,
     goToMyRoutines,
     goToCreateRoutine,
     goToDeleteRoutine,
     goToCreateUser,
     goToExercises,
     goToCreateNotification,
-    goToPlans
+    goToPlans,
+    goToRenew
   };
 };

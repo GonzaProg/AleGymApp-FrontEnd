@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { PageLayout } from '../../Components/UI/PageLayout'; // O el layout que uses
+import { PageLayout } from '../../Components/UI/PageLayout';
 import fondoGym from '../../assets/GymFondo.jpg'; 
 import { AppStyles } from '../../Styles/AppStyles';
 import { EjerciciosPageStyles } from '../../Styles/EjerciciosPageStyles';
@@ -8,16 +8,21 @@ export const EjerciciosPage = () => {
   const navigate = useNavigate();
 
   return (
-    // Usamos AppStyles.pageContainer si quitaras el PageLayout, 
-    // pero como usas PageLayout, aplicamos estilos internos.
     <PageLayout backgroundImage={fondoGym}>
         <div className="pt-24 container mx-auto px-4">
-            <h1 className={AppStyles.title}>
-                Panel de Ejercicios 🏋️‍♂️
+            <div className={AppStyles.headerContainer}>
+            <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
+                <span className={AppStyles.title}>
+                    Panel de Ejercicios
+                </span>
+                <span className="ml-3 text-white">
+                    🏋️‍♂️
+                </span>
             </h1>
-            <p className="text-gray-200 text-center mb-12 text-lg drop-shadow-md">
+            <p className={AppStyles.subtitle}>
                 Selecciona una operación para realizar
             </p>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 

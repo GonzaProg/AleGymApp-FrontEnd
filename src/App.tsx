@@ -13,6 +13,7 @@ import { CreateNotification } from "./Pages/Notificaciones/CreateNotification";
 import { ForgotPassword } from "./Pages/Auth/ForgotPassword";
 import { ResetPassword } from "./Pages/Auth/ResetPassword";
 import { PlansManager } from "./Pages/Planes/PlansManager";
+import { RenewPlan } from "./Pages/Planes/RenewPlan";
 
 function App() {
   return (
@@ -56,6 +57,9 @@ function App() {
 
         {/* Rutas de Planes y Membresías */}
         <Route path="/planes" element={<PlansManager />} />
+
+        {/* Ruta para Renovar Planes de Usuarios*/}
+        <Route path="/planes/renovar-gestion" element={<RenewPlan />} />
 
       </Routes>
     </BrowserRouter>
