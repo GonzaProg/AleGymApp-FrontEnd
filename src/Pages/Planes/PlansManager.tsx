@@ -32,6 +32,11 @@ export const PlansManager = () => {
     handleSelectAlumno
   } = usePlans();
 
+  // --- LÓGICA VISUAL PARA PLAN VENCIDO ---
+  const isVencido = myPlan?.estado === 'Vencido';
+  const statusColor = isVencido ? "text-red-500" : "text-green-400";
+  const borderColor = isVencido ? "border-red-500" : "border-green-500";
+
   return (
     // CONTENEDOR PRINCIPAL
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans text-gray-100">
@@ -73,14 +78,14 @@ export const PlansManager = () => {
                   <Card key={plan.id} className={`${AppStyles.glassCard} hover:border-green-500/50 transition-all relative group flex flex-col`}>
                     
                     <div className="flex justify-between items-start mb-2">
-                       <h3 className="text-2xl font-bold text-white">{plan.nombre}</h3>
-                       <button onClick={() => openEditModal(plan)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar Plan">
+                        <h3 className="text-2xl font-bold text-white">{plan.nombre}</h3>
+                        <button onClick={() => openEditModal(plan)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar Plan">
                           ✏️
-                       </button>
+                        </button>
                     </div>
 
                     <div className="text-3xl font-bold text-green-400 mb-1">
-                       ${plan.precio.toLocaleString()} 
+                        ${plan.precio.toLocaleString()} 
                     </div>
 
                     {plan.fechaActualizacion && (
@@ -91,15 +96,15 @@ export const PlansManager = () => {
 
                     <div className="space-y-3 mb-6 text-sm text-gray-300 flex-grow">
                       <div className="flex items-center gap-2">
-                         <span className="bg-white/10 p-1 rounded">📅</span> 
-                         <span>Duración: <b>{plan.duracionDias} días</b></span>
+                          <span className="bg-white/10 p-1 rounded">📅</span> 
+                          <span>Duración: <b>{plan.duracionDias} días</b></span>
                       </div>
                       <div className="flex items-center gap-2">
-                         <span className="bg-white/10 p-1 rounded">💪</span> 
-                         <span>Acceso: <b>{plan.diasPorSemana === 7 ? "Pase Libre" : `${plan.diasPorSemana} días por semana`}</b></span>
+                          <span className="bg-white/10 p-1 rounded">💪</span> 
+                          <span>Acceso: <b>{plan.diasPorSemana === 7 ? "Pase Libre" : `${plan.diasPorSemana} días por semana`}</b></span>
                       </div>
                       <div className="border-t border-white/10 pt-2 mt-2 italic text-gray-400">
-                         "{plan.descripcion}"
+                          "{plan.descripcion}"
                       </div>
                     </div>
 
@@ -166,19 +171,39 @@ export const PlansManager = () => {
             {/* 2. Tarjeta de Plan Activo - Ancha y alineada */}
             {myPlan ? (
               <div className="mb-10 animate-fade-in w-full max-w-4xl">
-                <Card className={`${AppStyles.glassCard} border-l-4 border-green-500 w-full`}>
+                {/* Usamos el color de borde dinámico */}
+                <Card className={`${AppStyles.glassCard} border-l-4 ${borderColor} w-full`}>
+                  
+                  {/* Banner de Aviso si está vencido */}
+                  {isVencido && (
+                    <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 mb-4 text-red-200 text-sm font-bold flex items-center gap-2">
+                        ⚠️ Tu plan ha vencido. Tienes 5 días antes de que se deshabilite tu cuenta.
+                    </div>
+                  )}
+
                   <div className="flex flex-col md:flex-row justify-between items-center gap-6 p-2">
                       <div className="text-left">
                         <h3 className="text-3xl font-bold text-white mb-2">{myPlan.plan.nombre}</h3>
-                        <p className="text-green-400 font-bold text-lg">Estado: {myPlan.estado}</p>
+                        {/* Color de estado dinámico */}
+                        <p className={`${statusColor} font-bold text-lg uppercase tracking-wide`}>
+                            Estado: {myPlan.estado}
+                        </p>
                       </div>
                       
                       <div className="text-right w-full md:w-auto mt-4 md:mt-0">
                         <p className="text-gray-300 text-sm mb-1">Vence el: {new Date(myPlan.fechaVencimiento).toLocaleDateString()}</p>
-                        <div className="flex items-baseline justify-end gap-2">
-                           <span className="text-4xl font-bold text-white">{myPlan.diasRestantes}</span>
-                           <span className="text-sm font-normal text-gray-400">días restantes</span>
-                        </div>
+                        
+                        {/* Mostrar días o EXPIRADO */}
+                        {!isVencido ? (
+                            <div className="flex items-baseline justify-end gap-2">
+                                <span className="text-4xl font-bold text-white">{myPlan.diasRestantes}</span>
+                                <span className="text-sm font-normal text-gray-400">días restantes</span>
+                            </div>
+                        ) : (
+                            <div className="text-red-400 font-bold text-xl mt-1">
+                                🚫 EXPIRADO
+                            </div>
+                        )}
                       </div>
                   </div>
                   <div className="mt-6 pt-4 border-t border-white/10 text-gray-400 text-sm italic text-left">
@@ -189,7 +214,7 @@ export const PlansManager = () => {
             ) : (
               // 3. Estado Vacío (Sin Plan)
               !loading && (
-                <div className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm w-full max-w-4xl mx-auto">
+                <div className="flex flex-col items-center justify-center py-20 bg-gray-900/80 rounded-2xl border border-white/10 backdrop-blur-sm w-full max-w-4xl mx-auto">
                   <span className="text-5xl mb-4">📭</span>
                   <h3 className="text-xl text-white font-bold">No tienes un plan activo</h3>
                   <p className="text-gray-400 mt-2 text-center max-w-md">
