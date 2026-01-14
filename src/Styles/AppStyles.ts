@@ -1,14 +1,16 @@
 export const AppStyles = {
-    // --- LAYOUT PRINCIPAL ---
+    // LAYOUT PRINCIPAL 
     pageContainer: "relative min-h-screen font-sans bg-gray-900 text-gray-200",
-    fixedBackground: "fixed inset-0 z-0 bg-cover bg-center bg-fixed brightness-[0.3] contrast-[1.1]",
+    fixedBackground: "fixed inset-0 z-0 bg-cover bg-center bg-fixed brightness-[0.6] contrast-[1.1]",
     contentContainer: "relative z-10 pt-28 pb-10 px-4 w-full flex justify-center",
     
-    // --- TEXTOS ---
-    title: "text-4xl font-bold text-white mb-8 tracking-tight drop-shadow-lg text-center",
+    // TEXTOS 
+    headerContainer: "text-center mb-6 mt-4 animate-fade-in-down",
+    title: "text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 drop-shadow-lg mb-8",
+    subtitle: "text-gray-200 mt-2 text-lg",
     highlight: "text-green-500",
     
-    // --- COMPONENTES UI COMPARTIDOS ---
+    // COMPONENTES UI COMPARTIDOS 
     glassCard: "w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-8 relative overflow-hidden",
     
     // Inputs
@@ -16,8 +18,8 @@ export const AppStyles = {
     label: "block text-gray-400 text-xs uppercase font-bold tracking-wider mb-2",
     
     // Botones
-    btnPrimary: "bg-green-600/80 hover:bg-green-500 text-white font-bold px-14 py-3 rounded-xl shadow-lg shadow-green-900/20 border border-green-500/20 transition-all hover:scale-[1.02]",
-    btnSecondary: "bg-gray-700/50 hover:bg-gray-700 text-gray-300 font-bold px-6 py-3 rounded-xl border border-white/5 transition-all",
+    btnPrimary: "bg-green-600/70 hover:bg-green-500 text-white font-bold px-14 py-3 rounded-xl shadow-lg shadow-green-900/20 border border-green-500/20 transition-all hover:scale-[1.02]",
+    btnSecondary: "bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
     btnDanger: "bg-red-600/80 hover:bg-red-500 text-white shadow-lg shadow-red-900/20 px-20 py-3 rounded-xl border border-red-500/20 font-bold transition-all hover:scale-105",
 
     // Decoración
@@ -42,4 +44,14 @@ export const AppStyles = {
     errorBox: "bg-red-500/20 border border-red-500/50 text-red-200 p-4 rounded-lg mb-6 flex items-center gap-3",
     infoBox: "mt-2 flex items-center gap-2 text-yellow-500/80 bg-yellow-500/10 p-2 rounded-lg border border-yellow-500/20 text-xs font-bold",
 
+    // Botones de acción en listas (Editar/Borrar/Guardar/Cancelar pequeños)
+    actionBtnBase: "px-3 py-1 rounded-lg text-sm transition-all border",
+    
+    btnSave: "bg-green-600/20 text-green-500 hover:bg-green-600 hover:text-white border-green-500/30",
+    btnCancel: "bg-gray-700 text-gray-300 hover:bg-gray-600 border-transparent",
+    btnBack: "text-gray-400 hover:text-white flex items-center gap-2 transition-colors text-sm font-bold uppercase tracking-widest cursor-pointer",
+    
+    btnIconBase: "p-2 rounded-lg transition-all border",
+    btnEdit: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black border-yellow-500/20",
+    btnDelete: "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border-red-500/20",
 };

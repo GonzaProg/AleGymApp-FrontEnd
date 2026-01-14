@@ -1,15 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../../Components/Navbar';
-import fondoGym from '../../assets/Fondo-CreateRoutine.png';
+import fondoGym from '../../assets/Fondo-CreateRoutine.jpg';
 import { useEjerciciosGestion } from '../../Hooks/Ejercicios/useEjerciciosGestion';
 import { AppStyles } from '../../Styles/AppStyles';
-import { EjerciciosGestionStyles, EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
+import { EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
 import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
 
 export const EjerciciosGestion = () => {
     const navigate = useNavigate();
     
-    // RECIBIR LOS NUEVOS ESTADOS DEL HOOK
     const { 
         ejercicios, loading, uploading, editingId, editForm, selectedFile,
         videoUrl,
@@ -21,8 +20,7 @@ export const EjerciciosGestion = () => {
         <div className={AppStyles.pageContainer}>
              <div
                 className={AppStyles.fixedBackground}
-                style={{ backgroundImage: `url(${fondoGym})`,
-                filter: 'brightness(0.8) contrast(1.1)'  }}
+                style={{ backgroundImage: `url(${fondoGym})` }}
             />
 
             <Navbar />
@@ -33,7 +31,7 @@ export const EjerciciosGestion = () => {
                     {/* Header */}
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <h2 className={AppStyles.title.replace("text-center", "")}>
-                            Gestión <span className={AppStyles.highlight}>Ejercicios</span>
+                            Gestión Ejercicios
                         </h2>
                         <button 
                             onClick={() => navigate('/ejercicios/crear')}
@@ -122,22 +120,22 @@ export const EjerciciosGestion = () => {
                                                                 <button 
                                                                     onClick={() => saveEdit(ej.id)} 
                                                                     disabled={uploading}
-                                                                    className={`${TableStyles.actionBtnBase} ${TableStyles.btnSave} disabled:opacity-50 disabled:cursor-wait`}
+                                                                    className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave} disabled:opacity-50 disabled:cursor-wait`}
                                                                 >
                                                                     {uploading ? 'Subiendo...' : 'Guardar'}
                                                                 </button>
                                                                 <button 
                                                                     onClick={cancelEdit} 
                                                                     disabled={uploading}
-                                                                    className={`${TableStyles.actionBtnBase} ${TableStyles.btnCancel} disabled:opacity-50`}
+                                                                    className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel} disabled:opacity-50`}
                                                                 >
                                                                     Cancelar
                                                                 </button>
                                                             </div>
                                                         ) : (
                                                             <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                                <button onClick={() => startEdit(ej)} className={`${TableStyles.btnIconBase} ${TableStyles.btnEdit}`} title="Editar">✏️</button>
-                                                                <button onClick={() => handleDelete(ej.id)} className={`${TableStyles.btnIconBase} ${TableStyles.btnDelete}`} title="Eliminar">🗑️</button>
+                                                                <button onClick={() => startEdit(ej)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar">✏️</button>
+                                                                <button onClick={() => handleDelete(ej.id)} className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} title="Eliminar">🗑️</button>
                                                             </div>
                                                         )}
                                                     </td>
@@ -151,7 +149,7 @@ export const EjerciciosGestion = () => {
                     </div>
                     
                     <div className="mt-8">
-                        <button onClick={() => navigate('/ejercicios')} className={EjerciciosGestionStyles.btnBack}>
+                        <button onClick={() => navigate('/ejercicios')} className={AppStyles.btnBack}>
                             ⬅ Volver al Menú
                         </button>
                     </div>

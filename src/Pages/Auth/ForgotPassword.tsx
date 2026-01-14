@@ -5,7 +5,7 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
 import { useForgotPassword } from "../../Hooks/Auth/useForgotPassword";
-import fondoLogin from "../../assets/Fondo-Login.png"; 
+import fondoLogin from "../../assets/Fondo-Login.jpg"; 
 
 export const ForgotPassword = () => {
   const { email, loading, message, error, handleEmailChange, handleSubmit } = useForgotPassword();

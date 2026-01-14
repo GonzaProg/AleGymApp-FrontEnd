@@ -1,7 +1,7 @@
 import { useMyRoutines } from "../../Hooks/MyRoutines/useMyRoutines";
 import { Navbar } from "../../Components/Navbar"; 
 import { Button } from "../../Components/UI/Button";
-import fondoGym from "../../assets/Fondo-MyRoutines.png"; 
+import fondoGym from "../../assets/Fondo-MyRoutines.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
@@ -15,8 +15,7 @@ export const MyRoutines = () => {
       <div
         className={AppStyles.fixedBackground}
         style={{
-          backgroundImage: `url(${fondoGym})`,
-          filter: 'brightness(0.8) contrast(1.1)' 
+          backgroundImage: `url(${fondoGym})`
         }}
       />
 
@@ -25,9 +24,16 @@ export const MyRoutines = () => {
       <div className={AppStyles.contentContainer}>
         <div className="w-full max-w-6xl space-y-6">
             
-          <h2 className={AppStyles.title}>
-            Mis <span className={AppStyles.highlight}>Rutinas</span> 💪
-          </h2>
+          <div className={AppStyles.headerContainer}>
+                      <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
+                          <span className={AppStyles.title}>
+                              Mis Rutinas
+                          </span>
+                          <span className="ml-3 text-white">
+                              💪
+                          </span>
+                      </h2>
+                      </div>
       
           {loading ? (
              <div className="text-center py-20">

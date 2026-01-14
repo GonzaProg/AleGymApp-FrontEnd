@@ -2,7 +2,7 @@ import { useCreateRoutine } from "../../Hooks/CreateRoutine/useCreateRoutine";
 import { Navbar } from "../../Components/Navbar"; 
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
-import fondoGym from "../../assets/Fondo-CreateRoutine.png"; 
+import fondoGym from "../../assets/Fondo-CreateRoutine.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles";
 
 export const CreateRoutine = () => {
@@ -20,8 +20,7 @@ export const CreateRoutine = () => {
       <div
         className={AppStyles.fixedBackground}
         style={{
-          backgroundImage: `url(${fondoGym})`,
-          filter: 'brightness(0.8) contrast(1.1)' 
+          backgroundImage: `url(${fondoGym})`
         }}
       />
 
@@ -30,8 +29,8 @@ export const CreateRoutine = () => {
       <div className={AppStyles.contentContainer}>
         <div className="w-full max-w-5xl space-y-6">
             
-          <h2 className={AppStyles.title}>
-            Nueva <span className={AppStyles.highlight}>Rutina</span>
+          <h2 className={`${AppStyles.title} text-center`}>
+            Nueva Rutina
           </h2>
       
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

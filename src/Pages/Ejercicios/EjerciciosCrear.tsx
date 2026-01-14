@@ -1,5 +1,5 @@
 import { Navbar } from '../../Components/Navbar';
-import fondoGym from '../../assets/Fondo-CreateRoutine.png';
+import fondoGym from '../../assets/Fondo-CreateRoutine.jpg';
 import { useEjerciciosCrear } from '../../Hooks/Ejercicios/useEjerciciosCrear'; 
 import { AppStyles } from '../../Styles/AppStyles';
 
@@ -9,32 +9,34 @@ export const EjerciciosCrear = () => {
         form, 
         loading, 
         error, 
-        selectedFile, // Recibimos el archivo seleccionado
+        selectedFile, 
         handleInputChange, 
-        handleFileChange, // Recibimos el handler de archivo
+        handleFileChange, 
         handleSubmit, 
         handleCancel 
     } = useEjerciciosCrear();
 
     return (
         <div className={AppStyles.pageContainer}>
-            {/* --- FONDO FIJO --- */}
+            {/*  FONDO FIJO  */}
             <div
                 className={AppStyles.fixedBackground}
-                style={{ backgroundImage: `url(${fondoGym})`, 
-                filter: 'brightness(0.8) contrast(1.1)' }}
+                style={{ backgroundImage: `url(${fondoGym})` 
+                }}
             />
 
             <Navbar />
 
-            {/* --- CONTENIDO --- */}
+            {/*  CONTENIDO  */}
             <div className={AppStyles.contentContainer}>
                 <div className="w-full max-w-2xl">
                     
+                    <div className={AppStyles.headerContainer}>
                     {/* Título */}
                     <h2 className={AppStyles.title}>
-                        Nuevo <span className={AppStyles.highlight}>Ejercicio</span>
+                        Nuevo Ejercicio
                     </h2>
+                    </div>
 
                     {/* Tarjeta del Formulario */}
                     <div className={AppStyles.glassCard}>
