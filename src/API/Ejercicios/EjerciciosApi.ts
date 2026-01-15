@@ -4,12 +4,14 @@ export interface Ejercicio {
     id: number;
     nombre: string;
     urlVideo?: string;
+    imagenUrl?: string;
     fechaActualizacion?: Date;
 }
 
 export interface EjercicioDTO {
     nombre: string;
     urlVideo?: string;
+    imagenUrl?: string;
 }
 
 export const EjerciciosApi = {
