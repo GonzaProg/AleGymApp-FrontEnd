@@ -5,6 +5,7 @@ import fondoGym from "../../assets/Fondo-MyRoutines.jpg";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
+import { getExerciseThumbnail } from "../../Helpers/CloudinaryHelper"; // <--- IMPORTANTE
 
 export const MyRoutines = () => {
   const { rutinas, loading, selectedRoutine, setSelectedRoutine, videoUrl, closeModal, closeVideo, handleOpenVideo } = useMyRoutines();
@@ -25,15 +26,15 @@ export const MyRoutines = () => {
         <div className="w-full max-w-6xl space-y-6">
             
           <div className={AppStyles.headerContainer}>
-                      <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
-                          <span className={AppStyles.title}>
-                              Mis Rutinas
-                          </span>
-                          <span className="ml-3 text-white">
-                              💪
-                          </span>
-                      </h2>
-                      </div>
+              <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
+                  <span className={AppStyles.title}>
+                      Mis Rutinas
+                  </span>
+                  <span className="ml-3 text-white">
+                      💪
+                  </span>
+              </h2>
+          </div>
       
           {loading ? (
              <div className="text-center py-20">
@@ -50,7 +51,7 @@ export const MyRoutines = () => {
 
           ) : (
             
-            /*  GRID DE RUTINAS  */
+            /* GRID DE RUTINAS  */
             <div className={MyRoutinesStyles.grid}>
               {rutinas.map((rutina) => (
                 <div 
@@ -102,10 +103,11 @@ export const MyRoutines = () => {
         </div>
       </div>
 
-      {/*  MODAL DETALLE  */}
+      {/* MODAL DETALLE (ESTILO NUEVO)  */}
       {selectedRoutine && (
         <div className={AppStyles.modalOverlay}>
-           <div className={AppStyles.modalContent}>
+           {/* Hacemos el modal más ancho (max-w-4xl) para el diseño horizontal */}
+           <div className={`${AppStyles.modalContent} max-w-4xl`}>
               
               {/* Header Modal */}
               <div className={MyRoutinesStyles.modalHeader}>
@@ -117,39 +119,93 @@ export const MyRoutines = () => {
                  <button onClick={closeModal} className="text-gray-400 hover:text-white text-3xl leading-none transition-colors">&times;</button>
               </div>
               
-              {/* Body Modal */}
-              <div className={MyRoutinesStyles.modalBody}>
-                 {selectedRoutine.detalles.map((d:any, i:number) => (
-                    <div key={i} className={MyRoutinesStyles.exerciseRow}>
-                       <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className={AppStyles.numberBadge}>#{i + 1}</span>
-                            <h4 className="font-bold text-gray-100 text-lg">{d.ejercicio.nombre}</h4>
-                          </div>
-                          {d.ejercicio.urlVideo && (
-                            <button onClick={() => handleOpenVideo(d.ejercicio.urlVideo)} className={MyRoutinesStyles.videoBtn}>
-                              ▶ Ver Video
-                            </button>
-                          )}
-                       </div>
-                       
-                       {/* Métricas */}
-                       <div className="flex gap-3 text-center">
-                          <div className={MyRoutinesStyles.metricBox}>
-                             <p className={MyRoutinesStyles.metricLabel}>Series</p>
-                             <p className={MyRoutinesStyles.metricValue}>{d.series}</p>
-                          </div>
-                          <div className={MyRoutinesStyles.metricBox}>
-                             <p className={MyRoutinesStyles.metricLabel}>Reps</p>
-                             <p className={MyRoutinesStyles.metricValue}>{d.repeticiones}</p>
-                          </div>
-                          <div className={`${MyRoutinesStyles.metricBox} bg-green-900/20 border-green-500/30`}>
-                             <p className={`${MyRoutinesStyles.metricLabel} text-green-400`}>Peso</p>
-                             <p className={`${MyRoutinesStyles.metricValue} text-green-400`}>{d.peso}<span className="text-xs ml-1">kg</span></p>
-                          </div>
-                       </div>
-                    </div>
-                 ))}
+              {/* Body Modal - Lista de Ejercicios */}
+              <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                 {selectedRoutine.detalles.map((d:any, i:number) => {
+                    
+                    // USAMOS EL HELPER AQUÍ PARA OBTENER LA IMAGEN
+                    const thumbnail = getExerciseThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
+
+                    return (
+                        // --- TARJETA DE EJERCICIO ---
+                        <div key={i} className="bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row gap-6 items-center md:items-stretch transition-all hover:bg-gray-800/80 group">
+                            
+                            {/* 1. IMAGEN (Izquierda) */}
+                            <div className="w-full md:w-48 h-32 flex-shrink-0 bg-black/40 rounded-lg border border-white/5 overflow-hidden relative">
+                                {thumbnail ? (
+                                    <img 
+                                        src={thumbnail} 
+                                        alt={d.ejercicio.nombre} 
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
+                                        <span className="text-3xl opacity-50">🏋️‍♂️</span>
+                                        <span className="text-xs mt-1">Sin imagen</span>
+                                    </div>
+                                )}
+                                
+                                {/* Overlay para ver video si existe */}
+                                {d.ejercicio.urlVideo && (
+                                    <div 
+                                        onClick={() => handleOpenVideo(d.ejercicio.urlVideo)}
+                                        className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-[1px]"
+                                    >
+                                        <span className="bg-gray-300/50 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform text-xl pl-0.5">
+                                            ▶
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* 2. CONTENIDO (Derecha) */}
+                            <div className="flex-1 flex flex-col justify-between w-full">
+                                
+                                {/* Título y Badge Número */}
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="bg-green-900/50 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">
+                                                #{i + 1}
+                                            </span>
+                                            <h4 className="font-bold text-white text-xl">{d.ejercicio.nombre}</h4>
+                                        </div>
+
+                                        {/* OPCIONAL: Enlace al video debajo del título
+                                        {d.ejercicio.urlVideo && (
+                                            <p 
+                                                className="text-xs text-green-400 mt-2 flex items-center gap-1 cursor-pointer hover:underline w-fit" 
+                                                onClick={() => handleOpenVideo(d.ejercicio.urlVideo)}
+                                            >
+                                                <span>📹</span> Ver demostración
+                                            </p>
+                                        )}
+                                        */}
+                                    </div>
+                                </div>
+
+                                {/* Métricas (Cajas Negras) */}
+                                <div className="grid grid-cols-3 gap-2 md:gap-4">
+                                    <div className="bg-black/40 rounded-lg p-2 text-center border border-white/5">
+                                        <span className="text-xs text-gray-500 uppercase font-bold tracking-wider block mb-1">Series</span>
+                                        <span className="text-xl font-bold text-white">{d.series}</span>
+                                    </div>
+                                    <div className="bg-black/40 rounded-lg p-2 text-center border border-white/5">
+                                        <span className="text-xs text-gray-500 uppercase font-bold tracking-wider block mb-1">Reps</span>
+                                        <span className="text-xl font-bold text-white">{d.repeticiones}</span>
+                                    </div>
+                                    <div className="bg-green-900/10 rounded-lg p-2 text-center border border-green-500/20">
+                                        <span className="text-xs text-green-500/70 uppercase font-bold tracking-wider block mb-1">Peso</span>
+                                        <span className="text-xl font-bold text-green-400">
+                                            {d.peso > 0 ? `${d.peso} kg` : '-'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    );
+                 })}
               </div>
               
               {/* Footer Modal */}
@@ -162,7 +218,7 @@ export const MyRoutines = () => {
         </div>
       )}
       
-      {/*  MODAL VIDEO  */}
+      {/* MODAL VIDEO  */}
       {videoUrl && (
         <div className={MyRoutinesStyles.videoContainer}>
            <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
@@ -170,7 +226,6 @@ export const MyRoutines = () => {
            </button>
            
            <div className="w-full max-w-4xl aspect-video px-4">
-             {/* 2. REEMPLAZAMOS EL IFRAME POR EL COMPONENTE */}
              <VideoEjercicio url={videoUrl} />
            </div>
            
