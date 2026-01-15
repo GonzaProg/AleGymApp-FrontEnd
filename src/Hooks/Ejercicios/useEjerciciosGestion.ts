@@ -10,94 +10,78 @@ export const useEjerciciosGestion = () => {
     const [ejercicios, setEjercicios] = useState<Ejercicio[]>([]);
     const [loading, setLoading] = useState(false);
     
-    // Estados para Edición
+    // Edición
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [editForm, setEditForm] = useState<EjercicioDTO>({ nombre: '', urlVideo: '' });
+    const [editForm, setEditForm] = useState<EjercicioDTO>({ nombre: '', urlVideo: '', imagenUrl: '' });
 
-    // Estados para subida de video
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    // Archivos seleccionados en edición
+    const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
 
-    //  Estado para el Visor de Video 
+    // Modals
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null); // Nuevo Modal Imagen
 
-    // 1. Cargar Ejercicios
     const fetchEjercicios = useCallback(async () => {
         setLoading(true);
         try {
             const data = await EjerciciosApi.getAll();
             setEjercicios(data);
-        } catch (err) {
-            console.error("Error al cargar ejercicios", err);
-        } finally {
-            setLoading(false);
-        }
+        } catch (err) { console.error(err); } 
+        finally { setLoading(false); }
     }, []);
 
-    useEffect(() => {
-        fetchEjercicios();
-    }, [fetchEjercicios]);
+    useEffect(() => { fetchEjercicios(); }, [fetchEjercicios]);
 
-    // 2. Eliminar
     const handleDelete = async (id: number) => {
         if (!isAdmin) return alert("Solo administradores pueden eliminar.");
-        if (!window.confirm("¿Seguro que deseas eliminar este ejercicio?")) return;
+        if (!window.confirm("¿Eliminar ejercicio?")) return;
         try {
             await EjerciciosApi.delete(id);
             setEjercicios(prev => prev.filter(e => e.id !== id));
-        } catch (err: any) {
-            const mensajeBackend = err.response?.data?.message || err.response?.data?.error;
-            alert(mensajeBackend || "Error al eliminar");
-        }
+        } catch (err: any) { alert("Error al eliminar"); }
     };
 
-    // 3. Edición
-    const startEdit = (ejercicio: Ejercicio) => {
+    const startEdit = (ej: Ejercicio) => {
         if (!isAdmin && !isEntrenador) return;
-        setEditingId(ejercicio.id);
-        setEditForm({ nombre: ejercicio.nombre, urlVideo: ejercicio.urlVideo || '' });
-        setSelectedFile(null);
+        setEditingId(ej.id);
+        setEditForm({ nombre: ej.nombre, urlVideo: ej.urlVideo || '', imagenUrl: ej.imagenUrl || '' });
+        setSelectedVideo(null);
+        setSelectedImage(null);
     };
 
     const cancelEdit = () => {
         setEditingId(null);
-        setEditForm({ nombre: '', urlVideo: '' });
-        setSelectedFile(null);
+        setEditForm({ nombre: '', urlVideo: '', imagenUrl: '' });
+        setSelectedVideo(null);
+        setSelectedImage(null);
     };
 
-    const uploadVideoToCloudinary = async (file: File): Promise<string> => {
+    const uploadToCloudinary = async (file: File, type: 'video' | 'image'): Promise<string> => {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('upload_preset', UPLOAD_PRESET);
-
-        try {
-            const res = await fetch(
-                `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, 
-                { method: 'POST', body: formData }
-            );
-            const data = await res.json();
-            if (!res.ok) throw new Error("Error al subir video");
-            return data.secure_url;
-        } catch (error) {
-            console.error("Cloudinary Error:", error);
-            throw error;
-        }
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${type}/upload`, { method: 'POST', body: formData });
+        const data = await res.json();
+        return data.secure_url;
     };
 
     const saveEdit = async (id: number) => {
         setUploading(true);
         try {
-            let finalUrl = editForm.urlVideo;
-            if (selectedFile) {
-                finalUrl = await uploadVideoToCloudinary(selectedFile);
-            }
-            const actualizado = await EjerciciosApi.update(id, { 
-                ...editForm, 
-                urlVideo: finalUrl 
-            });
+            let finalVideo = editForm.urlVideo;
+            let finalImage = editForm.imagenUrl;
+
+            const uploads = [];
+            if (selectedVideo) uploads.push(uploadToCloudinary(selectedVideo, 'video').then(u => finalVideo = u));
+            if (selectedImage) uploads.push(uploadToCloudinary(selectedImage, 'image').then(u => finalImage = u));
+            
+            await Promise.all(uploads);
+
+            const actualizado = await EjerciciosApi.update(id, { ...editForm, urlVideo: finalVideo, imagenUrl: finalImage });
             setEjercicios(prev => prev.map(e => (e.id === id ? actualizado : e)));
-            setEditingId(null);
-            setSelectedFile(null);
+            cancelEdit();
         } catch (err: any) {
             alert(err.response?.data?.error || "Error al actualizar");
         } finally {
@@ -109,38 +93,22 @@ export const useEjerciciosGestion = () => {
         setEditForm(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setSelectedFile(e.target.files[0]);
-        }
+    const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files?.[0]) setSelectedVideo(e.target.files[0]);
     };
 
-    // Funciones para abrir/cerrar Modal de Video 
-    const handleOpenVideo = (url: string) => {
-        if (url) setVideoUrl(url);
-    };
-
-    const closeVideo = () => {
-        setVideoUrl(null);
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files?.[0]) setSelectedImage(e.target.files[0]);
     };
 
     return {
-        ejercicios,
-        loading,
-        uploading,
-        isAdmin,
-        editingId,
-        editForm,
-        selectedFile,
-        videoUrl, 
-        handleOpenVideo,
-        closeVideo,
-        handleDelete,
-        startEdit,
-        cancelEdit,
-        saveEdit,
-        handleEditInputChange,
-        handleFileChange,
+        ejercicios, loading, uploading, isAdmin,
+        editingId, editForm, 
+        selectedVideo, selectedImage,
+        videoUrl, imageUrl, // Exportamos estados de modales
+        setVideoUrl, setImageUrl, // Setters para abrir/cerrar
+        handleDelete, startEdit, cancelEdit, saveEdit, handleEditInputChange,
+        handleVideoChange, handleImageChange,
         refetch: fetchEjercicios
     };
 };

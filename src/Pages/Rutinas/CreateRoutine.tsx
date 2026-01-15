@@ -36,10 +36,10 @@ export const CreateRoutine = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* --- COLUMNA 1: DATOS --- */}
-            <div className={AppStyles.glassCard}>
-               <div className={AppStyles.gradientDivider}></div>
+            <div className={`${AppStyles.glassCard} overflow-visible z-50`}>
+               <div className={"absolute top-[1px] left-[6px] w-[calc(100%-2px)] h-1 bg-gradient-to-r from-green-500/50 to-transparent rounded-t-3xl"}></div>
                
-               <h3 className={AppStyles.sectionTitle}>
+               <h3 className={`${AppStyles.sectionTitle} left-[100px]`}>
                   <span className={AppStyles.numberBadge}>1</span> Datos Generales
                </h3>
 
