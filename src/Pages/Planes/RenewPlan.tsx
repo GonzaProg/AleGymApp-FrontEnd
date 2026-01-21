@@ -1,6 +1,4 @@
-import { Navbar } from "../../Components/Navbar";
 import { useRenewPlan } from "../../Hooks/Planes/useRenewPlan"; 
-import fondoGym from "../../assets/Fondo-RenewPlan.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { RenewPlanStyles } from "../../Styles/RenewPlanStyles";
 
@@ -29,30 +27,15 @@ export const RenewPlan = () => {
   };
 
   return (
-    <div className={AppStyles.pageContainer}>
-      {/* Fondo */}
-      <div 
-        className={AppStyles.fixedBackground} 
-        style={{ backgroundImage: `url(${fondoGym})` }} 
-      />
-      <div className="fixed inset-0 z-0" />
-
-      <div className="relative z-10">
-        <Navbar />
-
-        <div className="container mx-auto px-4 py-24 max-w-5xl">
+    <div className="w-full h-full flex flex-col pt-6 animate-fade-in">
+        <div className="container mx-auto px-4 max-w-5xl">
           
           {/* HEADER */}
-          <div className={AppStyles.headerContainer}>
-            <h1 className={AppStyles.title}>
-              Gestión de Membresías
-            </h1>
-            <p className={AppStyles.subtitle}>
-              Administra renovaciones, altas y bajas de planes.
-            </p>
+          <div className={AppStyles.headerContainer + " mb-8"}>
+            <p className={AppStyles.subtitle}>Administra renovaciones, altas y bajas.</p>
           </div>
 
-          {/*  BUSCADOR  */}
+          {/* BUSCADOR  */}
           {!alumnoSeleccionado && (
             <div className={RenewPlanStyles.searchWrapper}>
               <div className={RenewPlanStyles.searchGlow}></div>
@@ -61,11 +44,10 @@ export const RenewPlan = () => {
                   type="text"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
-                  placeholder="🔍 Buscar alumno por nombre o email..."
+                  placeholder="🔍 Buscar alumno por nombre..."
                   className={RenewPlanStyles.searchInput}
                 />
                 
-                {/* LISTA DE SUGERENCIAS (Reutilizamos AppStyles) */}
                 {sugerencias.length > 0 && (
                   <ul className={AppStyles.suggestionsList}>
                     {sugerencias.map((alumno) => (
@@ -74,7 +56,10 @@ export const RenewPlan = () => {
                         onClick={() => seleccionarAlumno(alumno)}
                         className={AppStyles.suggestionItem}
                       >
-                        <span className="font-medium">{alumno.nombre} {alumno.apellido}</span>
+                        <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
+                                        {alumno.nombre.charAt(0)}
+                        </div>
+                        <span className="text-white font-medium">{alumno.nombre} {alumno.apellido}</span>
                         <span className="text-xs text-gray-500 bg-gray-900 px-2 py-1 rounded">{alumno.email}</span>
                       </li>
                     ))}
@@ -84,16 +69,13 @@ export const RenewPlan = () => {
             </div>
           )}
 
-          {/*  DETALLE ALUMNO SELECCIONADO  */}
+          {/* DETALLE ALUMNO SELECCIONADO  */}
           {alumnoSeleccionado && (
-            // Usamos glassCard de AppStyles
             <div className={`${AppStyles.glassCard} animate-fade-in`}>
               
               {/* Encabezado del Alumno */}
               <div className="flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-6 mb-6">
                 <div className="flex items-center gap-4">
-                  
-                  {/* AVATAR */}
                   <div className={RenewPlanStyles.avatarContainer}>
                     {alumnoSeleccionado.fotoPerfil ? (
                         <img 
@@ -108,7 +90,6 @@ export const RenewPlan = () => {
                         </span>
                     )}
                   </div>
-
                   <div>
                     <h2 className="text-2xl font-bold text-white">
                       {alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido}
@@ -125,15 +106,12 @@ export const RenewPlan = () => {
                 </button>
               </div>
 
-              {/* Lógica de Visualización: ¿Tiene Plan? */}
+              {/* Lógica de Visualización */}
               {alumnoSeleccionado.planActual ? (
-                
-                //  CASO 1: TIENE PLAN (RENOVAR) 
+                // CASO 1: TIENE PLAN
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Tarjeta Plan Activo */}
                   <div className={RenewPlanStyles.activePlanCard}>
                     <div className={RenewPlanStyles.activePlanDecor}></div>
-                    
                     <h3 className={RenewPlanStyles.activeLabel}>Plan Activo</h3>
                     <p className={RenewPlanStyles.activePrice}>{alumnoSeleccionado.planActual.nombre}</p>
                     
@@ -157,12 +135,10 @@ export const RenewPlan = () => {
                     </div>
                   </div>
 
-                  {/* Botones de Acción (Reutilizando AppStyles + Custom Layout) */}
                   <div className="flex flex-col justify-center gap-4">
                     <button 
                       onClick={renovarPlan}
                       disabled={loadingAction}
-                      // Aquí usamos AppStyles.btnPrimary pero le agregamos w-full para este layout
                       className={`${AppStyles.btnPrimary} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       {loadingAction ? 'Procesando...' : '♻️ RENOVAR SUSCRIPCIÓN'}
@@ -173,43 +149,38 @@ export const RenewPlan = () => {
                       disabled={loadingAction}
                       className={`${AppStyles.btnSecondary} w-full`}
                     >
-                       Cancelar Plan Actual
+                        Cancelar Plan Actual
                     </button>
                   </div>
                 </div>
 
               ) : (
-                
-                //  CASO 2: NO TIENE PLAN (ASIGNAR) 
+                // CASO 2: NO TIENE PLAN
                 <div>
-                   <div className={RenewPlanStyles.emptyStateBox}>
-                      <p className={RenewPlanStyles.emptyStateText}>⚠️ Este usuario no tiene suscripción activa. Selecciona un plan.</p>
-                   </div>
+                    <div className={RenewPlanStyles.emptyStateBox}>
+                       <p className={RenewPlanStyles.emptyStateText}>⚠️ Este usuario no tiene suscripción activa. Selecciona un plan.</p>
+                    </div>
 
-                   <div className={RenewPlanStyles.plansGrid}>
-                      {planesDisponibles.map(plan => (
-                        <div 
-                          key={plan.id}
-                          onClick={() => asignarPlan(plan)}
-                          className={RenewPlanStyles.planOptionCard}
-                        >
-                           <h4 className={RenewPlanStyles.planOptionTitle}>{plan.nombre}</h4>
-                           <p className={RenewPlanStyles.planOptionPrice}>${plan.precio}</p>
-                           <p className={RenewPlanStyles.planOptionDuration}>{plan.duracionDias} días</p>
-                           
-                           <button className={RenewPlanStyles.btnSelect}>
-                              SELECCIONAR
-                           </button>
-                        </div>
-                      ))}
-                   </div>
+                    <div className={RenewPlanStyles.plansGrid}>
+                       {planesDisponibles.map(plan => (
+                         <div 
+                           key={plan.id}
+                           onClick={() => asignarPlan(plan)}
+                           className={RenewPlanStyles.planOptionCard}
+                         >
+                            <h4 className={RenewPlanStyles.planOptionTitle}>{plan.nombre}</h4>
+                            <p className={RenewPlanStyles.planOptionPrice}>${plan.precio}</p>
+                            <p className={RenewPlanStyles.planOptionDuration}>{plan.duracionDias} días</p>
+                            
+                            <button className={RenewPlanStyles.btnSelect}>SELECCIONAR</button>
+                         </div>
+                       ))}
+                    </div>
                 </div>
               )}
             </div>
           )}
-
         </div>
-      </div>
     </div>
   );
 };

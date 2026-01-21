@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
+import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const useRenewPlan = () => {
     // --- ESTADOS DE DATOS ---
@@ -39,8 +40,7 @@ export const useRenewPlan = () => {
     const sugerencias = useMemo(() => {
         if (busqueda.length === 0) return [];
         return todosLosAlumnos.filter(u => 
-            `${u.nombre} ${u.apellido}`.toLowerCase().includes(busqueda.toLowerCase()) ||
-            u.email.toLowerCase().includes(busqueda.toLowerCase())
+            `${u.nombre} ${u.apellido}`.toLowerCase().includes(busqueda.toLowerCase())
         );
     }, [busqueda, todosLosAlumnos]);
 
@@ -62,14 +62,14 @@ export const useRenewPlan = () => {
         setLoadingAction(true);
         try {
             await PlansApi.renewPlan(alumnoSeleccionado.id);
-            alert(`✅ Plan de ${alumnoSeleccionado.nombre} renovado.`);
+            showSuccess(`✅ Plan de ${alumnoSeleccionado.nombre} renovado.`);
             // Actualizamos la lista localmente para no recargar toda la página
             await cargarDatosIniciales(); 
             // Buscamos al usuario actualizado en la nueva lista para refrescar la vista
             setAlumnoSeleccionado((prev: any) => ({...prev, estadoMembresia: 'Activo'})); // Optimista simple o recargar selección
             limpiarSeleccion(); // Opcional: volver al buscador
         } catch (error: any) {
-            alert(error.response?.data?.message || "Error al renovar");
+            showError(error.response?.data?.message || "Error al renovar");
         } finally {
             setLoadingAction(false);
         }
@@ -86,7 +86,7 @@ export const useRenewPlan = () => {
             setAlumnoSeleccionado({ ...alumnoSeleccionado, planActual: null });
             await cargarDatosIniciales(); // Sincronización real de fondo
         } catch (error: any) {
-            alert("Error al cancelar");
+            showError("Error al cancelar");
         } finally {
             setLoadingAction(false);
         }
@@ -99,11 +99,11 @@ export const useRenewPlan = () => {
         setLoadingAction(true);
         try {
             await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!);
-            alert("✅ Plan asignado correctamente.");
+            showSuccess("✅ Plan asignado correctamente.");
             await cargarDatosIniciales();
             limpiarSeleccion();
         } catch (error: any) {
-            alert("Error al asignar plan");
+            showError("Error al asignar plan");
         } finally {
             setLoadingAction(false);
         }

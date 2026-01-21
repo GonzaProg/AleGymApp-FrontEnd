@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { useAuthUser } from "../useAuthUser"; 
+import { showSuccess, showError, showConfirm } from "../../Helpers/Alerts";
 
 export const useDeleteRoutine = () => {
   // --- SEGURIDAD ---
@@ -74,11 +75,17 @@ export const useDeleteRoutine = () => {
   const handleDelete = async (rutinaId: number) => {
     // Validación de Seguridad Extra
     if (!isAdmin && !isEntrenador) {
-        return alert("Solo los administradores y entrenadores pueden eliminar rutinas.");
+        return showError("Solo los administradores y entrenadores pueden eliminar rutinas.");
     }
 
-    if (!window.confirm("¿Estás SEGURO de eliminar esta rutina? Esta acción no se puede deshacer.")) {
-      return;
+    const result = await showConfirm(
+        "¿Seguro que desea Eliminar esta rutina?", 
+        "Esta acción no se puede deshacer."
+    );
+
+    // Si el usuario toca "Cancelar" o hace click fuera, result.isConfirmed será false
+    if (!result.isConfirmed) {
+      return; 
     }
 
     try {
@@ -87,10 +94,10 @@ export const useDeleteRoutine = () => {
 
       // Actualizamos el estado local (Optimistic update)
       setRutinas((prev) => prev.filter((r) => r.id !== rutinaId));
-      alert("Rutina eliminada.");
+      showSuccess("Rutina eliminada.");
     } catch (error: any) {
       const msg = error.response?.data?.message || "Error al eliminar la rutina.";
-      alert(msg);
+      showError(msg);
       console.error(error);
     }
   };

@@ -6,14 +6,15 @@ import { CreateUser } from "./Pages/Usuarios/CreateUser";
 import { Profile } from "./Pages/Usuarios/Profile";
 import { MyRoutines } from "./Pages/Rutinas/MyRoutines";
 import { DeleteRoutine } from "./Pages/Rutinas/DeleteRoutine";
-import { EjerciciosPage } from "./Pages/Ejercicios/EjerciciosPage";
 import { EjerciciosCrear } from './Pages/Ejercicios/EjerciciosCrear';
 import { EjerciciosGestion } from './Pages/Ejercicios/EjerciciosGestion';
 import { CreateNotification } from "./Pages/Notificaciones/CreateNotification";
 import { ForgotPassword } from "./Pages/Auth/ForgotPassword";
 import { ResetPassword } from "./Pages/Auth/ResetPassword";
 import { PlansManager } from "./Pages/Planes/PlansManager";
+import { UserPlan } from "./Pages/Planes/UserPlan";
 import { RenewPlan } from "./Pages/Planes/RenewPlan";
+import {UserProfile} from "./Pages/Usuarios/UserProfile";
 
 function App() {
   return (
@@ -34,8 +35,9 @@ function App() {
         {/* Ruta para Crear Usuario */}
         <Route path="/create-user" element={<CreateUser />} />
 
-        {/* Ruta para Perfil de Usuario */}
+        {/* Ruta para Perfil */}
         <Route path="/profile" element={<Profile />} />
+        <Route path="/user-profile" element={<UserProfile />} />
 
         {/* Ruta para Mis Rutinas */}
         <Route path="/my-routines" element={<MyRoutines />} />
@@ -44,7 +46,6 @@ function App() {
         <Route path="/delete-routine" element={<DeleteRoutine />} />
 
         {/* Rutas para Ejercicios */}
-        <Route path="/ejercicios" element={<EjerciciosPage/>} />
         <Route path="/ejercicios/crear" element={<EjerciciosCrear />} />
         <Route path="/ejercicios/gestion" element={<EjerciciosGestion />} />
 
@@ -57,6 +58,7 @@ function App() {
 
         {/* Rutas de Planes y Membresías */}
         <Route path="/planes" element={<PlansManager />} />
+        <Route path="/planes/mi-plan" element={<UserPlan />} />
 
         {/* Ruta para Renovar Planes de Usuarios*/}
         <Route path="/planes/renovar-gestion" element={<RenewPlan />} />
