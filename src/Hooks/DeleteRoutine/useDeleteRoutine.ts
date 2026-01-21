@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { useAuthUser } from "../useAuthUser"; 
-import { showSuccess, showError, showConfirm } from "../../Helpers/Alerts";
+import { showSuccess, showError, showConfirmDelete } from "../../Helpers/Alerts";
 
 export const useDeleteRoutine = () => {
   // --- SEGURIDAD ---
@@ -78,7 +78,7 @@ export const useDeleteRoutine = () => {
         return showError("Solo los administradores y entrenadores pueden eliminar rutinas.");
     }
 
-    const result = await showConfirm(
+    const result = await showConfirmDelete(
         "¿Seguro que desea Eliminar esta rutina?", 
         "Esta acción no se puede deshacer."
     );

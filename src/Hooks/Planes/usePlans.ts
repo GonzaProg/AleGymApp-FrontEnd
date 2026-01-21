@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
 import { UsuarioApi, type AlumnoDTO } from "../../API/Usuarios/UsuarioApi"; 
-import { showError, showSuccess } from "../../Helpers/Alerts";
+import { showError, showSuccess, showConfirmSuccess } from "../../Helpers/Alerts";
 
 export const usePlans = () => {
     // --- ESTADOS DE DATOS ---
@@ -112,15 +112,23 @@ export const usePlans = () => {
         const alumnoObj = todosLosAlumnos.find(u => u.id === alumnoSeleccionadoId);
 
         if (alumnoObj && alumnoObj.planActual) {
-            const mensaje = 
-                `⚠️ ${alumnoObj.nombre} ya tiene activo el plan "${alumnoObj.planActual.nombre}".\n\n` +
-                `¿Deseas darlo de baja y activar el nuevo plan "${selectedPlanToSubscribe.nombre}" ahora mismo?\n` +
-                `(La fecha de vencimiento se reiniciará a partir de hoy).`;
+            const result = await showConfirmSuccess( 
+                `⚠️ ${alumnoObj.nombre} ya tiene activo el plan "${alumnoObj.planActual.nombre}".\n\n`,
+                `¿Deseas darlo de baja y activar el nuevo plan "${selectedPlanToSubscribe.nombre}" ahora mismo?\n`);
             
-            if (!confirm(mensaje)) return;
+            if (!result.isConfirmed) {
+                return;
+            }
         } else {
             const nombreAlumno = alumnoObj ? alumnoObj.nombre : "este alumno";
-            if (!confirm(`¿Confirmas asignar "${selectedPlanToSubscribe.nombre}" a ${nombreAlumno}?`)) return;
+            const result = await showConfirmSuccess(
+                "¿Confirmar?", 
+                `¿Confirmas asignar "${selectedPlanToSubscribe.nombre}" a ${nombreAlumno}?`
+            );
+
+            if (!result.isConfirmed) {
+                return; 
+            }
         }
 
         try {

@@ -5,7 +5,7 @@ import fondoGym from "../../assets/Fondo-MyRoutines.jpg";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
-import { getExerciseThumbnail } from "../../Helpers/CloudinaryHelper"; // <--- IMPORTANTE
+import { getExerciseThumbnail } from "../../Helpers/CloudinaryHelper"; 
 
 export const MyRoutines = () => {
   const { rutinas, loading, selectedRoutine, setSelectedRoutine, videoUrl, closeModal, closeVideo, handleOpenVideo } = useMyRoutines();
