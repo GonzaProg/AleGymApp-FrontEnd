@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { NotificacionesApi, type Notificacion } from "../../API/Notificaciones/NotificacionesApi";
+import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const useNotificaciones = () => {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
@@ -39,9 +40,9 @@ export const useNotificaciones = () => {
     setLoading(true);
     try {
       await NotificacionesApi.broadcast(titulo, mensaje);
-      alert("✅ Notificación enviada a todos los usuarios.");
+      showSuccess("✅ Notificación enviada a todos los usuarios.");
     } catch (error: any) {
-      alert("❌ Error al enviar: " + (error.response?.data?.error || "Desconocido"));
+      showError("❌ Error al enviar: " + (error.response?.data?.error || "Desconocido"));
     } finally {
       setLoading(false);
     }

@@ -5,7 +5,7 @@ import fondoGym from "../../assets/Fondo-MyRoutines.jpg";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
-import { getExerciseThumbnail } from "../../Helpers/CloudinaryHelper"; // <--- IMPORTANTE
+import { getExerciseThumbnail } from "../../Helpers/CloudinaryHelper"; 
 
 export const MyRoutines = () => {
   const { rutinas, loading, selectedRoutine, setSelectedRoutine, videoUrl, closeModal, closeVideo, handleOpenVideo } = useMyRoutines();
@@ -25,9 +25,9 @@ export const MyRoutines = () => {
       <div className={AppStyles.contentContainer}>
         <div className="w-full max-w-6xl space-y-6">
             
-          <div className={AppStyles.headerContainer}>
+          <div className={AppStyles.headerContainer + " mb-20"}>
               <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
-                  <span className={AppStyles.title}>
+                  <span className={AppStyles.title + " text-4xl"}>
                       Mis Rutinas
                   </span>
                   <span className="ml-3 text-white">

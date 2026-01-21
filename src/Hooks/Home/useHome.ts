@@ -14,6 +14,7 @@ export const useHome = () => {
   const goToExercises = () => navigate("/ejercicios");
   const goToCreateNotification = () => navigate("/notifications/create");
   const goToPlans = () => navigate("/planes");
+  const goToUserPlan = () => navigate("/planes/mi-plan");
   const goToRenew = () => navigate("/planes/renovar-gestion");
 
   return {
@@ -28,6 +29,7 @@ export const useHome = () => {
     goToExercises,
     goToCreateNotification,
     goToPlans,
+    goToUserPlan,
     goToRenew
   };
 };

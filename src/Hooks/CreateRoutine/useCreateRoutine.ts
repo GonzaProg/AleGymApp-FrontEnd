@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-// Importamos nuestras APIs limpias
 import { EjerciciosApi } from "../../API/Ejercicios/EjerciciosApi";
 import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
+import { showSuccess, showError } from "../../Helpers/Alerts";
 
 export const useCreateRoutine = () => {
-  const navigate = useNavigate();
 
   // --- DATOS ---
   const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
@@ -90,19 +88,19 @@ export const useCreateRoutine = () => {
 
   // 4. AGREGAR EJERCICIO (Sin cambios)
   const handleAddExercise = () => {
-    if (!ejercicioId) return alert("Selecciona un ejercicio");
+    if (!ejercicioId) return showError("Selecciona un ejercicio");
 
     const pesoFinal = parseFloat(peso.toString().replace(",", "."));
     const seriesFinal = parseInt(series.toString());
     const repsFinal = parseInt(reps.toString());
 
     if (seriesFinal <= 0 || repsFinal <= 0 || pesoFinal < 0) {
-      return alert("Los valores deben ser mayores a 0");
+      return showError("Los valores deben ser mayores a 0");
     }
-    if (isNaN(pesoFinal)) return alert("El peso debe ser un número válido");
+    if (isNaN(pesoFinal)) return showError("El peso debe ser un número válido");
 
     if (pesoFinal >= 1000) {
-      return alert("¿Vas a poder levantar ese Peso? ¿Sos HULK? 🟢💪");
+      return showError("¿Vas a poder levantar ese Peso? ¿Sos HULK? 🟢💪");
     }
 
     const ejercicioNombre = ejercicios.find((e) => e.id === parseInt(ejercicioId))?.nombre;
@@ -124,7 +122,7 @@ export const useCreateRoutine = () => {
   // 5. GUARDAR EN BACKEND (Ahora usando RutinasApi)
   const handleSubmit = async () => {
     if (!alumnoId || !nombreRutina || detalles.length === 0) {
-      return alert("Completa todos los datos y agrega al menos un ejercicio");
+      return showError("Completa todos los datos y agrega al menos un ejercicio");
     }
 
     try {
@@ -137,12 +135,13 @@ export const useCreateRoutine = () => {
       // Llamada limpia
       await RutinasApi.create(body);
 
-      alert("Rutina creada con éxito!");
-      navigate("/home");
+      showSuccess("Rutina creada con éxito!");
+      window.location.reload();
+
     } catch (error: any) {
       // Manejo de error mejorado
       const msg = error.response?.data?.error || error.response?.data?.message || "Error al crear rutina";
-      alert(msg);
+      showError(msg);
     }
   };
 

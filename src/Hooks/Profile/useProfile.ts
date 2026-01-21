@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuthUser } from "../useAuthUser"; 
-import { UsuarioApi, type UpdateProfileDTO, type ChangePasswordDTO } from "../../API/Usuarios/UsuarioApi"; 
+import { UsuarioApi, type UpdateProfileDTO } from "../../API/Usuarios/UsuarioApi"; 
+import { showSuccess, showError } from "../../Helpers/Alerts";
 
 // LEEMOS LAS VARIABLES DEL .ENV
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -8,18 +9,23 @@ const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const API_URL_CLOUDINARY = import.meta.env.VITE_API_URL_CLOUDINARY;
 
 export const useProfile = () => {
-  // 1. Obtenemos datos del contexto
   const { currentUser } = useAuthUser();
   const localId = currentUser?.id;
 
+  // Estado local para reflejar cambios instantáneamente sin recargar 
+  const [displayUser, setDisplayUser] = useState(currentUser);
+
+  // Sincronizar si el contexto cambia externamente
+  useEffect(() => {
+    setDisplayUser(currentUser);
+  }, [currentUser]);
+
   // ESTADOS DE VISTA
-  const [loading, setLoading] = useState(true); // Carga inicial y guardado
-  const [uploadingImage, setUploadingImage] = useState(false); // Feedback específico de subida
-  
-  // ESTADOS DE EDICIÓN PERFIL
+  const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false); 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
-  // Inicializamos con tipos seguros
+  // FORMULARIO DE EDICIÓN
   const [editForm, setEditForm] = useState<UpdateProfileDTO>({
     nombre: "",
     apellido: "",
@@ -28,11 +34,11 @@ export const useProfile = () => {
     fotoPerfil: ""
   });
 
-  // ESTADOS PARA MANEJO DE IMAGEN (CLOUDINARY)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // Archivo crudo
-  const [imagePreview, setImagePreview] = useState<string | null>(null); // Previsualización local
+  // ARCHIVOS (Cloudinary)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); 
+  const [imagePreview, setImagePreview] = useState<string | null>(null); 
 
-  // ESTADOS DE CAMBIO CONTRASEÑA 
+  // CONTRASEÑA
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [passForm, setPassForm] = useState({
     currentPassword: "",
@@ -40,21 +46,20 @@ export const useProfile = () => {
     confirmPassword: ""
   });
 
-  // 1. CARGAR DATOS (Cuando currentUser esté listo)
+  // CARGAR DATOS AL FORMULARIO CUANDO SE EDITA O CAMBIA EL USUARIO
   useEffect(() => {
-    if (currentUser) {
+    if (displayUser) {
       setEditForm({
-        nombre: currentUser.nombre || "",
-        apellido: currentUser.apellido || "", 
-        nombreUsuario: currentUser.nombreUsuario || "", 
-        email: currentUser.email || "", 
-        fotoPerfil: currentUser.fotoPerfil || "" 
+        nombre: displayUser.nombre || "",
+        apellido: displayUser.apellido || "", 
+        nombreUsuario: displayUser.nombreUsuario || "", 
+        email: displayUser.email || "", 
+        fotoPerfil: displayUser.fotoPerfil || "" 
       });
-      setLoading(false);
     }
-  }, [currentUser]);
+  }, [displayUser]);
 
-  // HANDLERS PARA INPUTS DE TEXTO
+  // HANDLERS
   const handleEditChange = (field: keyof UpdateProfileDTO, value: string) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -63,18 +68,14 @@ export const useProfile = () => {
     setPassForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // MANEJO DE SELECCIÓN DE IMAGEN (SOLO PREVIEW)
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // 1. Guardamos el archivo para subirlo luego
       setSelectedFile(file);
-      // 2. Creamos URL temporal para mostrarla al instante (Preview)
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
-  // FUNCIÓN AUXILIAR: SUBIR A CLOUDINARY
   const uploadToCloudinary = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
@@ -83,28 +84,25 @@ export const useProfile = () => {
     try {
         const response = await fetch(
             `${API_URL_CLOUDINARY}/${CLOUD_NAME}/image/upload`,
-            {
-                method: 'POST',
-                body: formData
-            }
+            { method: 'POST', body: formData }
         );
         const data = await response.json();
-        if (!response.ok) throw new Error("Error al subir imagen a la nube");
-        return data.secure_url; // Retornamos la URL HTTPS
+        if (!response.ok) throw new Error("Error al subir imagen");
+        return data.secure_url; 
     } catch (error) {
         console.error("Error cloudinary:", error);
         throw error;
     }
   };
 
-  // GUARDAR PERFIL (Lógica Principal)
+  // GUARDAR PERFIL
   const handleSaveProfile = async () => {
     if (!localId) return;
 
-    // Validación de Email 
+    // Validación Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (editForm.email && !emailRegex.test(editForm.email)) {
-        return alert("⚠️ El formato del correo electrónico no es válido.");
+        return showError("El formato del correo electrónico no es válido.");
     }
 
     setLoading(true);
@@ -112,67 +110,71 @@ export const useProfile = () => {
     try {
       let finalImageUrl = editForm.fotoPerfil; 
 
-      // 1. Si hay una imagen nueva seleccionada, la subimos primero
       if (selectedFile) {
           setUploadingImage(true);
           finalImageUrl = await uploadToCloudinary(selectedFile);
           setUploadingImage(false);
       }
 
-      // 2. Preparamos el DTO con la URL final (sea la nueva o la vieja)
       const updatedDTO: UpdateProfileDTO = {
         ...editForm,
         fotoPerfil: finalImageUrl
       };
 
-      // 3. Llamada limpia a la API (Backend guarda solo la URL)
+      // 1. Actualizar en Backend
       const data = await UsuarioApi.update(localId, updatedDTO);
 
-      // 4. Actualizamos LocalStorage
-      const updatedUser = { ...currentUser, ...data };
+      // 2. Crear objeto actualizado fusionando lo viejo con lo nuevo
+      const updatedUser = { ...displayUser, ...data };
+
+      // 3. Actualizar LocalStorage (para que persista al recargar manualmente)
       localStorage.setItem("user", JSON.stringify(updatedUser));
       
-      // Limpieza de estados
+      // 4. Actualizar Estado Local 
+      setDisplayUser(updatedUser);
+      
+      // 5. Limpieza UI
       setIsEditingProfile(false);
       setSelectedFile(null);
       setImagePreview(null);
       
-      alert("Datos actualizados correctamente");
-      window.location.reload(); 
+      showSuccess("Datos actualizados correctamente.");
 
     } catch (error: any) {
       setUploadingImage(false);
-      alert(error.response?.data?.error || error.message || "Error al actualizar");
+      showError(error.response?.data?.error || error.message || "Error al actualizar");
     } finally {
         setLoading(false);
     }
   };
 
-  // GUARDAR CONTRASEÑA 
+  // CAMBIAR CONTRASEÑA 
   const handleChangePassword = async () => {
     if (!localId) return;
 
-    if (!passForm.currentPassword || !passForm.newPassword || !passForm.confirmPassword) {
-      return alert("Todos los campos de contraseña son obligatorios");
-    }
-    if (passForm.newPassword !== passForm.confirmPassword) {
-      return alert("Las nuevas contraseñas no coinciden");
-    }
+    const currentPass = passForm.currentPassword.trim();
+    const newPass = passForm.newPassword.trim();
+    const confirmPass = passForm.confirmPassword.trim();
+
+    if (!currentPass || !newPass || !confirmPass) return showError("Todos los campos son obligatorios");
+    if (newPass !== confirmPass) return showError("Las nuevas contraseñas no coinciden");
     
     setLoading(true);
     try {
-      const passwordData: ChangePasswordDTO = {
-          currentPassword: passForm.currentPassword,
-          newPassword: passForm.newPassword
+      const passwordData = {
+          currentPassword: currentPass,
+          newPassword: newPass,
+          confirmPassword: confirmPass
       };
 
-      await UsuarioApi.changePassword(localId, passwordData);
+      await UsuarioApi.changePassword(localId, passwordData as any);
       
-      alert("Contraseña modificada con éxito.");
+      showSuccess("Contraseña modificada con éxito.");
+      
       setShowPasswordSection(false);
       setPassForm({ currentPassword: "", newPassword: "", confirmPassword: "" }); 
     } catch (error: any) {
-      alert(error.response?.data?.error || "Error al cambiar contraseña");
+      showError(error.response?.data?.error || "Error al cambiar contraseña");
     } finally {
       setLoading(false);
     }
@@ -185,11 +187,11 @@ export const useProfile = () => {
 
   return {
     loading,
-    uploadingImage, // Nuevo export para mostrar spinner de subida
-    userData: currentUser, 
+    uploadingImage, 
+    userData: displayUser,
     isEditingProfile,
     editForm,
-    imagePreview, // Nuevo export para mostrar la previsualización
+    imagePreview, 
     showPasswordSection,
     passForm,
     setIsEditingProfile,

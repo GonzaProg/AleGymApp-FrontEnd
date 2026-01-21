@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuthUser } from "../useAuthUser"; 
 import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi"; 
+import { showSuccess, showError } from "../../Helpers/Alerts";
 
 export const useCreateUser = () => {
-  const navigate = useNavigate();
   
   const { isAdmin } = useAuthUser();
 
@@ -29,19 +28,19 @@ export const useCreateUser = () => {
 
   const handleSubmit = async () => {
     // Validar campos vacíos
-    if (!formData.email || !formData.contraseña || !formData.nombreUsuario) {
-      return alert("Por favor completa los campos obligatorios");
+    if (!formData.email || !formData.contraseña || !formData.nombreUsuario || !formData.nombre) {
+      return showError("Por favor completa los campos obligatorios");
     }
 
     // Validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-        return alert("⚠️ Por favor ingresa una dirección de correo válida (ej: usuario@email.com)");
+        return showError("⚠️ Por favor ingresa una dirección de correo válida (ej: usuario@email.com)");
     }
 
     // Validación de seguridad: Solo admin puede crear Entrenadores
     if (formData.rol === "Entrenador" && !isAdmin) {
-        return alert("No tienes permisos para crear un Entrenador.");
+        return showError("No tienes permisos para crear un Entrenador.");
     }
 
     setLoading(true);
@@ -50,18 +49,18 @@ export const useCreateUser = () => {
       //  LLAMADA A LA API LIMPIA 
       await AuthApi.createUser(formData);
 
-      alert(`Usuario ${formData.nombreUsuario} creado con éxito!`);
-      navigate("/home");
+      showSuccess(`Usuario ${formData.nombreUsuario} creado con éxito!`);
+      window.location.reload();
 
     } catch (error: any) {
       const msg = error.response?.data?.error || error.response?.data?.message || "Error al crear usuario";
-      alert("❌ Error: " + msg);
+      showError("❌ Error: " + msg);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancel = () => navigate("/home");
+  const handleCancel = () => window.location.reload();
 
   return {
     formData,
