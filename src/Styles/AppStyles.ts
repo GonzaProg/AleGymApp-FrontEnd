@@ -6,7 +6,7 @@ export const AppStyles = {
     
     // TEXTOS 
     headerContainer: "text-center mb-6 mt-4 animate-fade-in-down",
-    title: "text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 drop-shadow-lg mb-8",
+    title: "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 drop-shadow-lg",
     subtitle: "text-gray-200 mt-2 text-lg",
     highlight: "text-green-500",
     

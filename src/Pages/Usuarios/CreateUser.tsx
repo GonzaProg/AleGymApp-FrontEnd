@@ -1,38 +1,18 @@
 import { useCreateUser } from "../../Hooks/CreateUser/useCreateUser";
-import { Navbar } from "../../Components/Navbar"; 
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
-import fondoUser from "../../assets/Fondo-CreateUser.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles"; 
 
 export const CreateUser = () => {
   const { formData, isAdmin, handleChange, handleSubmit, handleCancel } = useCreateUser();
 
   return (
-    <div className={AppStyles.pageContainer}>
-      
-      {/* FONDO FIJO */}
-      <div
-        className={AppStyles.fixedBackground}
-        style={{
-          backgroundImage: `url(${fondoUser})`
-        }}
-      />
-
-      <Navbar />
-
-      {/* CONTENIDO */}
-      <div className={`${AppStyles.contentContainer} min-h-[80vh] items-center`}> {/* Ajuste flex */}
+    <div className="w-full h-full flex flex-col items-center justify-center animate-fade-in p-6">
         <div className="w-full max-w-2xl">
           
             {/* Título */}
             <div className={AppStyles.headerContainer}>
-                <h2 className={AppStyles.title}>
-                    Registrar Nuevo Usuario
-                </h2>
-                <p className={AppStyles.subtitle}>
-                    Completa los datos para dar de alta un acceso.
-                </p>
+                <p className={AppStyles.subtitle + " mb-10"}>Completa los datos para dar de alta un acceso.</p>
             </div>
 
             {/* TARJETA */}
@@ -42,7 +22,7 @@ export const CreateUser = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input 
-                        label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} 
+                        label="Nombre *" name="nombre" value={formData.nombre} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
                     <Input 
@@ -50,16 +30,16 @@ export const CreateUser = () => {
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
                     <Input 
-                        label="Usuario" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange}
+                        label="Usuario *" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange}
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
                     <Input 
-                        label="Email" type="email" name="email" value={formData.email} onChange={handleChange} 
+                        label="Email *" type="email" name="email" value={formData.email} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
                     <div className="md:col-span-2">
-                         <Input 
-                            label="Contraseña" type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} 
+                          <Input 
+                            label="Contraseña *" type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} 
                             className={AppStyles.inputDark} labelClassName={AppStyles.label}
                         />
                     </div>
@@ -67,7 +47,7 @@ export const CreateUser = () => {
                     <div className="md:col-span-2">
                         <Input 
                             as="select" 
-                            label="Rol Asignado" 
+                            label="Rol Asignado *" 
                             name="rol" 
                             value={formData.rol} 
                             onChange={handleChange} 
@@ -105,7 +85,6 @@ export const CreateUser = () => {
                 </div>
             </div>
         </div>
-      </div>
     </div>
   );
 };

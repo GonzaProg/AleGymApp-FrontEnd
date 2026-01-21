@@ -67,7 +67,7 @@ export const Navbar = () => {
             className="flex items-center space-x-1 cursor-pointer group z-20"
         >
             <span className="self-center text-2xl font-semibold whitespace-nowrap text-white group-hover:text-gray-200 transition-colors">
-                Gym<span className="text-green-500 group-hover:text-green-400">App</span>
+                Gym<span className="text-green-500 group-hover:text-green-400">Mate</span>
             </span>
         </div>
 

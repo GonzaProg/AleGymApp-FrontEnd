@@ -1,8 +1,6 @@
 import { useProfile } from "../../Hooks/Profile/useProfile";
-import { Navbar } from "../../Components/Navbar";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
-import fondoPerfil from "../../assets/Fondo-Perfil.jpg";
 import { AppStyles } from "../../Styles/AppStyles"; 
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
 
@@ -22,45 +20,27 @@ export const Profile = () => {
     handleSaveProfile, 
     handleChangePassword, 
     handleCancelPassword,
-    // Nuevos estados para Cloudinary
     uploadingImage,
     imagePreview
   } = useProfile();
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-300">Cargando...</div>;
-  if (!userData) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-red-400">Error: No se pudo cargar el usuario.</div>;
+  if (loading) return <div className="h-full flex items-center justify-center text-gray-300">Cargando...</div>;
+  if (!userData) return <div className="h-full flex items-center justify-center text-red-400">Error: No se pudo cargar el usuario.</div>;
 
-  // Lógica para decidir qué imagen mostrar (Prioridad: Preview Local > Editando > Guardada)
   const avatarSrc = imagePreview || (isEditingProfile ? editForm.fotoPerfil : userData.fotoPerfil);
 
   return (
-    <div className={AppStyles.pageContainer}>
+    <div className="w-full h-full flex flex-col pt-6 px-4 pb-10 animate-fade-in overflow-y-auto">
+        <div className="w-full max-w-2xl mx-auto space-y-8">
 
-      <div
-        className={AppStyles.fixedBackground}
-        style={{
-          backgroundImage: `url(${fondoPerfil})`,
-          filter: 'brightness(0.8) contrast(1.1)' 
-        }}
-      />
-
-      <Navbar />
-
-      <div className={AppStyles.contentContainer}>
-        
-        <div className="w-full max-w-2xl space-y-8">
-
-          {/* --- CARD PERFIL (Diseño Especial) --- */}
-          <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
+          {/* --- CARD PERFIL --- */}
+          <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
             
             <div className={ProfileStyles.coverGradient}></div>
 
             <div className="px-10 pb-10">
-              
               <div className={ProfileStyles.avatarContainer}>
                 <div className={ProfileStyles.avatarWrapper}>
-                  
-                  {/* IMAGEN DE PERFIL */}
                   {avatarSrc ? (
                     <img 
                       src={avatarSrc} 
@@ -73,17 +53,15 @@ export const Profile = () => {
                     </div>
                   )}
 
-                  {/* INDICADOR DE SUBIDA (SPINNER) */}
                   {uploadingImage && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-20 backdrop-blur-sm">
                       <div className="flex flex-col items-center">
-                         <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                         <span className="text-white text-[10px] font-bold tracking-wider animate-pulse">SUBIENDO</span>
+                          <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                          <span className="text-white text-[10px] font-bold tracking-wider animate-pulse">SUBIENDO</span>
                       </div>
                     </div>
                   )}
 
-                  {/* OVERLAY DE EDICIÓN (INPUT FILE) */}
                   {isEditingProfile && !uploadingImage && (
                     <label className={ProfileStyles.uploadOverlay}>
                       <span className="text-4xl cursor-pointer hover:scale-110 transition-transform">📷</span>
@@ -137,7 +115,7 @@ export const Profile = () => {
             </div>
           </div>
 
-          {/* --- CARD SEGURIDAD (Usa estilos globales) --- */}
+          {/* --- CARD SEGURIDAD --- */}
           <div className={AppStyles.glassCard + " p-8"}>
             {!showPasswordSection ? (
               <div className="flex justify-between items-center">
@@ -159,8 +137,8 @@ export const Profile = () => {
                 <div className="bg-black/20 p-6 rounded-xl border border-white/5 space-y-4">
                     <Input label="Contraseña Actual" type="password" value={passForm.currentPassword} onChange={e => handlePassChange('currentPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Nueva" type="password" value={passForm.newPassword} onChange={e => handlePassChange('newPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-                        <Input label="Repetir" type="password" value={passForm.confirmPassword} onChange={e => handlePassChange('confirmPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                        <Input label="Nueva" type="password" autoComplete="new-password" value={passForm.newPassword} onChange={e => handlePassChange('newPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                        <Input label="Repetir" type="password" autoComplete="new-password" value={passForm.confirmPassword} onChange={e => handlePassChange('confirmPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
                 </div>
 
@@ -171,9 +149,7 @@ export const Profile = () => {
               </div>
             )}
           </div>
-
         </div>
-      </div>
     </div>
   );
 };

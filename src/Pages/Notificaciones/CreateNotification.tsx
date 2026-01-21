@@ -1,48 +1,29 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Navbar } from "../../Components/Navbar";
 import { useNotificaciones } from "../../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../../Styles/AppStyles";
-import fondoNotificaciones from "../../assets/Fondo-Notificaciones.jpg";
 
 export const CreateNotification = () => {
-  const navigate = useNavigate();
   const { sendBroadcast, loading } = useNotificaciones();
-  
   const [form, setForm] = useState({ titulo: "", mensaje: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.titulo.trim() || !form.mensaje.trim()) return;
-    
     await sendBroadcast(form.titulo, form.mensaje);
-    navigate("/home");
+    // Aquí podrías limpiar el form o mostrar mensaje de éxito
+    setForm({ titulo: "", mensaje: "" });
   };
 
   return (
-    <div className={AppStyles.pageContainer}>
-      <div
-        className={AppStyles.fixedBackground}
-        style={{
-          backgroundImage: `url(${fondoNotificaciones})`
-        }}
-      />
-
-      <Navbar />
-
-      <div className={AppStyles.contentContainer}>
+    <div className="w-full h-full flex flex-col items-center animate-fade-in">
         <div className="w-full max-w-2xl">
           
-          <div className={AppStyles.headerContainer}>
+          <div className={AppStyles.headerContainer + " mb-14"}>
             <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
-                <span className={AppStyles.title}>
-                    Nueva Notificación
-                </span>
-                <span className="ml-3 text-white">
-                    📢
-                </span>
+                <span className={AppStyles.subtitle}>Envía una Notificación a todos los Usuarios</span>
+                <span className="ml-3 text-white text-2xl">📢</span>
             </h2>
-            </div>
+          </div>
 
           <div className={AppStyles.glassCard}>
             <div className={AppStyles.gradientDivider}></div>
@@ -81,16 +62,9 @@ export const CreateNotification = () => {
 
               <div className="pt-4 flex justify-end gap-3">
                 <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className={AppStyles.btnSecondary}
-                >
-                  Cancelar
-                </button>
-                <button
                   type="submit"
                   disabled={loading}
-                  className={AppStyles.btnPrimary + " px-8"}
+                  className={AppStyles.btnPrimary + " px-8 w-full"}
                 >
                   {loading ? "Enviando..." : "🚀 Enviar a Todos"}
                 </button>
@@ -98,7 +72,6 @@ export const CreateNotification = () => {
             </form>
           </div>
         </div>
-      </div>
     </div>
   );
 };

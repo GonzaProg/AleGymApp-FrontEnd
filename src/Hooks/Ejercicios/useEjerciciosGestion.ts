@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthUser } from '../useAuthUser'; 
 import { EjerciciosApi, type Ejercicio, type EjercicioDTO } from '../../API/Ejercicios/EjerciciosApi';
+import { showConfirm, showError } from '../../Helpers/Alerts';
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET; 
@@ -35,12 +36,19 @@ export const useEjerciciosGestion = () => {
     useEffect(() => { fetchEjercicios(); }, [fetchEjercicios]);
 
     const handleDelete = async (id: number) => {
-        if (!isAdmin) return alert("Solo administradores pueden eliminar.");
-        if (!window.confirm("¿Eliminar ejercicio?")) return;
+        if (!isAdmin) return showError("Solo administradores pueden eliminar.");
+        const result = await showConfirm(
+                "¿Seguro que desea Eliminar este ejercicio?", 
+                "Esta acción no se puede deshacer."
+            );
+
+        if (!result.isConfirmed) {
+        return;}
+
         try {
             await EjerciciosApi.delete(id);
             setEjercicios(prev => prev.filter(e => e.id !== id));
-        } catch (err: any) { alert("Error al eliminar"); }
+        } catch (err: any) { showError("Error al eliminar"); }
     };
 
     const startEdit = (ej: Ejercicio) => {
@@ -83,7 +91,7 @@ export const useEjerciciosGestion = () => {
             setEjercicios(prev => prev.map(e => (e.id === id ? actualizado : e)));
             cancelEdit();
         } catch (err: any) {
-            alert(err.response?.data?.error || "Error al actualizar");
+            showError(err.response?.data?.error || "Error al actualizar");
         } finally {
             setUploading(false);
         }

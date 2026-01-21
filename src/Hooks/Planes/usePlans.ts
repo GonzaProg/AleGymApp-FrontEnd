@@ -1,60 +1,51 @@
 import { useState, useEffect } from "react";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
 import { UsuarioApi, type AlumnoDTO } from "../../API/Usuarios/UsuarioApi"; 
-import { useAuthUser } from "../useAuthUser";
+import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const usePlans = () => {
-    //  ESTADOS DE DATOS 
+    // --- ESTADOS DE DATOS ---
     const [planes, setPlanes] = useState<PlanDTO[]>([]);
-    const [myPlan, setMyPlan] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     
-    //  ESTADOS DE BUSQUEDA DE ALUMNOS 
+    // --- ESTADOS DE BUSQUEDA DE ALUMNOS ---
     const [todosLosAlumnos, setTodosLosAlumnos] = useState<AlumnoDTO[]>([]);
     const [busqueda, setBusqueda] = useState("");
     const [sugerencias, setSugerencias] = useState<AlumnoDTO[]>([]);
     const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
     const [alumnoSeleccionadoId, setAlumnoSeleccionadoId] = useState<number | null>(null);
 
-    //  ESTADOS DE UI 
+    // --- ESTADOS DE UI ---
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<PlanDTO | null>(null);
     const [selectedPlanToSubscribe, setSelectedPlanToSubscribe] = useState<PlanDTO | null>(null);
 
-    const { isEntrenador } = useAuthUser();
-
     useEffect(() => {
         loadData();
-    }, [isEntrenador]);
+    }, []);
 
     const loadData = async () => {
         setLoading(true);
         try {
-            const listaPlanes = await PlansApi.getAll();
+            // Carga paralela de planes y alumnos para el admin
+            const [listaPlanes, dataAlumnos] = await Promise.all([
+                PlansApi.getAll(),
+                UsuarioApi.getAlumnos(true) // true para traer planActual
+            ]);
+            
             setPlanes(listaPlanes);
-
-            if (isEntrenador) {
-                try {
-                    // Pedimos TRUE para traer también el 'planActual' de cada alumno
-                    const dataAlumnos = await UsuarioApi.getAlumnos(true);
-                    setTodosLosAlumnos(dataAlumnos);
-                } catch (e) { console.error("Error cargando alumnos", e); }
-            }
-
-            try {
-                const miPlanInfo = await PlansApi.getMyPlan();
-                if (miPlanInfo.tienePlan) setMyPlan(miPlanInfo);
-            } catch (e) { }
+            setTodosLosAlumnos(dataAlumnos);
 
         } catch (err: any) {
             console.error(err);
+            showError("Error al cargar los datos.");
         } finally {
             setLoading(false);
         }
     };
 
-    //  LOGICA DE BUSCADOR 
+    // --- LOGICA DE BUSCADOR ---
     const handleSearchChange = (text: string) => {
         setBusqueda(text);
         if (text.length > 0) {
@@ -77,7 +68,7 @@ export const usePlans = () => {
         setMostrarSugerencias(false);
     };
 
-    //  FUNCIONES DEL MODAL 
+    // --- FUNCIONES DEL MODAL ---
     const openCreateModal = () => {
         setEditingPlan(null);
         setIsModalOpen(true);
@@ -100,27 +91,27 @@ export const usePlans = () => {
         try {
             if (editingPlan && editingPlan.id) {
                 await PlansApi.update(editingPlan.id, formData);
+                showSuccess("Plan actualizado correctamente.");
             } else {
                 await PlansApi.create(formData);
+                showSuccess("Plan creado correctamente.");
             }
             setIsModalOpen(false);
             loadData();
         } catch (err: any) {
-            alert("Error: " + (err.response?.data?.message || err.message));
+            showError("Error: " + (err.response?.data?.message || err.message));
         }
     };
 
-    //  LOGICA PRINCIPAL DE SUSCRIPCIÓN 
+    // --- LOGICA PRINCIPAL DE SUSCRIPCIÓN ---
     const handleSubscribeUser = async () => {
         if (!selectedPlanToSubscribe || !alumnoSeleccionadoId) {
-            return alert("Por favor selecciona un alumno primero.");
+            return showError("Por favor selecciona un alumno primero.");
         }
 
-        // 1. Buscamos el objeto alumno completo para ver si tiene plan
         const alumnoObj = todosLosAlumnos.find(u => u.id === alumnoSeleccionadoId);
 
         if (alumnoObj && alumnoObj.planActual) {
-            // TIENE PLAN: Pedimos confirmación de cambio
             const mensaje = 
                 `⚠️ ${alumnoObj.nombre} ya tiene activo el plan "${alumnoObj.planActual.nombre}".\n\n` +
                 `¿Deseas darlo de baja y activar el nuevo plan "${selectedPlanToSubscribe.nombre}" ahora mismo?\n` +
@@ -128,31 +119,27 @@ export const usePlans = () => {
             
             if (!confirm(mensaje)) return;
         } else {
-            // NO TIENE PLAN: Confirmación simple
             const nombreAlumno = alumnoObj ? alumnoObj.nombre : "este alumno";
             if (!confirm(`¿Confirmas asignar "${selectedPlanToSubscribe.nombre}" a ${nombreAlumno}?`)) return;
         }
 
-        // 2. Ejecutamos la acción
         try {
             await PlansApi.subscribeUser(alumnoSeleccionadoId, selectedPlanToSubscribe.id!);
-            alert(`✅ Plan asignado correctamente.`);
+            showSuccess(`✅ Plan asignado correctamente.`);
             setIsSubscribeModalOpen(false);
-            loadData(); // Recargamos para actualizar la lista de alumnos con sus nuevos planes
+            loadData(); 
         } catch (error: any) {
-            alert("Error al asignar: " + (error.response?.data?.message || error.message));
+            showError("Error al asignar: " + (error.response?.data?.message || error.message));
         }
     };
 
     return {
         planes,
-        myPlan,
         loading,
         isModalOpen,
         isSubscribeModalOpen,
         editingPlan,
         selectedPlanToSubscribe,
-        isEntrenador,
         busqueda,
         sugerencias,
         mostrarSugerencias,

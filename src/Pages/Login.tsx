@@ -8,14 +8,23 @@ import { LoginStyles } from "../Styles/LoginStyles";
 import { Link } from "react-router-dom";
 
 export const Login = () => {
-  const { email, password, error, handleEmailChange, handlePasswordChange, handleLogin } = useLogin();
+  const { 
+    email, 
+    password, 
+    rememberMe,
+    error, 
+    handleEmailChange, 
+    handlePasswordChange, 
+    handleRememberMeChange,
+    handleLogin 
+  } = useLogin();
 
   return (
     <PageLayout centered showNavbar={false} backgroundImage={fondoLogin}>
       
       <Card className={LoginStyles.glassCard}> 
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white drop-shadow-md">Gym App</h1>
+          <h1 className="text-4xl font-bold text-white drop-shadow-md">GymMate</h1>
           <p className="text-gray-200 mt-2 text-lg">Inicia sesión para entrenar</p>
         </div>
 
@@ -40,9 +49,24 @@ export const Login = () => {
                value={password} 
                onChange={handlePasswordChange} 
                required 
-               className={LoginStyles.inputDark} // <--- Reutilizamos
+               className={LoginStyles.inputDark} 
              />
           </div>
+
+          {/* --- CHECKBOX RECORDAR --- */}
+          <div className="flex items-center gap-2">
+            <input 
+                id="rememberMe"
+                type="checkbox" 
+                checked={rememberMe}
+                onChange={handleRememberMeChange}
+                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500 focus:ring-offset-gray-800 cursor-pointer"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-gray-300 cursor-pointer select-none">
+                Recordar usuario y contraseña
+            </label>
+          </div>
+          {/* ------------------------- */}
 
           {error && (
             <div className={LoginStyles.errorBox}>
@@ -50,7 +74,6 @@ export const Login = () => {
             </div>
           )}
 
-          {/* Nota: En el botón ya incluimos w-full, py-3, etc en el estilo */}
           <Button type="submit" className={LoginStyles.btnPrimary}>
             INGRESAR
           </Button>

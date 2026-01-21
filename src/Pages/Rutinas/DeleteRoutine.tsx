@@ -1,7 +1,5 @@
 import { useDeleteRoutine } from "../../Hooks/DeleteRoutine/useDeleteRoutine";
-import { Navbar } from "../../Components/Navbar"; 
 import { Button } from "../../Components/UI/Button";
-import fondoGym from "../../assets/Fondo-DeleteRoutine.jpg"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { DeleteRoutineStyles } from "../../Styles/DeleteRoutineStyles";
 
@@ -19,22 +17,11 @@ export const DeleteRoutine = () => {
   } = useDeleteRoutine();
 
   return (
-    <div className={AppStyles.pageContainer}>
-      
-      {/* Fondo */}
-      <div
-        className={AppStyles.fixedBackground}
-        style={{ backgroundImage: `url(${fondoGym})` }}
-      />
-      <div className="fixed inset-0 z-0" />
-
-      <div className="relative z-10">
-        <Navbar />
-
-        <div className="container mx-auto px-4 py-24 max-w-5xl">
+    <div className="w-full h-full flex flex-col pt-6 animate-fade-in">
+        <div className="container mx-auto px-4 max-w-5xl">
             
             {/* HEADER */}
-            <div className="text-center mb-10 animate-fade-in-down">
+            <div className="text-center mb-10">
                 <h2 className={DeleteRoutineStyles.redTitle}>
                     <span>🗑️</span> Borrar Rutinas
                 </h2>
@@ -66,13 +53,13 @@ export const DeleteRoutine = () => {
                                     onClick={() => handleSelectAlumno(alumno)} 
                                     className={`${AppStyles.suggestionItem} hover:bg-red-500/20`}
                                 >
-                                    {/* Avatar pequeño en lista */}
                                     <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
                                         {alumno.nombre.charAt(0)}
                                     </div>
                                     <span className="font-medium text-gray-200 group-hover:text-white">
                                         {alumno.nombre} {alumno.apellido}
                                     </span>
+                                    <span className="text-xs text-gray-500 bg-gray-900 px-2 py-1 rounded">{alumno.email}</span>
                                 </li>
                             ))}
                         </ul>
@@ -82,7 +69,7 @@ export const DeleteRoutine = () => {
 
             {/* --- RESULTADOS --- */}
             {alumnoSeleccionado && (
-                <div className="animate-fade-in-up mt-12">
+                <div className="animate-fade-in-up mt-12 pb-20">
                     
                     <h3 className="text-2xl font-bold text-white mb-6 pl-4 border-l-4 border-red-500 flex items-center gap-2 bg-gradient-to-r from-red-500/10 to-transparent py-2 rounded-r-lg">
                         Rutinas de <span className="text-red-400">{alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido}</span>
@@ -98,7 +85,6 @@ export const DeleteRoutine = () => {
                             {rutinas.map(rutina => (
                                 <div key={rutina.id} className={DeleteRoutineStyles.itemRedList}>
                                     
-                                    {/* Decoración lateral roja */}
                                     <div className="absolute left-0 top-0 h-full w-1 bg-red-600 group-hover:w-2 transition-all duration-300"></div>
                                     
                                     <div className="pl-6">
@@ -123,7 +109,6 @@ export const DeleteRoutine = () => {
                 </div>
             )}
         </div>
-      </div>
     </div>
   );
 };
