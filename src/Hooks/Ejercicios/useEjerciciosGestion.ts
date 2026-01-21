@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthUser } from '../useAuthUser'; 
 import { EjerciciosApi, type Ejercicio, type EjercicioDTO } from '../../API/Ejercicios/EjerciciosApi';
-import { showConfirm, showError } from '../../Helpers/Alerts';
+import { showConfirmDelete, showError } from '../../Helpers/Alerts';
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET; 
@@ -37,7 +37,7 @@ export const useEjerciciosGestion = () => {
 
     const handleDelete = async (id: number) => {
         if (!isAdmin) return showError("Solo administradores pueden eliminar.");
-        const result = await showConfirm(
+        const result = await showConfirmDelete(
                 "¿Seguro que desea Eliminar este ejercicio?", 
                 "Esta acción no se puede deshacer."
             );
