@@ -2,7 +2,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { Card } from "../../Components/UI/Card";
 import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
 import { PageLayout } from "../../Components/UI/PageLayout";
-import fondoGym from "../../Assets/Fondo-MiPlan.jpg";
+import fondoGym from "../../assets/Fondo-MiPlan.jpg";
 
 export const UserPlan = () => {
   const { myPlan, loading, error } = useUserPlan();
