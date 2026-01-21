@@ -1,18 +1,21 @@
 import api from '../axios';
 
-// DTO para tener tipado seguro al crear usuario
+// DTO para crear usuario (Actualizado con DNI, Telefono, Fecha)
 export interface CreateUserDTO {
+    dni: string;          
     nombre: string;
     apellido: string;
     nombreUsuario: string;
     email: string;
     contraseña: string;
+    telefono?: string;    
+    fechaNacimiento?: string; // (Opcional, string 'YYYY-MM-DD')
     rol: string;
 }
 
-// DTO para el Login
+// DTO para el Login 
 export interface LoginDTO {
-    email: string;
+    dni: string;      
     contraseña: string;
 }
 
@@ -21,10 +24,11 @@ export interface LoginResponse {
     token: string;
     user: {
         id: number;
+        dni: string;    
         nombre: string;
         apellido: string;
         rol: string;
-        // otros campos...
+        fotoPerfil?: string;
     };
 }
 
@@ -57,7 +61,7 @@ export const AuthApi = {
         return response.data;
     },
 
-    // Solicitar correo de recuperación
+    // Solicitar correo de recuperación (Sigue siendo por email)
     forgotPassword: async (email: string) => {
         const response = await api.post('/auth/forgot-password', { email });
         return response.data;

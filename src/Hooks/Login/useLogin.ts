@@ -6,7 +6,7 @@ export const useLogin = () => {
   const navigate = useNavigate();
 
   // ESTADOS 
-  const [email, setEmail] = useState("");
+  const [dni, setDni] = useState(""); 
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false); 
   const [error, setError] = useState<string | null>(null);
@@ -14,26 +14,29 @@ export const useLogin = () => {
 
   // EFECTO: CARGAR CREDENCIALES GUARDADAS AL INICIAR 
   useEffect(() => {
-    const savedEmail = localStorage.getItem("remember_email");
+    const savedDni = localStorage.getItem("remember_dni"); 
     const savedPass = localStorage.getItem("remember_pass");
     
-    if (savedEmail && savedPass) {
-      setEmail(savedEmail);
+    if (savedDni && savedPass) {
+      setDni(savedDni);
       setPassword(savedPass);
       setRememberMe(true);
     }
   }, []);
 
   // HANDLERS PARA INPUTS 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
+  const handleDniChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Opcional: Permitir solo números mientras se escribe
+    const val = e.target.value;
+    if (/^\d*$/.test(val)) { 
+        setDni(val);
+    }
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
-  // Nuevo handler para el checkbox
   const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
@@ -47,7 +50,7 @@ export const useLogin = () => {
     try {
       // 1. Preparamos los datos
       const credentials: LoginDTO = {
-        email: email,
+        dni: dni, 
         contraseña: password,
       };
 
@@ -60,10 +63,10 @@ export const useLogin = () => {
 
       // 4. LÓGICA RECORDAR USUARIO (Persistencia futura)
       if (rememberMe) {
-        localStorage.setItem("remember_email", email);
+        localStorage.setItem("remember_dni", dni); 
         localStorage.setItem("remember_pass", password); 
       } else {
-        localStorage.removeItem("remember_email");
+        localStorage.removeItem("remember_dni");
         localStorage.removeItem("remember_pass");
       }
 
@@ -82,12 +85,12 @@ export const useLogin = () => {
   };
 
   return {
-    email,
+    dni,      
     password,
     rememberMe, 
     error,
     loading, 
-    handleEmailChange,
+    handleDniChange,
     handlePasswordChange,
     handleRememberMeChange, 
     handleLogin

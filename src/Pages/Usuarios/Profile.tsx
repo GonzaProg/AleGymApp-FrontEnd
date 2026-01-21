@@ -3,6 +3,7 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles"; 
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
+import { formatearFechaUTC } from "../../Helpers/DateUtils";
 
 export const Profile = () => {
   const { 
@@ -28,10 +29,9 @@ export const Profile = () => {
   if (!userData) return <div className="h-full flex items-center justify-center text-red-400">Error: No se pudo cargar el usuario.</div>;
 
   const avatarSrc = imagePreview || (isEditingProfile ? editForm.fotoPerfil : userData.fotoPerfil);
-
   return (
     <div className="w-full h-full flex flex-col pt-6 px-4 pb-10 animate-fade-in overflow-y-auto">
-        <div className="w-full max-w-2xl mx-auto space-y-8">
+        <div className="w-full max-w-3xl mx-auto space-y-8">
 
           {/* --- CARD PERFIL --- */}
           <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
@@ -76,12 +76,44 @@ export const Profile = () => {
                 {isEditingProfile ? (
                   // MODO EDICIÓN
                   <div className="space-y-5 text-left animate-fade-in-up px-4">
+                    
                     <div className="grid grid-cols-2 gap-4">
                       <Input label="Nombre" value={editForm.nombre} onChange={e => handleEditChange('nombre', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                       <Input label="Apellido" value={editForm.apellido} onChange={e => handleEditChange('apellido', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
-                    <Input label="Usuario" value={editForm.nombreUsuario} onChange={e => handleEditChange('nombreUsuario', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Usuario" value={editForm.nombreUsuario} onChange={e => handleEditChange('nombreUsuario', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                        
+                        {/* DNI NO EDITABLE */}
+                        <div>
+                            <label className={AppStyles.label}>DNI (No editable)</label>
+                            <div className="w-full bg-black/20 border border-white/5 text-gray-400 p-3 rounded-lg font-mono text-sm">
+                                {userData.dni}
+                            </div>
+                        </div>
+                    </div>
+
                     <Input label="Email" value={editForm.email} onChange={e => handleEditChange('email', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input 
+                            label="Teléfono" 
+                            value={editForm.telefono || ""} 
+                            onChange={e => handleEditChange('telefono', e.target.value)} 
+                            className={AppStyles.inputDark} 
+                            labelClassName={AppStyles.label}
+                            placeholder="Ej: 11 1234 5678"
+                        />
+                        <Input 
+                            label="Fecha Nacimiento" 
+                            type="date" 
+                            value={editForm.fechaNacimiento || ""} 
+                            onChange={e => handleEditChange('fechaNacimiento', e.target.value)} 
+                            className={AppStyles.inputDark} 
+                            labelClassName={AppStyles.label}
+                        />
+                    </div>
 
                     <div className="flex justify-center gap-4 pt-6">
                       <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={AppStyles.btnSecondary}>Cancelar</Button>
@@ -101,7 +133,30 @@ export const Profile = () => {
                       @{userData.nombreUsuario} • {userData.email}
                     </p>
                     
-                    <div className="pt-10">
+                    {/* VISUALIZACIÓN DE DATOS EXTRA */}
+                    <div className="flex flex-wrap justify-center gap-4 mt-6">
+                        <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
+                            <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">DNI</span>
+                            <span className="text-white font-mono">{userData.dni}</span>
+                        </div>
+
+                        {userData.telefono && (
+                            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
+                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Teléfono</span>
+                                <span className="text-white">{userData.telefono}</span>
+                            </div>
+                        )}
+
+                        {userData.fechaNacimiento && (
+                            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
+                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Nacimiento</span>
+                                {/* USAMOS LA FUNCIÓN DE FORMATEO CORRECTA AQUÍ */}
+                                <span className="text-white">{formatearFechaUTC(userData.fechaNacimiento)}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="pt-8">
                       <Button 
                         onClick={() => setIsEditingProfile(true)} 
                         className={ProfileStyles.editProfileBtn}

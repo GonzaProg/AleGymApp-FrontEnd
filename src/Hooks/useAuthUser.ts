@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 
 export interface User {
     id?: number;
+    dni: string;
     nombre?: string;
     apellido?: string;
     nombreUsuario?: string;
+    telefono?: string;
+    fechaNacimiento?: string;
     email?: string;
     fotoPerfil?: string;
     rol: string; 
