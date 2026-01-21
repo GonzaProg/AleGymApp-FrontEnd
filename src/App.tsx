@@ -14,6 +14,7 @@ import { ResetPassword } from "./Pages/Auth/ResetPassword";
 import { PlansManager } from "./Pages/Planes/PlansManager";
 import { UserPlan } from "./Pages/Planes/UserPlan";
 import { RenewPlan } from "./Pages/Planes/RenewPlan";
+import {UserProfile} from "./Pages/Usuarios/UserProfile";
 
 function App() {
   return (
@@ -34,8 +35,9 @@ function App() {
         {/* Ruta para Crear Usuario */}
         <Route path="/create-user" element={<CreateUser />} />
 
-        {/* Ruta para Perfil de Usuario */}
+        {/* Ruta para Perfil */}
         <Route path="/profile" element={<Profile />} />
+        <Route path="/user-profile" element={<UserProfile />} />
 
         {/* Ruta para Mis Rutinas */}
         <Route path="/my-routines" element={<MyRoutines />} />

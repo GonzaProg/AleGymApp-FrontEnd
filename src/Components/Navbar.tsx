@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import api from "../API/axios";
+//import api from "../API/axios";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
 
@@ -37,7 +37,7 @@ export const Navbar = () => {
   const handleLogout = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      await api.post("/api/users/logout");
+      //await api.post("/api/users/logout");
     } catch (error) {
       console.error("Error al registrar salida", error);
     } finally {
@@ -74,7 +74,7 @@ export const Navbar = () => {
         {/* --- CENTRO: BOTONES (Solo Desktop) --- */}
         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden md:flex gap-8 z-10">
             <Link to="/home" className="text-gray-300 hover:text-green-400 font-medium text-sm transition-colors tracking-wider hover:scale-125 transform duration-200">Inicio</Link>
-            <Link to="/profile" className="text-gray-300 hover:text-green-400 font-medium text-sm transition-colors tracking-wider hover:scale-125 transform duration-200">Mi Perfil</Link>
+            <Link to="/user-profile" className="text-gray-300 hover:text-green-400 font-medium text-sm transition-colors tracking-wider hover:scale-125 transform duration-200">Mi Perfil</Link>
         </div>
         
         {/* --- DERECHA: NOTIFICACIONES + PERFIL + SALIR --- */}
@@ -148,7 +148,7 @@ export const Navbar = () => {
 
           {/* CÁPSULA DE USUARIO */}
           <div 
-            onClick={() => navigate("/profile")} 
+            onClick={() => navigate("/user-profile")} 
             className="flex items-center gap-3 cursor-pointer hover:bg-white/10 border border-transparent hover:border-white/10 p-2 rounded-xl transition-all duration-300"
           >
             <div className="w-10 h-10 rounded-full bg-gray-700 border border-gray-600 overflow-hidden flex items-center justify-center text-white font-bold shadow-sm">

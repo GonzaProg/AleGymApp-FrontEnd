@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
-import api from "../API/axios"; 
 
 // Hooks y Componentes
 import { useHome } from "../Hooks/Home/useHome";
@@ -9,7 +8,7 @@ import { Card } from "../Components/UI/Card";
 import { EntrenadorNavbar } from "../Components/EntrenadorNavbar"; 
 import { HomeStyles } from "../Styles/HomeStyles"; 
 
-// IMÁGENES DE FONDO (Asegúrate de tener estas imágenes o usa la misma si prefieres repetir)
+// IMÁGENES DE FONDO
 import fondoGym from "../assets/GymFondo.jpg";
 import fondoCreateRoutine from "../assets/Fondo-CreateRoutine.jpg";
 import fondoCreateuser from "../assets/Fondo-CreateUser.jpg";
@@ -19,7 +18,7 @@ import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
 import fondoPerfil from "../assets/Fondo-Perfil.jpg";
 import fondoRenewPlan from "../assets/Fondo-RenewPlan.jpg";
 
-// Importación de tus páginas
+// Importación de páginas
 import { PlansManager } from "../Pages/Planes/PlansManager";
 import { CreateRoutine } from "../Pages/Rutinas/CreateRoutine";
 import { EjerciciosGestion } from "../Pages/Ejercicios/EjerciciosGestion";
@@ -30,7 +29,7 @@ import { DeleteRoutine } from "../Pages/Rutinas/DeleteRoutine";
 import { RenewPlan } from "../Pages/Planes/RenewPlan";
 import { Profile } from "../Pages/Usuarios/Profile"; 
 
-// --- MAPA DE FONDOS ---
+// MAPA DE FONDOS DINÁMICOS SEGÚN LA TAB ACTIVA
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
   "Planes y Pagos": fondoMiPlan, 
@@ -80,7 +79,7 @@ export const Home = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login", { replace: true });
-    api.post("/auth/logout").catch(err => console.error("Error logout:", err));
+    //api.post("/auth/logout").catch(err => console.error("Error logout:", err)); Para actualizar ultimaConexion del usuario
   };
 
   // INICIO 
