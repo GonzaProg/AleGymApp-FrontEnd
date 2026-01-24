@@ -5,6 +5,7 @@ import { Button } from "../../Components/UI/Button";
 import fondoPerfil from "../../assets/Fondo-Perfil.jpg";
 import { AppStyles } from "../../Styles/AppStyles"; 
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
+import { formatearFechaUTC } from "../../Helpers/DateUtils";
 
 export const UserProfile = () => {
   const { 
@@ -22,7 +23,6 @@ export const UserProfile = () => {
     handleSaveProfile, 
     handleChangePassword, 
     handleCancelPassword,
-    // Nuevos estados para Cloudinary
     uploadingImage,
     imagePreview
   } = useProfile();
@@ -30,7 +30,6 @@ export const UserProfile = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-300">Cargando...</div>;
   if (!userData) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-red-400">Error: No se pudo cargar el usuario.</div>;
 
-  // Lógica para decidir qué imagen mostrar (Prioridad: Preview Local > Editando > Guardada)
   const avatarSrc = imagePreview || (isEditingProfile ? editForm.fotoPerfil : userData.fotoPerfil);
 
   return (
@@ -48,9 +47,9 @@ export const UserProfile = () => {
 
       <div className={AppStyles.contentContainer}>
         
-        <div className="w-full max-w-2xl space-y-8">
+        <div className="w-full max-w-3xl space-y-8">
 
-          {/* --- CARD PERFIL (Diseño Especial) --- */}
+          {/* --- CARD PERFIL --- */}
           <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-3xl shadow-2xl overflow-hidden">
             
             <div className={ProfileStyles.coverGradient}></div>
@@ -59,31 +58,23 @@ export const UserProfile = () => {
               
               <div className={ProfileStyles.avatarContainer}>
                 <div className={ProfileStyles.avatarWrapper}>
-                  
-                  {/* IMAGEN DE PERFIL */}
                   {avatarSrc ? (
-                    <img 
-                      src={avatarSrc} 
-                      alt="Perfil" 
-                      className={`${ProfileStyles.avatarImg} ${uploadingImage ? 'opacity-50 grayscale' : ''} transition-all duration-300`} 
-                    />
+                    <img src={avatarSrc} alt="Perfil" className={`${ProfileStyles.avatarImg} ${uploadingImage ? 'opacity-50 grayscale' : ''} transition-all duration-300`} />
                   ) : (
                     <div className={ProfileStyles.avatarPlaceholder}>
                         {userData.nombre?.charAt(0)}
                     </div>
                   )}
 
-                  {/* INDICADOR DE SUBIDA (SPINNER) */}
                   {uploadingImage && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-20 backdrop-blur-sm">
                       <div className="flex flex-col items-center">
-                         <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
-                         <span className="text-white text-[10px] font-bold tracking-wider animate-pulse">SUBIENDO</span>
+                          <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                          <span className="text-white text-[10px] font-bold tracking-wider animate-pulse">SUBIENDO</span>
                       </div>
                     </div>
                   )}
 
-                  {/* OVERLAY DE EDICIÓN (INPUT FILE) */}
                   {isEditingProfile && !uploadingImage && (
                     <label className={ProfileStyles.uploadOverlay}>
                       <span className="text-4xl cursor-pointer hover:scale-110 transition-transform">📷</span>
@@ -102,8 +93,22 @@ export const UserProfile = () => {
                       <Input label="Nombre" value={editForm.nombre} onChange={e => handleEditChange('nombre', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                       <Input label="Apellido" value={editForm.apellido} onChange={e => handleEditChange('apellido', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
-                    <Input label="Usuario" value={editForm.nombreUsuario} onChange={e => handleEditChange('nombreUsuario', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input label="Usuario" value={editForm.nombreUsuario} onChange={e => handleEditChange('nombreUsuario', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                      {/* DNI NO EDITABLE */}
+                      <div>
+                         <label className={AppStyles.label}>DNI (No editable)</label>
+                         <div className="w-full bg-black/10 border border-white/5 text-gray-400 p-3 rounded-lg">{userData.dni}</div>
+                      </div>
+                    </div>
+
                     <Input label="Email" value={editForm.email} onChange={e => handleEditChange('email', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Teléfono" value={editForm.telefono} onChange={e => handleEditChange('telefono', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                        <Input label="Fecha Nacimiento" type="date" value={editForm.fechaNacimiento} onChange={e => handleEditChange('fechaNacimiento', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                    </div>
 
                     <div className="flex justify-center gap-4 pt-6">
                       <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={AppStyles.btnSecondary}>Cancelar</Button>
@@ -122,8 +127,29 @@ export const UserProfile = () => {
                     <p className={ProfileStyles.usernameSubtitle}>
                       @{userData.nombreUsuario} • {userData.email}
                     </p>
+
+                    <div className="flex justify-center gap-6 mt-4 text-sm text-gray-300 bg-white/5 py-3 px-6 rounded-2xl border border-white/5">
+                        <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
+                            <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">DNI</span>
+                            <span className="text-white font-mono">{userData.dni}</span>
+                        </div>
+                        
+                        {userData.telefono && (
+                            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
+                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Teléfono</span>
+                                <span className="text-white">{userData.telefono}</span>
+                            </div>
+                        )}
+
+                        {userData.fechaNacimiento && (
+                            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
+                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Nacimiento</span>
+                                <span className="text-white">{formatearFechaUTC(userData.fechaNacimiento)}</span>
+                            </div>
+                        )}
+                    </div>
                     
-                    <div className="pt-10">
+                    <div className="pt-8">
                       <Button 
                         onClick={() => setIsEditingProfile(true)} 
                         className={ProfileStyles.editProfileBtn}
@@ -137,7 +163,7 @@ export const UserProfile = () => {
             </div>
           </div>
 
-          {/* --- CARD SEGURIDAD (Usa estilos globales) --- */}
+          {/* --- CARD SEGURIDAD --- */}
           <div className={AppStyles.glassCard + " p-8"}>
             {!showPasswordSection ? (
               <div className="flex justify-between items-center">
@@ -159,8 +185,8 @@ export const UserProfile = () => {
                 <div className="bg-black/20 p-6 rounded-xl border border-white/5 space-y-4">
                     <Input label="Contraseña Actual" type="password" value={passForm.currentPassword} onChange={e => handlePassChange('currentPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Nueva" type="password" value={passForm.newPassword} onChange={e => handlePassChange('newPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-                        <Input label="Repetir" type="password" value={passForm.confirmPassword} onChange={e => handlePassChange('confirmPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                        <Input label="Nueva" type="password" autoComplete="new-password" value={passForm.newPassword} onChange={e => handlePassChange('newPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                        <Input label="Repetir" type="password" autoComplete="new-password" value={passForm.confirmPassword} onChange={e => handlePassChange('confirmPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
                 </div>
 

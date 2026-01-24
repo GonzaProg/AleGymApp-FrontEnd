@@ -1,43 +1,47 @@
 import api from '../axios';
 
-// Esto define qué datos trae un alumno para que el autocompletado funcione bien
+// Interfaz completa del Alumno 
 export interface AlumnoDTO {
     id: number;
+    dni: string;            
     nombre: string;
     apellido: string;
     email: string;
     nombreUsuario: string;
+    telefono?: string;      
+    fechaNacimiento?: string; 
     fotoPerfil?: string;
-    // Estos campos son importantes para la lógica de planes
     planActual?: {
         id: number;
         nombre: string;
         precio: number;
         duracionDias: number;
     };
-    fechaVencimientoPlan?: string; // Viene como string del JSON
+    fechaVencimientoPlan?: string; 
     estadoMembresia?: string;
 }
 
-// Interfaces para tipado seguro
+// Interfaz para Editar Perfil
 export interface UpdateProfileDTO {
     nombre: string;
+    dni: string;
     apellido: string;
     nombreUsuario: string;
     email: string;
     fotoPerfil: string;
+    telefono?: string;       
+    fechaNacimiento?: string; 
 }
 
 export interface ChangePasswordDTO {
     currentPassword: string;
     newPassword: string;
-    confirmPassword?: string; // Opcional en el DTO de envío, pero útil en el form
+    confirmPassword?: string;
 }
 
 export const UsuarioApi = {
     // Obtener alumnos
     getAlumnos: async (includePlan: boolean = false) => {
-        // Si includePlan es true, añade "?includePlan=true" a la URL
         const query = includePlan ? '?includePlan=true' : '';
         const response = await api.get(`/users/alumnos${query}`); 
         return response.data;
