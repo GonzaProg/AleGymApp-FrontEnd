@@ -56,18 +56,22 @@ export const useRenewPlan = () => {
     };
 
     // --- ACCIONES CON LA API ---
-
     const renovarPlan = async () => {
         if (!alumnoSeleccionado) return;
         setLoadingAction(true);
         try {
-            await PlansApi.renewPlan(alumnoSeleccionado.id);
-            showSuccess(`✅ Plan de ${alumnoSeleccionado.nombre} renovado.`);
-            // Actualizamos la lista localmente para no recargar toda la página
+            // AQUI CAPTURAMOS LA RESPUESTA
+            const response: any = await PlansApi.renewPlan(alumnoSeleccionado.id);
+            
+            if (response.whatsappEnviado) {
+                showSuccess(`✅ Plan renovado. Recibo enviado por WhatsApp 📱`);
+            } else {
+                showSuccess(`✅ Plan renovado correctamente (No se pudo enviar WhatsApp ⚠️)`);
+            }
+
             await cargarDatosIniciales(); 
-            // Buscamos al usuario actualizado en la nueva lista para refrescar la vista
-            setAlumnoSeleccionado((prev: any) => ({...prev, estadoMembresia: 'Activo'})); // Optimista simple o recargar selección
-            limpiarSeleccion(); // Opcional: volver al buscador
+            setAlumnoSeleccionado((prev: any) => ({...prev, estadoMembresia: 'Activo'})); 
+            limpiarSeleccion(); 
         } catch (error: any) {
             showError(error.response?.data?.message || "Error al renovar");
         } finally {
@@ -98,8 +102,15 @@ export const useRenewPlan = () => {
 
         setLoadingAction(true);
         try {
-            await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!);
-            showSuccess("✅ Plan asignado correctamente.");
+            // AQUI CAPTURAMOS LA RESPUESTA TAMBIÉN
+            const response: any = await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!);
+            
+            if (response.whatsappEnviado) {
+                showSuccess(`✅ Plan asignado. Recibo enviado por WhatsApp 📱`);
+            } else {
+                showSuccess(`✅ Plan asignado correctamente (No se pudo enviar WhatsApp ⚠️)`);
+            }
+
             await cargarDatosIniciales();
             limpiarSeleccion();
         } catch (error: any) {

@@ -7,6 +7,7 @@ import { PageLayout } from "../Components/UI/PageLayout";
 import { Card } from "../Components/UI/Card";
 import { EntrenadorNavbar } from "../Components/EntrenadorNavbar"; 
 import { HomeStyles } from "../Styles/HomeStyles"; 
+import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 
 // IMÁGENES DE FONDO
 import fondoGym from "../assets/GymFondo.jpg";
@@ -140,6 +141,9 @@ export const Home = () => {
     return (
       <div className="flex h-screen bg-gray-900 overflow-hidden font-sans">
         
+        {/* MODAL WHATSAPP */}
+        <WhatsAppModal />
+
         {/* 1. SIDEBAR IZQUIERDO */}
         <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
           <div>

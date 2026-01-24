@@ -116,24 +116,27 @@ export const usePlans = () => {
                 `⚠️ ${alumnoObj.nombre} ya tiene activo el plan "${alumnoObj.planActual.nombre}".\n\n`,
                 `¿Deseas darlo de baja y activar el nuevo plan "${selectedPlanToSubscribe.nombre}" ahora mismo?\n`);
             
-            if (!result.isConfirmed) {
-                return;
-            }
+            if (!result.isConfirmed) return;
         } else {
             const nombreAlumno = alumnoObj ? alumnoObj.nombre : "este alumno";
             const result = await showConfirmSuccess(
                 "¿Confirmar?", 
                 `¿Confirmas asignar "${selectedPlanToSubscribe.nombre}" a ${nombreAlumno}?`
             );
-
-            if (!result.isConfirmed) {
-                return; 
-            }
+            if (!result.isConfirmed) return; 
         }
 
         try {
-            await PlansApi.subscribeUser(alumnoSeleccionadoId, selectedPlanToSubscribe.id!);
-            showSuccess(`✅ Plan asignado correctamente.`);
+            // AQUI CAPTURAMOS LA RESPUESTA COMPLETA DEL BACKEND
+            const response: any = await PlansApi.subscribeUser(alumnoSeleccionadoId, selectedPlanToSubscribe.id!);
+            
+            // Verificamos si se envió el WhatsApp
+            if (response.whatsappEnviado) {
+                showSuccess(`✅ Plan asignado. Recibo enviado por WhatsApp 📱`);
+            } else {
+                showSuccess(`✅ Plan asignado correctamente (No se pudo enviar WhatsApp ⚠️)`);
+            }
+
             setIsSubscribeModalOpen(false);
             loadData(); 
         } catch (error: any) {
