@@ -15,7 +15,7 @@ export const UserPlan = () => {
   
   // Clases dinámicas basadas en el estado
   const statusColor = isActivo ? "text-green-500" : "text-orange-500";
-  const borderColor = isActivo ? "border-green-600" : "border-orange-600";
+  const borderColor = isActivo ? "border-green-600" : "border-orange-500";
   // Agregamos un fondo sutil del mismo color para que resalte más
   const bgTint = isActivo ? "bg-green-500/10" : "bg-orange-500/10"; 
 
