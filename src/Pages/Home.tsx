@@ -8,6 +8,7 @@ import { Card } from "../Components/UI/Card";
 import { EntrenadorNavbar } from "../Components/EntrenadorNavbar"; 
 import { HomeStyles } from "../Styles/HomeStyles"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
+import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
 
 // IMÁGENES DE FONDO
 import fondoGym from "../assets/GymFondo.jpg";
@@ -69,7 +70,7 @@ export const Home = () => {
     isLoading,
     goToMyRoutines, 
     goToUserPlan,
-  } = useHome();  
+  } = useHome();
 
   // ESTADO PARA EL DASHBOARD ADMIN 
   const [activeTab, setActiveTab] = useState("Inicio");
@@ -80,7 +81,6 @@ export const Home = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login", { replace: true });
-    //api.post("/auth/logout").catch(err => console.error("Error logout:", err)); Para actualizar ultimaConexion del usuario
   };
 
   // INICIO 
@@ -135,7 +135,6 @@ export const Home = () => {
 
   //  VISTA ADMIN / ENTRENADOR (DISEÑO SIDEBAR)
   if (isEntrenador) {
-    // Seleccionamos la imagen de fondo según la tab activa
     const currentBg = BackgroundMap[activeTab] || BackgroundMap["default"];
 
     return (
@@ -146,14 +145,16 @@ export const Home = () => {
 
         {/* 1. SIDEBAR IZQUIERDO */}
         <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
-          <div>
-            <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer" onClick={() => setActiveTab("Inicio")}>
+          
+          {/* SECCIÓN SUPERIOR Y NAVEGACIÓN */}
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => setActiveTab("Inicio")}>
                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
                  GYMMate
                </span>
             </div>
 
-            <nav className={`p-4 space-y-2 mt-4 max-h-[calc(100vh-200px)] ${HomeStyles.customScrollbar}`}>
+            <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">General</p>
               <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => setActiveTab("Inicio")} />
               <SidebarItem icon={Icons.planes} label="Planes y Pagos" active={activeTab === "Planes y Pagos"} onClick={() => setActiveTab("Planes y Pagos")} />
@@ -171,18 +172,25 @@ export const Home = () => {
             </nav>
           </div>
 
-          <div className="p-4 border-t border-white/5">
-             <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
-                <span>{Icons.salir}</span>
-                Cerrar Sesión
-             </button>
+          {/* SECCIÓN INFERIOR (WHATSAPP + LOGOUT) */}
+          <div className="shrink-0 bg-[#1a1225]">
+             
+             {/* AQUI ESTÁ EL COMPONENTE DE ESTADO DE WHATSAPP */}
+             <WhatsAppStatus />
+
+             <div className="p-4">
+                 <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
+                   <span>{Icons.salir}</span>
+                   Cerrar Sesión
+                 </button>
+             </div>
           </div>
+
         </aside>
 
         {/* 2. ÁREA PRINCIPAL DERECHA */}
         <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
           
-          {/* FONDO DINÁMICO CON TRANSICIÓN SUAVE */}
           <div 
             className="absolute inset-0 z-0 opacity-40 pointer-events-none transition-all duration-700 ease-in-out"
             style={{ 
@@ -192,10 +200,8 @@ export const Home = () => {
             }} 
           />
           
-          {/* NAVBAR SUPERIOR */}
           <EntrenadorNavbar title={activeTab} user={user} />
 
-          {/* CONTENIDO SCROLLABLE */}
           <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
              {renderAdminContent()}
           </div>
@@ -231,7 +237,6 @@ export const Home = () => {
   );
 };
 
-// COMPONENTE AUXILIAR SIDEBAR
 const SidebarItem = ({ icon, label, active, onClick }: { icon: string, label: string, active: boolean, onClick: () => void }) => {
   return (
     <div onClick={onClick} className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>

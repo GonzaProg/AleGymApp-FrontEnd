@@ -10,9 +10,9 @@ export const WhatsAppModal = () => {
     const [isConnected, setIsConnected] = useState(false); 
     const [isLoading, setIsLoading] = useState(true);
 
-    // NUEVO ESTADO: Controla si el usuario descartó el modal para detener el polling
+    // Controla si el usuario descartó el modal para detener el polling
     const [isDismissed, setIsDismissed] = useState(() => {
-        return sessionStorage.getItem('whatsapp_dismissed') === 'true';
+        return localStorage.getItem('whatsapp_dismissed') === 'true';
     });
 
     const checkStatus = async () => {
@@ -26,7 +26,7 @@ export const WhatsAppModal = () => {
             if (data.isReady) {
                 // Si se conectó, nos aseguramos de limpiar el bloqueo para futuras desconexiones
                 setIsOpen(false);
-                sessionStorage.removeItem('whatsapp_dismissed');
+                localStorage.removeItem('whatsapp_dismissed');
                 setIsDismissed(false);
             } 
             else if (data.qrCode && !isDismissed) {
@@ -38,13 +38,21 @@ export const WhatsAppModal = () => {
         }
     };
 
-    // --- HANDLER OPTIMIZADO ---
-    const handleDismiss = () => {
+    // HANDLER OPTIMIZADO
+    const handleDismiss = async () => {
         setIsOpen(false);
-        // 1. Guardamos en sesión
-        sessionStorage.setItem('whatsapp_dismissed', 'true');
-        // 2. Actualizamos estado para detener el useEffect inmediatamente
+        // 1. Guardamos en sesión (Frontend)
+        localStorage.setItem('whatsapp_dismissed', 'true');
+        // 2. Detenemos el polling (Frontend)
         setIsDismissed(true);
+
+        // 3. AVISAMOS AL BACKEND QUE PAUSE 
+        try {
+            await api.post("/whatsapp/pause");
+            console.log("Servidor notificado para pausar generación de QRs.");
+        } catch (error) {
+            console.error("No se pudo pausar el backend:", error);
+        }
     };
 
     // POLLING INTELIGENTE
@@ -54,12 +62,12 @@ export const WhatsAppModal = () => {
 
         checkStatus(); 
 
-        // Si está conectado, revisamos lento (30s). Si no, rápido (3s).
-        const intervalTime = isConnected ? 30000 : 3000;
+        // Si está conectado, revisamos lento (60s). Si no, rápido (3s).
+        const intervalTime = isConnected ? 60000 : 3000;
         const interval = setInterval(checkStatus, intervalTime);
 
         return () => clearInterval(interval);
-    }, [isConnected, isDismissed]); // <--- Se re-ejecuta si cambia el estado de dismissal
+    }, [isConnected, isDismissed]); 
 
     // Si está cerrado, no renderizamos nada
     if (!isOpen) return null;
