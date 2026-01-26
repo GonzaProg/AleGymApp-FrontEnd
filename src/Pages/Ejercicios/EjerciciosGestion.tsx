@@ -25,7 +25,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
     const handleNewExercise = () => {
         if (onNavigate) {
             // Si estamos en el Dashboard, cambiamos el tab internamente
-            onNavigate('crear_ejercicio');
+            onNavigate('Crear Ejercicio');
         } else {
             // Si accedimos por URL directa, usamos router
             navigate('/ejercicios/crear');

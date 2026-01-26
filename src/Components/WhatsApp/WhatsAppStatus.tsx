@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../../API/axios";
-import { showError } from "../../Helpers/Alerts";
+import { showConfirmSuccess, showError } from "../../Helpers/Alerts";
 
 export const WhatsAppStatus = () => {
     const [status, setStatus] = useState({ isReady: false, isPaused: false });
@@ -35,7 +35,11 @@ export const WhatsAppStatus = () => {
     };
 
     const handleLogout = async () => {
-        if (!confirm("¿Desvincular WhatsApp?")) return;
+        const result = await showConfirmSuccess( 
+                        "¿Desvincular WhatsApp?",
+                        "¿Deseas desvincular WhatsApp y cerrar la sesión?");
+                    
+            if (!result.isConfirmed) return;
         try {
             await api.post("/whatsapp/logout");
             localStorage.removeItem('whatsapp_dismissed'); // Reseteamos preferencia
