@@ -61,9 +61,10 @@ export const AuthApi = {
         return response.data;
     },
 
-    // Solicitar correo de recuperación (Sigue siendo por email)
-    forgotPassword: async (email: string) => {
-        const response = await api.post('/auth/forgot-password', { email });
+    // Solicitar recuperación (Ya no es por email, sino por DNI)
+    forgotPassword: async (dni: string) => {
+        // Enviamos { dni } en lugar de { email }
+        const response = await api.post('/auth/forgot-password', { dni });
         return response.data;
     },
 
