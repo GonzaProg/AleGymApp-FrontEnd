@@ -37,15 +37,15 @@ export const RenewPlan = () => {
 
           {/* BUSCADOR  */}
           {!alumnoSeleccionado && (
-            <div className={RenewPlanStyles.searchWrapper}>
-              <div className={RenewPlanStyles.searchGlow}></div>
+            <div className={AppStyles.searchWrapper}>
+              <div className={AppStyles.searchGlow}></div>
               <div className="relative">
                 <input
                   type="text"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
                   placeholder="🔍 Buscar alumno por nombre..."
-                  className={RenewPlanStyles.searchInput}
+                  className={AppStyles.searchInput}
                 />
                 
                 {sugerencias.length > 0 && (
@@ -59,8 +59,10 @@ export const RenewPlan = () => {
                         <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
                                         {alumno.nombre.charAt(0)}
                         </div>
-                        <span className="text-white font-medium">{alumno.nombre} {alumno.apellido}</span>
-                        <span className="text-xs text-gray-500 bg-gray-900 px-2 py-1 rounded">{alumno.email}</span>
+                        <div className="flex flex-col">
+                        <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
+                        <span className="text-xs text-gray-500">{alumno.email}</span>
+                    </div>
                       </li>
                     ))}
                   </ul>

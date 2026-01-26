@@ -20,7 +20,7 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
     // 1. Lógica para volver atrás (Soporta SPA y Router normal)
     const handleGoBack = () => {
         if (onNavigate) {
-            onNavigate('ejercicios'); // Volvemos al tab de lista en el Dashboard
+            onNavigate('Ejercicios'); // Volvemos al tab de lista en el Dashboard
         } else {
             navigate('/ejercicios/gestion'); // Fallback por si se usa por URL directa
         }

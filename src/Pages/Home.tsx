@@ -19,6 +19,8 @@ import fondoMiPlan from "../assets/Fondo-MiPlan.jpg";
 import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
 import fondoPerfil from "../assets/Fondo-Perfil.jpg";
 import fondoRenewPlan from "../assets/Fondo-RenewPlan.jpg";
+// Puedes usar el mismo fondo de "Crear Rutina" o importar uno nuevo si tienes
+import fondoEnviarPDF from "../assets/Fondo-CreateRoutine.jpg"; 
 
 // Importación de páginas
 import { PlansManager } from "../Pages/Planes/PlansManager";
@@ -30,6 +32,7 @@ import { CreateUser } from "../Pages/Usuarios/CreateUser";
 import { DeleteRoutine } from "../Pages/Rutinas/DeleteRoutine";
 import { RenewPlan } from "../Pages/Planes/RenewPlan";
 import { Profile } from "../Pages/Usuarios/Profile"; 
+import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; // <--- NUEVA IMPORTACIÓN
 
 // MAPA DE FONDOS DINÁMICOS SEGÚN LA TAB ACTIVA
 const BackgroundMap: Record<string, string> = {
@@ -41,6 +44,7 @@ const BackgroundMap: Record<string, string> = {
   "Notificaciones": fondoNotificaciones,
   "Usuarios": fondoCreateuser,
   "Borrar Rutina": fondoDeleteRoutine,
+  "Enviar PDF": fondoEnviarPDF, // <--- NUEVO FONDO
   "Renovar": fondoRenewPlan,
   "Perfil": fondoPerfil,
   "default": fondoGym
@@ -56,6 +60,7 @@ const Icons = {
   notificaciones: "📢",
   usuarios: "👥",
   borrar: "🗑️",
+  enviarPDF: "📤", // <--- NUEVO ICONO
   renovar: "🔄",
   salir: "🚪",
   perfil: "👤"
@@ -70,7 +75,7 @@ export const Home = () => {
     isLoading,
     goToMyRoutines, 
     goToUserPlan,
-  } = useHome();
+  } = useHome();  
 
   // ESTADO PARA EL DASHBOARD ADMIN 
   const [activeTab, setActiveTab] = useState("Inicio");
@@ -124,6 +129,7 @@ export const Home = () => {
       case "Notificaciones": return <CreateNotification />;
       case "Usuarios": return <CreateUser />;
       case "Borrar Rutina": return <DeleteRoutine />;
+      case "Enviar PDF": return <SendRoutinePDF />; // <--- NUEVA RUTA RENDERIZADA
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
       default: return <AdminDashboardWelcome />;
@@ -169,6 +175,8 @@ export const Home = () => {
               
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
               <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => setActiveTab("Notificaciones")} />
+              {/* NUEVO ITEM EN SIDEBAR */}
+              <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => setActiveTab("Enviar PDF")} />
             </nav>
           </div>
 
@@ -211,7 +219,7 @@ export const Home = () => {
     );
   }
 
-  //  VISTA ALUMNO
+  //  VISTA ALUMNO (Igual que antes)
   return (
     <PageLayout backgroundImage={fondoGym}>
       

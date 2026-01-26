@@ -56,10 +56,10 @@ export const DeleteRoutine = () => {
                                     <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
                                         {alumno.nombre.charAt(0)}
                                     </div>
-                                    <span className="font-medium text-gray-200 group-hover:text-white">
-                                        {alumno.nombre} {alumno.apellido}
-                                    </span>
-                                    <span className="text-xs text-gray-500 bg-gray-900 px-2 py-1 rounded">{alumno.email}</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
+                                        <span className="text-xs text-gray-500">{alumno.email}</span>
+                                    </div>
                                 </li>
                             ))}
                         </ul>

@@ -1,9 +1,4 @@
 export const RenewPlanStyles = {
-    // --- BUSCADOR HERO (Más grande que el input normal) ---
-    searchWrapper: "max-w-2xl mx-auto relative group",
-    searchGlow: "absolute -inset-1 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000",
-    searchInput: "w-full bg-gray-800/80 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-4 px-6 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all text-lg shadow-xl backdrop-blur-md relative z-10",
-
     // --- AVATAR GRANDE ---
     avatarContainer: "w-16 h-16 rounded-full bg-gradient-to-br from-gray-700 to-gray-600 flex items-center justify-center text-2xl border-2 border-green-500 shadow-lg shadow-green-500/20 overflow-hidden relative",
     avatarImg: "w-full h-full object-cover",
