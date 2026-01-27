@@ -13,9 +13,20 @@ import { ForgotPassword } from "./Pages/Auth/ForgotPassword";
 import { PlansManager } from "./Pages/Planes/PlansManager";
 import { UserPlan } from "./Pages/Planes/UserPlan";
 import { RenewPlan } from "./Pages/Planes/RenewPlan";
-import {UserProfile} from "./Pages/Usuarios/UserProfile";
+import { UserProfile } from "./Pages/Usuarios/UserProfile";
+import { GymConfigProvider, useGymConfig } from "./Context/GymConfigContext";
+import { SetupScreen } from "./Pages/Setup/SetupScreen";
 
-function App() {
+// Componente interno para manejar la lógica de bloqueo
+const AppContent = () => {
+  const { isConfigured } = useGymConfig();
+
+  // SI LA PC NO TIENE CÓDIGO DE GIMNASIO -> MUESTRA PANTALLA DE CONFIGURACIÓN
+  if (!isConfigured) {
+    return <SetupScreen />;
+  }
+
+  // SI YA ESTÁ CONFIGURADA -> MUESTRA LA APP NORMAL
   return (
     <BrowserRouter>
       <Routes>
@@ -63,6 +74,14 @@ function App() {
 
       </Routes>
     </BrowserRouter>
+  );
+};
+
+function App() {
+  return (
+    <GymConfigProvider>
+       <AppContent />
+    </GymConfigProvider>
   );
 }
 
