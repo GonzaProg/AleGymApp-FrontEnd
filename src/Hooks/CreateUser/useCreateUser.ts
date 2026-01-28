@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useAuthUser } from "../useAuthUser"; 
 import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
+import { useGymConfig } from "../../Context/GymConfigContext"; 
 
 export const useCreateUser = () => {
   
   const { isAdmin } = useAuthUser();
+  const { gymCode } = useGymConfig(); // OBTENER CÓDIGO LOCAL
 
   // ESTADOS DEL FORMULARIO 
   const [formData, setFormData] = useState<CreateUserDTO>({
@@ -30,7 +32,7 @@ export const useCreateUser = () => {
   };
 
   const handleSubmit = async () => {
-    // Validar campos vacíos (DNI es obligatorio ahora)
+    // Validar campos vacíos
     if (!formData.dni || !formData.email || !formData.contraseña || !formData.nombreUsuario || !formData.nombre) {
       return showError("Por favor completa los campos obligatorios (*)");
     }
@@ -41,7 +43,7 @@ export const useCreateUser = () => {
         return showError("⚠️ Por favor ingresa un email válido.");
     }
 
-    // Validar formato DNI (Solo números)
+    // Validar formato DNI
     if (!/^\d+$/.test(formData.dni)) {
         return showError("⚠️ El DNI debe contener solo números.");
     }
@@ -54,10 +56,15 @@ export const useCreateUser = () => {
     setLoading(true);
 
     try {
-      await AuthApi.createUser(formData);
+      // INYECTAR EL CÓDIGO DEL GIMNASIO AL CREAR
+      const dataToSend = {
+          ...formData,
+          codigoGym: gymCode || undefined
+      };
+
+      await AuthApi.createUser(dataToSend);
 
       showSuccess(`Usuario ${formData.nombreUsuario} creado con éxito!`);
-      // Recargar para limpiar o redirigir según prefieras
       window.location.reload();
 
     } catch (error: any) {

@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthApi, type LoginDTO } from "../../API/Auth/AuthApi";
+import { useGymConfig } from "../../Context/GymConfigContext";
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const { gymCode } = useGymConfig(); // OBTENER CÓDIGO LOCAL
 
   // ESTADOS 
   const [dni, setDni] = useState(""); 
@@ -26,7 +28,6 @@ export const useLogin = () => {
 
   // HANDLERS PARA INPUTS 
   const handleDniChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Opcional: Permitir solo números mientras se escribe
     const val = e.target.value;
     if (/^\d*$/.test(val)) { 
         setDni(val);
@@ -48,10 +49,11 @@ export const useLogin = () => {
     setLoading(true);
 
     try {
-      // 1. Preparamos los datos
+      // 1. Preparamos los datos INYECTANDO EL GYM CODE
       const credentials: LoginDTO = {
         dni: dni, 
         contraseña: password,
+        codigoGym: gymCode || undefined // Enviamos el código local
       };
 
       // 2. Llamada a la API

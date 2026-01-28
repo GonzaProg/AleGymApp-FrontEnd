@@ -32,7 +32,8 @@ import { CreateUser } from "../Pages/Usuarios/CreateUser";
 import { DeleteRoutine } from "../Pages/Rutinas/DeleteRoutine";
 import { RenewPlan } from "../Pages/Planes/RenewPlan";
 import { Profile } from "../Pages/Usuarios/Profile"; 
-import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; // <--- NUEVA IMPORTACIÓN
+import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
+import { CreateGym } from "../Pages/Gym/CreateGym";
 
 // MAPA DE FONDOS DINÁMICOS SEGÚN LA TAB ACTIVA
 const BackgroundMap: Record<string, string> = {
@@ -44,10 +45,11 @@ const BackgroundMap: Record<string, string> = {
   "Notificaciones": fondoNotificaciones,
   "Usuarios": fondoCreateuser,
   "Borrar Rutina": fondoDeleteRoutine,
-  "Enviar PDF": fondoEnviarPDF, // <--- NUEVO FONDO
+  "Enviar PDF": fondoEnviarPDF,
   "Renovar": fondoRenewPlan,
   "Perfil": fondoPerfil,
-  "default": fondoGym
+  "default": fondoGym,
+  "Nuevo Gimnasio": fondoCreateRoutine
 };
 
 const Icons = {
@@ -60,10 +62,11 @@ const Icons = {
   notificaciones: "📢",
   usuarios: "👥",
   borrar: "🗑️",
-  enviarPDF: "📤", // <--- NUEVO ICONO
+  enviarPDF: "📤", 
   renovar: "🔄",
   salir: "🚪",
-  perfil: "👤"
+  perfil: "👤",
+  nuevoGym: "🏢"
 };
 
 export const Home = () => {
@@ -72,6 +75,7 @@ export const Home = () => {
   const { 
     user, 
     isEntrenador, 
+    isAdmin,
     isLoading,
     goToMyRoutines, 
     goToUserPlan,
@@ -129,9 +133,10 @@ export const Home = () => {
       case "Notificaciones": return <CreateNotification />;
       case "Usuarios": return <CreateUser />;
       case "Borrar Rutina": return <DeleteRoutine />;
-      case "Enviar PDF": return <SendRoutinePDF />; // <--- NUEVA RUTA RENDERIZADA
+      case "Enviar PDF": return <SendRoutinePDF />; 
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
+      case "Nuevo Gimnasio": return <CreateGym />;
       default: return <AdminDashboardWelcome />;
     }
   };
@@ -177,6 +182,16 @@ export const Home = () => {
               <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => setActiveTab("Notificaciones")} />
               {/* NUEVO ITEM EN SIDEBAR */}
               <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => setActiveTab("Enviar PDF")} />
+
+                {/* SOLO VISIBLE PARA ADMIN */}
+                {isAdmin && (
+                    <SidebarItem 
+                        icon={Icons.nuevoGym} 
+                        label="Nuevo Gimnasio" 
+                        active={activeTab === "Nuevo Gimnasio"} 
+                        onClick={() => setActiveTab("Nuevo Gimnasio")} 
+                    />
+                )}
             </nav>
           </div>
 
