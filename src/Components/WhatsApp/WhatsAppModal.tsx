@@ -1,124 +1,158 @@
 import { useState, useEffect } from "react";
-import { QRCodeCanvas } from "qrcode.react"; 
+import { QRCodeSVG } from "qrcode.react";
 import api from "../../API/axios";
-import { AppStyles } from "../../Styles/AppStyles";
+import { useWhatsAppModal } from "../../Context/WhatsAppModalContext";
+import { Card } from "../UI/Card";
 import { Button } from "../UI/Button";
 
 export const WhatsAppModal = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [qrCode, setQrCode] = useState<string | null>(null);
-    const [isConnected, setIsConnected] = useState(false); 
-    const [isLoading, setIsLoading] = useState(true);
+  const { isOpen, closeModal } = useWhatsAppModal();
+  
+  // Estados
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  // Intervalo para consultar estado
+  const [pollInterval, setPollInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
-    // Controla si el usuario descartó el modal para detener el polling
-    const [isDismissed, setIsDismissed] = useState(() => {
-        return localStorage.getItem('whatsapp_dismissed') === 'true';
-    });
+  // --- 1. LÓGICA DE CIERRE (CANCELAR) ---
+  const handleClose = async () => {
+    // Detenemos el polling del frontend
+    if (pollInterval) clearInterval(pollInterval);
+    
+    // Si cerramos y NO se conectó, avisamos al backend para que deje de trabajar
+    if (!isReady) {
+        try {
+            // NOTA: Ruta corregida (sin doble /api)
+            await api.post("/whatsapp/cancel"); 
+        } catch (error) { console.error("Error cancelando:", error); }
+    }
 
-    const checkStatus = async () => {
+    // Limpieza visual
+    setQrCode(null);
+    setIsReady(false);
+    closeModal();
+  };
+
+  // --- 2. POLLING (Consultar si ya escaneó) ---
+  const startPolling = () => {
+    const interval = setInterval(async () => {
         try {
             const { data } = await api.get("/whatsapp/status");
             
-            setIsConnected(data.isReady);
-            setQrCode(data.qrCode);
-            setIsLoading(false);
-
+            // CASO A: ¡CONECTADO!
             if (data.isReady) {
-                // Si se conectó, nos aseguramos de limpiar el bloqueo para futuras desconexiones
-                setIsOpen(false);
-                localStorage.removeItem('whatsapp_dismissed');
-                setIsDismissed(false);
-            } 
-            else if (data.qrCode && !isDismissed) {
-                setIsOpen(true);
-            }
-
-        } catch (error) {
-            console.error("Silencio: Error verificando WhatsApp", error);
-        }
-    };
-
-    // HANDLER OPTIMIZADO
-    const handleDismiss = async () => {
-        setIsOpen(false);
-        // 1. Guardamos en sesión (Frontend)
-        localStorage.setItem('whatsapp_dismissed', 'true');
-        // 2. Detenemos el polling (Frontend)
-        setIsDismissed(true);
-
-        // 3. AVISAMOS AL BACKEND QUE PAUSE 
-        try {
-            await api.post("/whatsapp/pause");
-            console.log("Servidor notificado para pausar generación de QRs.");
-        } catch (error) {
-            console.error("No se pudo pausar el backend:", error);
-        }
-    };
-
-    // POLLING INTELIGENTE
-    useEffect(() => {
-        // PAUSA TOTAL: Si está descartado, no hacemos NADA.
-        if (isDismissed) return;
-
-        checkStatus(); 
-
-        // Si está conectado, revisamos lento (60s). Si no, rápido (3s).
-        const intervalTime = isConnected ? 60000 : 3000;
-        const interval = setInterval(checkStatus, intervalTime);
-
-        return () => clearInterval(interval);
-    }, [isConnected, isDismissed]); 
-
-    // Si está cerrado, no renderizamos nada
-    if (!isOpen) return null;
-
-    return (
-        <div className={AppStyles.modalOverlay + " z-[10000]"}>
-            <div className={`${AppStyles.modalContent} max-w-md p-8 bg-[#111b21] border border-gray-700 animate-fade-in`}>
+                setIsReady(true);
+                setQrCode(null);
+                setLoading(false);
                 
-                <div className="text-center space-y-6">
-                    <h2 className="text-2xl font-bold text-white mb-2">Vincular WhatsApp</h2>
-                    
-                    <p className="text-gray-400 text-sm">
-                        Para enviar recibos automáticamente, abre WhatsApp en tu celular y escanea este código.
-                    </p>
+                // Dejamos de preguntar
+                clearInterval(interval); 
+                
+                // AUTO-CIERRE: Esperamos 2 segundos para que vea el check verde y cerramos
+                setTimeout(() => {
+                    closeModal();
+                }, 2000);
 
-                    <div className="bg-white p-4 rounded-xl shadow-2xl mx-auto min-h-[250px] flex items-center justify-center">
-                        {isLoading ? (
-                            <span className="text-black font-bold animate-pulse">Cargando estado...</span>
-                        ) : qrCode ? (
-                            <QRCodeCanvas 
-                                value={qrCode} 
-                                size={220} 
-                                level={"H"} 
-                                includeMargin={true}
-                            />
-                        ) : (
-                            <div className="flex flex-col items-center justify-center text-black p-4">
-                                <span className="text-2xl mb-2">⏳</span>
-                                <span className="text-sm font-medium">Esperando QR del servidor...</span>
-                            </div>
-                        )}
-                    </div>
+            } 
+            // CASO B: NOS LLEGA EL QR
+            else if (data.qrCode) {
+                setQrCode(data.qrCode);
+                setLoading(false);
+            }
+        } catch (error) {
+            console.error("Polling error", error);
+        }
+    }, 2000); // Preguntar cada 2 segundos
 
-                    <div className="space-y-2 text-left bg-white/5 p-4 rounded-lg">
-                        <p className="text-xs text-gray-400 leading-relaxed">
-                            1. Abre WhatsApp en tu teléfono.<br/>
-                            2. Toca <b>Menú</b> o <b>Configuración</b>.<br/>
-                            3. Selecciona <b>Dispositivos vinculados</b>.<br/>
-                            4. Toca <b>Vincular un dispositivo</b> y apunta aquí.
-                        </p>
-                    </div>
+    setPollInterval(interval);
+  };
 
-                    <Button 
-                        variant="ghost" 
-                        onClick={handleDismiss} 
-                        className="text-gray-500 hover:text-white mt-2 text-xs uppercase tracking-widest"
-                    >
-                        Cerrar y verificar más tarde
-                    </Button>
-                </div>
+  // --- 3. INICIAR (Pedir QR al Backend) ---
+  const initSession = async () => {
+    setLoading(true);
+    try {
+        // Pedimos iniciar
+        await api.post("/whatsapp/init");
+        // Empezamos a escuchar
+        startPolling();
+    } catch (error) {
+        console.error("Error iniciando:", error);
+        setLoading(false);
+    }
+  };
+
+  // --- EFECTO DE APERTURA ---
+  useEffect(() => {
+    if (isOpen) {
+        // Reseteamos estados
+        setQrCode(null);
+        setIsReady(false);
+        setLoading(true);
+
+        // Verificamos si DE CASUALIDAD ya estaba conectado antes de generar QR
+        api.get("/whatsapp/status").then(({ data }) => {
+            if (data.isReady) {
+                setIsReady(true);
+                setLoading(false);
+                setTimeout(closeModal, 1500); // Si ya estaba, cerramos rápido
+            } else {
+                // Si no está conectado, arrancamos el flujo normal
+                initSession();
+            }
+        }).catch(() => initSession());
+
+    } else {
+        // Si el modal se cierra por fuera (ej: cambio de estado global), limpiamos
+        if (pollInterval) clearInterval(pollInterval);
+    }
+
+    // Cleanup al desmontar
+    return () => {
+        if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <Card className="max-w-md w-full bg-gray-900 border border-green-500/30 p-6 text-center relative">
+        {/* Botón X llama a handleClose (Cancela) */}
+        <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+        
+        <h2 className="text-2xl font-bold text-white mb-2">WhatsApp Web 📱</h2>
+        <p className="text-gray-400 text-sm mb-6">
+             {isReady ? "¡Vinculación Exitosa!" : "Escanea el código para conectar"}
+        </p>
+
+        <div className="flex justify-center items-center bg-white p-4 rounded-xl min-h-[250px]">
+          {loading ? (
+            <div className="animate-pulse flex flex-col items-center">
+                <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-gray-500">Generando QR seguro...</p>
             </div>
+          ) : isReady ? (
+            <div className="text-center animate-fade-in-up">
+                <div className="text-6xl mb-4">✅</div>
+                <p className="text-green-600 font-bold text-lg">¡Conectado!</p>
+                <p className="text-gray-400 text-xs mt-2">Cerrando ventana...</p>
+            </div>
+          ) : qrCode ? (
+            <QRCodeSVG value={qrCode} size={220} />
+          ) : (
+            <p className="text-red-500">Esperando QR...</p>
+          )}
         </div>
-    );
+
+        <div className="mt-6">
+            {/* Solo botón de Cancelar (o Cerrar si ya terminó) */}
+            <Button onClick={handleClose} className="w-full bg-gray-700 text-white hover:bg-gray-600">
+                {isReady ? "Cerrar" : "Cancelar"}
+            </Button>
+        </div>
+      </Card>
+    </div>
+  );
 };

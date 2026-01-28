@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthApi } from "../../API/Auth/AuthApi";
+import { AuthApi, type LoginDTO } from "../../API/Auth/AuthApi";
 import { useGymConfig } from "../../Context/GymConfigContext";
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  const { gymCode } = useGymConfig(); // Obtenemos el código local (Ej: "IRON-GYM")
+  const { gymCode } = useGymConfig(); // OBTENER CÓDIGO LOCAL
 
   // ESTADOS 
   const [dni, setDni] = useState(""); 
@@ -49,19 +49,15 @@ export const useLogin = () => {
     setLoading(true);
 
     try {
-      // 1. Preparamos los datos INCLUYENDO EL CÓDIGO DEL GYM
-      // Nota: Asegúrate de actualizar la interfaz LoginDTO en AuthApi para aceptar 'codigoGym' opcional
-      const credentials: any = { // Usamos any temporalmente o actualiza tu DTO
+      // 1. Preparamos los datos INYECTANDO EL GYM CODE
+      const credentials: LoginDTO = {
         dni: dni, 
         contraseña: password,
-        codigoGym: gymCode //  Vincula el login a esta PC
+        codigoGym: gymCode || undefined // Enviamos el código local
       };
 
       // 2. Llamada a la API
       const data = await AuthApi.login(credentials);
-
-      // Si el backend devuelve "requireGymSelection", aquí deberías manejarlo.
-      // Pero como enviamos 'codigoGym', debería entrar directo.
 
       // 3. Guardar Token y Usuario (Sesión actual)
       localStorage.setItem("token", data.token);

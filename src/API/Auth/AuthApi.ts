@@ -1,6 +1,6 @@
 import api from '../axios';
 
-// DTO para crear usuario (Actualizado con DNI, Telefono, Fecha)
+// DTO para crear usuario (Ahora incluye codigoGym opcional para enviarlo desde el front)
 export interface CreateUserDTO {
     dni: string;          
     nombre: string;
@@ -9,17 +9,19 @@ export interface CreateUserDTO {
     email: string;
     contraseña: string;
     telefono?: string;    
-    fechaNacimiento?: string; // (Opcional, string 'YYYY-MM-DD')
+    fechaNacimiento?: string;
     rol: string;
+    codigoGym?: string; // Para vincular el usuario al gym local
 }
 
-// DTO para el Login 
+// DTO para el Login (Ahora incluye codigoGym)
 export interface LoginDTO {
     dni: string;      
     contraseña: string;
+    codigoGym?: string; 
 }
 
-// Interfaz de respuesta del login
+// Interfaz de respuesta del login (Actualizada con datos del Gym)
 export interface LoginResponse {
     token: string;
     user: {
@@ -29,6 +31,11 @@ export interface LoginResponse {
         apellido: string;
         rol: string;
         fotoPerfil?: string;
+        gym?: { // <--- Info del gym
+            id: number;
+            nombre: string;
+            logoUrl?: string;
+        }
     };
 }
 
@@ -61,9 +68,8 @@ export const AuthApi = {
         return response.data;
     },
 
-    // Solicitar recuperación (Ya no es por email, sino por DNI)
+    // Solicitar recuperación
     forgotPassword: async (dni: string) => {
-        // Enviamos { dni } en lugar de { email }
         const response = await api.post('/auth/forgot-password', { dni });
         return response.data;
     },

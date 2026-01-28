@@ -5,7 +5,7 @@ import { Card } from "../../Components/UI/Card";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
-import fondoSetup from "../../assets/Fondo-Login.jpg"; 
+import fondoSetup from "../../assets/Fondo-Login.jpg";
 
 export const SetupScreen = () => {
   const { setGymLocal } = useGymConfig();
@@ -19,19 +19,14 @@ export const SetupScreen = () => {
     setError(null);
 
     try {
-      // 1. Validamos con el Backend que el código exista realmente
-      // Necesitarás un endpoint simple tipo GET /api/gyms/validate/:code
-      // O simplemente intentamos guardar y si el back no chilla, ok.
+      // Validación simple local (el backend validará realmente al intentar loguearse)
+      if (code.trim().length < 3) throw new Error("Código muy corto.");
       
-      // Simulación de validación (idealmente haz una llamada a API real)
-      if (code.length < 3) throw new Error("Código muy corto.");
+      // Guardamos la configuración y recargamos el contexto
+      setGymLocal(code.trim().toUpperCase());
       
-      // 2. Si es válido, lo guardamos "Para siempre" en esta PC
-      setGymLocal(code);
-      
-      // La app se recargará o redirigirá sola gracias al Context
-    } catch (err) {
-      setError("Código inválido o error de conexión.");
+    } catch (err: any) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -39,34 +34,45 @@ export const SetupScreen = () => {
 
   return (
     <PageLayout centered showNavbar={false} backgroundImage={fondoSetup}>
-      <Card className={AppStyles.glassCard}>
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-white">Configuración Inicial ⚙️</h1>
-          <p className="text-gray-300 mt-2">
-            Esta PC aún no está vinculada a ningún gimnasio.
-          </p>
-        </div>
-
-        <form onSubmit={handleSaveConfig} className="space-y-6">
-          <div>
-            <label className={AppStyles.label}>Código del Gimnasio</label>
-            <Input
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())} // Forzamos mayúsculas
-              placeholder="Ej: IRON-GYM"
-              className={AppStyles.inputDark}
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">Este código lo provee el administrador del sistema.</p>
+      <div className="w-full max-w-md animate-fade-in-up">
+        <Card className={AppStyles.glassCard}>
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 border border-green-500/50 mb-4 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+                <span className="text-3xl">⚙️</span>
+            </div>
+            <h1 className="text-3xl font-bold text-white drop-shadow-md">Configuración</h1>
+            <p className="text-gray-300 mt-2 text-sm px-4">
+              Esta terminal aún no está vinculada. Ingresa el <b>Código de Acceso</b> de tu gimnasio.
+            </p>
           </div>
 
-          {error && <div className={AppStyles.errorBox}>{error}</div>}
+          <form onSubmit={handleSaveConfig} className="space-y-6">
+            <div>
+              <label className={AppStyles.label}>Código del Gimnasio</label>
+              <Input
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                placeholder="Ej: IRON-GYM"
+                className={`${AppStyles.inputDark} text-center tracking-widest font-bold text-lg`}
+                autoFocus
+                required
+              />
+            </div>
 
-          <Button type="submit" disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
-            VINCULAR ESTA PC
-          </Button>
-        </form>
-      </Card>
+            {error && <div className={AppStyles.errorBox}>{error}</div>}
+
+            <Button type="submit" disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
+              {loading ? "VINCULANDO..." : "VINCULAR TERMINAL"}
+            </Button>
+          </form>
+          
+          <div className="mt-6 text-center">
+             <p className="text-xs text-gray-500">
+                Este código vincula esta PC con tu base de datos en la nube.
+             </p>
+          </div>
+        </Card>
+      </div>
     </PageLayout>
   );
 };

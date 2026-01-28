@@ -14,7 +14,7 @@ export const GymConfigProvider = ({ children }: { children: React.ReactNode }) =
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Al iniciar la app, buscamos si ya existe la configuración guardada
+    // Al iniciar, leemos del disco si ya se configuró esta PC
     const storedCode = localStorage.getItem("GYMMATE_LOCAL_CODE");
     if (storedCode) {
       setGymCode(storedCode);
@@ -23,28 +23,19 @@ export const GymConfigProvider = ({ children }: { children: React.ReactNode }) =
   }, []);
 
   const setGymLocal = (code: string) => {
-    // Guardamos en disco (localStorage persiste aunque cierren la app)
     localStorage.setItem("GYMMATE_LOCAL_CODE", code);
     setGymCode(code);
   };
 
   const clearConfig = () => {
-    // Por si necesitas resetear la instalación
     localStorage.removeItem("GYMMATE_LOCAL_CODE");
     setGymCode(null);
   };
 
-  if (loading) return <div>Cargando configuración...</div>;
+  if (loading) return <div className="min-h-screen bg-gray-900 flex items-center justify-center text-green-500">Cargando configuración...</div>;
 
   return (
-    <GymConfigContext.Provider 
-      value={{ 
-        gymCode, 
-        isConfigured: !!gymCode, 
-        setGymLocal, 
-        clearConfig 
-      }}
-    >
+    <GymConfigContext.Provider value={{ gymCode, isConfigured: !!gymCode, setGymLocal, clearConfig }}>
       {children}
     </GymConfigContext.Provider>
   );
