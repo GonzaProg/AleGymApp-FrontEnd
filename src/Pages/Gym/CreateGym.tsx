@@ -99,7 +99,6 @@ export const CreateGym = () => {
                                         value={ownerForm.fechaNacimiento} 
                                         onChange={handleOwnerChange} 
                                         className={AppStyles.inputDark} 
-                                        required 
                                     />
                                 </div>
 

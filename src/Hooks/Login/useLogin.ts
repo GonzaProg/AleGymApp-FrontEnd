@@ -13,6 +13,9 @@ export const useLogin = () => {
   const [rememberMe, setRememberMe] = useState(false); 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // NUEVO ESTADO: Para el modal de vencimiento
+  const [showExpiredModal, setShowExpiredModal] = useState(false);
 
   // EFECTO: CARGAR CREDENCIALES GUARDADAS AL INICIAR 
   useEffect(() => {
@@ -76,8 +79,24 @@ export const useLogin = () => {
       navigate("/home"); 
       
     } catch (err: any) {
-      if (err.response) {
-        setError(err.response.data.error || "Credenciales incorrectas");
+      // --- MANEJO DE ERRORES PERSONALIZADO (BLOQUEOS) ---
+      if (err.response && err.response.data) {
+          const { code, error: msg } = err.response.data;
+
+          if (code === "GYM_LOCKED") {
+              // MENSAJE AMIGABLE DE GYM BLOQUEADO
+              setError("⚠️ Mantenimiento Temporal. El sistema está en una breve pausa administrativa. Contacta a tu gimnasio.");
+          } else if (code === "USER_EXPIRED") {
+              // ABRIMOS MODAL DE VENCIMIENTO
+              setShowExpiredModal(true);
+              setError(null); // Limpiamos el error rojo para que solo salga el modal
+          } else if (code === "USER_LOCKED") {
+               // USUARIO INACTIVO (DEUDA)
+               setError("⛔ Acceso restringido. Tu cuenta está inactiva. Contacta a administración.");
+          } else {
+              // OTROS ERRORES (Pass incorrecta, etc)
+              setError(msg || "Credenciales incorrectas");
+          }
       } else {
         setError("Error al conectar con el servidor");
       }
@@ -92,6 +111,8 @@ export const useLogin = () => {
     rememberMe, 
     error,
     loading, 
+    showExpiredModal, // EXPORTAMOS EL ESTADO DEL MODAL
+    setShowExpiredModal,
     handleDniChange,
     handlePasswordChange,
     handleRememberMeChange, 
