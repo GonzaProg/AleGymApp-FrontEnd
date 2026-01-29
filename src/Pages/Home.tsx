@@ -10,7 +10,7 @@ import { HomeStyles } from "../Styles/HomeStyles";
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
 
-// IMÁGENES DE FONDO
+// IMÁGENES
 import fondoGym from "../assets/GymFondo.jpg";
 import fondoCreateRoutine from "../assets/Fondo-CreateRoutine.jpg";
 import fondoCreateuser from "../assets/Fondo-CreateUser.jpg";
@@ -19,7 +19,6 @@ import fondoMiPlan from "../assets/Fondo-MiPlan.jpg";
 import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
 import fondoPerfil from "../assets/Fondo-Perfil.jpg";
 import fondoRenewPlan from "../assets/Fondo-RenewPlan.jpg";
-// Puedes usar el mismo fondo de "Crear Rutina" o importar uno nuevo si tienes
 import fondoEnviarPDF from "../assets/Fondo-CreateRoutine.jpg"; 
 
 // Importación de páginas
@@ -34,8 +33,8 @@ import { RenewPlan } from "../Pages/Planes/RenewPlan";
 import { Profile } from "../Pages/Usuarios/Profile"; 
 import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
 import { CreateGym } from "../Pages/Gym/CreateGym";
+import { GymManagement } from "../Pages/Gym/GymManagement"; // <--- NUEVO IMPORT
 
-// MAPA DE FONDOS DINÁMICOS SEGÚN LA TAB ACTIVA
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
   "Planes y Pagos": fondoMiPlan, 
@@ -49,7 +48,8 @@ const BackgroundMap: Record<string, string> = {
   "Renovar": fondoRenewPlan,
   "Perfil": fondoPerfil,
   "default": fondoGym,
-  "Nuevo Gimnasio": fondoCreateRoutine
+  "Nuevo Gimnasio": fondoCreateRoutine,
+  "Gestión Gimnasios": fondoCreateRoutine // Fondo para gestión
 };
 
 const Icons = {
@@ -66,7 +66,8 @@ const Icons = {
   renovar: "🔄",
   salir: "🚪",
   perfil: "👤",
-  nuevoGym: "🏢"
+  nuevoGym: "🏢",
+  gestionGyms: "⚙️" // Icono nuevo
 };
 
 export const Home = () => {
@@ -81,10 +82,8 @@ export const Home = () => {
     goToUserPlan,
   } = useHome();  
 
-  // ESTADO PARA EL DASHBOARD ADMIN 
   const [activeTab, setActiveTab] = useState("Inicio");
 
-  // LOGICA CERRAR SESIÓN (Sidebar) 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault(); 
     localStorage.removeItem("token");
@@ -92,7 +91,6 @@ export const Home = () => {
     navigate("/login", { replace: true });
   };
 
-  // INICIO 
   const AdminDashboardWelcome = () => (
     <div className="animate-fade-in-up space-y-6">
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
@@ -103,26 +101,11 @@ export const Home = () => {
         <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
           Aquí tienes un resumen de la actividad del gimnasio hoy.
         </p>
-        <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
-          Todo parece estar bajo control.
-        </p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gray-800/60 backdrop-blur-md p-6 rounded-2xl border border-white/5 hover:border-green-500/30 transition-all group">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-gray-400 text-sm">Alumnos Activos</p>
-              <h3 className="text-3xl font-bold text-white mt-1 group-hover:text-green-400 transition-colors">124</h3>
-            </div>
-            <span className="text-2xl bg-gray-700/50 p-3 rounded-xl">👥</span>
-          </div>
-        </div>
-      </div>
+      {/* ... estadísticas ... */}
     </div>
   );
 
-  // RENDERIZADO DEL CONTENIDO DERECHO 
   const renderAdminContent = () => {
     switch (activeTab) {
       case "Inicio": return <AdminDashboardWelcome/>;
@@ -137,6 +120,7 @@ export const Home = () => {
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
       case "Nuevo Gimnasio": return <CreateGym />;
+      case "Gestión Gimnasios": return <GymManagement />; // <--- NUEVA RUTA
       default: return <AdminDashboardWelcome />;
     }
   };
@@ -144,20 +128,16 @@ export const Home = () => {
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
   if (!user) return null; 
 
-  //  VISTA ADMIN / ENTRENADOR (DISEÑO SIDEBAR)
   if (isEntrenador) {
     const currentBg = BackgroundMap[activeTab] || BackgroundMap["default"];
 
     return (
       <div className="flex h-screen bg-gray-900 overflow-hidden font-sans">
         
-        {/* MODAL WHATSAPP */}
         <WhatsAppModal />
 
-        {/* 1. SIDEBAR IZQUIERDO */}
         <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
           
-          {/* SECCIÓN SUPERIOR Y NAVEGACIÓN */}
           <div className="flex-1 overflow-hidden flex flex-col">
             <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => setActiveTab("Inicio")}>
                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
@@ -180,27 +160,31 @@ export const Home = () => {
               
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
               <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => setActiveTab("Notificaciones")} />
-              {/* NUEVO ITEM EN SIDEBAR */}
               <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => setActiveTab("Enviar PDF")} />
 
                 {/* SOLO VISIBLE PARA ADMIN */}
                 {isAdmin && (
+                  <>
+                    <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Administración</p>
                     <SidebarItem 
                         icon={Icons.nuevoGym} 
                         label="Nuevo Gimnasio" 
                         active={activeTab === "Nuevo Gimnasio"} 
                         onClick={() => setActiveTab("Nuevo Gimnasio")} 
                     />
+                    <SidebarItem 
+                        icon={Icons.gestionGyms} 
+                        label="Gestión Gimnasios" 
+                        active={activeTab === "Gestión Gimnasios"} 
+                        onClick={() => setActiveTab("Gestión Gimnasios")} 
+                    />
+                  </>
                 )}
             </nav>
           </div>
 
-          {/* SECCIÓN INFERIOR (WHATSAPP + LOGOUT) */}
           <div className="shrink-0 bg-[#1a1225]">
-             
-             {/* AQUI ESTÁ EL COMPONENTE DE ESTADO DE WHATSAPP */}
              <WhatsAppStatus />
-
              <div className="p-4">
                  <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
                    <span>{Icons.salir}</span>
@@ -211,9 +195,7 @@ export const Home = () => {
 
         </aside>
 
-        {/* 2. ÁREA PRINCIPAL DERECHA */}
         <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-          
           <div 
             className="absolute inset-0 z-0 opacity-40 pointer-events-none transition-all duration-700 ease-in-out"
             style={{ 
@@ -222,29 +204,24 @@ export const Home = () => {
                 backgroundPosition: 'center'
             }} 
           />
-          
           <EntrenadorNavbar title={activeTab} user={user} />
-
           <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
              {renderAdminContent()}
           </div>
-
         </main>
       </div>
     );
   }
 
-  //  VISTA ALUMNO (Igual que antes)
+  // VISTA ALUMNO (Sin cambios)
   return (
     <PageLayout backgroundImage={fondoGym}>
-      
       <h1 className="text-4xl font-bold text-white drop-shadow-lg mt-28">
         Hola, <span className={HomeStyles.userName}>{user.nombre}</span> 👋
       </h1>
       <p className="text-gray-100 mt-2 mb-8 text-lg drop-shadow-md">
         Bienvenido a tu panel de control.
       </p>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <Card onClick={goToMyRoutines} className="border-l-4 border-green-500 hover:shadow-xl transition cursor-pointer bg-green-600/70 backdrop-blur-md hover:scale-105">
             <h3 className="text-xl font-bold mb-2 text-white">💪 Mis Rutinas</h3>

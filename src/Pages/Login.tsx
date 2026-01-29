@@ -1,4 +1,4 @@
-import { useLogin } from "../Hooks/Login/useLogin"; // Ajusta ruta si es necesario
+import { useLogin } from "../Hooks/Login/useLogin"; 
 import { PageLayout } from "../Components/UI/PageLayout";
 import { Card } from "../Components/UI/Card";
 import { Input } from "../Components/UI/Input";
@@ -6,14 +6,17 @@ import { Button } from "../Components/UI/Button";
 import fondoLogin from "../assets/Fondo-Login.jpg";
 import { LoginStyles } from "../Styles/LoginStyles";
 import { Link } from "react-router-dom";
+import { PlanExpiredModal } from "../Components/Planes/PlanExpiredModal"; 
 
 export const Login = () => {
   const { 
-    dni,             
+    dni,            
     password, 
     rememberMe,
     error, 
     loading,          
+    showExpiredModal,
+    setShowExpiredModal,
     handleDniChange,  
     handlePasswordChange, 
     handleRememberMeChange,
@@ -23,6 +26,12 @@ export const Login = () => {
   return (
     <PageLayout centered showNavbar={false} backgroundImage={fondoLogin}>
       
+      {/* MODAL DE PLAN VENCIDO */}
+      <PlanExpiredModal 
+        isOpen={showExpiredModal} 
+        onClose={() => setShowExpiredModal(false)} 
+      />
+
       <Card className={LoginStyles.glassCard}> 
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white drop-shadow-md">GymMate</h1>
@@ -33,8 +42,8 @@ export const Login = () => {
           <div>
               <label className={LoginStyles.label}>DNI</label> 
               <Input 
-                type="text" // 'text' con validación numérica es mejor que 'number' para quitar flechitas
-                inputMode="numeric" // Teclado numérico en móvil
+                type="text" 
+                inputMode="numeric"
                 placeholder="Ingresa tu DNI" 
                 value={dni} 
                 onChange={handleDniChange} 
@@ -55,14 +64,13 @@ export const Login = () => {
               />
           </div>
 
-          {/* CHECKBOX RECORDAR */}
           <div className="flex items-center gap-2">
             <input 
                 id="rememberMe"
                 type="checkbox" 
                 checked={rememberMe}
                 onChange={handleRememberMeChange}
-                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500 focus:ring-offset-gray-800 cursor-pointer"
+                className="w-4 h-4 rounded border-gray-600 bg-gray-700 text-green-500 focus:ring-green-500 cursor-pointer"
             />
             <label htmlFor="rememberMe" className="text-sm text-gray-300 cursor-pointer select-none">
                 Recordar mis datos
@@ -70,8 +78,10 @@ export const Login = () => {
           </div>
 
           {error && (
-            <div className={LoginStyles.errorBox}>
-              {error}
+            <div className={`${LoginStyles.errorBox} flex items-center gap-2`}>
+               {/* Icono condicional si es bloqueo de gym */}
+               {error.includes("Mantenimiento") && <span className="text-xl">⚠️</span>}
+               {error}
             </div>
           )}
 

@@ -57,10 +57,20 @@ export const useCreateUser = () => {
 
     try {
       // INYECTAR EL CÓDIGO DEL GIMNASIO AL CREAR
-      const dataToSend = {
+      const dataToSend: any = {
           ...formData,
           codigoGym: gymCode || undefined
       };
+
+      // No enviar fechaNacimiento si está vacío
+      if (!dataToSend.fechaNacimiento) {
+          delete dataToSend.fechaNacimiento;
+      }
+
+      // No enviar telefono si está vacío
+      if (!dataToSend.telefono) {
+          delete dataToSend.telefono;
+      }
 
       await AuthApi.createUser(dataToSend);
 

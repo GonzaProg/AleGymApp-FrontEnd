@@ -59,11 +59,17 @@ export const useCreateGym = () => {
 
         setLoadingOwner(true);
         try {
-            // IMPORTANTE: Enviamos el codigoGym del NUEVO gimnasio, no el del contexto actual
-            await AuthApi.createUser({
+            // IMPORTANTE: Enviamos el codigoGym del NUEVO gimnasio, no del contexto actual
+            const ownerData: any = {
                 ...ownerForm,
                 codigoGym: createdGymCode // <--- Vinculación clave
-            });
+            };
+
+            // No enviar campos vacíos opcionales
+            if (!ownerData.telefono) delete ownerData.telefono;
+            if (!ownerData.fechaNacimiento) delete ownerData.fechaNacimiento;
+
+            await AuthApi.createUser(ownerData);
 
             showSuccess(`Dueño asignado a ${createdGymName} correctamente.`);
             
