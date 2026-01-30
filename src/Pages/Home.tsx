@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+// import { useNavigate } from "react-router-dom"; // Ya no se necesita aquí, lo maneja useLogout
 
 // Hooks y Componentes
 import { useHome } from "../Hooks/Home/useHome";
+import { useLogout } from "../Hooks/Auth/useLogout"; // <--- NUEVO IMPORT
 import { PageLayout } from "../Components/UI/PageLayout";
 import { Card } from "../Components/UI/Card";
 import { EntrenadorNavbar } from "../Components/EntrenadorNavbar"; 
@@ -33,7 +34,7 @@ import { RenewPlan } from "../Pages/Planes/RenewPlan";
 import { Profile } from "../Pages/Usuarios/Profile"; 
 import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
 import { CreateGym } from "../Pages/Gym/CreateGym";
-import { GymManagement } from "../Pages/Gym/GymManagement"; // <--- NUEVO IMPORT
+import { GymManagement } from "../Pages/Gym/GymManagement"; 
 
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
@@ -49,7 +50,7 @@ const BackgroundMap: Record<string, string> = {
   "Perfil": fondoPerfil,
   "default": fondoGym,
   "Nuevo Gimnasio": fondoCreateRoutine,
-  "Gestión Gimnasios": fondoCreateRoutine // Fondo para gestión
+  "Gestión Gimnasios": fondoCreateRoutine 
 };
 
 const Icons = {
@@ -67,11 +68,11 @@ const Icons = {
   salir: "🚪",
   perfil: "👤",
   nuevoGym: "🏢",
-  gestionGyms: "⚙️" // Icono nuevo
+  gestionGyms: "⚙️"
 };
 
 export const Home = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Eliminado, lo usa el hook useLogout
   
   const { 
     user, 
@@ -82,13 +83,14 @@ export const Home = () => {
     goToUserPlan,
   } = useHome();  
 
+  const { handleLogout: logoutAction } = useLogout(); // <--- Usamos el Hook
+
   const [activeTab, setActiveTab] = useState("Inicio");
 
-  const handleLogout = (e: React.MouseEvent) => {
+  // Reemplazamos la lógica manual por la llamada al hook
+  const handleLogoutClick = (e: React.MouseEvent) => {
     e.preventDefault(); 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login", { replace: true });
+    logoutAction(); // Limpia localStorage, sessionStorage y redirige
   };
 
   const AdminDashboardWelcome = () => (
@@ -120,7 +122,7 @@ export const Home = () => {
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
       case "Nuevo Gimnasio": return <CreateGym />;
-      case "Gestión Gimnasios": return <GymManagement />; // <--- NUEVA RUTA
+      case "Gestión Gimnasios": return <GymManagement />;
       default: return <AdminDashboardWelcome />;
     }
   };
@@ -186,7 +188,8 @@ export const Home = () => {
           <div className="shrink-0 bg-[#1a1225]">
              <WhatsAppStatus />
              <div className="p-4">
-                 <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
+                 {/* BOTÓN SALIR ACTUALIZADO */}
+                 <button onClick={handleLogoutClick} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
                    <span>{Icons.salir}</span>
                    Cerrar Sesión
                  </button>

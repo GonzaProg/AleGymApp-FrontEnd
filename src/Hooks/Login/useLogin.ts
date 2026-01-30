@@ -63,27 +63,26 @@ export const useLogin = () => {
       // 2. Llamada a la API
       const data = await AuthApi.login(credentials);
 
-      // 3. GUARDAR TOKENS Y USUARIO usando AuthTokenService
+      // 1. GUARDADO INTELIGENTE:
+      // Si rememberMe es true -> LocalStorage (Persiste al cerrar app)
+      // Si rememberMe es false -> SessionStorage (Muere al cerrar app)
       authTokenService.setTokens({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
         expiresIn: data.expiresIn,
-      });
-      localStorage.setItem("user", JSON.stringify(data.user));
+      }, data.user, rememberMe);
 
-      // 4. El auto-refresh se configura automáticamente en useAuthUser al cargar la app
-
-      // 5. LÓGICA RECORDAR USUARIO (Persistencia futura)
+      // 2. Persistencia de INPUTS (Independiente de la sesión)
+      // Esto es solo para que no tenga que escribir el DNI de nuevo, pero no inicia sesión solo.
       if (rememberMe) {
-        localStorage.setItem("remember_dni", dni); 
-        localStorage.setItem("remember_pass", password); 
+        localStorage.setItem("remember_dni_input", dni); 
+        localStorage.setItem("remember_pass_input", password); 
       } else {
-        localStorage.removeItem("remember_dni");
-        localStorage.removeItem("remember_pass");
+        localStorage.removeItem("remember_dni_input");
+        localStorage.removeItem("remember_pass_input");
       }
 
-      // 6. Redirección
-      navigate("/home"); 
+      navigate("/home");
       
     } catch (err: any) {
       // --- MANEJO DE ERRORES PERSONALIZADO (BLOQUEOS) ---

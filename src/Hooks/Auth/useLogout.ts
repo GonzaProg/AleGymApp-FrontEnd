@@ -3,38 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { AuthApi } from '../../API/Auth/AuthApi';
 import { authTokenService } from '../../API/Auth/AuthTokenService';
 
-/**
- * HOOK PARA LOGOUT
- * Maneja la limpieza segura de tokens y redirección
- */
 export const useLogout = () => {
     const navigate = useNavigate();
 
     const handleLogout = useCallback(async (redirectToLogin = true) => {
         try {
-            // 1. Intentar revocar el refresh token en el backend
             const refreshToken = authTokenService.getRefreshToken();
             if (refreshToken) {
-                try {
-                    await AuthApi.logout(refreshToken);
-                } catch (error) {
-                    // Continuar aunque falle, el token se limpia localmente
-                    console.warn('Error revocando token en backend:', error);
-                }
+                // Avisamos al backend para que invalide el token en BD
+                await AuthApi.logout(refreshToken);
             }
         } catch (error) {
-            console.error('Error en logout:', error);
+            console.warn('Error revocando token en backend:', error);
         } finally {
-            // 2. Limpiar tokens locales
+            // Limpieza TOTAL del frontend
             authTokenService.clearTokens();
             
-            // 3. Limpiar datos del usuario
-            localStorage.removeItem('user');
-            localStorage.removeItem('remember_dni');
-            localStorage.removeItem('remember_pass');
-            sessionStorage.clear();
+            // Limpiamos también inputs guardados si quieres ser estricto, 
+            // o déjalos para comodidad del usuario.
+            // localStorage.removeItem('remember_dni_input'); 
             
-            // 4. Redireccionar a login
             if (redirectToLogin) {
                 navigate('/login', { replace: true });
             }
@@ -43,25 +31,14 @@ export const useLogout = () => {
 
     const handleLogoutAll = useCallback(async (redirectToLogin = true) => {
         try {
-            // 1. Revocar todos los refresh tokens en el backend
             await AuthApi.logoutAll();
         } catch (error) {
-            console.error('Error en logout de todos los dispositivos:', error);
+            console.error('Error logout all:', error);
         } finally {
-            // 2. Limpiar todo
             authTokenService.clearTokens();
-            localStorage.clear();
-            sessionStorage.clear();
-            
-            // 3. Redireccionar
-            if (redirectToLogin) {
-                navigate('/login', { replace: true });
-            }
+            if (redirectToLogin) navigate('/login', { replace: true });
         }
     }, [navigate]);
 
-    return {
-        handleLogout,
-        handleLogoutAll
-    };
+    return { handleLogout, handleLogoutAll };
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { authTokenService } from '../API/Auth/AuthTokenService';
 import { AuthApi } from '../API/Auth/AuthApi';
+import { useLogout } from './Auth/useLogout'; // Reutilizamos el hook de logout
 
 export interface User {
     id?: number;
@@ -21,10 +22,10 @@ export const useAuthUser = () => {
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [isEntrenador, setIsEntrenador] = useState<boolean>(false);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [refreshToken, setRefreshToken] = useState<string | null>(null);
+    
+    // Importamos logout para usarlo si falla el refresh
+    const { handleLogout } = useLogout(); 
 
-    // Función para refresh de tokens
     const refreshTokens = useCallback(async () => {
         try {
             const refreshToken = authTokenService.getRefreshToken();
@@ -32,100 +33,53 @@ export const useAuthUser = () => {
 
             const response = await AuthApi.refresh(refreshToken);
             
-            // Actualizar tokens
+            // Al refrescar, mantenemos la persistencia donde estaba (Local o Session)
+            // Verificamos dónde estaba el token viejo para guardar el nuevo en el mismo lugar
+            const wasRemembered = !!localStorage.getItem('refreshToken');
+            
+            // Actualizamos user y tokens
+            // Nota: El backend en refresh a veces no devuelve el objeto user completo, 
+            // si es así, mantenemos el que ya teníamos en memoria/storage.
+            const currentUser = authTokenService.getUser();
+
             authTokenService.setTokens({
                 accessToken: response.accessToken,
                 refreshToken: response.refreshToken,
                 expiresIn: response.expiresIn
-            });
+            }, currentUser, wasRemembered);
 
-            setAccessToken(response.accessToken);
-            setRefreshToken(response.refreshToken);
-
-            // Reconfigurar auto-refresh
             authTokenService.setupAutoRefresh(refreshTokens);
 
         } catch (error) {
             console.error('Error refreshing tokens:', error);
-            // Si falla, hacer logout
-            logout();
+            handleLogout(true); // Logout forzado si falla el refresh
         }
-    }, []);
+    }, [handleLogout]);
 
-    // Callback para logout
-    const logout = useCallback(async () => {
-        try {
-            const token = authTokenService.getRefreshToken();
-            if (token) {
-                // Llamar al endpoint de logout para revocar el token en la BD
-                // await AuthApi.logout(token);
-            }
-        } catch (error) {
-            console.error("Error en logout:", error);
-        } finally {
-            // Limpiar todo
-            authTokenService.clearTokens();
-            localStorage.removeItem("user");
-            localStorage.removeItem("remember_dni");
-            localStorage.removeItem("remember_pass");
+    useEffect(() => {
+        // 1. Recuperar usuario INMEDIATAMENTE
+        const userObj = authTokenService.getUser();
+        const token = authTokenService.getAccessToken();
+        
+        if (userObj && token) {
+            // Si hay usuario en storage, lo seteamos de una para que no parpadee el login
+            setCurrentUser(userObj);
+            setIsAdmin(userObj.rol === "Admin");
+            setIsEntrenador(userObj.rol === "Entrenador" || userObj.rol === "Admin");
             
+            // Inicializamos la lógica de refresh en segundo plano
+            authTokenService.initializeSession(refreshTokens);
+        } else {
+            // Solo si no hay usuario, limpiamos
             setCurrentUser(null);
-            setAccessToken(null);
-            setRefreshToken(null);
             setIsAdmin(false);
             setIsEntrenador(false);
         }
-    }, []);
 
-    useEffect(() => {
-        const userStr = localStorage.getItem("user");
-        const tokenInfo = authTokenService.getTokens();
-
-        if (userStr) {
-            try {
-                const userObj: User = JSON.parse(userStr);
-                setCurrentUser(userObj);
-                
-                // Determinamos roles
-                const admin = userObj.rol === "Admin";
-                setIsAdmin(admin);
-                setIsEntrenador(userObj.rol === "Entrenador" || admin); 
-
-            } catch (error) {
-                console.error("Error sesión:", error);
-                setIsAdmin(false);
-                setIsEntrenador(false);
-                setCurrentUser(null);
-            }
-        }
-        
-        if (tokenInfo.accessToken) {
-            setAccessToken(tokenInfo.accessToken);
-        }
-
-        if (tokenInfo.refreshToken) {
-            setRefreshToken(tokenInfo.refreshToken);
-        }
-
-        // Inicializar sesión con auto-refresh
-        const sessionInitialized = authTokenService.initializeSession(refreshTokens);
-        
-        // Si no se pudo inicializar y hay tokens, intentar refresh inmediato
-        if (!sessionInitialized && tokenInfo.accessToken && tokenInfo.refreshToken) {
-            refreshTokens();
-        }
-
+        // Dejamos de cargar inmediatamente
         setIsLoading(false);
 
     }, [refreshTokens]);
 
-    return { 
-        isAdmin,
-        isEntrenador, 
-        currentUser,
-        accessToken,
-        refreshToken,
-        isLoading,
-        logout
-    };
+    return { isAdmin, isEntrenador, currentUser, isLoading };
 };
