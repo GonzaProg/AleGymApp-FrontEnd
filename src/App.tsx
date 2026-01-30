@@ -17,64 +17,52 @@ import { UserProfile } from "./Pages/Usuarios/UserProfile";
 import { GymConfigProvider, useGymConfig } from "./Context/GymConfigContext";
 import { SetupScreen } from "./Pages/Setup/SetupScreen";
 import { WhatsAppModalProvider } from "./Context/WhatsAppModalContext"; 
+import { PrivateRoute } from "./Routes/PrivateRoute";
+import { useAuth, AuthProvider  } from "./Context/AuthContext";
 
 // Componente interno para manejar la lógica de bloqueo
 const AppContent = () => {
+  const { isAuthenticated, isLoading } = useAuth();
   const { isConfigured } = useGymConfig();
 
-  // SI LA PC NO TIENE CÓDIGO DE GIMNASIO -> MUESTRA PANTALLA DE CONFIGURACIÓN
-  if (!isConfigured) {
-    return <SetupScreen />;
-  }
+  if (!isConfigured) return <SetupScreen />;
+  if (isLoading) return null;
 
-  // SI YA ESTÁ CONFIGURADA -> MUESTRA LA APP NORMAL
   return (
-    /* 2. ENVOLVEMOS EL ROUTER CON EL PROVIDER DE WHATSAPP */
     <WhatsAppModalProvider>
       <BrowserRouter>
         <Routes>
-          {/* Ruta por defecto: Redirige al Login */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? <Navigate to="/home" replace /> : <Login />
+            }
+          />
+
+          <Route
+            path="/home"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+
+          {/* TODAS LAS DEMÁS RUTAS → PROTEGIDAS */}
+          <Route path="/create-routine" element={<PrivateRoute><CreateRoutine /></PrivateRoute>} />
+          <Route path="/create-user" element={<PrivateRoute><CreateUser /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/user-profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
+          <Route path="/my-routines" element={<PrivateRoute><MyRoutines /></PrivateRoute>} />
+          <Route path="/delete-routine" element={<PrivateRoute><DeleteRoutine /></PrivateRoute>} />
+          <Route path="/ejercicios/crear" element={<PrivateRoute><EjerciciosCrear /></PrivateRoute>} />
+          <Route path="/ejercicios/gestion" element={<PrivateRoute><EjerciciosGestion /></PrivateRoute>} />
+          <Route path="/notifications/create" element={<PrivateRoute><CreateNotification /></PrivateRoute>} />
+          <Route path="/forgot-password" element={<PrivateRoute><ForgotPassword /></PrivateRoute>} />
+          <Route path="/planes" element={<PrivateRoute><PlansManager /></PrivateRoute>} />
+          <Route path="/planes/mi-plan" element={<PrivateRoute><UserPlan /></PrivateRoute>} />
+          <Route path="/planes/renovar-gestion" element={<PrivateRoute><RenewPlan /></PrivateRoute>} />
           
-          {/* Ruta del Login */}
-          <Route path="/login" element={<Login />} />
-
-          {/* Ruta Home */}
-          <Route path="/home" element={<Home />} />
-          
-          {/* Ruta para Crear Rutina */}
-          <Route path="/create-routine" element={<CreateRoutine />} />
-
-          {/* Ruta para Crear Usuario */}
-          <Route path="/create-user" element={<CreateUser />} />
-
-          {/* Ruta para Perfil */}
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/user-profile" element={<UserProfile />} />
-
-          {/* Ruta para Mis Rutinas */}
-          <Route path="/my-routines" element={<MyRoutines />} />
-
-          {/* Ruta para Eliminar Rutina */}
-          <Route path="/delete-routine" element={<DeleteRoutine />} />
-
-          {/* Rutas para Ejercicios */}
-          <Route path="/ejercicios/crear" element={<EjerciciosCrear />} />
-          <Route path="/ejercicios/gestion" element={<EjerciciosGestion />} />
-
-          {/* Ruta para Crear Notificación (Broadcast) */}
-          <Route path="/notifications/create" element={<CreateNotification />} />
-
-          {/* Ruta de Recuperación de contraseña */}
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-
-          {/* Rutas de Planes y Membresías */}
-          <Route path="/planes" element={<PlansManager />} />
-          <Route path="/planes/mi-plan" element={<UserPlan />} />
-
-          {/* Ruta para Renovar Planes de Usuarios*/}
-          <Route path="/planes/renovar-gestion" element={<RenewPlan />} />
-
         </Routes>
       </BrowserRouter>
     </WhatsAppModalProvider>
@@ -84,7 +72,9 @@ const AppContent = () => {
 function App() {
   return (
     <GymConfigProvider>
-       <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </GymConfigProvider>
   );
 }

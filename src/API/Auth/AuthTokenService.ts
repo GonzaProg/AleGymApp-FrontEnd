@@ -106,17 +106,15 @@ class AuthTokenService {
      * Inicializa la sesión. Retorna TRUE si hay datos válidos para mostrar la app inmediatamente.
      */
     initializeSession(onRefresh: () => Promise<void>): boolean {
-        const accessToken = this.getAccessToken();
-        const refreshToken = this.getRefreshToken();
+    const accessToken = this.getAccessToken();
+    const refreshToken = this.getRefreshToken();
 
-        if (!accessToken || !refreshToken) return false;
+    if (!accessToken || !refreshToken) return false;
 
-        // Configuramos el refresh silencioso en segundo plano
-        this.setupAutoRefresh(onRefresh);
-        
-        // Retornamos true para que la UI renderice de inmediato sin esperar
-        return true;
+    this.setupAutoRefresh(onRefresh);
+    return true;
     }
+
 }
 
 export const authTokenService = new AuthTokenService();

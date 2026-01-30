@@ -69,7 +69,7 @@ export const useLogin = () => {
       authTokenService.setTokens({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
-        expiresIn: data.expiresIn,
+        expiresIn: 900, // 15 minutos en segundos
       }, data.user, rememberMe);
 
       // 2. Persistencia de INPUTS (Independiente de la sesión)
