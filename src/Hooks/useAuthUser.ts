@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { authTokenService } from '../API/Auth/AuthTokenService';
+import { AuthApi } from '../API/Auth/AuthApi';
 
 export interface User {
     id?: number;
@@ -15,18 +17,69 @@ export interface User {
 }
 
 export const useAuthUser = () => {
-    // 1. AGREGAMOS EL ESTADO DE CARGA (Inicia en true)
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [isEntrenador, setIsEntrenador] = useState<boolean>(false);
-    
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [refreshToken, setRefreshToken] = useState<string | null>(null);
+
+    // Función para refresh de tokens
+    const refreshTokens = useCallback(async () => {
+        try {
+            const refreshToken = authTokenService.getRefreshToken();
+            if (!refreshToken) throw new Error('No refresh token');
+
+            const response = await AuthApi.refresh(refreshToken);
+            
+            // Actualizar tokens
+            authTokenService.setTokens({
+                accessToken: response.accessToken,
+                refreshToken: response.refreshToken,
+                expiresIn: response.expiresIn
+            });
+
+            setAccessToken(response.accessToken);
+            setRefreshToken(response.refreshToken);
+
+            // Reconfigurar auto-refresh
+            authTokenService.setupAutoRefresh(refreshTokens);
+
+        } catch (error) {
+            console.error('Error refreshing tokens:', error);
+            // Si falla, hacer logout
+            logout();
+        }
+    }, []);
+
+    // Callback para logout
+    const logout = useCallback(async () => {
+        try {
+            const token = authTokenService.getRefreshToken();
+            if (token) {
+                // Llamar al endpoint de logout para revocar el token en la BD
+                // await AuthApi.logout(token);
+            }
+        } catch (error) {
+            console.error("Error en logout:", error);
+        } finally {
+            // Limpiar todo
+            authTokenService.clearTokens();
+            localStorage.removeItem("user");
+            localStorage.removeItem("remember_dni");
+            localStorage.removeItem("remember_pass");
+            
+            setCurrentUser(null);
+            setAccessToken(null);
+            setRefreshToken(null);
+            setIsAdmin(false);
+            setIsEntrenador(false);
+        }
+    }, []);
 
     useEffect(() => {
         const userStr = localStorage.getItem("user");
-        const tokenStr = localStorage.getItem("token");
+        const tokenInfo = authTokenService.getTokens();
 
         if (userStr) {
             try {
@@ -40,26 +93,39 @@ export const useAuthUser = () => {
 
             } catch (error) {
                 console.error("Error sesión:", error);
-                // Si falla el parseo, reseteamos permisos
                 setIsAdmin(false);
                 setIsEntrenador(false);
                 setCurrentUser(null);
             }
         }
         
-        if (tokenStr) setToken(tokenStr);
+        if (tokenInfo.accessToken) {
+            setAccessToken(tokenInfo.accessToken);
+        }
 
-        // 2. FINALIZAMOS LA CARGA
-        // Esto asegura que ya leímos el localStorage (haya datos o no)
+        if (tokenInfo.refreshToken) {
+            setRefreshToken(tokenInfo.refreshToken);
+        }
+
+        // Inicializar sesión con auto-refresh
+        const sessionInitialized = authTokenService.initializeSession(refreshTokens);
+        
+        // Si no se pudo inicializar y hay tokens, intentar refresh inmediato
+        if (!sessionInitialized && tokenInfo.accessToken && tokenInfo.refreshToken) {
+            refreshTokens();
+        }
+
         setIsLoading(false);
 
-    }, []);
+    }, [refreshTokens]);
 
     return { 
         isAdmin,
         isEntrenador, 
         currentUser,
-        token,
-        isLoading // 3. RETORNAMOS LA PROPIEDAD
+        accessToken,
+        refreshToken,
+        isLoading,
+        logout
     };
 };

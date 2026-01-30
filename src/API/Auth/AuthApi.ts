@@ -23,7 +23,9 @@ export interface LoginDTO {
 
 // Interfaz de respuesta del login (Actualizada con datos del Gym)
 export interface LoginResponse {
-    token: string;
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
     user: {
         id: number;
         dni: string;    
@@ -37,6 +39,13 @@ export interface LoginResponse {
             logoUrl?: string;
         }
     };
+}
+
+// Interfaz para response de refresh
+export interface RefreshResponse {
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
 }
 
 // DTO para Reset Password
@@ -65,6 +74,24 @@ export const AuthApi = {
 
     login: async (credentials: LoginDTO): Promise<LoginResponse> => {
         const response = await api.post('/auth/login', credentials);
+        return response.data;
+    },
+
+    // NUEVO: Refresh token
+    refresh: async (refreshToken: string): Promise<RefreshResponse> => {
+        const response = await api.post('/auth/refresh', { refreshToken });
+        return response.data;
+    },
+
+    // NUEVO: Logout
+    logout: async (refreshToken: string) => {
+        const response = await api.post('/auth/logout', { refreshToken });
+        return response.data;
+    },
+
+    // NUEVO: Logout desde todos los dispositivos
+    logoutAll: async () => {
+        const response = await api.post('/auth/logout-all', {});
         return response.data;
     },
 

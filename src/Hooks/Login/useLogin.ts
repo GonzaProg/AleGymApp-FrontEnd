@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthApi, type LoginDTO } from "../../API/Auth/AuthApi";
+import { authTokenService } from "../../API/Auth/AuthTokenService";
 import { useGymConfig } from "../../Context/GymConfigContext";
 
 export const useLogin = () => {
@@ -62,11 +63,17 @@ export const useLogin = () => {
       // 2. Llamada a la API
       const data = await AuthApi.login(credentials);
 
-      // 3. Guardar Token y Usuario (Sesión actual)
-      localStorage.setItem("token", data.token);
+      // 3. GUARDAR TOKENS Y USUARIO usando AuthTokenService
+      authTokenService.setTokens({
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        expiresIn: data.expiresIn,
+      });
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // 4. LÓGICA RECORDAR USUARIO (Persistencia futura)
+      // 4. El auto-refresh se configura automáticamente en useAuthUser al cargar la app
+
+      // 5. LÓGICA RECORDAR USUARIO (Persistencia futura)
       if (rememberMe) {
         localStorage.setItem("remember_dni", dni); 
         localStorage.setItem("remember_pass", password); 
@@ -75,7 +82,7 @@ export const useLogin = () => {
         localStorage.removeItem("remember_pass");
       }
 
-      // 5. Redirección
+      // 6. Redirección
       navigate("/home"); 
       
     } catch (err: any) {
@@ -111,7 +118,7 @@ export const useLogin = () => {
     rememberMe, 
     error,
     loading, 
-    showExpiredModal, // EXPORTAMOS EL ESTADO DEL MODAL
+    showExpiredModal,
     setShowExpiredModal,
     handleDniChange,
     handlePasswordChange,
