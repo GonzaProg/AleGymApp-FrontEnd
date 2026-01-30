@@ -20,11 +20,9 @@ export const useLogin = () => {
   // EFECTO: CARGAR CREDENCIALES GUARDADAS AL INICIAR 
   useEffect(() => {
     const savedDni = localStorage.getItem("remember_dni"); 
-    const savedPass = localStorage.getItem("remember_pass");
     
-    if (savedDni && savedPass) {
+    if (savedDni) {
       setDni(savedDni);
-      setPassword(savedPass);
       setRememberMe(true);
     }
   }, []);
@@ -66,18 +64,22 @@ export const useLogin = () => {
             if (rememberMe) {
                 // CASO A: PERSISTIR (LocalStorage)
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("refreshToken", data.refreshToken);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 
                 // Limpiamos sessionStorage por si acaso había basura vieja
                 sessionStorage.removeItem("token");
+                sessionStorage.removeItem("refreshToken");
                 sessionStorage.removeItem("user");
             } else {
                 // CASO B: SESIÓN TEMPORAL (SessionStorage)
                 sessionStorage.setItem("token", data.token);
+                sessionStorage.setItem("refreshToken", data.refreshToken);
                 sessionStorage.setItem("user", JSON.stringify(data.user));
                 
                 // Limpiamos localStorage de sesiones previas
                 localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
                 localStorage.removeItem("user");
             }
             

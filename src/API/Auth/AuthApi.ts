@@ -24,6 +24,7 @@ export interface LoginDTO {
 // Interfaz de respuesta del login (Actualizada con datos del Gym)
 export interface LoginResponse {
     token: string;
+    refreshToken: string;
     user: {
         id: number;
         dni: string;    
