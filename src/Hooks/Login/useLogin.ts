@@ -62,21 +62,26 @@ export const useLogin = () => {
       // 2. Llamada a la API
       const data = await AuthApi.login(credentials);
 
-      // 3. Guardar Token y Usuario (Sesión actual)
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // 4. LÓGICA RECORDAR USUARIO (Persistencia futura)
-      if (rememberMe) {
-        localStorage.setItem("remember_dni", dni); 
-        localStorage.setItem("remember_pass", password); 
-      } else {
-        localStorage.removeItem("remember_dni");
-        localStorage.removeItem("remember_pass");
-      }
-
-      // 5. Redirección
-      navigate("/home"); 
+      // --- LÓGICA DE PERSISTENCIA ---
+            if (rememberMe) {
+                // CASO A: PERSISTIR (LocalStorage)
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                
+                // Limpiamos sessionStorage por si acaso había basura vieja
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("user");
+            } else {
+                // CASO B: SESIÓN TEMPORAL (SessionStorage)
+                sessionStorage.setItem("token", data.token);
+                sessionStorage.setItem("user", JSON.stringify(data.user));
+                
+                // Limpiamos localStorage de sesiones previas
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+            }
+            
+            navigate("/home");
       
     } catch (err: any) {
       // --- MANEJO DE ERRORES PERSONALIZADO (BLOQUEOS) ---

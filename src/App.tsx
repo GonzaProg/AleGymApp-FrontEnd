@@ -17,6 +17,8 @@ import { UserProfile } from "./Pages/Usuarios/UserProfile";
 import { GymConfigProvider, useGymConfig } from "./Context/GymConfigContext";
 import { SetupScreen } from "./Pages/Setup/SetupScreen";
 import { WhatsAppModalProvider } from "./Context/WhatsAppModalContext"; 
+import { useAuthUser } from "./Hooks/useAuthUser";
+import type { JSX } from "react/jsx-dev-runtime";
 
 // Componente interno para manejar la lógica de bloqueo
 const AppContent = () => {
@@ -27,6 +29,32 @@ const AppContent = () => {
     return <SetupScreen />;
   }
 
+  // --- COMPONENTE GUARDIÁN: RUTA PÚBLICA ---
+// Si ya hay usuario, NO deja ver el Login y manda al Home.
+const PublicRoute = ({ children }: { children: JSX.Element }) => {
+    const { currentUser, isLoading } = useAuthUser();
+
+    if (isLoading) return null; // O un Spinner
+
+    if (currentUser) {
+        return <Navigate to="/home" replace />;
+    }
+    return children;
+};
+
+// --- COMPONENTE GUARDIÁN: RUTA PRIVADA ---
+// (Opcional pero recomendado) Si no hay usuario, manda al Login.
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+    const { currentUser, isLoading } = useAuthUser();
+
+    if (isLoading) return null; 
+
+    if (!currentUser) {
+        return <Navigate to="/login" replace />;
+    }
+    return children;
+};
+
   // SI YA ESTÁ CONFIGURADA -> MUESTRA LA APP NORMAL
   return (
     /* 2. ENVOLVEMOS EL ROUTER CON EL PROVIDER DE WHATSAPP */
@@ -36,45 +64,50 @@ const AppContent = () => {
           {/* Ruta por defecto: Redirige al Login */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           
-          {/* Ruta del Login */}
-          <Route path="/login" element={<Login />} />
+          {/* 2. LOGIN PROTEGIDO (Si ya soy user, me patea al home) */}
+          <Route path="/login" element={
+              <PublicRoute>
+                  <Login />
+              </PublicRoute>
+          } />
 
-          {/* Ruta Home */}
-          <Route path="/home" element={<Home />} />
+          {/* 3. HOME PROTEGIDO (Si no soy user, me patea al login) */}
+          <Route path="/home" element={
+              <ProtectedRoute>
+                  <Home />
+              </ProtectedRoute>
+          } />
           
           {/* Ruta para Crear Rutina */}
-          <Route path="/create-routine" element={<CreateRoutine />} />
+          <Route path="/create-routine" element={<ProtectedRoute><CreateRoutine /></ProtectedRoute>} />
 
           {/* Ruta para Crear Usuario */}
-          <Route path="/create-user" element={<CreateUser />} />
+          <Route path="/create-user" element={<ProtectedRoute><CreateUser /></ProtectedRoute>} />
 
           {/* Ruta para Perfil */}
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/user-profile" element={<UserProfile />} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/user-profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
 
           {/* Ruta para Mis Rutinas */}
-          <Route path="/my-routines" element={<MyRoutines />} />
-
+          <Route path="/my-routines" element={<ProtectedRoute><MyRoutines /></ProtectedRoute>} />
           {/* Ruta para Eliminar Rutina */}
-          <Route path="/delete-routine" element={<DeleteRoutine />} />
+          <Route path="/delete-routine" element={<ProtectedRoute><DeleteRoutine /></ProtectedRoute>} />
 
           {/* Rutas para Ejercicios */}
-          <Route path="/ejercicios/crear" element={<EjerciciosCrear />} />
-          <Route path="/ejercicios/gestion" element={<EjerciciosGestion />} />
-
+          <Route path="/ejercicios/crear" element={<ProtectedRoute><EjerciciosCrear /></ProtectedRoute>} />
+          <Route path="/ejercicios/gestion" element={<ProtectedRoute><EjerciciosGestion /></ProtectedRoute>} />
           {/* Ruta para Crear Notificación (Broadcast) */}
-          <Route path="/notifications/create" element={<CreateNotification />} />
+          <Route path="/notifications/create" element={<ProtectedRoute><CreateNotification /></ProtectedRoute>} />
 
           {/* Ruta de Recuperación de contraseña */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Rutas de Planes y Membresías */}
-          <Route path="/planes" element={<PlansManager />} />
-          <Route path="/planes/mi-plan" element={<UserPlan />} />
+          <Route path="/planes" element={<ProtectedRoute><PlansManager /></ProtectedRoute>} />
+          <Route path="/planes/mi-plan" element={<ProtectedRoute><UserPlan /></ProtectedRoute>} />
 
           {/* Ruta para Renovar Planes de Usuarios*/}
-          <Route path="/planes/renovar-gestion" element={<RenewPlan />} />
-
+          <Route path="/planes/renovar-gestion" element={<ProtectedRoute><RenewPlan /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </WhatsAppModalProvider>
