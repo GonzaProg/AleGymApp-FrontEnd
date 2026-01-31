@@ -25,14 +25,23 @@ export const useAuthUser = () => {
     const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
-        const userStr = localStorage.getItem("user");
-        const tokenStr = localStorage.getItem("token");
+        // Buscar en ambos almacenamientos
+        const userLocal = localStorage.getItem("user");
+        const tokenLocal = localStorage.getItem("token");
+        
+        const userSession = sessionStorage.getItem("user");
+        const tokenSession = sessionStorage.getItem("token");
 
-        if (userStr) {
+        // Priorizamos Local (Persistente), sino usamos Session (Temporal)
+        const userStr = userLocal || userSession;
+        const tokenStr = tokenLocal || tokenSession;
+
+        if (userStr && tokenStr) {
             try {
                 const userObj: User = JSON.parse(userStr);
                 setCurrentUser(userObj);
-                
+                setToken(tokenStr);
+
                 // Determinamos roles
                 const admin = userObj.rol === "Admin";
                 setIsAdmin(admin);
@@ -40,15 +49,15 @@ export const useAuthUser = () => {
 
             } catch (error) {
                 console.error("Error sesión:", error);
-                // Si falla el parseo, reseteamos permisos
+                // Limpieza de emergencia
+                localStorage.clear();
+                sessionStorage.clear();
                 setIsAdmin(false);
                 setIsEntrenador(false);
                 setCurrentUser(null);
             }
         }
         
-        if (tokenStr) setToken(tokenStr);
-
         // 2. FINALIZAMOS LA CARGA
         // Esto asegura que ya leímos el localStorage (haya datos o no)
         setIsLoading(false);

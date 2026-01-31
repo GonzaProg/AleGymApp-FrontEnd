@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 //import api from "../API/axios";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
+import { useLogout } from "../Hooks/Login/useLogout";
 
 // Icono Campanita código SVG
 const BellIcon = () => (
@@ -34,18 +35,8 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      //await api.post("/api/users/logout");
-    } catch (error) {
-      console.error("Error al registrar salida", error);
-    } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      navigate("/login");
-    }
-  };
+  const { logout } = useLogout();
+
 
   const handleNotifClick = (notif: any) => {
     markAsRead(notif.id);
@@ -167,7 +158,7 @@ export const Navbar = () => {
 
           {/* BOTÓN SALIR */}
           <button 
-            onClick={handleLogout}
+            onClick={logout}
             className="text-white bg-red-600/70 hover:bg-red-600/90 border border-red-500/30 backdrop-blur-sm font-medium rounded-lg text-sm px-4 py-2 transition-all duration-300 shadow-lg hover:shadow-red-900/30"
           >
             Salir

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
 
 // Hooks y Componentes
 import { useHome } from "../Hooks/Home/useHome";
@@ -34,6 +33,7 @@ import { Profile } from "../Pages/Usuarios/Profile";
 import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
 import { CreateGym } from "../Pages/Gym/CreateGym";
 import { GymManagement } from "../Pages/Gym/GymManagement"; // <--- NUEVO IMPORT
+import { useLogout } from "../Hooks/Login/useLogout";
 
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
@@ -71,7 +71,6 @@ const Icons = {
 };
 
 export const Home = () => {
-  const navigate = useNavigate();
   
   const { 
     user, 
@@ -84,12 +83,7 @@ export const Home = () => {
 
   const [activeTab, setActiveTab] = useState("Inicio");
 
-  const handleLogout = (e: React.MouseEvent) => {
-    e.preventDefault(); 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login", { replace: true });
-  };
+  const { logout } = useLogout();
 
   const AdminDashboardWelcome = () => (
     <div className="animate-fade-in-up space-y-6">
@@ -186,7 +180,7 @@ export const Home = () => {
           <div className="shrink-0 bg-[#1a1225]">
              <WhatsAppStatus />
              <div className="p-4">
-                 <button onClick={handleLogout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
+                 <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
                    <span>{Icons.salir}</span>
                    Cerrar Sesión
                  </button>

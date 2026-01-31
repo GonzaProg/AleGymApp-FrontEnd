@@ -164,11 +164,11 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className={AppStyles.label}>Precio ($)</label>
-                    <Input type="number" name="precio" value={form.precio} onChange={handleChange} required className={AppStyles.inputDark} />
+                    <Input type="number" name="precio" min="0" value={form.precio} onChange={handleChange} required className={AppStyles.inputDark} />
                 </div>
                 <div>
                     <label className={AppStyles.label}>Duración (Días)</label>
-                    <Input type="number" name="duracionDias" value={form.duracionDias} onChange={handleChange} required className={AppStyles.inputDark} />
+                    <Input type="number" name="duracionDias" min="0" value={form.duracionDias} onChange={handleChange} required className={AppStyles.inputDark} />
                 </div>
             </div>
             <div>
