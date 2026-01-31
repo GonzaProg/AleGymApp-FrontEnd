@@ -135,7 +135,7 @@ export const useCreateRoutine = () => {
       // Llamada limpia
       await RutinasApi.create(body);
 
-      showSuccess("Rutina creada con éxito!");
+      await showSuccess("Rutina creada con éxito!");
       window.location.reload();
 
     } catch (error: any) {
