@@ -5,7 +5,7 @@ import fondoGym from "../../assets/Fondo-MyRoutines.jpg";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
-import { getExerciseThumbnail } from "../../Helpers/CloudinaryHelper"; 
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
 export const MyRoutines = () => {
   const { rutinas, loading, selectedRoutine, setSelectedRoutine, videoUrl, closeModal, closeVideo, handleOpenVideo } = useMyRoutines();
@@ -124,7 +124,7 @@ export const MyRoutines = () => {
                  {selectedRoutine.detalles.map((d:any, i:number) => {
                     
                     // USAMOS EL HELPER AQUÍ PARA OBTENER LA IMAGEN
-                    const thumbnail = getExerciseThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
+                    const thumbnail = CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
 
                     return (
                         // --- TARJETA DE EJERCICIO ---

@@ -6,12 +6,14 @@ import { AppStyles } from "../../Styles/AppStyles";
 
 export const CreateGym = () => {
     const { 
-        nombre, setNombre, codigo, setCodigo, loadingGym, handleSubmitGym,
+        nombre, setNombre, codigo, setCodigo, 
+        selectedLogo, handleLogoChange, // Nuevos props
+        loadingGym, handleSubmitGym,
         showOwnerModal, createdGymName, ownerForm, loadingOwner, handleOwnerChange, handleSubmitOwner, skipOwnerCreation
     } = useCreateGym();
 
     return (
-        <div className="mt-24">
+        <div className="mt-24 pb-10"> {/* Agregado padding bottom para scroll si es necesario */}
             <div className="flex justify-center items-center h-full relative">
                 
                 {/* --- FORMULARIO PASO 1: CREAR GIMNASIO --- */}
@@ -22,6 +24,7 @@ export const CreateGym = () => {
                     </div>
 
                     <form onSubmit={handleSubmitGym} className="space-y-6">
+                        {/* NOMBRE */}
                         <div>
                             <label className={AppStyles.label}>Nombre del Gimnasio</label>
                             <Input 
@@ -32,6 +35,7 @@ export const CreateGym = () => {
                             />
                         </div>
 
+                        {/* CÓDIGO */}
                         <div>
                             <label className={AppStyles.label}>Código de Acceso Único</label>
                             <Input 
@@ -42,8 +46,34 @@ export const CreateGym = () => {
                             />
                         </div>
 
+                        {/* --- DRAG & DROP LOGO (Nuevo) --- */}
+                        <div>
+                            <label className={AppStyles.label}>Logo del Gimnasio (Opcional)</label>
+                            <div className="mt-2 border-2 border-dashed border-white/20 rounded-xl p-4 text-center hover:border-green-500/50 hover:bg-white/5 transition-all group cursor-pointer relative h-32 flex items-center justify-center">
+                                <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={handleLogoChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                />
+                                <div className="flex flex-col items-center gap-2 pointer-events-none">
+                                    {selectedLogo ? (
+                                        <>
+                                            <span className="text-3xl">🖼️</span>
+                                            <p className="text-green-400 font-bold text-sm truncate max-w-[200px]">{selectedLogo.name}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📷</span>
+                                            <p className="text-gray-400 text-xs">Arrastra el logo aquí</p>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                         <Button type="submit" disabled={loadingGym} className={`w-full ${AppStyles.btnPrimary} py-3 text-lg`}>
-                            {loadingGym ? "Creando..." : "Siguiente: Asignar Dueño →"}
+                            {loadingGym ? "Subiendo datos..." : "Siguiente: Asignar Dueño →"}
                         </Button>
                     </form>
                 </Card>
@@ -51,7 +81,7 @@ export const CreateGym = () => {
                 {/* --- MODAL PASO 2: CREAR DUEÑO (Overlay) --- */}
                 {showOwnerModal && (
                     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-                        <Card className="bg-gray-900 border border-green-500/30 max-w-2xl w-full p-8 shadow-2xl relative">
+                        <Card className="bg-gray-900 border border-green-500/30 max-w-2xl w-full p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
                             <div className="text-center mb-6">
                                 <h2 className="text-2xl font-bold text-white">
                                     ¡Gimnasio <span className="text-green-400">{createdGymName}</span> Creado!
@@ -90,7 +120,6 @@ export const CreateGym = () => {
                                     <Input type="password" name="contraseña" value={ownerForm.contraseña} onChange={handleOwnerChange} className={AppStyles.inputDark} required />
                                 </div>
 
-                                {/* --- NUEVO CAMPO AGREGADO: FECHA DE NACIMIENTO --- */}
                                 <div className="col-span-1">
                                     <label className={AppStyles.label}>Fecha Nacimiento</label>
                                     <Input 

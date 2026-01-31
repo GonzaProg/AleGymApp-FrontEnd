@@ -14,6 +14,7 @@ export interface GymDTO {
 export interface CreateGymDTO {
     nombre: string;
     codigoAcceso: string;
+    logoUrl?: string;
 }
 
 export const GymApi = {
