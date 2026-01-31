@@ -19,6 +19,7 @@ import { SetupScreen } from "./Pages/Setup/SetupScreen";
 import { WhatsAppModalProvider } from "./Context/WhatsAppModalContext"; 
 import { useAuthUser } from "./Hooks/useAuthUser";
 import type { JSX } from "react/jsx-dev-runtime";
+import { GymLockedScreen } from "./Components/GymLocked/GymLockedScreen";
 
 // Componente interno para manejar la lógica de bloqueo
 const AppContent = () => {
@@ -59,6 +60,10 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   return (
     /* 2. ENVOLVEMOS EL ROUTER CON EL PROVIDER DE WHATSAPP */
     <WhatsAppModalProvider>
+      
+      {/* Este componente está "dormido" hasta que Axios lo despierte */}
+      <GymLockedScreen />
+      
       <BrowserRouter>
         <Routes>
           {/* Ruta por defecto: Redirige al Login */}
