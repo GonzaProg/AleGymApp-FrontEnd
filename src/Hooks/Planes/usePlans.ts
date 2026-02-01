@@ -20,6 +20,7 @@ export const usePlans = () => {
     const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<PlanDTO | null>(null);
     const [selectedPlanToSubscribe, setSelectedPlanToSubscribe] = useState<PlanDTO | null>(null);
+    const [metodoPago, setMetodoPago] = useState("Transferencia");
 
     useEffect(() => {
         loadData();
@@ -84,6 +85,7 @@ export const usePlans = () => {
         setBusqueda("");
         setAlumnoSeleccionadoId(null);
         setSugerencias([]);
+        setMetodoPago("Transferencia");
         setIsSubscribeModalOpen(true);
     };
 
@@ -128,7 +130,7 @@ export const usePlans = () => {
 
         try {
             // AQUI CAPTURAMOS LA RESPUESTA COMPLETA DEL BACKEND
-            const response: any = await PlansApi.subscribeUser(alumnoSeleccionadoId, selectedPlanToSubscribe.id!);
+            const response: any = await PlansApi.subscribeUser(alumnoSeleccionadoId, selectedPlanToSubscribe.id!, metodoPago);
             
             // Verificamos si se envió el WhatsApp
             if (response.whatsappEnviado) {
@@ -154,6 +156,7 @@ export const usePlans = () => {
         busqueda,
         sugerencias,
         mostrarSugerencias,
+        metodoPago,
         setIsModalOpen,
         setIsSubscribeModalOpen,
         setMostrarSugerencias,
@@ -163,6 +166,7 @@ export const usePlans = () => {
         handleSavePlan,
         handleSubscribeUser,
         handleSearchChange,
-        handleSelectAlumno
+        handleSelectAlumno,
+        setMetodoPago
     };
 };

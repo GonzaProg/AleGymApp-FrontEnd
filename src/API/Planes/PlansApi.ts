@@ -36,14 +36,14 @@ export const PlansApi = {
     },
 
     // 5. Suscribir Usuario (Admin/Entrenador)
-    subscribeUser: async (userId: number, planId: number) => {
-        const response = await api.post('/planes/suscribir', { userId, planId });
+    subscribeUser: async (userId: number, planId: number, metodoPago: string = "Transferencia") => {
+        const response = await api.post('/planes/suscribir', { userId, planId, metodoPago });
         return response.data;
     },
 
     // 6. Renovar Plan (Solo Admin/Entrenador)
-    renewPlan: async (userId: number) => {
-        const response = await api.post('/planes/renovar', { userId });
+    renewPlan: async (userId: number, metodoPago: string = "Transferencia") => {
+        const response = await api.post('/planes/renovar', { userId, metodoPago });
         return response.data;
     },
 

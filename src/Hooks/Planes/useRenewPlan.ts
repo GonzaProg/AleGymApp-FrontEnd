@@ -13,6 +13,7 @@ export const useRenewPlan = () => {
     const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
     const [loading, setLoading] = useState(false);
     const [loadingAction, setLoadingAction] = useState(false); // Para spinners en botones
+    const [metodoPago, setMetodoPago] = useState("Transferencia");
 
     // 1. Carga inicial de datos
     useEffect(() => {
@@ -48,6 +49,7 @@ export const useRenewPlan = () => {
     const seleccionarAlumno = (alumno: any) => {
         setAlumnoSeleccionado(alumno);
         setBusqueda(""); // Limpiamos búsqueda para estética
+        setMetodoPago("Transferencia");
     };
 
     const limpiarSeleccion = () => {
@@ -61,7 +63,7 @@ export const useRenewPlan = () => {
         setLoadingAction(true);
         try {
             // AQUI CAPTURAMOS LA RESPUESTA
-            const response: any = await PlansApi.renewPlan(alumnoSeleccionado.id);
+            const response: any = await PlansApi.renewPlan(alumnoSeleccionado.id, metodoPago);
             
             if (response.whatsappEnviado) {
                 showSuccess(`✅ Plan renovado. Recibo enviado por WhatsApp 📱`);
@@ -113,7 +115,7 @@ export const useRenewPlan = () => {
         setLoadingAction(true);
         try {
             // AQUI CAPTURAMOS LA RESPUESTA TAMBIÉN
-            const response: any = await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!);
+            const response: any = await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!, metodoPago);
             
             if (response.whatsappEnviado) {
                 showSuccess(`✅ Plan asignado. Recibo enviado por WhatsApp 📱`);
@@ -138,6 +140,7 @@ export const useRenewPlan = () => {
         busqueda,
         loading,
         loadingAction,
+        metodoPago,
         
         // Acciones
         setBusqueda,
@@ -145,6 +148,7 @@ export const useRenewPlan = () => {
         limpiarSeleccion,
         renovarPlan,
         cancelarPlan,
-        asignarPlan
+        asignarPlan,
+        setMetodoPago
     };
 };
