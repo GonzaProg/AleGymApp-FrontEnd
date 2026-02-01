@@ -5,6 +5,7 @@ import { Card } from "../../Components/UI/Card";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { usePlans } from "../../Hooks/Planes/usePlans";
+import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
 
 export const PlansManager = () => {
   const { 
@@ -17,6 +18,8 @@ export const PlansManager = () => {
     busqueda,
     sugerencias,
     mostrarSugerencias,
+    metodoPago,      // <--- IMPORTANTE: Nuevo estado del hook
+    setMetodoPago,   // <--- IMPORTANTE: Setter del hook
     setIsModalOpen, 
     setMostrarSugerencias,
     setIsSubscribeModalOpen,
@@ -50,14 +53,14 @@ export const PlansManager = () => {
                 <Card key={plan.id} className={`${AppStyles.glassCard} hover:border-green-500/50 transition-all relative group flex flex-col`}>
                   
                   <div className="flex justify-between items-start mb-2">
-                     <h3 className="text-2xl font-bold text-white">{plan.nombre}</h3>
-                     <button onClick={() => openEditModal(plan)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar Plan">
-                       ✏️
-                     </button>
+                      <h3 className="text-2xl font-bold text-white">{plan.nombre}</h3>
+                      <button onClick={() => openEditModal(plan)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar Plan">
+                        ✏️
+                      </button>
                   </div>
 
                   <div className="text-3xl font-bold text-green-400 mb-1">
-                     ${plan.precio.toLocaleString()} 
+                      ${plan.precio.toLocaleString()} 
                   </div>
 
                   {plan.fechaActualizacion && (
@@ -126,6 +129,9 @@ export const PlansManager = () => {
                         setMostrarSugerencias={setMostrarSugerencias}
                         onConfirm={handleSubscribeUser}
                         onCancel={() => setIsSubscribeModalOpen(false)}
+                        // Pasamos props de pago
+                        metodoPago={metodoPago}
+                        setMetodoPago={setMetodoPago}
                     />
                 </div>
             </div>,
@@ -136,7 +142,8 @@ export const PlansManager = () => {
   );
 };
 
-// --- Subcomponentes (Mantenidos igual) ---
+// --- Subcomponentes ---
+
 const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
     const [form, setForm] = useState({
         nombre: initialData?.nombre || "",
@@ -190,7 +197,8 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
 const SubscribeForm = ({ 
     busqueda, sugerencias, mostrarSugerencias, 
     handleSearchChange, handleSelectAlumno, setMostrarSugerencias, 
-    onConfirm, onCancel 
+    onConfirm, onCancel,
+    metodoPago, setMetodoPago // Recibimos props
 }: any) => {
     return (
         <div className="space-y-6">
@@ -218,6 +226,12 @@ const SubscribeForm = ({
                     </ul>
                 )}
             </div>
+
+            {/* Selector de Pago */}
+            <PaymentMethodSelect 
+                value={metodoPago} 
+                onChange={setMetodoPago} 
+            />
 
             <div className="flex gap-4 pt-2">
                 <button type="button" onClick={onCancel} className={AppStyles.btnSecondary + " w-full"}>CANCELAR</button>

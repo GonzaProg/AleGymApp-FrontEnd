@@ -1,6 +1,7 @@
 import { useRenewPlan } from "../../Hooks/Planes/useRenewPlan"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { RenewPlanStyles } from "../../Styles/RenewPlanStyles";
+import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
 
 export const RenewPlan = () => {
   const {
@@ -9,6 +10,8 @@ export const RenewPlan = () => {
     sugerencias,
     busqueda,
     loadingAction,
+    metodoPago,      // <--- IMPORTANTE: Del hook
+    setMetodoPago,   // <--- IMPORTANTE: Del hook
     setBusqueda,
     seleccionarAlumno,
     limpiarSeleccion,
@@ -119,6 +122,12 @@ export const RenewPlan = () => {
                     
                     <div className="space-y-3 text-gray-300">
                       <div className={RenewPlanStyles.infoRow}>
+                        <span>Duración:</span>
+                        <span className={RenewPlanStyles.infoValue}>
+                          {alumnoSeleccionado.planActual.duracionDias} días
+                        </span>
+                      </div>
+                      <div className={RenewPlanStyles.infoRow}>
                         <span>Vencimiento:</span>
                         <span className={RenewPlanStyles.infoValue}>
                           {new Date(alumnoSeleccionado.fechaVencimientoPlan).toLocaleDateString()}
@@ -138,6 +147,16 @@ export const RenewPlan = () => {
                   </div>
 
                   <div className="flex flex-col justify-center gap-4">
+                    
+                    {/* Selector de Pago para Renovación */}
+                    <div className="bg-gray-800/50 p-4 rounded-xl border border-white/10">
+                        <PaymentMethodSelect 
+                            value={metodoPago} 
+                            onChange={setMetodoPago}
+                            label="Método de Pago para Renovación" 
+                        />
+                    </div>
+
                     <button 
                       onClick={renovarPlan}
                       disabled={loadingAction}
@@ -161,6 +180,16 @@ export const RenewPlan = () => {
                 <div>
                     <div className={RenewPlanStyles.emptyStateBox}>
                        <p className={RenewPlanStyles.emptyStateText}>⚠️ Este usuario no tiene suscripción activa. Selecciona un plan.</p>
+                    </div>
+
+                    {/* Selector de Pago para Alta*/}
+                    <div className="mb-6 max-w-xs mx-auto">
+                        <PaymentMethodSelect 
+                            value={metodoPago} 
+                            onChange={setMetodoPago}
+                            className="text-center"
+                            selectClassName="text-center font-bold" // Centramos el texto dentro del input
+                        />
                     </div>
 
                     <div className={RenewPlanStyles.plansGrid}>

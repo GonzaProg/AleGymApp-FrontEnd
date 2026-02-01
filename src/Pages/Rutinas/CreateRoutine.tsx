@@ -75,8 +75,8 @@ export const CreateRoutine = () => {
               className={`${AppStyles.inputDark} appearance-none`}
               labelClassName={AppStyles.label}
             >
-                <option value="" className="text-gray-800">-- Elige un ejercicio --</option>
-                {ejercicios.map(ej => <option key={ej.id} value={ej.id} className="text-gray-800">{ej.nombre}</option>)}
+                <option value="" className="bg-gray-900 text-gray-300 py-2">-- Elige un ejercicio --</option>
+                {ejercicios.map(ej => <option key={ej.id} value={ej.id} className="bg-gray-900 text-gray-300 py-2">{ej.nombre}</option>)}
             </Input>
 
             <div className="grid grid-cols-3 gap-4 mt-4">
