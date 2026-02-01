@@ -10,14 +10,21 @@ export const UserPlan = () => {
   if (loading) return <div className="p-8 text-center text-gray-400 animate-pulse">Cargando tu plan...</div>;
   if (error) return <div className="p-8 text-center text-red-400">{error}</div>;
 
-  // Lógica para determinar colores
+  // Lógica para determinar colores y estado
+  // Nota: myPlan.estado viene del getter virtual del backend ('Activo', 'Vencido', etc)
   const isActivo = myPlan?.estado === "Activo";
-  
-  // Clases dinámicas basadas en el estado
-  const statusColor = isActivo ? "text-green-500" : "text-orange-500";
-  const borderColor = isActivo ? "border-green-600" : "border-orange-500";
-  // Agregamos un fondo sutil del mismo color para que resalte más
-  const bgTint = isActivo ? "bg-green-500/10" : "bg-orange-500/10"; 
+  const dias = myPlan?.diasRestantes || 0;
+  const venceHoy = myPlan?.diasRestantes === 0 && myPlan?.estado === "Activo";
+
+  // Clases dinámicas
+  const statusColor = venceHoy ? "text-orange-500" : "text-green-500";
+  const borderColor = venceHoy ?  "border-orange-600" : "border-green-700";
+  const bgTint = venceHoy ? "bg-orange-500/10" : "bg-green-500/10"; 
+
+  // Formateo de fecha seguro
+  const fechaVencimientoStr = myPlan?.fechaVencimiento 
+    ? new Date(myPlan.fechaVencimiento).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    : '-';
 
   return (
     <PageLayout backgroundImage={fondoGym}>
@@ -32,6 +39,8 @@ export const UserPlan = () => {
             <div className="mb-10 animate-fade-in w-full">
               <Card className={`${AppStyles.glassCard} border-l-4 ${borderColor} ${bgTint} w-full transition-colors duration-300`}>
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 p-2">
+                    
+                    {/* IZQUIERDA: Nombre y Estado */}
                     <div className="text-left">
                       <h3 className="text-3xl font-bold text-white mb-2">{myPlan.plan.nombre}</h3>
                       <p className={`${statusColor} font-bold text-lg flex items-center gap-2`}>
@@ -39,26 +48,39 @@ export const UserPlan = () => {
                       </p>
                     </div>
                     
+                    {/* DERECHA: Contador e Info */}
                     <div className="text-right w-full md:w-auto mt-4 md:mt-0">
-                      <p className="text-gray-300 text-sm mb-1">
-                        {isActivo ? 'Vence el:' : 'Venció el:'} {new Date(myPlan.fechaVencimiento).toLocaleDateString()}
+                      <p className="text-gray-300 text-sm mb-1 tracking-wide font-semibold">
+                        {isActivo ? 'Vence el:' : 'Venció el:'} 
+                        <span className="text-white ml-2 text-base">{fechaVencimientoStr}</span>
                       </p>
                       
-                      <div className="flex items-baseline justify-end gap-2">
-                         <span className={`text-4xl font-bold ${isActivo ? 'text-white' : 'text-gray-400'}`}>
-                            {myPlan.diasRestantes}
-                         </span>
-                         <span className="text-sm font-normal text-gray-400">
-                            {myPlan.diasRestantes === 1 ? 'día restante' : 'días restantes'}
-                         </span>
+                      <div className="flex items-baseline justify-end gap-2 mt-2">
+                         {/* Lógica visual del contador */}
+                         {dias > 0 ? (
+                             <>
+                                <span className={`text-3xl font-black ${isActivo ? 'text-white' : 'text-gray-400'}`}>
+                                    {dias}
+                                </span>
+                                <span className="text-sm font-medium text-gray-400 tracking-wider">
+                                    {dias === 1 ? 'Día Restante' : 'Días Restantes'}
+                                </span>
+                             </>
+                         ) : (
+                             // Si días es 0 pero está activo, es que vence HOY
+                             <span className="text-xl font-bold text-orange-400 animate-pulse">
+                                 ⚠️ VENCE HOY
+                             </span>
+                         )}
                       </div>
                     </div>
                 </div>
                 
-                <div className="mt-6 pt-4 border-t border-white/10 text-gray-400 text-sm italic text-left flex justify-between items-center">
+                {/* FOOTER CARD */}
+                <div className="mt-6 pt-4 border-t border-white/10 text-gray-400 text-sm italic text-left flex flex-col md:flex-row justify-between items-center gap-2">
                     <span>"{myPlan.plan.descripcion}"</span>
                     {!isActivo && (
-                        <span className="text-orange-400 text-xs font-bold uppercase tracking-widest border border-orange-500/50 px-2 py-1 rounded">
+                        <span className="text-orange-400 text-xs font-bold uppercase tracking-widest border border-orange-500/50 px-3 py-1 rounded-full bg-orange-500/10">
                             Renovación Pendiente
                         </span>
                     )}
@@ -67,7 +89,7 @@ export const UserPlan = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm w-full">
-                <span className="text-5xl mb-4">📭</span>
+                <span className="text-5xl mb-4 opacity-50">📭</span>
                 <h3 className="text-xl text-white font-bold">No tienes un plan activo</h3>
                 <p className="text-gray-400 mt-2 text-center max-w-md">
                   Acércate a recepción o habla con tu entrenador para suscribirte a un nuevo plan.

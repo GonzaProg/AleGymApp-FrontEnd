@@ -2,16 +2,18 @@ import { useState } from "react";
 import { GymApi } from "../../API/Gym/GymApi";
 import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi";
 import { showSuccess, showError, showConfirmSuccess } from "../../Helpers/Alerts";
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
 export const useCreateGym = () => {
     // --- ESTADO GYM ---
     const [nombre, setNombre] = useState("");
     const [codigo, setCodigo] = useState("");
+    const [selectedLogo, setSelectedLogo] = useState<File | null>(null); // Nuevo estado
     const [loadingGym, setLoadingGym] = useState(false);
 
     // --- ESTADO MODAL DUEÑO ---
     const [showOwnerModal, setShowOwnerModal] = useState(false);
-    const [createdGymCode, setCreatedGymCode] = useState(""); // Guardamos el código del gym recién creado
+    const [createdGymCode, setCreatedGymCode] = useState(""); 
     const [createdGymName, setCreatedGymName] = useState("");
 
     // --- ESTADO FORMULARIO DUEÑO ---
@@ -22,6 +24,13 @@ export const useCreateGym = () => {
     });
     const [loadingOwner, setLoadingOwner] = useState(false);
 
+    // --- HANDLER FILE ---
+    const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedLogo(e.target.files[0]);
+        }
+    };
+
     // 1. CREAR GIMNASIO
     const handleSubmitGym = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,10 +39,24 @@ export const useCreateGym = () => {
 
         setLoadingGym(true);
         try {
-            const gymDTO = { nombre, codigoAcceso: codigo.toUpperCase() };
+            let logoUrl = "";
+
+            // 1. Subir logo si existe
+            if (selectedLogo) {
+                // Por defecto sube como 'image', así que no hace falta el 2do parámetro
+                logoUrl = await CloudinaryApi.upload(selectedLogo);
+            }
+
+            // 2. Crear Gym con la URL
+            const gymDTO = { 
+                nombre, 
+                codigoAcceso: codigo.toUpperCase(),
+                logoUrl: logoUrl // Enviamos la URL (puede ser string vacío)
+            };
+
             const newGym = await GymApi.create(gymDTO);
             
-            // ÉXITO: No limpiamos, sino que abrimos el modal del dueño
+            // ÉXITO
             setCreatedGymCode(newGym.codigoAcceso);
             setCreatedGymName(newGym.nombre);
             setShowOwnerModal(true); 
@@ -59,13 +82,11 @@ export const useCreateGym = () => {
 
         setLoadingOwner(true);
         try {
-            // IMPORTANTE: Enviamos el codigoGym del NUEVO gimnasio, no del contexto actual
             const ownerData: any = {
                 ...ownerForm,
-                codigoGym: createdGymCode // <--- Vinculación clave
+                codigoGym: createdGymCode 
             };
 
-            // No enviar campos vacíos opcionales
             if (!ownerData.telefono) delete ownerData.telefono;
             if (!ownerData.fechaNacimiento) delete ownerData.fechaNacimiento;
 
@@ -73,10 +94,11 @@ export const useCreateGym = () => {
 
             showSuccess(`Dueño asignado a ${createdGymName} correctamente.`);
             
-            // FIN DEL FLUJO: Limpiamos todo
+            // RESET TOTAL
             setShowOwnerModal(false);
             setNombre("");
             setCodigo("");
+            setSelectedLogo(null); // Reset logo
             setOwnerForm({
                 dni: "", nombre: "", apellido: "", nombreUsuario: "",
                 email: "", contraseña: "", telefono: "", fechaNacimiento: "",
@@ -100,6 +122,7 @@ export const useCreateGym = () => {
             setShowOwnerModal(false);
             setNombre("");
             setCodigo("");
+            setSelectedLogo(null);
         }
     };
 
@@ -107,6 +130,7 @@ export const useCreateGym = () => {
         // Gym Form
         nombre, setNombre,
         codigo, setCodigo,
+        selectedLogo, handleLogoChange, // Exponemos
         loadingGym,
         handleSubmitGym,
 

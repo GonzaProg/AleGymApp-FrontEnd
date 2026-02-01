@@ -9,16 +9,16 @@ export interface GymDTO {
     logoUrl?: string;
 }
 
-// Interfaz para CREAR datos (Escritura)
-// Solo pedimos lo que el usuario ingresa en el formulario
-export interface CreateGymDTO {
+// Interfaz para ACTUALIZAR datos
+export interface CreateUpdateGymDTO {
     nombre: string;
     codigoAcceso: string;
+    logoUrl?: string;
 }
 
 export const GymApi = {
     // 1. Crear: Ahora acepta CreateGymDTO (sin id ni activo)
-    create: async (data: CreateGymDTO) => {
+    create: async (data: CreateUpdateGymDTO) => {
         const response = await api.post('/gyms', data);
         return response.data; // El backend nos devolverá el GymDTO completo (con ID)
     },
@@ -32,6 +32,12 @@ export const GymApi = {
     // 3. Bloquear / Desbloquear
     toggleStatus: async (id: number, activo: boolean) => {
         const response = await api.patch(`/gyms/${id}/status`, { activo });
+        return response.data;
+    },
+
+    // 4. Actualizar
+    update: async (id: number, data: CreateUpdateGymDTO) => {
+        const response = await api.put(`/gyms/${id}`, data);
         return response.data;
     }
 };

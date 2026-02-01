@@ -41,8 +41,8 @@ api.interceptors.response.use(
             if (errorCode === "GYM_LOCKED") {
                 const rol = getUserRole();
 
-                // SI ES EL DUEÑO (Entrenador/Admin) -> PANTALLA DE BLOQUEO (NO LOGOUT)
-                if (rol === "Entrenador" || rol === "Admin") {
+                // SI ES EL DUEÑO (Entrenador) -> PANTALLA DE BLOQUEO (NO LOGOUT)
+                if (rol === "Entrenador") {
                     console.warn("⛔ GIMNASIO BLOQUEADO. Activando pantalla de deuda.");
                     
                     // 1. Marcar flag en session para que persista al recargar (F5)

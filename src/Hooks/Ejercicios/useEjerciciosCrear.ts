@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { EjerciciosApi, type EjercicioDTO } from '../../API/Ejercicios/EjerciciosApi'; 
 import { useAuthUser } from '../useAuthUser';
 import { showSuccess, showError } from "../../Helpers/Alerts";
-
-// Constantes fuera del hook para no recrearlas en cada render
-const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET; 
-const API_URL_CLOUDINARY = "https://api.cloudinary.com/v1_1";
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
 export const useEjerciciosCrear = () => {
     const { isAdmin, isEntrenador } = useAuthUser();
@@ -33,26 +29,6 @@ export const useEjerciciosCrear = () => {
         }
     };
 
-    // Función auxiliar pura para subida (fuera del scope del render si es posible, o mantenida aquí por simplicidad)
-    const uploadToCloudinary = async (file: File, resourceType: 'video' | 'image'): Promise<string> => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', UPLOAD_PRESET);
-
-        try {
-            const res = await fetch(`${API_URL_CLOUDINARY}/${CLOUD_NAME}/${resourceType}/upload`, { 
-                method: 'POST', 
-                body: formData 
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error?.message || `Error subiendo ${resourceType}`);
-            return data.secure_url;
-        } catch (error) {
-            console.error(`Error Cloudinary (${resourceType}):`, error);
-            throw error;
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
         e.preventDefault();
         
@@ -76,10 +52,10 @@ export const useEjerciciosCrear = () => {
             const uploadPromises: Promise<void>[] = [];
 
             if (selectedVideo) {
-                uploadPromises.push(uploadToCloudinary(selectedVideo, 'video').then(url => { finalVideoUrl = url; }));
+                uploadPromises.push(CloudinaryApi.upload(selectedVideo, 'video').then(url => { finalVideoUrl = url; }));
             }
             if (selectedImage) {
-                uploadPromises.push(uploadToCloudinary(selectedImage, 'image').then(url => { finalImageUrl = url; }));
+                uploadPromises.push(CloudinaryApi.upload(selectedImage, 'image').then(url => { finalImageUrl = url; }));
             }
 
             // Esperamos a que todo se suba

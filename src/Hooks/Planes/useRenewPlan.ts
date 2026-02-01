@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
-import { showError, showSuccess } from "../../Helpers/Alerts";
+import { showConfirmSuccess, showError, showSuccess } from "../../Helpers/Alerts";
 
 export const useRenewPlan = () => {
     // --- ESTADOS DE DATOS ---
@@ -81,7 +81,12 @@ export const useRenewPlan = () => {
 
     const cancelarPlan = async () => {
         if (!alumnoSeleccionado) return;
-        if (!confirm("¿Seguro que deseas cancelar la suscripción?")) return;
+
+        const result = await showConfirmSuccess( 
+                        `¿Cancelar plan?`,
+                        `¿Deseas cancelar la membresía de ${alumnoSeleccionado.nombre}?`);
+                        
+        if (!result.isConfirmed) return;
 
         setLoadingAction(true);
         try {
@@ -98,7 +103,12 @@ export const useRenewPlan = () => {
 
     const asignarPlan = async (plan: PlanDTO) => {
         if (!alumnoSeleccionado) return;
-        if (!confirm(`¿Asignar ${plan.nombre} a ${alumnoSeleccionado.nombre}?`)) return;
+
+        const result = await showConfirmSuccess( 
+                        `Asignar ${plan.nombre}`,
+                        `¿Deseas asignar el plan "${plan.nombre}" a ${alumnoSeleccionado.nombre}?`);
+                        
+        if (!result.isConfirmed) return;
 
         setLoadingAction(true);
         try {

@@ -32,7 +32,7 @@ import { RenewPlan } from "../Pages/Planes/RenewPlan";
 import { Profile } from "../Pages/Usuarios/Profile"; 
 import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
 import { CreateGym } from "../Pages/Gym/CreateGym";
-import { GymManagement } from "../Pages/Gym/GymManagement"; // <--- NUEVO IMPORT
+import { GymManagement } from "../Pages/Gym/GymManagement"; 
 import { useLogout } from "../Hooks/Login/useLogout";
 
 const BackgroundMap: Record<string, string> = {
@@ -49,7 +49,7 @@ const BackgroundMap: Record<string, string> = {
   "Perfil": fondoPerfil,
   "default": fondoGym,
   "Nuevo Gimnasio": fondoCreateRoutine,
-  "Gestión Gimnasios": fondoCreateRoutine // Fondo para gestión
+  "Gestión Gimnasios": fondoCreateRoutine 
 };
 
 const Icons = {
@@ -67,7 +67,7 @@ const Icons = {
   salir: "🚪",
   perfil: "👤",
   nuevoGym: "🏢",
-  gestionGyms: "⚙️" // Icono nuevo
+  gestionGyms: "⚙️" 
 };
 
 export const Home = () => {
@@ -114,7 +114,7 @@ export const Home = () => {
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
       case "Nuevo Gimnasio": return <CreateGym />;
-      case "Gestión Gimnasios": return <GymManagement />; // <--- NUEVA RUTA
+      case "Gestión Gimnasios": return <GymManagement />; 
       default: return <AdminDashboardWelcome />;
     }
   };

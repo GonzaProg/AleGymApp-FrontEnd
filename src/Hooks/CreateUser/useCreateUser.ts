@@ -74,7 +74,7 @@ export const useCreateUser = () => {
 
       await AuthApi.createUser(dataToSend);
 
-      showSuccess(`Usuario ${formData.nombreUsuario} creado con éxito!`);
+      await showSuccess(`Usuario ${formData.nombreUsuario} creado con éxito!`);
       window.location.reload();
 
     } catch (error: any) {
