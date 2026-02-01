@@ -42,7 +42,7 @@ export const AppStyles = {
     tableRow: "hover:bg-white/5 transition-colors border-b border-white/5 last:border-0",
 
     // MODAL BASE
-    modalOverlay: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in",
+    modalOverlay: "fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in",
     modalContent: "bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-white/10 flex flex-col max-h-[90vh] overflow-hidden",
 
     // Alertas

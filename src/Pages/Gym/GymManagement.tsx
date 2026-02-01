@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { GymApi, type GymDTO } from "../../API/Gym/GymApi";
 import { Card } from "../../Components/UI/Card";
 import { showSuccess, showError } from "../../Helpers/Alerts";
@@ -26,7 +27,7 @@ export const GymManagement = () => {
     showEditModal,
     nombre, setNombre,
     codigo, setCodigo,
-    handleLogoChange,
+    selectedLogo, handleLogoChange,
     loading: editLoading,
     openEditModal,
     closeEditModal,
@@ -98,8 +99,8 @@ export const GymManagement = () => {
       </div>
 
       {/* MODAL EDITAR GYM */}
-      {showEditModal && (
-        <div className={AppStyles.modalOverlay}>
+      {showEditModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
           <div className={AppStyles.modalContent}>
             <div className="p-6 border-b border-white/10 flex justify-between items-center">
               <h2 className="text-2xl font-bold text-white">Editar Gimnasio</h2>
@@ -121,13 +122,27 @@ export const GymManagement = () => {
                 required
               />
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Logo (opcional)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="w-full text-white"
-                />
+                <label className={AppStyles.label}>Logo (Opcional)</label>
+                <div className="mt-2 border-2 border-dashed border-white/20 rounded-xl p-4 text-center hover:border-purple-500/50 hover:bg-white/5 transition-all group cursor-pointer relative h-40 flex items-center justify-center">
+                  <input 
+                    type="file" accept="image/*" 
+                    onChange={handleLogoChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="flex flex-col items-center gap-2 pointer-events-none">
+                    {selectedLogo ? (
+                      <>
+                        <span className="text-3xl">🖼️</span>
+                        <p className="text-purple-400 font-bold text-sm truncate max-w-[150px]">{selectedLogo.name}</p>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📷</span>
+                        <p className="text-gray-400 text-xs">Arrastra logo</p>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="flex gap-4 pt-4">
                 <Button type="submit" disabled={editLoading} className="flex-1">
@@ -139,7 +154,8 @@ export const GymManagement = () => {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
