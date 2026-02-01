@@ -21,6 +21,7 @@ import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
 import fondoPerfil from "../assets/Fondo-Perfil.jpg";
 import fondoRenewPlan from "../assets/Fondo-RenewPlan.jpg";
 import fondoEnviarPDF from "../assets/Fondo-CreateRoutine.jpg"; 
+import fondoPagos from "../assets/Fondo-MiPlan.jpg"; // Reutilizamos fondo o pones uno nuevo
 
 // Importación de páginas
 import { PlansManager } from "../Pages/Planes/PlansManager";
@@ -35,11 +36,13 @@ import { Profile } from "../Pages/Usuarios/Profile";
 import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
 import { CreateGym } from "../Pages/Gym/CreateGym";
 import { GymManagement } from "../Pages/Gym/GymManagement"; 
+import { HistorialPagos } from "../Pages/Pagos/HistorialPagos"; 
 import { useLogout } from "../Hooks/Login/useLogout";
 
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
   "Planes y Pagos": fondoMiPlan, 
+  "Historial Pagos": fondoPagos, 
   "Crear Rutina": fondoCreateRoutine,
   "Ejercicios": fondoCreateRoutine,
   "Crear Ejercicio": fondoCreateRoutine,
@@ -123,6 +126,7 @@ export const Home = () => {
     switch (activeTab) {
       case "Inicio": return <AdminDashboardWelcome/>;
       case "Planes y Pagos": return <PlansManager />;
+      case "Historial Pagos": return <HistorialPagos />; 
       case "Crear Rutina": return <CreateRoutine />;
       case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
       case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
@@ -161,7 +165,8 @@ export const Home = () => {
             <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">General</p>
               <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => setActiveTab("Inicio")} />
-              <SidebarItem icon={Icons.planes} label="Planes y Pagos" active={activeTab === "Planes y Pagos"} onClick={() => setActiveTab("Planes y Pagos")} />
+              <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes y Pagos"} onClick={() => setActiveTab("Planes y Pagos")} />
+              <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => setActiveTab("Historial Pagos")} /> {/* <--- NUEVO ÍTEM */}
               <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => setActiveTab("Perfil")} />
 
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Gestión</p>
@@ -219,7 +224,7 @@ export const Home = () => {
           />
           <EntrenadorNavbar title={activeTab} user={user} />
           <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
-             {renderAdminContent()}
+              {renderAdminContent()}
           </div>
         </main>
       </div>
