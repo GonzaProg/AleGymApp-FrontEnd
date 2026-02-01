@@ -8,6 +8,8 @@ import { EntrenadorNavbar } from "../Components/EntrenadorNavbar";
 import { HomeStyles } from "../Styles/HomeStyles"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
+import { StatsGrid } from "../Components/Dashboard/StatsGrid"; 
+import { useDashboardMetrics } from "../Hooks/Home/useDashboardMetrics"; 
 
 // IMÁGENES
 import fondoGym from "../assets/GymFondo.jpg";
@@ -84,6 +86,9 @@ export const Home = () => {
   const [activeTab, setActiveTab] = useState("Inicio");
 
   const { logout } = useLogout();
+  
+  const { metrics, loading: loadingMetrics } = useDashboardMetrics();
+  
 
   const AdminDashboardWelcome = () => (
     <div className="animate-fade-in-up space-y-6">
@@ -95,8 +100,22 @@ export const Home = () => {
         <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
           Aquí tienes un resumen de la actividad del gimnasio hoy.
         </p>
+        <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
+          Todo parece estar en orden. 😎 
+        </p>
       </div>
-      {/* ... estadísticas ... */}
+
+      {/* MÉTRICAS*/}
+      {loadingMetrics ? (
+          <div className="grid grid-cols-4 gap-6 mt-8">
+              {[1,2,3,4].map(i => (
+                  <div key={i} className="h-32 bg-gray-800/50 rounded-2xl animate-pulse"></div>
+              ))}
+          </div>
+      ) : metrics ? (
+          <StatsGrid metrics={metrics} />
+      ) : null}
+
     </div>
   );
 

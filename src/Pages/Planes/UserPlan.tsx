@@ -1,4 +1,5 @@
 import { AppStyles } from "../../Styles/AppStyles";
+import { UserPlanStyles } from "../../Styles/UserPlanStyles";
 import { Card } from "../../Components/UI/Card";
 import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
 import { PageLayout } from "../../Components/UI/PageLayout";
@@ -18,7 +19,7 @@ export const UserPlan = () => {
 
   // Clases dinámicas
   const statusColor = venceHoy ? "text-orange-500" : "text-green-500";
-  const borderColor = venceHoy ?  "border-orange-600" : "border-green-700";
+  const borderColor = venceHoy ?  "border-orange-500" : "border-green-500";
   const bgTint = venceHoy ? "bg-orange-500/10" : "bg-green-500/10"; 
 
   // Formateo de fecha seguro
@@ -37,7 +38,7 @@ export const UserPlan = () => {
 
           {myPlan ? (
             <div className="mb-10 animate-fade-in w-full">
-              <Card className={`${AppStyles.glassCard} border-l-4 ${borderColor} ${bgTint} w-full transition-colors duration-300`}>
+              <Card className={`${UserPlanStyles.glassCardUserPlan} border-l-4 ${borderColor} ${bgTint} w-full transition-colors duration-300`}>
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 p-2">
                     
                     {/* IZQUIERDA: Nombre y Estado */}
