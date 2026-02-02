@@ -41,14 +41,14 @@ export const RenewPlan = () => {
           {/* BUSCADOR  */}
           {!alumnoSeleccionado && (
             <div className={AppStyles.searchWrapper}>
-              <div className={AppStyles.searchGlow}></div>
+              <div className={`${AppStyles.searchGlow} bg-gradient-to-r from-green-600 to-blue-600`}></div>
               <div className="relative">
                 <input
                   type="text"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
                   placeholder="🔍 Buscar alumno por nombre..."
-                  className={AppStyles.searchInput}
+                  className={`${AppStyles.searchInput} focus:border-green-500 focus:ring-1 focus:ring-green-500`}
                 />
                 
                 {sugerencias.length > 0 && (

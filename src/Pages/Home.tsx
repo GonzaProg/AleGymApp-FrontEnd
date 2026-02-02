@@ -10,6 +10,7 @@ import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
 import { StatsGrid } from "../Components/Dashboard/StatsGrid"; 
 import { useDashboardMetrics } from "../Hooks/Home/useDashboardMetrics"; 
+import { useLogout } from "../Hooks/Login/useLogout";
 
 // IMÁGENES
 import fondoGym from "../assets/GymFondo.jpg";
@@ -37,8 +38,8 @@ import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF";
 import { CreateGym } from "../Pages/Gym/CreateGym";
 import { GymManagement } from "../Pages/Gym/GymManagement"; 
 import { HistorialPagos } from "../Pages/Pagos/HistorialPagos"; 
-import { Preferences } from "../Pages/Config/Preferences"; // <--- NUEVA IMPORTACIÓN
-import { useLogout } from "../Hooks/Login/useLogout";
+import { Preferences } from "../Pages/Config/Preferences"; 
+import { ManualReceipt } from "../Pages/Planes/ReciboManual";
 
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
@@ -53,10 +54,11 @@ const BackgroundMap: Record<string, string> = {
   "Enviar PDF": fondoEnviarPDF,
   "Renovar": fondoRenewPlan,
   "Perfil": fondoPerfil,
-  "Preferencias": fondoPerfil, // <--- FONDO PARA PREFERENCIAS
+  "Preferencias": fondoPerfil, 
   "default": fondoGym,
   "Nuevo Gimnasio": fondoCreateRoutine,
-  "Gestión Gimnasios": fondoCreateRoutine 
+  "Gestión Gimnasios": fondoCreateRoutine,
+  "Enviar Recibo Manualmente": fondoCreateRoutine, 
 };
 
 const Icons = {
@@ -75,7 +77,8 @@ const Icons = {
   perfil: "👤",
   preferencias: "⚙️", // <--- NUEVO ÍCONO
   nuevoGym: "🏢",
-  gestionGyms: "⚙️" 
+  gestionGyms: "⚙️",
+  reciboManual: "🧾",
 };
 
 export const Home = () => {
@@ -139,9 +142,10 @@ export const Home = () => {
       case "Enviar PDF": return <SendRoutinePDF />; 
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
-      case "Preferencias": return <Preferences />; // <--- NUEVA RUTA
+      case "Preferencias": return <Preferences />; 
       case "Nuevo Gimnasio": return <CreateGym />;
       case "Gestión Gimnasios": return <GymManagement />; 
+      case "Enviar Recibo Manualmente": return <ManualReceipt />;
       default: return <AdminDashboardWelcome />;
     }
   };
@@ -183,6 +187,7 @@ export const Home = () => {
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
               <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => setActiveTab("Notificaciones")} />
               <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => setActiveTab("Enviar PDF")} />
+              <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => setActiveTab("Enviar Recibo Manualmente")} />
 
               {/* SECCIÓN CONFIGURACIÓN */}
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>

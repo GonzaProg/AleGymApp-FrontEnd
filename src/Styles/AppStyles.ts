@@ -1,8 +1,10 @@
 export const AppStyles = {
     // BUSCADOR HERO (Más grande que el input normal)
     searchWrapper: "max-w-2xl mx-auto relative group",
-    searchGlow: "absolute -inset-1 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000",
-    searchInput: "w-full bg-gray-900/80 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-4 px-6 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all text-lg shadow-xl backdrop-blur-md relative z-10",
+    // searchGlow ponerle color asi: `${AppStyles.searchGlow} bg-gradient-to-r from-green-600 to-blue-600`
+    searchGlow: "absolute -inset-1 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000",
+    // searchInput ponerle color asi: `${AppStyles.searchInput} focus:border-green-500 focus:ring-1 focus:ring-green-500`
+    searchInput: "w-full bg-gray-900/80 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-4 px-6 focus:outline-none transition-all text-lg shadow-xl backdrop-blur-md relative z-10",
 
     // LAYOUT PRINCIPAL 
     pageContainer: "relative min-h-screen font-sans bg-gray-900 text-gray-200",
@@ -15,7 +17,7 @@ export const AppStyles = {
     avatarSmall: "w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-white border border-white/10 group-hover:border-green-500/50",
 
     // TEXTOS 
-    headerContainer: "text-center mb-6 mt-4 animate-fade-in-down",
+    headerContainer: "text-center mb-8 mt-4 animate-fade-in-down",
     title: "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 drop-shadow-lg",
     subtitle: "text-gray-200 mt-2 text-lg",
     highlight: "text-green-500",
