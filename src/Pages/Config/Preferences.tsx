@@ -7,6 +7,7 @@ export const Preferences = () => {
         loading, 
         autoBirthday, toggleBirthday,
         autoReceipts, toggleReceipts,
+        birthdayMessage, setBirthdayMessage, saveBirthdayMessage, savingMessage,
         showFinancialMetrics, setShowFinancialMetrics
     } = usePreferences();
 
@@ -37,6 +38,36 @@ export const Preferences = () => {
                             </div>
                             <ToggleSwitch checked={autoBirthday} onChange={toggleBirthday} />
                         </div>
+
+                        {/* Cumpleaños - Editor de Mensaje (Solo si está activo) */}
+                        {autoBirthday && (
+                            <div className="mb-8 ml-1 pl-4 border-l-2 border-green-500/30 animate-fade-in-down">
+                                <label className="block text-gray-300 text-sm font-bold mb-2">
+                                    Mensaje Personalizado:
+                                </label>
+                                <div className="text-xs text-gray-500 mb-2">
+                                    Puedes usar <span className="text-green-400">{`{nombre}`}</span> para el nombre del socio y <span className="text-green-400">{`{gym}`}</span> para el nombre del gimnasio.
+                                    <span className="italic opacity-70 ml-1">(Si lo dejas vacío, se usará el mensaje por defecto).</span>
+                                </div>
+                                <textarea 
+                                    value={birthdayMessage}
+                                    onChange={(e) => setBirthdayMessage(e.target.value)}
+                                    className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-white/10 focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-all text-sm h-32 resize-none"
+                                    placeholder={`¡Feliz Cumpleaños {nombre}! 🎂🎈\n\nDesde *{gym}* queremos desearte un día excelente.\n¡Gracias por entrenar con nosotros! 💪🎁`}
+                                />
+                                <div className="flex justify-end mt-2">
+                                    <button 
+                                        onClick={saveBirthdayMessage}
+                                        disabled={savingMessage}
+                                        className="bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+                                    >
+                                        {savingMessage ? 'Guardando...' : '💾 Guardar Mensaje'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="h-px bg-white/10 my-6"></div>
 
                         {/* Recibos */}
                         <div className="flex items-center justify-between">

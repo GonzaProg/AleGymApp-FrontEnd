@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { GymApi } from "../../API/Gym/GymApi";
-import { showError } from "../../Helpers/Alerts";
+import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const usePreferences = () => {
     // DB Settings
     const [autoBirthday, setAutoBirthday] = useState(true);
     const [autoReceipts, setAutoReceipts] = useState(true);
+    const [birthdayMessage, setBirthdayMessage] = useState("");
     
     // LocalStorage Settings (Métricas)
     // Inicializamos leyendo de localStorage
@@ -15,6 +16,7 @@ export const usePreferences = () => {
     });
 
     const [loading, setLoading] = useState(true);
+    const [savingMessage, setSavingMessage] = useState(false);
 
     // Cargar Configuración del Backend
     useEffect(() => {
@@ -23,6 +25,7 @@ export const usePreferences = () => {
                 const data = await GymApi.getPreferences();
                 setAutoBirthday(data.envioAutomaticoCumpleanos);
                 setAutoReceipts(data.envioAutomaticoRecibos);
+                setBirthdayMessage(data.mensajeCumpleanos || "");
             } catch (err) {
                 console.error("Error cargando preferencias", err);
             } finally {
@@ -61,13 +64,30 @@ export const usePreferences = () => {
         window.dispatchEvent(new Event("storage"));
     };
 
+    // --- HANDLER PARA EL MENSAJE ---
+    const saveBirthdayMessage = async () => {
+        setSavingMessage(true);
+        try {
+            await GymApi.updatePreferences({ mensajeCumpleanos: birthdayMessage });
+            showSuccess("Mensaje de cumpleaños actualizado ✅");
+        } catch (error) {
+            showError("No se pudo guardar el mensaje");
+        } finally {
+            setSavingMessage(false);
+        }
+    };
+
     return {
         loading,
+        savingMessage, 
         autoBirthday,
         autoReceipts,
-        showFinancialMetrics,
+        birthdayMessage, 
+        setBirthdayMessage, 
+        saveBirthdayMessage, 
         toggleBirthday,
         toggleReceipts,
+        showFinancialMetrics,
         setShowFinancialMetrics
     };
 };
