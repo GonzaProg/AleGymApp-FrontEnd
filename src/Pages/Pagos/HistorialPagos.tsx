@@ -14,9 +14,26 @@ export const HistorialPagos = () => {
         return saved !== null ? JSON.parse(saved) : false;
     });
 
+    // 1. Efecto para GUARDAR cuando cambiamos el switch AQUÍ
+    const handleToggle = (val: boolean) => {
+        setShowMetrics(val);
+        localStorage.setItem("showFinancialMetrics", JSON.stringify(val));
+        // Disparamos evento para avisar a otras pestañas/componentes
+        window.dispatchEvent(new Event("storage")); 
+    };
+
+    // 2. Efecto para ESCUCHAR cambios externos (desde Preferences)
     useEffect(() => {
-        localStorage.setItem("showFinancialMetrics", JSON.stringify(showMetrics));
-    }, [showMetrics]);
+        const syncState = () => {
+            const saved = localStorage.getItem("showFinancialMetrics");
+            if (saved !== null) {
+                setShowMetrics(JSON.parse(saved));
+            }
+        };
+
+        window.addEventListener("storage", syncState); // Escucha cambios de localStorage
+        return () => window.removeEventListener("storage", syncState);
+    }, []);
 
     // Formateador de moneda
     const formatCurrency = (amount: number | string) => {
@@ -67,7 +84,7 @@ export const HistorialPagos = () => {
                         
                         <ToggleSwitch 
                             checked={showMetrics} 
-                            onChange={setShowMetrics} 
+                            onChange={handleToggle} 
                         />
                     </div>
                 </div>

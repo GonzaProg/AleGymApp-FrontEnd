@@ -21,7 +21,7 @@ import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
 import fondoPerfil from "../assets/Fondo-Perfil.jpg";
 import fondoRenewPlan from "../assets/Fondo-RenewPlan.jpg";
 import fondoEnviarPDF from "../assets/Fondo-CreateRoutine.jpg"; 
-import fondoPagos from "../assets/Fondo-MiPlan.jpg"; // Reutilizamos fondo o pones uno nuevo
+import fondoPagos from "../assets/Fondo-MiPlan.jpg"; 
 
 // Importación de páginas
 import { PlansManager } from "../Pages/Planes/PlansManager";
@@ -37,6 +37,7 @@ import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF";
 import { CreateGym } from "../Pages/Gym/CreateGym";
 import { GymManagement } from "../Pages/Gym/GymManagement"; 
 import { HistorialPagos } from "../Pages/Pagos/HistorialPagos"; 
+import { Preferences } from "../Pages/Config/Preferences"; // <--- NUEVA IMPORTACIÓN
 import { useLogout } from "../Hooks/Login/useLogout";
 
 const BackgroundMap: Record<string, string> = {
@@ -52,6 +53,7 @@ const BackgroundMap: Record<string, string> = {
   "Enviar PDF": fondoEnviarPDF,
   "Renovar": fondoRenewPlan,
   "Perfil": fondoPerfil,
+  "Preferencias": fondoPerfil, // <--- FONDO PARA PREFERENCIAS
   "default": fondoGym,
   "Nuevo Gimnasio": fondoCreateRoutine,
   "Gestión Gimnasios": fondoCreateRoutine 
@@ -71,6 +73,7 @@ const Icons = {
   renovar: "🔄",
   salir: "🚪",
   perfil: "👤",
+  preferencias: "⚙️", // <--- NUEVO ÍCONO
   nuevoGym: "🏢",
   gestionGyms: "⚙️" 
 };
@@ -136,6 +139,7 @@ export const Home = () => {
       case "Enviar PDF": return <SendRoutinePDF />; 
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
+      case "Preferencias": return <Preferences />; // <--- NUEVA RUTA
       case "Nuevo Gimnasio": return <CreateGym />;
       case "Gestión Gimnasios": return <GymManagement />; 
       default: return <AdminDashboardWelcome />;
@@ -166,7 +170,7 @@ export const Home = () => {
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">General</p>
               <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => setActiveTab("Inicio")} />
               <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes y Pagos"} onClick={() => setActiveTab("Planes y Pagos")} />
-              <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => setActiveTab("Historial Pagos")} /> {/* <--- NUEVO ÍTEM */}
+              <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => setActiveTab("Historial Pagos")} />
               <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => setActiveTab("Perfil")} />
 
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Gestión</p>
@@ -179,6 +183,10 @@ export const Home = () => {
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
               <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => setActiveTab("Notificaciones")} />
               <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => setActiveTab("Enviar PDF")} />
+
+              {/* SECCIÓN CONFIGURACIÓN */}
+              <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
+              <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => setActiveTab("Preferencias")} />
 
                 {/* SOLO VISIBLE PARA ADMIN */}
                 {isAdmin && (

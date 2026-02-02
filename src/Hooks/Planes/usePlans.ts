@@ -129,14 +129,27 @@ export const usePlans = () => {
         }
 
         try {
-            // AQUI CAPTURAMOS LA RESPUESTA COMPLETA DEL BACKEND
+            // Recibimos estadoRecibo en lugar de whatsappEnviado
             const response: any = await PlansApi.subscribeUser(alumnoSeleccionadoId, selectedPlanToSubscribe.id!, metodoPago);
             
-            // Verificamos si se envió el WhatsApp
-            if (response.whatsappEnviado) {
-                showSuccess(`✅ Plan asignado. Recibo enviado por WhatsApp 📱`);
-            } else {
-                showSuccess(`✅ Plan asignado correctamente (No se pudo enviar WhatsApp ⚠️)`);
+            // LÓGICA DE MENSAJES SEGÚN ESTADO REAL
+            switch (response.estadoRecibo) {
+                case 'ENVIADO':
+                    showSuccess(`✅ Plan asignado. Recibo enviado por WhatsApp 📱`);
+                    break;
+                case 'DESACTIVADO':
+                    // Mensaje informativo (no es error, es configuración)
+                    showSuccess(`✅ Plan asignado correctamente.\n(Recibo automático desactivado 🔕)`);
+                    break;
+                case 'ERROR':
+                    // Mensaje de advertencia (se asignó el plan, pero falló el envío)
+                    showSuccess(`⚠️ Plan asignado, pero FALLÓ el envío del recibo.\n(Verifica conexión o número)`);
+                    break;
+                case 'SIN_TELEFONO':
+                    showSuccess(`✅ Plan asignado. (Usuario sin teléfono para recibo)`);
+                    break;
+                default:
+                    showSuccess(`✅ Plan asignado correctamente.`);
             }
 
             setIsSubscribeModalOpen(false);
