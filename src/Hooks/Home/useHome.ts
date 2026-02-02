@@ -8,14 +8,7 @@ export const useHome = () => {
   const { currentUser, isEntrenador, isAdmin, isLoading } = useAuthUser();
 
   const goToMyRoutines = () => navigate("/my-routines");
-  const goToCreateRoutine = () => navigate("/create-routine");
-  const goToDeleteRoutine = () => navigate("/delete-routine");
-  const goToCreateUser = () => navigate("/create-user");
-  const goToExercises = () => navigate("/ejercicios");
-  const goToCreateNotification = () => navigate("/notifications/create");
-  const goToPlans = () => navigate("/planes");
   const goToUserPlan = () => navigate("/planes/mi-plan");
-  const goToRenew = () => navigate("/planes/renovar-gestion");
 
   return {
     user: currentUser, 
@@ -23,13 +16,6 @@ export const useHome = () => {
     isAdmin,
     isLoading,
     goToMyRoutines,
-    goToCreateRoutine,
-    goToDeleteRoutine,
-    goToCreateUser,
-    goToExercises,
-    goToCreateNotification,
-    goToPlans,
     goToUserPlan,
-    goToRenew
   };
 };

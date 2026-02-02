@@ -62,13 +62,13 @@ export const useRenewPlan = () => {
         if (!alumnoSeleccionado) return;
         setLoadingAction(true);
         try {
-            // AQUI CAPTURAMOS LA RESPUESTA
             const response: any = await PlansApi.renewPlan(alumnoSeleccionado.id, metodoPago);
             
-            if (response.whatsappEnviado) {
-                showSuccess(`✅ Plan renovado. Recibo enviado por WhatsApp 📱`);
-            } else {
-                showSuccess(`✅ Plan renovado correctamente (No se pudo enviar WhatsApp ⚠️)`);
+            switch (response.estadoRecibo) {
+                case 'ENVIADO': showSuccess(`✅ Renovado. Recibo enviado 📱`); break;
+                case 'DESACTIVADO': showSuccess(`✅ Renovado correctamente.\n(Recibo desactivado 🔕)`); break;
+                case 'ERROR': showSuccess(`⚠️ Renovado, pero FALLÓ el envío del recibo.`); break;
+                default: showSuccess(`✅ Renovado correctamente.`);
             }
 
             await cargarDatosIniciales(); 
@@ -114,15 +114,15 @@ export const useRenewPlan = () => {
 
         setLoadingAction(true);
         try {
-            // AQUI CAPTURAMOS LA RESPUESTA TAMBIÉN
             const response: any = await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!, metodoPago);
             
-            if (response.whatsappEnviado) {
-                showSuccess(`✅ Plan asignado. Recibo enviado por WhatsApp 📱`);
-            } else {
-                showSuccess(`✅ Plan asignado correctamente (No se pudo enviar WhatsApp ⚠️)`);
+            switch (response.estadoRecibo) {
+                case 'ENVIADO': showSuccess(`✅ Asignado. Recibo enviado 📱`); break;
+                case 'DESACTIVADO': showSuccess(`✅ Asignado correctamente.\n(Recibo desactivado 🔕)`); break;
+                case 'ERROR': showSuccess(`⚠️ Asignado, pero FALLÓ el envío del recibo.`); break;
+                default: showSuccess(`✅ Asignado correctamente.`);
             }
-
+            
             await cargarDatosIniciales();
             limpiarSeleccion();
         } catch (error: any) {

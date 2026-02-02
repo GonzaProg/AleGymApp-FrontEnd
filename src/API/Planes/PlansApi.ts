@@ -51,5 +51,10 @@ export const PlansApi = {
     cancelPlan: async (userId: number) => {
         const response = await api.post('/planes/cancelar', { userId });
         return response.data;
+    },
+
+    enviarReciboManual: async (userId: number) => {
+        const response = await api.post('/planes/enviar-recibo', { userId });
+        return response.data;
     }
 };

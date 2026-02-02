@@ -39,5 +39,18 @@ export const GymApi = {
     update: async (id: number, data: CreateUpdateGymDTO) => {
         const response = await api.put(`/gyms/${id}`, data);
         return response.data;
+    },
+
+    getPreferences: async () => {
+        const response = await api.get('/gyms/preferences');
+        return response.data;
+    },
+    updatePreferences: async (data: { 
+        envioAutomaticoCumpleanos?: boolean; 
+        envioAutomaticoRecibos?: boolean;
+        mensajeCumpleanos?: string;
+     }) => {
+        const response = await api.put('/gyms/preferences', data);
+        return response.data;
     }
 };

@@ -8,6 +8,9 @@ import { EntrenadorNavbar } from "../Components/EntrenadorNavbar";
 import { HomeStyles } from "../Styles/HomeStyles"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
+import { StatsGrid } from "../Components/Dashboard/StatsGrid"; 
+import { useDashboardMetrics } from "../Hooks/Home/useDashboardMetrics"; 
+import { useLogout } from "../Hooks/Login/useLogout";
 
 // IMÁGENES
 import fondoGym from "../assets/GymFondo.jpg";
@@ -19,6 +22,7 @@ import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
 import fondoPerfil from "../assets/Fondo-Perfil.jpg";
 import fondoRenewPlan from "../assets/Fondo-RenewPlan.jpg";
 import fondoEnviarPDF from "../assets/Fondo-CreateRoutine.jpg"; 
+import fondoPagos from "../assets/Fondo-MiPlan.jpg"; 
 
 // Importación de páginas
 import { PlansManager } from "../Pages/Planes/PlansManager";
@@ -33,11 +37,14 @@ import { Profile } from "../Pages/Usuarios/Profile";
 import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
 import { CreateGym } from "../Pages/Gym/CreateGym";
 import { GymManagement } from "../Pages/Gym/GymManagement"; 
-import { useLogout } from "../Hooks/Login/useLogout";
+import { HistorialPagos } from "../Pages/Pagos/HistorialPagos"; 
+import { Preferences } from "../Pages/Config/Preferences"; 
+import { ManualReceipt } from "../Pages/Planes/ReciboManual";
 
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
   "Planes y Pagos": fondoMiPlan, 
+  "Historial Pagos": fondoPagos, 
   "Crear Rutina": fondoCreateRoutine,
   "Ejercicios": fondoCreateRoutine,
   "Crear Ejercicio": fondoCreateRoutine,
@@ -47,9 +54,11 @@ const BackgroundMap: Record<string, string> = {
   "Enviar PDF": fondoEnviarPDF,
   "Renovar": fondoRenewPlan,
   "Perfil": fondoPerfil,
+  "Preferencias": fondoPerfil, 
   "default": fondoGym,
   "Nuevo Gimnasio": fondoCreateRoutine,
-  "Gestión Gimnasios": fondoCreateRoutine 
+  "Gestión Gimnasios": fondoCreateRoutine,
+  "Enviar Recibo Manualmente": fondoCreateRoutine, 
 };
 
 const Icons = {
@@ -66,8 +75,10 @@ const Icons = {
   renovar: "🔄",
   salir: "🚪",
   perfil: "👤",
+  preferencias: "⚙️", // <--- NUEVO ÍCONO
   nuevoGym: "🏢",
-  gestionGyms: "⚙️" 
+  gestionGyms: "⚙️",
+  reciboManual: "🧾",
 };
 
 export const Home = () => {
@@ -84,6 +95,9 @@ export const Home = () => {
   const [activeTab, setActiveTab] = useState("Inicio");
 
   const { logout } = useLogout();
+  
+  const { metrics, loading: loadingMetrics } = useDashboardMetrics();
+  
 
   const AdminDashboardWelcome = () => (
     <div className="animate-fade-in-up space-y-6">
@@ -95,8 +109,22 @@ export const Home = () => {
         <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
           Aquí tienes un resumen de la actividad del gimnasio hoy.
         </p>
+        <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
+          Todo parece estar en orden. 😎 
+        </p>
       </div>
-      {/* ... estadísticas ... */}
+
+      {/* MÉTRICAS*/}
+      {loadingMetrics ? (
+          <div className="grid grid-cols-4 gap-6 mt-8">
+              {[1,2,3,4].map(i => (
+                  <div key={i} className="h-32 bg-gray-800/50 rounded-2xl animate-pulse"></div>
+              ))}
+          </div>
+      ) : metrics ? (
+          <StatsGrid metrics={metrics} />
+      ) : null}
+
     </div>
   );
 
@@ -104,6 +132,7 @@ export const Home = () => {
     switch (activeTab) {
       case "Inicio": return <AdminDashboardWelcome/>;
       case "Planes y Pagos": return <PlansManager />;
+      case "Historial Pagos": return <HistorialPagos />; 
       case "Crear Rutina": return <CreateRoutine />;
       case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
       case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
@@ -113,8 +142,10 @@ export const Home = () => {
       case "Enviar PDF": return <SendRoutinePDF />; 
       case "Renovar": return <RenewPlan />;
       case "Perfil": return <Profile />;
+      case "Preferencias": return <Preferences />; 
       case "Nuevo Gimnasio": return <CreateGym />;
       case "Gestión Gimnasios": return <GymManagement />; 
+      case "Enviar Recibo Manualmente": return <ManualReceipt />;
       default: return <AdminDashboardWelcome />;
     }
   };
@@ -142,7 +173,8 @@ export const Home = () => {
             <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">General</p>
               <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => setActiveTab("Inicio")} />
-              <SidebarItem icon={Icons.planes} label="Planes y Pagos" active={activeTab === "Planes y Pagos"} onClick={() => setActiveTab("Planes y Pagos")} />
+              <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes y Pagos"} onClick={() => setActiveTab("Planes y Pagos")} />
+              <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => setActiveTab("Historial Pagos")} />
               <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => setActiveTab("Perfil")} />
 
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Gestión</p>
@@ -155,6 +187,11 @@ export const Home = () => {
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
               <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => setActiveTab("Notificaciones")} />
               <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => setActiveTab("Enviar PDF")} />
+              <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => setActiveTab("Enviar Recibo Manualmente")} />
+
+              {/* SECCIÓN CONFIGURACIÓN */}
+              <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
+              <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => setActiveTab("Preferencias")} />
 
                 {/* SOLO VISIBLE PARA ADMIN */}
                 {isAdmin && (
@@ -200,7 +237,7 @@ export const Home = () => {
           />
           <EntrenadorNavbar title={activeTab} user={user} />
           <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
-             {renderAdminContent()}
+              {renderAdminContent()}
           </div>
         </main>
       </div>
