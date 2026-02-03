@@ -39,7 +39,10 @@ export const Navbar = () => {
 
 
   const handleNotifClick = (notif: any) => {
-    markAsRead(notif.id);
+    // Solo marcar como leída si no lo está ya
+    if (!notif.leida) {
+      markAsRead(notif.id);
+    }
     // Si el texto es largo (> 100 chars), abrimos modal. Si es corto, solo marcamos leída.
     if (notif.mensaje.length > 100) {
         setSelectedNotif(notif);

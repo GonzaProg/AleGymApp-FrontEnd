@@ -105,9 +105,9 @@ export const MyRoutines = () => {
 
       {/* MODAL DETALLE (ESTILO NUEVO)  */}
       {selectedRoutine && (
-        <div className={AppStyles.modalOverlay}>
+        <div className={AppStyles.modalOverlay} onClick={closeModal}>
            {/* Hacemos el modal más ancho (max-w-4xl) para el diseño horizontal */}
-           <div className={`${AppStyles.modalContent} max-w-4xl`}>
+           <div className={`${AppStyles.modalContent} max-w-4xl`} onClick={(e) => e.stopPropagation()}>
               
               {/* Header Modal */}
               <div className={MyRoutinesStyles.modalHeader}>
@@ -220,12 +220,12 @@ export const MyRoutines = () => {
       
       {/* MODAL VIDEO  */}
       {videoUrl && (
-        <div className={MyRoutinesStyles.videoContainer}>
+        <div className={MyRoutinesStyles.videoContainer} onClick={closeVideo}>
            <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
              <span className="text-2xl font-bold">&times;</span>
            </button>
            
-           <div className="w-full max-w-4xl aspect-video px-4">
+           <div className="w-full max-w-4xl aspect-video px-4" onClick={(e) => e.stopPropagation()}>
              <VideoEjercicio url={videoUrl} />
            </div>
            

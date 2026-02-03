@@ -29,7 +29,7 @@ export const MyRoutinesStyles = {
     videoBtn: "text-blue-400 text-sm font-bold flex items-center gap-1 hover:text-blue-300 mt-2 bg-blue-500/10 px-3 py-1 rounded transition-colors",
 
     // Videos Ejercicios
-    videoContainer: "fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center animate-fade-in backdrop-blur-xl",
+    videoContainer: "fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center animate-fade-in backdrop-blur-xl",
 
     // Boton Cerrar Video
     closeVideoBtn: "absolute top-5 right-5 text-white bg-white/10 hover:bg-red-500/80 rounded-full w-12 h-12 flex items-center justify-center transition border border-white/10",
