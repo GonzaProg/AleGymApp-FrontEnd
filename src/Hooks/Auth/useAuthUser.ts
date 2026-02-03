@@ -15,60 +15,69 @@ export interface User {
 }
 
 export const useAuthUser = () => {
-    // 1. AGREGAMOS EL ESTADO DE CARGA (Inicia en true)
     const [isLoading, setIsLoading] = useState<boolean>(true);
-
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [isEntrenador, setIsEntrenador] = useState<boolean>(false);
-    
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
-        // Buscar en ambos almacenamientos
         const userLocal = localStorage.getItem("user");
         const tokenLocal = localStorage.getItem("token");
-        
         const userSession = sessionStorage.getItem("user");
         const tokenSession = sessionStorage.getItem("token");
 
-        // Priorizamos Local (Persistente), sino usamos Session (Temporal)
         const userStr = userLocal || userSession;
         const tokenStr = tokenLocal || tokenSession;
 
         if (userStr && tokenStr) {
             try {
                 const userObj: User = JSON.parse(userStr);
-                setCurrentUser(userObj);
-                setToken(tokenStr);
-
-                // Determinamos roles
-                const admin = userObj.rol === "Admin";
-                setIsAdmin(admin);
-                setIsEntrenador(userObj.rol === "Entrenador" || admin); 
-
+                establecerEstadoUsuario(userObj, tokenStr);
             } catch (error) {
                 console.error("Error sesión:", error);
-                // Limpieza de emergencia
-                localStorage.clear();
-                sessionStorage.clear();
-                setIsAdmin(false);
-                setIsEntrenador(false);
-                setCurrentUser(null);
+                logout();
             }
         }
-        
-        // 2. FINALIZAMOS LA CARGA
-        // Esto asegura que ya leímos el localStorage (haya datos o no)
         setIsLoading(false);
-
     }, []);
+
+    // Helper interno para setear estados
+    const establecerEstadoUsuario = (user: User, token: string) => {
+        setCurrentUser(user);
+        setToken(token);
+        const admin = user.rol === "Admin";
+        setIsAdmin(admin);
+        setIsEntrenador(user.rol === "Entrenador" || admin);
+    };
+
+    // Autologin al crear nuevo usuario
+    const login = (user: User, accessToken: string, refreshToken: string, remember: boolean = true) => {
+        const storage = remember ? localStorage : sessionStorage;
+        
+        storage.setItem("token", accessToken);
+        storage.setItem("refreshToken", refreshToken);
+        storage.setItem("user", JSON.stringify(user));
+
+        establecerEstadoUsuario(user, accessToken);
+    };
+
+    const logout = () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        setIsAdmin(false);
+        setIsEntrenador(false);
+        setCurrentUser(null);
+        setToken(null);
+    };
 
     return { 
         isAdmin,
         isEntrenador, 
         currentUser,
         token,
-        isLoading // 3. RETORNAMOS LA PROPIEDAD
+        isLoading,
+        login, // <--- AHORA SÍ EXISTE
+        logout
     };
 };
