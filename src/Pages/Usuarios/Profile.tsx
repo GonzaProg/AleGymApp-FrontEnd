@@ -29,8 +29,13 @@ export const Profile = () => {
   if (!userData) return <div className="h-full flex items-center justify-center text-red-400">Error: No se pudo cargar el usuario.</div>;
 
   const avatarSrc = imagePreview || (isEditingProfile ? editForm.fotoPerfil : userData.fotoPerfil);
+  
+  // Estilos para la barra de desplazamiento oscura
+  const darkScrollbarClass = "[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-600";
+
   return (
-    <div className="w-full h-full flex flex-col pt-6 px-4 pb-10 animate-fade-in overflow-y-auto">
+    // Añadido darkScrollbarClass al contenedor principal
+    <div className={`w-full h-full flex flex-col pt-6 px-4 pb-10 animate-fade-in overflow-y-auto ${darkScrollbarClass}`}>
         <div className="w-full max-w-3xl mx-auto space-y-8">
 
           {/* --- CARD PERFIL --- */}
@@ -38,7 +43,7 @@ export const Profile = () => {
             
             <div className={ProfileStyles.coverGradient}></div>
 
-            <div className="px-10 pb-10">
+            <div className="px-6 md:px-10 pb-10">
               <div className={ProfileStyles.avatarContainer}>
                 <div className={ProfileStyles.avatarWrapper}>
                   {avatarSrc ? (
@@ -75,17 +80,16 @@ export const Profile = () => {
               <div className="text-center">
                 {isEditingProfile ? (
                   // MODO EDICIÓN
-                  <div className="space-y-5 text-left animate-fade-in-up px-4">
+                  <div className="space-y-5 text-left animate-fade-in-up px-2 md:px-4">
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input label="Nombre" value={editForm.nombre} onChange={e => handleEditChange('nombre', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                       <Input label="Apellido" value={editForm.apellido} onChange={e => handleEditChange('apellido', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input label="Usuario" value={editForm.nombreUsuario} onChange={e => handleEditChange('nombreUsuario', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                         
-                        {/* DNI NO EDITABLE */}
                         <div>
                             <label className={AppStyles.label}>DNI (No editable)</label>
                             <div className="w-full bg-black/20 border border-white/5 text-gray-400 p-3 rounded-lg font-mono text-sm">
@@ -96,7 +100,7 @@ export const Profile = () => {
 
                     <Input label="Email" value={editForm.email} onChange={e => handleEditChange('email', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input 
                             label="Teléfono" 
                             value={editForm.telefono || ""} 
@@ -115,16 +119,16 @@ export const Profile = () => {
                         />
                     </div>
 
-                    <div className="flex justify-center gap-4 pt-6">
-                      <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={AppStyles.btnSecondary}>Cancelar</Button>
-                      <Button onClick={handleSaveProfile} className={AppStyles.btnPrimary} disabled={uploadingImage}>
+                    <div className="flex flex-col md:flex-row justify-center gap-4 pt-6">
+                      <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={`${AppStyles.btnSecondary} w-full md:w-auto`}>Cancelar</Button>
+                      <Button onClick={handleSaveProfile} className={`${AppStyles.btnPrimary} w-full md:w-auto`} disabled={uploadingImage}>
                         {uploadingImage ? 'Guardando...' : 'Guardar Cambios'}
                       </Button>
                     </div>
                   </div>
                 ) : (
                   // MODO VISTA
-                  <div className="space-y-3">
+                  <div className="space-y-6">
                     <h2 className={ProfileStyles.nameTitle}>
                       {userData.nombre} <span className="text-green-500">{userData.apellido}</span>
                     </h2>
@@ -133,25 +137,25 @@ export const Profile = () => {
                       @{userData.nombreUsuario} • {userData.email}
                     </p>
                     
-                    {/* VISUALIZACIÓN DE DATOS EXTRA */}
-                    <div className="flex flex-wrap justify-center gap-4 mt-6">
-                        <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
-                            <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">DNI</span>
-                            <span className="text-white font-mono">{userData.dni}</span>
+                    {/* Visualización de datos extra responsive */}
+                    <div className="grid grid-cols-1 gap-3 mt-6 w-full md:flex md:flex-row md:justify-center md:gap-4 bg-white/5 p-4 rounded-xl">
+                        
+                        <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl flex flex-col justify-center items-center w-full md:w-auto md:min-w-[140px]">
+                            <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-1">DNI</span>
+                            <span className="text-white font-mono font-bold text-lg">{userData.dni}</span>
                         </div>
 
                         {userData.telefono && (
-                            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
-                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Teléfono</span>
-                                <span className="text-white">{userData.telefono}</span>
+                            <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl flex flex-col justify-center items-center w-full md:w-auto md:min-w-[140px]">
+                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-1">Teléfono</span>
+                                <span className="text-white font-medium">{userData.telefono}</span>
                             </div>
                         )}
 
                         {userData.fechaNacimiento && (
-                            <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
-                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">Nacimiento</span>
-                                {/* USAMOS LA FUNCIÓN DE FORMATEO CORRECTA AQUÍ */}
-                                <span className="text-white">{formatearFechaUTC(userData.fechaNacimiento)}</span>
+                            <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl flex flex-col justify-center items-center w-full md:w-auto md:min-w-[140px]">
+                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-1">Nacimiento</span>
+                                <span className="text-white font-medium">{formatearFechaUTC(userData.fechaNacimiento)}</span>
                             </div>
                         )}
                     </div>
@@ -171,17 +175,17 @@ export const Profile = () => {
           </div>
 
           {/* --- CARD SEGURIDAD --- */}
-          <div className={AppStyles.glassCard + " p-8"}>
+          <div className={AppStyles.glassCard + " p-6 md:p-8"}>
             {!showPasswordSection ? (
-              <div className="flex justify-between items-center">
-                 <div className="flex items-center gap-4">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+                 <div className="flex flex-col md:flex-row items-center gap-4">
                     <span className="text-3xl bg-gray-800 p-2 rounded-lg">🔒</span>
                     <div>
                         <span className="font-bold text-gray-100 text-xl block">Seguridad</span>
                         <span className="text-gray-500 text-sm">Gestiona tu contraseña</span>
                     </div>
                  </div>
-                 <button onClick={() => setShowPasswordSection(true)} className="text-green-500 hover:text-green-400 font-bold text-base tracking-wider hover:bg-green-500/10 px-4 py-2 rounded-lg transition-all">
+                 <button onClick={() => setShowPasswordSection(true)} className="text-green-500 hover:text-green-400 font-bold text-base tracking-wider hover:bg-green-500/10 px-4 py-2 rounded-lg transition-all w-full md:w-auto border border-green-500/20 md:border-transparent mt-2 md:mt-0">
                     Cambiar Contraseña
                  </button>
               </div>
@@ -191,15 +195,15 @@ export const Profile = () => {
                 
                 <div className="bg-black/20 p-6 rounded-xl border border-white/5 space-y-4">
                     <Input label="Contraseña Actual" type="password" value={passForm.currentPassword} onChange={e => handlePassChange('currentPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input label="Nueva" type="password" autoComplete="new-password" value={passForm.newPassword} onChange={e => handlePassChange('newPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                         <Input label="Repetir" type="password" autoComplete="new-password" value={passForm.confirmPassword} onChange={e => handlePassChange('confirmPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
                 </div>
 
-                <div className="flex justify-center gap-4">
-                    <Button variant="ghost" onClick={handleCancelPassword} className={AppStyles.btnSecondary}>Cancelar</Button>
-                    <Button onClick={handleChangePassword} className={AppStyles.btnDanger}>Actualizar</Button>
+                <div className="flex flex-col md:flex-row justify-center gap-4">
+                    <Button variant="ghost" onClick={handleCancelPassword} className={`${AppStyles.btnSecondary} w-full md:w-auto`}>Cancelar</Button>
+                    <Button onClick={handleChangePassword} className={`${AppStyles.btnDanger} w-full md:w-auto`}>Actualizar</Button>
                 </div>
               </div>
             )}

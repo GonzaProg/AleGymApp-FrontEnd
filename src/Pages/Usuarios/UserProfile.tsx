@@ -119,7 +119,7 @@ export const UserProfile = () => {
                   </div>
                 ) : (
                   // MODO VISTA
-                  <div className="space-y-3">
+                  <div className="space-y-6">
                     <h2 className={ProfileStyles.nameTitle}>
                       {userData.nombre} <span className="text-green-500">{userData.apellido}</span>
                     </h2>
@@ -128,7 +128,7 @@ export const UserProfile = () => {
                       @{userData.nombreUsuario} • {userData.email}
                     </p>
 
-                    <div className="flex justify-center gap-6 mt-4 text-sm text-gray-300 bg-white/5 py-3 px-6 rounded-2xl border border-white/5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 place-items-center bg-white/5 border border-white/10 p-6 rounded-xl">
                         <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
                             <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">DNI</span>
                             <span className="text-white font-mono">{userData.dni}</span>
