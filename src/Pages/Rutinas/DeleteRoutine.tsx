@@ -78,7 +78,7 @@ export const DeleteRoutine = () => {
                     {rutinas.length === 0 ? (
                         <div className={`${AppStyles.glassCard} text-center py-12 flex flex-col items-center justify-center border-dashed border-2 border-gray-700`}>
                             <span className="text-5xl opacity-30 mb-4 grayscale">📂</span>
-                            <p className="text-gray-400 text-lg">Este alumno no tiene rutinas asignadas.</p>
+                            <p className="text-gray-400 text-lg">Este alumno no tiene rutinas personales asignadas.</p>
                         </div>
                     ) : (
                         <div className="grid gap-4">

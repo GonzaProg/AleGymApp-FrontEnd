@@ -40,6 +40,7 @@ import { GymManagement } from "../Pages/Gym/GymManagement";
 import { HistorialPagos } from "../Pages/Pagos/HistorialPagos"; 
 import { Preferences } from "../Pages/Config/Preferences"; 
 import { ManualReceipt } from "../Pages/Planes/ReciboManual";
+import { GeneralRoutinesManager } from "../Pages/Rutinas/GeneralRoutinesManager";
 
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
@@ -59,6 +60,8 @@ const BackgroundMap: Record<string, string> = {
   "Nuevo Gimnasio": fondoCreateRoutine,
   "Gestión Gimnasios": fondoCreateRoutine,
   "Enviar Recibo Manualmente": fondoCreateRoutine, 
+  "Rutina General": fondoCreateRoutine,
+  "Crear Rutina General": fondoCreateRoutine,
 };
 
 const Icons = {
@@ -75,10 +78,11 @@ const Icons = {
   renovar: "🔄",
   salir: "🚪",
   perfil: "👤",
-  preferencias: "⚙️", // <--- NUEVO ÍCONO
+  preferencias: "⚙️", 
   nuevoGym: "🏢",
   gestionGyms: "⚙️",
   reciboManual: "🧾",
+  crearRutinaGeneral: "📚",
 };
 
 export const Home = () => {
@@ -93,11 +97,26 @@ export const Home = () => {
   } = useHome();  
 
   const [activeTab, setActiveTab] = useState("Inicio");
+  
+  // --- NUEVO ESTADO: ID de la rutina a editar ---
+  const [routineIdToEdit, setRoutineIdToEdit] = useState<number | null>(null);
 
   const { logout } = useLogout();
-  
   const { metrics, loading: loadingMetrics } = useDashboardMetrics();
-  
+
+  // --- NUEVO HANDLER: Prepara la edición y cambia de tab ---
+  const handleEditRoutine = (id: number) => {
+      setRoutineIdToEdit(id);
+      setActiveTab("Crear Rutina General");
+  };
+
+  // --- NUEVO HANDLER: Navegación segura (Limpieza de estados) ---
+  const handleSidebarClick = (tabName: string) => {
+      // Si navegamos manualmente desde el menú, limpiamos el ID de edición
+      // para evitar que se abra el formulario en modo edición por error.
+      setRoutineIdToEdit(null);
+      setActiveTab(tabName);
+  };
 
   const AdminDashboardWelcome = () => (
     <div className="animate-fade-in-up space-y-6">
@@ -108,9 +127,6 @@ export const Home = () => {
         </h2>
         <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
           Aquí tienes un resumen de la actividad del gimnasio hoy.
-        </p>
-        <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
-          Todo parece estar en orden. 😎 
         </p>
       </div>
 
@@ -124,7 +140,6 @@ export const Home = () => {
       ) : metrics ? (
           <StatsGrid metrics={metrics} />
       ) : null}
-
     </div>
   );
 
@@ -133,7 +148,12 @@ export const Home = () => {
       case "Inicio": return <AdminDashboardWelcome/>;
       case "Planes y Pagos": return <PlansManager />;
       case "Historial Pagos": return <HistorialPagos />; 
-      case "Crear Rutina": return <CreateRoutine />;
+      // RUTINA PERSONALIZADA 
+      case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
+      // GESTOR DE RUTINAS GENERALES 
+      case "Rutina General": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
+      // FORMULARIO RUTINA GENERAL (Recibe el ID si estamos editando)
+      case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} />;
       case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
       case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
       case "Notificaciones": return <CreateNotification />;
@@ -164,7 +184,7 @@ export const Home = () => {
         <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
           
           <div className="flex-1 overflow-hidden flex flex-col">
-            <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => setActiveTab("Inicio")}>
+            <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => handleSidebarClick("Inicio")}>
                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
                  GYMMate
                </span>
@@ -172,26 +192,33 @@ export const Home = () => {
 
             <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">General</p>
-              <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => setActiveTab("Inicio")} />
-              <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes y Pagos"} onClick={() => setActiveTab("Planes y Pagos")} />
-              <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => setActiveTab("Historial Pagos")} />
-              <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => setActiveTab("Perfil")} />
+              
+              {/* Usamos handleSidebarClick en lugar de setActiveTab directo para limpiar estados */}
+              <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
+              <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes y Pagos"} onClick={() => handleSidebarClick("Planes y Pagos")} />
+              <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
+              <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
 
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Gestión</p>
-              <SidebarItem icon={Icons.usuarios} label="Usuarios" active={activeTab === "Usuarios"} onClick={() => setActiveTab("Usuarios")} />
-              <SidebarItem icon={Icons.crearRutina} label="Crear Rutina" active={activeTab === "Crear Rutina"} onClick={() => setActiveTab("Crear Rutina")} />
-              <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => setActiveTab("Ejercicios")} />
-              <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => setActiveTab("Renovar")} />
-              <SidebarItem icon={Icons.borrar} label="Borrar Rutina" active={activeTab === "Borrar Rutina"} onClick={() => setActiveTab("Borrar Rutina")} />
+              <SidebarItem icon={Icons.usuarios} label="Usuarios" active={activeTab === "Usuarios"} onClick={() => handleSidebarClick("Usuarios")} />
+              
+              {/* SECCIÓN RUTINAS */}
+              <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
+              <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
+              <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutina General" active={activeTab === "Rutina General" || activeTab === "Crear Rutina General"} onClick={() => handleSidebarClick("Rutina General")} />
+              
+              <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
+              <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
+              <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
               
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
-              <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => setActiveTab("Notificaciones")} />
-              <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => setActiveTab("Enviar PDF")} />
-              <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => setActiveTab("Enviar Recibo Manualmente")} />
+              <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
+              <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
+              <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
 
               {/* SECCIÓN CONFIGURACIÓN */}
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
-              <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => setActiveTab("Preferencias")} />
+              <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
 
                 {/* SOLO VISIBLE PARA ADMIN */}
                 {isAdmin && (
@@ -201,13 +228,13 @@ export const Home = () => {
                         icon={Icons.nuevoGym} 
                         label="Nuevo Gimnasio" 
                         active={activeTab === "Nuevo Gimnasio"} 
-                        onClick={() => setActiveTab("Nuevo Gimnasio")} 
+                        onClick={() => handleSidebarClick("Nuevo Gimnasio")} 
                     />
                     <SidebarItem 
                         icon={Icons.gestionGyms} 
                         label="Gestión Gimnasios" 
                         active={activeTab === "Gestión Gimnasios"} 
-                        onClick={() => setActiveTab("Gestión Gimnasios")} 
+                        onClick={() => handleSidebarClick("Gestión Gimnasios")} 
                     />
                   </>
                 )}
