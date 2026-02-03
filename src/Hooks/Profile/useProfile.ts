@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 import { UsuarioApi, type UpdateProfileDTO } from "../../API/Usuarios/UsuarioApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
 

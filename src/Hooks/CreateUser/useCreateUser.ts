@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
 import { useGymConfig } from "../../Context/GymConfigContext"; 

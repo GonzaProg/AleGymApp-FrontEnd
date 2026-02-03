@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 // 1. Importamos las APIs y el Auth
 import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 import { showSuccess, showError, showConfirmDelete } from "../../Helpers/Alerts";
 
 export const useDeleteRoutine = () => {

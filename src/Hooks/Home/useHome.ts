@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 
 export const useHome = () => {
   const navigate = useNavigate();

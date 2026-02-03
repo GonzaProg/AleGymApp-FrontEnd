@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { EjerciciosApi, type EjercicioDTO } from '../../API/Ejercicios/EjerciciosApi'; 
-import { useAuthUser } from '../useAuthUser';
+import { useAuthUser } from '../Auth/useAuthUser';
 import { showSuccess, showError } from "../../Helpers/Alerts";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuthUser } from '../useAuthUser'; 
+import { useAuthUser } from '../Auth/useAuthUser'; 
 import { EjerciciosApi, type Ejercicio, type EjercicioDTO } from '../../API/Ejercicios/EjerciciosApi';
 import { showConfirmDelete, showError } from '../../Helpers/Alerts';
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
