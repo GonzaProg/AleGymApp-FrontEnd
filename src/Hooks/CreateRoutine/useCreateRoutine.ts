@@ -4,61 +4,69 @@ import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { showSuccess, showError } from "../../Helpers/Alerts";
 
-export const useCreateRoutine = () => {
+export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: number | null = null) => {
 
-  // --- DATOS ---
   const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
   const [ejercicios, setEjercicios] = useState<any[]>([]);
 
-  // --- BUSCADOR ---
+  // Inputs
   const [busqueda, setBusqueda] = useState("");
   const [sugerencias, setSugerencias] = useState<any[]>([]);
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
-
-  // --- FORMULARIO ---
   const [nombreRutina, setNombreRutina] = useState("");
   const [alumnoId, setAlumnoId] = useState("");
 
-  // --- DETALLE ACTUAL ---
+  // Inputs Detalle
   const [ejercicioId, setEjercicioId] = useState("");
-  const [peso, setPeso] = useState("");
+  const [peso, setPeso] = useState(""); 
   const [series, setSeries] = useState<number | string>(4);
   const [reps, setReps] = useState<number | string>(10);
 
-  // --- LISTA FINAL ---
+  // Tabla
   const [detalles, setDetalles] = useState<any[]>([]);
+  const [editIndex, setEditIndex] = useState<number | null>(null); // Índice de la fila que editamos
 
-  // 1. CARGAR DATOS INICIALES (Ahora usando APIs)
+  // 1. CARGA INICIAL (Ejercicios y Datos de Edición)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Llamadas limpias sin rutas hardcodeadas
         const dataEjercicios = await EjerciciosApi.getAll();
         setEjercicios(dataEjercicios);
 
-        const dataAlumnos = await UsuarioApi.getAlumnos();
-        setTodosLosAlumnos(dataAlumnos);
-      } catch (error) {
-        console.error("Error cargando datos", error);
-      }
+        if (!isGeneral) {
+            const dataAlumnos = await UsuarioApi.getAlumnos();
+            setTodosLosAlumnos(dataAlumnos);
+        }
+
+        // SI HAY ID, ES EDICIÓN: CARGAMOS LA RUTINA
+        if (routineIdToEdit) {
+            const rutina = await RutinasApi.getOne(routineIdToEdit);
+            setNombreRutina(rutina.nombreRutina);
+            const detallesFormateados = rutina.detalles.map((d: any) => ({
+                ejercicioId: d.ejercicio.id,
+                nombreEjercicio: d.ejercicio.nombre,
+                series: d.series,
+                repeticiones: d.repeticiones,
+                peso: d.peso
+            }));
+            setDetalles(detallesFormateados);
+        }
+
+      } catch (error) { console.error(error); }
     };
     fetchData();
-  }, []);
+  }, [isGeneral, routineIdToEdit]);
 
-  // 2. LOGICA DEL BUSCADOR (Sin cambios)
+  // HANDLERS
   const handleSearchChange = (text: string) => {
     setBusqueda(text);
     if (text.length > 0) {
-      const filtrados = todosLosAlumnos.filter((alumno) => {
-        const nombreCompleto = `${alumno.nombre} ${alumno.apellido}`.toLowerCase();
-        return nombreCompleto.includes(text.toLowerCase());
-      });
+      const filtrados = todosLosAlumnos.filter(a => `${a.nombre} ${a.apellido}`.toLowerCase().includes(text.toLowerCase()));
       setSugerencias(filtrados);
       setMostrarSugerencias(true);
     } else {
       setSugerencias([]);
       setMostrarSugerencias(false);
-      setAlumnoId("");
     }
   };
 
@@ -68,104 +76,94 @@ export const useCreateRoutine = () => {
     setMostrarSugerencias(false);
   };
 
-  // 3. LOGICA DE INPUTS (Sin cambios)
-  const handleSeriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value);
-    if (val < 0) return;
-    setSeries(e.target.value);
-  };
+  // INPUTS EJERCICIO
+  const handleSeriesChange = (e: any) => setSeries(e.target.value);
+  const handleRepsChange = (e: any) => setReps(e.target.value);
+  const handlePesoChange = (e: any) => setPeso(e.target.value);
 
-  const handleRepsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value);
-    if (val < 0) return;
-    setReps(e.target.value);
-  };
-
-  const handlePesoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (parseFloat(e.target.value) < 0) return;
-    setPeso(e.target.value);
-  };
-
-  // 4. AGREGAR EJERCICIO (Sin cambios)
+  // 2. LÓGICA AGREGAR / ACTUALIZAR FILA
   const handleAddExercise = () => {
     if (!ejercicioId) return showError("Selecciona un ejercicio");
-
-    const pesoFinal = parseFloat(peso.toString().replace(",", "."));
-    const seriesFinal = parseInt(series.toString());
-    const repsFinal = parseInt(reps.toString());
-
-    if (seriesFinal <= 0 || repsFinal <= 0 || pesoFinal < 0) {
-      return showError("Los valores deben ser mayores a 0");
-    }
-    if (isNaN(pesoFinal)) return showError("El peso debe ser un número válido");
-
-    if (pesoFinal >= 1000) {
-      return showError("¿Vas a poder levantar ese Peso? ¿Sos HULK? 🟢💪");
-    }
-
+    
+    const pesoFinal = peso.trim() === "" ? "A elección" : peso;
     const ejercicioNombre = ejercicios.find((e) => e.id === parseInt(ejercicioId))?.nombre;
 
     const nuevoDetalle = {
       ejercicioId: parseInt(ejercicioId),
       nombreEjercicio: ejercicioNombre,
-      series: seriesFinal,
-      repeticiones: repsFinal,
+      series: parseInt(series.toString()),
+      repeticiones: parseInt(reps.toString()),
       peso: pesoFinal,
     };
 
-    setDetalles([...detalles, nuevoDetalle]);
-    setSeries(4);
-    setReps(10);
-    setPeso("");
+    if (editIndex !== null) {
+        // ACTUALIZAR
+        const copia = [...detalles];
+        copia[editIndex] = nuevoDetalle;
+        setDetalles(copia);
+        setEditIndex(null); // Salir modo edición
+        showSuccess("Fila actualizada");
+    } else {
+        // AGREGAR NUEVO
+        setDetalles([...detalles, nuevoDetalle]);
+    }
+
+    // Reset inputs
+    setSeries(4); setReps(10); setPeso("");
   };
 
-  // 5. GUARDAR EN BACKEND (Ahora usando RutinasApi)
+  // 3. EDITAR FILA (Subir datos al form)
+  const handleEditRow = (index: number) => {
+      const item = detalles[index];
+      setEjercicioId(item.ejercicioId.toString());
+      setSeries(item.series);
+      setReps(item.repeticiones);
+      setPeso(item.peso === "A elección" ? "" : item.peso);
+      setEditIndex(index);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEditRow = () => {
+      setEditIndex(null);
+      setSeries(4); setReps(10); setPeso(""); setEjercicioId("");
+  };
+
+  // 4. GUARDAR TODO (POST/PUT)
   const handleSubmit = async () => {
-    if (!alumnoId || !nombreRutina || detalles.length === 0) {
-      return showError("Completa todos los datos y agrega al menos un ejercicio");
+    if ((!isGeneral && !alumnoId) || !nombreRutina || detalles.length === 0) {
+      return showError("Faltan datos obligatorios.");
     }
 
     try {
       const body = {
-        usuarioAlumnoId: parseInt(alumnoId),
+        usuarioAlumnoId: isGeneral ? null : parseInt(alumnoId),
         nombreRutina,
         detalles,
+        esGeneral: isGeneral
       };
 
-      // Llamada limpia
-      await RutinasApi.create(body);
-
-      await showSuccess("Rutina creada con éxito!");
+      if (routineIdToEdit) {
+          await RutinasApi.update(routineIdToEdit, body);
+          await showSuccess("¡Rutina Actualizada!");
+      } else {
+          await RutinasApi.create(body);
+          await showSuccess("¡Rutina Creada!");
+      }
+      
       window.location.reload();
 
     } catch (error: any) {
-      // Manejo de error mejorado
-      const msg = error.response?.data?.error || error.response?.data?.message || "Error al crear rutina";
-      showError(msg);
+      showError("Error al guardar la rutina");
     }
   };
 
   return {
-    ejercicios,
-    busqueda,
-    sugerencias,
-    mostrarSugerencias,
-    nombreRutina,
-    detalles,
-    ejercicioId,
-    series,
-    reps,
-    peso,
-    setNombreRutina,
-    setEjercicioId,
-    setMostrarSugerencias,
-    setDetalles,
-    handleSearchChange,
-    handleSelectAlumno,
-    handleSeriesChange,
-    handleRepsChange,
-    handlePesoChange,
-    handleAddExercise,
-    handleSubmit,
+    ejercicios, busqueda, sugerencias, mostrarSugerencias, nombreRutina, detalles,
+    ejercicioId, series, reps, peso,
+    setNombreRutina, setEjercicioId, setMostrarSugerencias, setDetalles,
+    handleSearchChange, handleSelectAlumno, handleSeriesChange, handleRepsChange, handlePesoChange, 
+    handleAddExercise, handleSubmit,
+    // Nuevos exports
+    editIndex, handleEditRow, cancelEditRow
   };
 };

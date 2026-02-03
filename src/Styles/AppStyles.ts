@@ -16,6 +16,9 @@ export const AppStyles = {
     suggestionItem: "p-3 hover:bg-green-600/20 cursor-pointer border-b border-white/5 transition-colors flex items-center gap-3 group",
     avatarSmall: "w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-white border border-white/10 group-hover:border-green-500/50",
 
+    // Desplegable de Opciones
+    darkBackgroundSelect: "bg-gray-900 text-gray-300 py-2",
+
     // TEXTOS 
     headerContainer: "text-center mb-8 mt-4 animate-fade-in-down",
     title: "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 drop-shadow-lg",
@@ -44,7 +47,7 @@ export const AppStyles = {
     tableRow: "hover:bg-white/5 transition-colors border-b border-white/5 last:border-0",
 
     // MODAL BASE
-    modalOverlay: "fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in",
+    modalOverlay: "fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in",
     modalContent: "bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-white/10 flex flex-col max-h-[90vh] overflow-hidden",
 
     // Alertas
