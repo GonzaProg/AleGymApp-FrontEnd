@@ -60,7 +60,7 @@ const BackgroundMap: Record<string, string> = {
   "Nuevo Gimnasio": fondoCreateRoutine,
   "Gestión Gimnasios": fondoCreateRoutine,
   "Enviar Recibo Manualmente": fondoCreateRoutine, 
-  "Rutina General": fondoCreateRoutine,
+  "Rutinas Generales": fondoCreateRoutine,
   "Crear Rutina General": fondoCreateRoutine,
 };
 
@@ -151,7 +151,7 @@ export const Home = () => {
       // RUTINA PERSONALIZADA 
       case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
       // GESTOR DE RUTINAS GENERALES 
-      case "Rutina General": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
+      case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
       // FORMULARIO RUTINA GENERAL (Recibe el ID si estamos editando)
       case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} />;
       case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
@@ -205,7 +205,7 @@ export const Home = () => {
               {/* SECCIÓN RUTINAS */}
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
               <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
-              <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutina General" active={activeTab === "Rutina General" || activeTab === "Crear Rutina General"} onClick={() => handleSidebarClick("Rutina General")} />
+              <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
               
               <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
               <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />

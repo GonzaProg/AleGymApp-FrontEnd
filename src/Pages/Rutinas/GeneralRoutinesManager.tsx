@@ -19,8 +19,7 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
                 
                 {/* HEADER */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <div className="text-left">
-                        <h1 className={AppStyles.title}>Rutinas Generales 📚</h1>
+                    <div className={AppStyles.headerContainer}>
                         <p className={AppStyles.subtitle}>Plantillas de entrenamiento reutilizables.</p>
                     </div>
                     <Button onClick={() => onNavigate("Crear Rutina General")} className={AppStyles.btnPrimary}>
@@ -34,9 +33,6 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
                 ) : rutinas.length === 0 ? (
                     <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
                         <p className="text-gray-400 mb-4">No hay rutinas generales creadas.</p>
-                        <Button onClick={() => onNavigate("Crear Rutina General")} className={AppStyles.btnSecondary}>
-                            Crear la primera
-                        </Button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

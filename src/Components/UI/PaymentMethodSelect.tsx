@@ -28,8 +28,8 @@ export const PaymentMethodSelect = ({
                     onChange={(e) => onChange(e.target.value)}
                     className={`${AppStyles.inputDark} appearance-none cursor-pointer pr-10 ${selectClassName}`}
                 >
-                    <option value="Efectivo" className="bg-gray-900 text-gray-300 py-2">💵 Efectivo</option>
-                    <option value="Transferencia" className="bg-gray-900 text-gray-300 py-2">💳 Transferencia</option>
+                    <option value="Efectivo" className={AppStyles.darkBackgroundSelect}>💵 Efectivo</option>
+                    <option value="Transferencia" className={AppStyles.darkBackgroundSelect}>💳 Transferencia</option>
                 </select>
 
                 {/* Flecha personalizada con efecto Neon */}

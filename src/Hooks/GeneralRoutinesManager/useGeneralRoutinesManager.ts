@@ -95,7 +95,7 @@ export const useGeneralRoutinesManager = () => {
     const handleDelete = async (rutina: any) => {
         const confirm = await showConfirmSuccess(
             "¿Eliminar Plantilla?",
-            `Se eliminará "${rutina.nombreRutina}" de las rutinas generales. Los alumnos que ya la tienen NO la perderán.`
+            `Se eliminará "${rutina.nombreRutina}" de las rutinas generales. Todos los alumnos asignados la perderán.`
         );
 
         if (!confirm.isConfirmed) return;

@@ -38,7 +38,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
               label="Nombre de Rutina" 
               value={nombreRutina} 
               onChange={e => setNombreRutina(e.target.value)} 
-              placeholder="Ej: Hipertrofia Pecho" 
+              placeholder="Ej: Hipertrofia" 
               className={AppStyles.inputDark}
               labelClassName={AppStyles.label}
             />
@@ -56,7 +56,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                       {sugerencias.map((a) => (
                         <li key={a.id} onClick={() => handleSelectAlumno(a)} className={AppStyles.suggestionItem}>
                           <div className={AppStyles.avatarSmall}>{a.nombre.charAt(0)}</div>
-                          <span>{a.nombre} {a.apellido}</span>
+                          <span className="text-gray-200">{a.nombre} {a.apellido}</span>
                         </li>
                       ))}
                     </ul>
@@ -76,10 +76,10 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
             
             <Input 
               as="select" label="Ejercicio" value={ejercicioId} onChange={e => setEjercicioId(e.target.value)}
-              className={`${AppStyles.inputDark} appearance-none`} labelClassName={AppStyles.label}
+              className={`${AppStyles.inputDark} appearance-none cursor-pointer pr-10`} labelClassName={AppStyles.label}
             >
-                <option value="">-- Seleccionar --</option>
-                {ejercicios.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
+                <option className={AppStyles.darkBackgroundSelect} value="">-- Seleccionar --</option>
+                {ejercicios.map(e => <option className={AppStyles.darkBackgroundSelect} key={e.id} value={e.id}>{e.nombre}</option>)}
             </Input>
 
             <div className="grid grid-cols-3 gap-4 mt-4">
