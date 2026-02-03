@@ -44,7 +44,7 @@ import { GeneralRoutinesManager } from "../Pages/Rutinas/GeneralRoutinesManager"
 
 const BackgroundMap: Record<string, string> = {
   "Inicio": fondoGym,
-  "Planes y Pagos": fondoMiPlan, 
+  "Planes": fondoMiPlan, 
   "Historial Pagos": fondoPagos, 
   "Crear Rutina": fondoCreateRoutine,
   "Ejercicios": fondoCreateRoutine,
@@ -128,6 +128,9 @@ export const Home = () => {
         <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
           Aquí tienes un resumen de la actividad del gimnasio hoy.
         </p>
+        <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
+          Todo parece estar en orden 😎
+        </p>
       </div>
 
       {/* MÉTRICAS*/}
@@ -146,7 +149,7 @@ export const Home = () => {
   const renderAdminContent = () => {
     switch (activeTab) {
       case "Inicio": return <AdminDashboardWelcome/>;
-      case "Planes y Pagos": return <PlansManager />;
+      case "Planes": return <PlansManager />;
       case "Historial Pagos": return <HistorialPagos />; 
       // RUTINA PERSONALIZADA 
       case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
@@ -195,7 +198,7 @@ export const Home = () => {
               
               {/* Usamos handleSidebarClick en lugar de setActiveTab directo para limpiar estados */}
               <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
-              <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes y Pagos"} onClick={() => handleSidebarClick("Planes y Pagos")} />
+              <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
               <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
               <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
 
@@ -207,7 +210,6 @@ export const Home = () => {
               <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
               <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
               
-              <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
               <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
               <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
               
@@ -235,6 +237,12 @@ export const Home = () => {
                         label="Gestión Gimnasios" 
                         active={activeTab === "Gestión Gimnasios"} 
                         onClick={() => handleSidebarClick("Gestión Gimnasios")} 
+                    />
+                    <SidebarItem 
+                        icon={Icons.ejercicios} 
+                        label="Ejercicios" 
+                        active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} 
+                        onClick={() => handleSidebarClick("Ejercicios")} 
                     />
                   </>
                 )}
