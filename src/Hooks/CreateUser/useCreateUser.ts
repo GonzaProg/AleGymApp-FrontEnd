@@ -15,7 +15,6 @@ export const useCreateUser = () => {
     nombre: "",
     apellido: "",
     nombreUsuario: "",
-    email: "",
     contraseña: "",
     telefono: "",         
     fechaNacimiento: "",  
@@ -33,14 +32,8 @@ export const useCreateUser = () => {
 
   const handleSubmit = async () => {
     // Validar campos vacíos
-    if (!formData.dni || !formData.email || !formData.contraseña || !formData.nombreUsuario || !formData.nombre) {
+    if (!formData.dni || !formData.contraseña || !formData.nombreUsuario || !formData.nombre) {
       return showError("Por favor completa los campos obligatorios (*)");
-    }
-
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-        return showError("⚠️ Por favor ingresa un email válido.");
     }
 
     // Validar formato DNI

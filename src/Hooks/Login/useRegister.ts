@@ -13,7 +13,6 @@ export const useRegister = (onSuccess: () => void) => {
         nombre: "",
         apellido: "",
         nombreUsuario: "",
-        email: "",
         contraseña: "",
         confirmarContrasena: "",
         telefono: "",

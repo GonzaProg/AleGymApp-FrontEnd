@@ -28,7 +28,9 @@ export const Login = () => {
   } = useRegister(() => navigate("/home")); // Al éxito, va al home
 
   return (
-    <PageLayout centered showNavbar={false} backgroundImage={fondoLogin}>
+    <PageLayout centered showNavbar={false} backgroundImage={fondoLogin}
+        className={isRegistering ? "max-w-2xl transition-all duration-500" : "max-w-md transition-all duration-500"}
+    >
       
       {/* MODAL (Solo relevante en login) */}
       <PlanExpiredModal 
@@ -48,7 +50,7 @@ export const Login = () => {
 
         {/* --- FORMULARIO DE REGISTRO --- */}
         {isRegistering ? (
-            <form onSubmit={handleRegister} className="space-y-4 animate-fade-in">
+            <form onSubmit={handleRegister} className="space-y-4 animate-fade-in mx-center">
                 
                 {/* Nombre y Apellido (Responsive) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -58,11 +60,10 @@ export const Login = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input name="dni" placeholder="DNI" type="number" value={formData.dni} onChange={handleChange} required className={LoginStyles.inputDark} />
-                    <Input name="telefono" placeholder="Teléfono (Para WhatsApp)" type="tel" value={formData.telefono} onChange={handleChange} className={LoginStyles.inputDark} />
+                    <Input name="telefono" placeholder="Teléfono" type="tel" value={formData.telefono} onChange={handleChange} className={LoginStyles.inputDark} />
                 </div>
 
                 <Input name="nombreUsuario" placeholder="Nombre de Usuario" value={formData.nombreUsuario} onChange={handleChange} required className={LoginStyles.inputDark} />
-                <Input name="email" placeholder="Correo Electrónico" type="email" value={formData.email} onChange={handleChange} required className={LoginStyles.inputDark} />
                 
                 <Input name="fechaNacimiento" type="date" value={formData.fechaNacimiento} onChange={handleChange} className={`${LoginStyles.inputDark} text-gray-400`} labelClassName={LoginStyles.label}
                     />
