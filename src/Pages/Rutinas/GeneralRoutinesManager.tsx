@@ -20,10 +20,10 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
                 {/* HEADER */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div className={AppStyles.headerContainer}>
-                        <p className={AppStyles.subtitle}>Plantillas de entrenamiento reutilizables.</p>
+                        <p className={AppStyles.subtitle}>Rutinas de entrenamiento reutilizables.</p>
                     </div>
                     <Button onClick={() => onNavigate("Crear Rutina General")} className={AppStyles.btnPrimary}>
-                        + NUEVA PLANTILLA
+                        + NUEVA RUTINA
                     </Button>
                 </div>
 

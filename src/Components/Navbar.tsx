@@ -192,7 +192,7 @@ export const Navbar = () => {
                 
                 {/* Body */}
                 <div className="p-8 overflow-y-auto max-h-[70vh]">
-                    <p className="text-gray-200 text-lg leading-relaxed whitespace-pre-wrap break-words">
+                    <p className="text-gray-200 text-lg leading-relaxed break-words">
                         {selectedNotif.mensaje}
                     </p>
                     

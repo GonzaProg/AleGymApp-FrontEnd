@@ -131,7 +131,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   // 4. GUARDAR TODO (POST/PUT)
   const handleSubmit = async () => {
     if ((!isGeneral && !alumnoId) || !nombreRutina || detalles.length === 0) {
-      return showError("Faltan datos obligatorios.");
+      return showError("Completa todos los Datos Generales y agrega al menos un Ejercicio");
     }
 
     try {
