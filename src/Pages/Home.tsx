@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useHome } from "../Hooks/Home/useHome";
 import { PageLayout } from "../Components/UI/PageLayout";
 import { Card } from "../Components/UI/Card";
-import { EntrenadorNavbar } from "../Components/EntrenadorNavbar"; 
 import { HomeStyles } from "../Styles/HomeStyles"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
@@ -119,7 +118,7 @@ export const Home = () => {
   };
 
   const AdminDashboardWelcome = () => (
-    <div className="animate-fade-in-up space-y-6">
+    <div className="animate-fade-in-up space-y-6 mt-20">
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
         <h2 className="text-3xl font-bold text-white relative z-10">
@@ -201,9 +200,6 @@ export const Home = () => {
               <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
               <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
               <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
-
-              <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Gestión</p>
-              <SidebarItem icon={Icons.usuarios} label="Usuarios" active={activeTab === "Usuarios"} onClick={() => handleSidebarClick("Usuarios")} />
               
               {/* SECCIÓN RUTINAS */}
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
@@ -244,6 +240,12 @@ export const Home = () => {
                         active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} 
                         onClick={() => handleSidebarClick("Ejercicios")} 
                     />
+                    <SidebarItem 
+                        icon={Icons.usuarios} 
+                        label="Usuarios" 
+                        active={activeTab === "Usuarios"} 
+                        onClick={() => handleSidebarClick("Usuarios")} 
+                    />
                   </>
                 )}
             </nav>
@@ -270,7 +272,6 @@ export const Home = () => {
                 backgroundPosition: 'center'
             }} 
           />
-          <EntrenadorNavbar title={activeTab} user={user} />
           <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
               {renderAdminContent()}
           </div>
