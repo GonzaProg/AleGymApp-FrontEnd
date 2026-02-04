@@ -6,20 +6,22 @@ interface PageLayoutProps {
   showNavbar?: boolean;
   centered?: boolean;
   backgroundImage?: string;
+  className?: string; // NUEVA PROP para permitir personalizar el contenedor interno
 }
 
 export const PageLayout = ({ 
   children, 
   showNavbar = true, 
   centered = false,
-  backgroundImage 
+  backgroundImage,
+  className = "" // Valor por defecto vacío
 }: PageLayoutProps) => {
   
   // --- MODO LOGIN (Centrado) ---
   if (centered) {
     return (
       <div 
-        className={`min-h-screen w-full flex items-center justify-center relative ${!backgroundImage ? "bg-gradient-to-br from-green-900 via-green-700 to-green-500" : ""}`}
+        className={`min-h-screen w-full flex items-center justify-center relative overflow-y-auto py-10 ${!backgroundImage ? "bg-gradient-to-br from-green-900 via-green-700 to-green-500" : ""}`}
         style={backgroundImage ? { 
             backgroundImage: `url(${backgroundImage})`,
             backgroundSize: 'cover',
@@ -27,19 +29,20 @@ export const PageLayout = ({
             backgroundRepeat: 'no-repeat'
         } : {}}
       >
-        {/* Bajamos la intensidad de bg-black/70 a bg-black/30 para probar */}
         {backgroundImage && (
-          <div className="absolute inset-0 bg-black/30 z-0"></div> 
+          <div className="absolute inset-0 bg-black/30 z-0"></div> // Oscurecimiento unificado
         )}
 
-        <div className="w-full max-w-md p-4 relative z-10">
+        {/* AQUÍ ESTÁ EL CAMBIO CLAVE: */}
+        {/* Si pasamos className, lo usa. Si no, usa max-w-md por defecto */}
+        <div className={`w-full p-4 relative z-10 mx-auto ${className || 'max-w-md'}`}>
           {children}
         </div>
       </div>
     );
   }
 
-  // --- MODO NORMAL (Home - SE MANTIENE IGUAL) ---
+  // --- MODO NORMAL (Sin cambios) ---
   return (
     <div 
       className="min-h-screen flex flex-col relative"
@@ -51,7 +54,6 @@ export const PageLayout = ({
         backgroundAttachment: 'fixed'
       } : {}}
     >
-      {/* Aquí seguimos usando bg-black/60 para el Home */}
       {backgroundImage && (
         <div className="absolute inset-0 bg-black/60 z-0"></div> 
       )}

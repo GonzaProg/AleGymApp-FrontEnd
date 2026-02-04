@@ -98,8 +98,6 @@ export const Profile = () => {
                         </div>
                     </div>
 
-                    <Input label="Email" value={editForm.email} onChange={e => handleEditChange('email', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input 
                             label="Teléfono" 
@@ -134,7 +132,7 @@ export const Profile = () => {
                     </h2>
                     
                     <p className={ProfileStyles.usernameSubtitle}>
-                      @{userData.nombreUsuario} • {userData.email}
+                      @{userData.nombreUsuario}
                     </p>
                     
                     {/* Visualización de datos extra responsive */}

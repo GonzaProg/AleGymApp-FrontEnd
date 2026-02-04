@@ -4,7 +4,7 @@ import { Card } from "../../Components/UI/Card";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
-import { useRecoverPassword } from "../../Hooks/Auth/useRecoverPassword";
+import { useRecoverPassword } from "../../Hooks/Login/useRecoverPassword";
 import fondoLogin from "../../assets/Fondo-Login.jpg";
 
 export const ForgotPassword = () => {

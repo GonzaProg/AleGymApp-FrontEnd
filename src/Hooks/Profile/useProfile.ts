@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 import { UsuarioApi, type UpdateProfileDTO } from "../../API/Usuarios/UsuarioApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
 
@@ -27,7 +27,6 @@ export const useProfile = () => {
     dni: "",
     apellido: "",
     nombreUsuario: "",
-    email: "",
     fotoPerfil: "",
     telefono: "",         
     fechaNacimiento: ""   
@@ -57,7 +56,6 @@ export const useProfile = () => {
         dni: displayUser.dni || "", 
         apellido: displayUser.apellido || "", 
         nombreUsuario: displayUser.nombreUsuario || "", 
-        email: displayUser.email || "", 
         fotoPerfil: displayUser.fotoPerfil || "",
         telefono: displayUser.telefono || "",           
         fechaNacimiento: fechaFormateada            
@@ -102,11 +100,6 @@ export const useProfile = () => {
 
   const handleSaveProfile = async () => {
     if (!localId) return;
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (editForm.email && !emailRegex.test(editForm.email)) {
-        return showError("El formato del correo electrónico no es válido.");
-    }
 
     setLoading(true);
 

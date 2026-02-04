@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Login } from "./Pages/Login";
+import { Login } from "./Pages/Login/Login";
 import { CreateRoutine } from "./Pages/Rutinas/CreateRoutine";
 import { Home } from "./Pages/Home";
 import { CreateUser } from "./Pages/Usuarios/CreateUser";
@@ -9,7 +9,7 @@ import { DeleteRoutine } from "./Pages/Rutinas/DeleteRoutine";
 import { EjerciciosCrear } from './Pages/Ejercicios/EjerciciosCrear';
 import { EjerciciosGestion } from './Pages/Ejercicios/EjerciciosGestion';
 import { CreateNotification } from "./Pages/Notificaciones/CreateNotification";
-import { ForgotPassword } from "./Pages/Auth/ForgotPassword";
+import { ForgotPassword } from "./Pages/Login/ForgotPassword";
 import { PlansManager } from "./Pages/Planes/PlansManager";
 import { UserPlan } from "./Pages/Planes/UserPlan";
 import { RenewPlan } from "./Pages/Planes/RenewPlan";
@@ -17,7 +17,7 @@ import { UserProfile } from "./Pages/Usuarios/UserProfile";
 import { GymConfigProvider, useGymConfig } from "./Context/GymConfigContext";
 import { SetupScreen } from "./Pages/Setup/SetupScreen";
 import { WhatsAppModalProvider } from "./Context/WhatsAppModalContext"; 
-import { useAuthUser } from "./Hooks/useAuthUser";
+import { useAuthUser } from "./Hooks/Auth/useAuthUser";
 import type { JSX } from "react/jsx-dev-runtime";
 import { GymLockedScreen } from "./Components/GymLocked/GymLockedScreen";
 

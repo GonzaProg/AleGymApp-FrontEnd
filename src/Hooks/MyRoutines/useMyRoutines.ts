@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 
 export const useMyRoutines = () => {

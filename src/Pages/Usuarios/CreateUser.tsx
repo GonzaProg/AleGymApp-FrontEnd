@@ -46,32 +46,24 @@ export const CreateUser = () => {
                     
                     {/* Fila 3 */}
                     <Input 
-                        label="Usuario *" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange}
+                        label="Nombre de Usuario *" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
-                    <Input 
-                        label="Email *" type="email" name="email" value={formData.email} onChange={handleChange} 
-                        className={AppStyles.inputDark} labelClassName={AppStyles.label}
-                    />
-
-                    {/* Fila 4: Datos Opcionales */}
                     <Input 
                         label="Teléfono" type="tel" name="telefono" value={formData.telefono} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
+
+                    {/* Fila 4 */}
                     <Input 
                         label="Fecha Nacimiento" type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
+                    <Input 
+                        label="Contraseña *" type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} 
+                        className={AppStyles.inputDark} labelClassName={AppStyles.label}
+                    />
 
-                    {/* Fila 5: Contraseña (Full Width) */}
-                    <div className="md:col-span-2">
-                          <Input 
-                            label="Contraseña *" type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} 
-                            className={AppStyles.inputDark} labelClassName={AppStyles.label}
-                        />
-                    </div>
-                    
                     {!isAdmin && (
                         <div className="md:col-span-2">
                             <div className={AppStyles.infoBox}>

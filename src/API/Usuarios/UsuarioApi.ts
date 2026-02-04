@@ -6,7 +6,6 @@ export interface AlumnoDTO {
     dni: string;            
     nombre: string;
     apellido: string;
-    email: string;
     nombreUsuario: string;
     telefono?: string;      
     fechaNacimiento?: string; 
@@ -27,7 +26,6 @@ export interface UpdateProfileDTO {
     dni: string;
     apellido: string;
     nombreUsuario: string;
-    email: string;
     fotoPerfil: string;
     telefono?: string;       
     fechaNacimiento?: string; 
