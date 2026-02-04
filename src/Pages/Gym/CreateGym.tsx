@@ -111,10 +111,6 @@ export const CreateGym = () => {
                                 </div>
                                 
                                 {/* Datos Cuenta */}
-                                <div className="col-span-2">
-                                    <label className={AppStyles.label}>Email</label>
-                                    <Input type="email" name="email" value={ownerForm.email} onChange={handleOwnerChange} className={AppStyles.inputDark} required />
-                                </div>
                                 <div className="col-span-1">
                                     <label className={AppStyles.label}>Contraseña</label>
                                     <Input type="password" name="contraseña" value={ownerForm.contraseña} onChange={handleOwnerChange} className={AppStyles.inputDark} required />

@@ -19,7 +19,7 @@ export const useCreateGym = () => {
     // --- ESTADO FORMULARIO DUEÑO ---
     const [ownerForm, setOwnerForm] = useState<CreateUserDTO>({
         dni: "", nombre: "", apellido: "", nombreUsuario: "",
-        email: "", contraseña: "", telefono: "", fechaNacimiento: "",
+        contraseña: "", telefono: "", fechaNacimiento: "",
         rol: "Entrenador"
     });
     const [loadingOwner, setLoadingOwner] = useState(false);
@@ -78,7 +78,7 @@ export const useCreateGym = () => {
 
     const handleSubmitOwner = async (e: React.FormEvent) => {
         e.preventDefault();
-        if(!ownerForm.dni || !ownerForm.email || !ownerForm.contraseña) return showError("Completa los datos del dueño.");
+        if(!ownerForm.dni || !ownerForm.contraseña) return showError("Completa los datos del dueño.");
 
         setLoadingOwner(true);
         try {
@@ -101,7 +101,7 @@ export const useCreateGym = () => {
             setSelectedLogo(null); // Reset logo
             setOwnerForm({
                 dni: "", nombre: "", apellido: "", nombreUsuario: "",
-                email: "", contraseña: "", telefono: "", fechaNacimiento: "",
+                contraseña: "", telefono: "", fechaNacimiento: "",
                 rol: "Entrenador"
             });
 

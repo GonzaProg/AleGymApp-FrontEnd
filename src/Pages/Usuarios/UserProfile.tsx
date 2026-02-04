@@ -102,8 +102,6 @@ export const UserProfile = () => {
                          <div className="w-full bg-black/10 border border-white/5 text-gray-400 p-3 rounded-lg">{userData.dni}</div>
                       </div>
                     </div>
-
-                    <Input label="Email" value={editForm.email} onChange={e => handleEditChange('email', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     
                     <div className="grid grid-cols-2 gap-4">
                         <Input label="Teléfono" value={editForm.telefono} onChange={e => handleEditChange('telefono', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
