@@ -19,8 +19,6 @@ import fondoDeleteRoutine from "../assets/Fondo-DeleteRoutine.jpg";
 import fondoMiPlan from "../assets/Fondo-MiPlan.jpg";
 import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
 import fondoPerfil from "../assets/Fondo-Perfil.jpg";
-import fondoRenewPlan from "../assets/Fondo-RenewPlan.jpg";
-import fondoEnviarPDF from "../assets/Fondo-CreateRoutine.jpg"; 
 import fondoPagos from "../assets/Fondo-MiPlan.jpg"; 
 
 // Importación de páginas
@@ -51,8 +49,8 @@ const BackgroundMap: Record<string, string> = {
   "Notificaciones": fondoNotificaciones,
   "Usuarios": fondoCreateuser,
   "Borrar Rutina": fondoDeleteRoutine,
-  "Enviar PDF": fondoEnviarPDF,
-  "Renovar": fondoRenewPlan,
+  "Enviar PDF": fondoCreateRoutine,
+  "Renovar": fondoCreateRoutine,
   "Perfil": fondoPerfil,
   "Preferencias": fondoPerfil, 
   "default": fondoGym,
@@ -193,20 +191,19 @@ export const Home = () => {
             </div>
 
             <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
-              <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">General</p>
+              
+              <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
+
+              <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
               
               {/* Usamos handleSidebarClick en lugar de setActiveTab directo para limpiar estados */}
-              <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
               <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
+              <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
               <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
-              <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
               
-              {/* SECCIÓN RUTINAS */}
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
               <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
               <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
-              
-              <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
               <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
               
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
@@ -214,9 +211,10 @@ export const Home = () => {
               <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
               <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
 
-              {/* SECCIÓN CONFIGURACIÓN */}
               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
               <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
+              <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
+
 
                 {/* SOLO VISIBLE PARA ADMIN */}
                 {isAdmin && (

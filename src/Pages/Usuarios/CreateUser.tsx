@@ -74,8 +74,8 @@ export const CreateUser = () => {
                     )}
                 </div>
 
-                <div className="mt-8 flex justify-end gap-4 border-t border-white/10 pt-6">
-                    <Button variant="ghost" onClick={handleCancel} className={AppStyles.btnSecondary + " hover:text-white"}>
+                <div className="mt-8 flex justify-center gap-4 border-t border-white/10 pt-6">
+                    <Button variant="ghost" onClick={handleCancel} className={AppStyles.btnSecondaryNotFlex }>
                         Cancelar
                     </Button>
                     <Button onClick={handleSubmit} className={AppStyles.btnPrimary + " px-8 tracking-wide"}>

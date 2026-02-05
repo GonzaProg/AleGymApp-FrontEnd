@@ -14,7 +14,7 @@ export const Preferences = () => {
     if (loading) return <div className="text-white text-center pt-20">Cargando preferencias...</div>;
 
     return (
-        <div className="w-full h-full flex flex-col pt-6 px-4 animate-fade-in">
+        <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-4xl mx-auto">
                 
                 <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>

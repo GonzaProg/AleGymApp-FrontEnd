@@ -13,7 +13,7 @@ export const CreateGym = () => {
     } = useCreateGym();
 
     return (
-        <div className="mt-24 pb-10"> {/* Agregado padding bottom para scroll si es necesario */}
+        <div className="mt-10 pb-10"> {/* Agregado padding bottom para scroll si es necesario */}
             <div className="flex justify-center items-center h-full relative">
                 
                 {/* --- FORMULARIO PASO 1: CREAR GIMNASIO --- */}

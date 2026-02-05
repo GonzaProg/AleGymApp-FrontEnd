@@ -18,8 +18,8 @@ export const PlansManager = () => {
     busqueda,
     sugerencias,
     mostrarSugerencias,
-    metodoPago,      // <--- IMPORTANTE: Nuevo estado del hook
-    setMetodoPago,   // <--- IMPORTANTE: Setter del hook
+    metodoPago,     
+    setMetodoPago,   
     setIsModalOpen, 
     setMostrarSugerencias,
     setIsSubscribeModalOpen,
@@ -33,7 +33,7 @@ export const PlansManager = () => {
   } = usePlans();
 
   return (
-    <div className="w-full h-full flex flex-col pt-6 px-4 animate-fade-in">
+    <div className={AppStyles.principalContainer}>
       
         <div className="w-full max-w-7xl mx-auto">
           {/* Encabezado Admin */}

@@ -20,7 +20,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
   } = useCreateRoutine(isGeneral, routineIdToEdit); 
 
   return (
-    <div className="w-full h-full flex flex-col pt-6 animate-fade-in px-4 pb-10">
+    <div className={AppStyles.principalContainer}>
       <div className="w-full max-w-5xl mx-auto space-y-6">
               
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

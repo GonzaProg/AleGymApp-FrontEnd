@@ -14,7 +14,7 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
     } = useGeneralRoutinesManager();
 
     return (
-        <div className="w-full h-full flex flex-col pt-6 px-4 animate-fade-in pb-20">
+        <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-7xl mx-auto">
                 
                 {/* HEADER */}
@@ -31,8 +31,8 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
                 {loading ? (
                     <div className="text-center py-20 text-white animate-pulse">Cargando biblioteca de rutinas...</div>
                 ) : rutinas.length === 0 ? (
-                    <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
-                        <p className="text-gray-400 mb-4">No hay rutinas generales creadas.</p>
+                    <div className="text-center py-20 bg-white/10 rounded-2xl border border-white/10">
+                        <p className="text-white mb-4">No hay rutinas generales creadas.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

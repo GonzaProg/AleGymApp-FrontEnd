@@ -10,8 +10,8 @@ export const RenewPlan = () => {
     sugerencias,
     busqueda,
     loadingAction,
-    metodoPago,      // <--- IMPORTANTE: Del hook
-    setMetodoPago,   // <--- IMPORTANTE: Del hook
+    metodoPago,      
+    setMetodoPago,   
     setBusqueda,
     seleccionarAlumno,
     limpiarSeleccion,
@@ -30,7 +30,7 @@ export const RenewPlan = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col pt-6 animate-fade-in">
+    <div className={AppStyles.principalContainer}>
         <div className="container mx-auto px-4 max-w-5xl">
           
           {/* HEADER */}
@@ -59,7 +59,7 @@ export const RenewPlan = () => {
                         onClick={() => seleccionarAlumno(alumno)}
                         className={AppStyles.suggestionItem}
                       >
-                        <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
+                        <div className={AppStyles.avatarSmall}>
                                         {alumno.nombre.charAt(0)}
                         </div>
                         <div className="flex flex-col">
@@ -160,7 +160,7 @@ export const RenewPlan = () => {
                     <button 
                       onClick={renovarPlan}
                       disabled={loadingAction}
-                      className={`${AppStyles.btnPrimary} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`${AppStyles.btnPrimary} flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       {loadingAction ? 'Procesando...' : '♻️ RENOVAR SUSCRIPCIÓN'}
                     </button>
@@ -168,7 +168,7 @@ export const RenewPlan = () => {
                     <button 
                       onClick={cancelarPlan}
                       disabled={loadingAction}
-                      className={`${AppStyles.btnSecondary} w-full`}
+                      className={`${AppStyles.btnSecondaryNotFlex}`}
                     >
                         Cancelar Plan Actual
                     </button>

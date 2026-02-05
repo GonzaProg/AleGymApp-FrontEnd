@@ -7,6 +7,7 @@ export const AppStyles = {
     searchInput: "w-full bg-gray-900/80 border border-gray-600 text-white placeholder-gray-500 rounded-lg py-4 px-6 focus:outline-none transition-all text-lg shadow-xl backdrop-blur-md relative z-10",
 
     // LAYOUT PRINCIPAL 
+    principalContainer: "mt-10 w-full h-full flex flex-col pt-6 animate-fade-in px-4 pb-10 items-center",
     pageContainer: "relative min-h-screen font-sans bg-gray-900 text-gray-200",
     fixedBackground: "fixed inset-0 z-0 bg-cover bg-center bg-fixed brightness-[0.6] contrast-[1.1]",
     contentContainer: "relative z-10 pt-28 pb-10 px-4 w-full flex justify-center",
@@ -14,7 +15,7 @@ export const AppStyles = {
     // LISTAS Y SUGERENCIAS (Buscador)
     suggestionsList: "absolute z-20 w-full backdrop-blur-xl bg-gray-900/95 border border-white/10 rounded-xl shadow-2xl mt-1 max-h-60 overflow-y-auto overflow-x-hidden thin-scrollbar",
     suggestionItem: "p-3 hover:bg-green-600/20 cursor-pointer border-b border-white/5 transition-colors flex items-center gap-3 group",
-    avatarSmall: "w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold text-white border border-white/10 group-hover:border-green-500/50",
+    avatarSmall: "group-hover:scale-110 transition-transform w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border bg-gray-800 text-green-400 border-green-500/30",
 
     // Desplegable de Opciones
     darkBackgroundSelect: "bg-gray-900 text-gray-300 py-2",
@@ -33,8 +34,9 @@ export const AppStyles = {
     label: "block text-gray-400 text-xs uppercase font-bold tracking-wider mb-2",
     
     // Botones
-    btnPrimary: "bg-green-600/70 hover:bg-green-500 text-white font-bold px-14 py-3 rounded-xl shadow-lg shadow-green-900/20 border border-green-500/20 transition-all hover:scale-[1.02]",
-    btnSecondary: "bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
+    btnPrimary: "bg-green-600/60 hover:bg-green-500 text-white font-bold px-14 py-3 rounded-xl shadow-lg shadow-green-900/20 border border-green-500 transition-all hover:scale-105",
+    btnSecondary: "flex-1 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
+    btnSecondaryNotFlex: "bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
     btnDanger: "bg-red-600/80 hover:bg-red-500 text-white shadow-lg shadow-red-900/20 px-20 py-3 rounded-xl border border-red-500/20 font-bold transition-all hover:scale-105",
 
     // Decoración
