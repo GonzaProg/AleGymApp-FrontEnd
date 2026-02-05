@@ -6,6 +6,7 @@ import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
 import { useRecoverPassword } from "../../Hooks/Login/useRecoverPassword";
 import fondoLogin from "../../assets/Fondo-Login.jpg";
+import { LoginStyles } from "../../Styles/LoginStyles";
 
 export const ForgotPassword = () => {
   const { 
@@ -48,7 +49,7 @@ export const ForgotPassword = () => {
                   value={dni}
                   onChange={(e) => setDni(e.target.value)}
                   required
-                  className={AppStyles.inputDark}
+                  className={LoginStyles.inputDark}
                   autoFocus
                 />
               </div>
@@ -72,7 +73,7 @@ export const ForgotPassword = () => {
                   onChange={(e) => setCode(e.target.value)}
                   required
                   maxLength={6}
-                  className={`${AppStyles.inputDark} text-center tracking-widest text-xl font-bold`}
+                  className={`${LoginStyles.inputDark} text-center tracking-widest text-xl font-bold`}
                   autoFocus
                 />
               </div>
@@ -86,7 +87,7 @@ export const ForgotPassword = () => {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   minLength={6}
-                  className={AppStyles.inputDark}
+                  className={LoginStyles.inputDark}
                 />
               </div>
 
@@ -100,7 +101,7 @@ export const ForgotPassword = () => {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={6}
-                  className={AppStyles.inputDark}
+                  className={LoginStyles.inputDark}
                 />
               </div>
 

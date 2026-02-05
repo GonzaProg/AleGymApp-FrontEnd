@@ -56,7 +56,7 @@ export const HistorialPagos = () => {
     };
 
     return (
-        <div className="w-full h-full flex flex-col pt-6 animate-fade-in px-4 pb-10">
+        <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-7xl mx-auto">
 
                 {/* --- HEADER --- */}

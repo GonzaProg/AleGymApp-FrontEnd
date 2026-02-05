@@ -15,7 +15,7 @@ export const ManualReceipt = () => {
     } = useManualReceipt();
 
     return (
-        <div className="w-full h-full flex flex-col pt-6 px-4 animate-fade-in pb-10">
+        <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-3xl mx-auto">
                 
                 {/* HEADER */}
@@ -47,13 +47,10 @@ export const ManualReceipt = () => {
                                             onClick={() => seleccionarAlumno(alumno)}
                                             className="p-3 hover:bg-cyan-500/10 cursor-pointer transition-colors flex items-center gap-3 group"
                                         >
-                                            <div className="w-8 h-8 rounded-full bg-cyan-900/50 flex items-center justify-center text-cyan-400 font-bold border border-cyan-500/30 group-hover:scale-110 transition-transform">
+                                            <div className={AppStyles.avatarSmall.replace("bg-gray-800 text-green-400 border-green-500/30", "bg-cyan-900/50 text-cyan-400 border-cyan-500/30")}>
                                                 {alumno.nombre.charAt(0)}
                                             </div>
-                                            <div>
-                                                <p className="text-gray-200 text-sm font-bold">{alumno.nombre} {alumno.apellido}</p>
-                                                <p className="text-xs text-gray-500">{alumno.email || 'Sin email'}</p>
-                                            </div>
+                                            <p className="text-gray-200 text-sm font-bold">{alumno.nombre} {alumno.apellido}</p>
                                         </li>
                                     ))}
                                 </ul>

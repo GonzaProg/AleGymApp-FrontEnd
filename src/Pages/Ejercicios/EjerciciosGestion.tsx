@@ -34,7 +34,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
     };
 
     return (
-        <div className="w-full h-full flex flex-col pt-2 animate-fade-in">
+        <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-7xl mx-auto space-y-6"> 
                 
                 {/* Header */}

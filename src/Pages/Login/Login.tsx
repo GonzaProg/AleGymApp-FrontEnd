@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLogin } from "../../Hooks/Login/useLogin"; 
-import { useRegister } from "../../Hooks/Login/useRegister"; // Nuevo Hook
+import { useRegister } from "../../Hooks/Login/useRegister"; 
 import { PageLayout } from "../../Components/UI/PageLayout";
 import { Card } from "../../Components/UI/Card";
 import { Input } from "../../Components/UI/Input";
@@ -9,10 +9,13 @@ import fondoLogin from "../../assets/Fondo-Login.jpg";
 import { LoginStyles } from "../../Styles/LoginStyles";
 import { Link, useNavigate } from "react-router-dom";
 import { PlanExpiredModal } from "../../Components/Planes/PlanExpiredModal"; 
+import { GymCodeModal } from "../../Components/GymCodeModal/GymCodeModal"; 
+import { useGymConfig } from "../../Context/GymConfigContext";
 
 export const Login = () => {
   // Estado para alternar vistas
   const [isRegistering, setIsRegistering] = useState(false);
+  const [showGymCodeModal, setShowGymCodeModal] = useState(false);
   const navigate = useNavigate();
 
   // --- HOOK LOGIN ---
@@ -25,7 +28,16 @@ export const Login = () => {
   // --- HOOK REGISTRO ---
   const {
     formData, handleChange, handleRegister, loading: registerLoading
-  } = useRegister(() => navigate("/home")); // Al éxito, va al home
+  } = useRegister(() => navigate("/home"));
+
+  // --- HOOK GYM CONFIG ---
+  const { setGymLocal } = useGymConfig();
+
+  // HANDLER PARA CAMBIAR CÓDIGO
+  const handleGymCodeChange = (newCode: string) => {
+      setGymLocal(newCode); // Actualiza Contexto y LocalStorage a la vez
+      console.log("Código de gym actualizado:", newCode);
+  };
 
   return (
     <PageLayout centered showNavbar={false} backgroundImage={fondoLogin}
@@ -36,6 +48,13 @@ export const Login = () => {
       <PlanExpiredModal 
         isOpen={showExpiredModal} 
         onClose={() => setShowExpiredModal(false)} 
+      />
+
+      {/* MODAL PARA CAMBIAR CÓDIGO DE GIMNASIO */}
+      <GymCodeModal 
+        isOpen={showGymCodeModal}
+        onClose={() => setShowGymCodeModal(false)}
+        onCodeChange={handleGymCodeChange}
       />
 
       <Card className={`${LoginStyles.glassCard} max-w-lg transition-all duration-500`}> 
@@ -153,12 +172,22 @@ export const Login = () => {
                         </button>
                     </div>
 
-                    <Link 
-                        to="/forgot-password" 
-                        className="text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer block mt-2"
-                    >
-                        ¿Olvidaste tu contraseña?
-                    </Link>
+                    <div className="flex flex-col gap-2">
+                        <button 
+                            type="button"
+                            onClick={() => setShowGymCodeModal(true)}
+                            className="text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
+                        >
+                            🏋️ Cambiar código de gimnasio
+                        </button>
+
+                        <Link 
+                            to="/forgot-password" 
+                            className="text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
+                        >
+                            ¿Olvidaste tu contraseña?
+                        </Link>
+                    </div>
                 </div>
             </form>
         )}

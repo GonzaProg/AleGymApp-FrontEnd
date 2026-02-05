@@ -17,7 +17,7 @@ export const DeleteRoutine = () => {
   } = useDeleteRoutine();
 
   return (
-    <div className="w-full h-full flex flex-col pt-6 animate-fade-in">
+    <div className={AppStyles.principalContainer}>
         <div className="container mx-auto px-4 max-w-5xl">
             
             {/* HEADER */}
@@ -53,7 +53,7 @@ export const DeleteRoutine = () => {
                                     onClick={() => handleSelectAlumno(alumno)} 
                                     className={`${AppStyles.suggestionItem} hover:bg-red-500/20`}
                                 >
-                                    <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
+                                    <div className={AppStyles.avatarSmall.replace("text-green-400 border-green-500/30", "text-red-400 border-red-500/30")}>
                                         {alumno.nombre.charAt(0)}
                                     </div>
                                     <div className="flex flex-col">

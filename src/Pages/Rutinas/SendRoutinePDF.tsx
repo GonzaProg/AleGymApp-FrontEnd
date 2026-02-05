@@ -20,7 +20,7 @@ export const SendRoutinePDF = () => {
   } = useSendRoutinePDF();
 
   return (
-    <div className="w-full h-full flex flex-col pt-6 animate-fade-in">
+    <div className={AppStyles.principalContainer}>
       <div className="container mx-auto px-4 max-w-5xl">
 
         {/* --- HEADER --- */}
@@ -32,7 +32,7 @@ export const SendRoutinePDF = () => {
 
         {/* --- BUSCADOR (Glassmorphism Neon Green) --- */}
         <div className={AppStyles.searchWrapper}>
-          <div className={AppStyles.searchGlow}></div>
+          <div className={`${AppStyles.searchGlow} bg-gradient-to-r from-green-600 to-blue-600`}></div>
 
           <div className="relative">
              <div className="flex gap-2">
@@ -64,13 +64,10 @@ export const SendRoutinePDF = () => {
                     onClick={() => handleSelectAlumno(alumno)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-green-500/20 cursor-pointer transition-colors border-b border-white/5 last:border-0"
                   >
-                    <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
+                    <div className={AppStyles.avatarSmall} >
                       {alumno.nombre.charAt(0)}
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
-                        <span className="text-xs text-gray-500">{alumno.email}</span>
-                    </div>
+                    <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
                   </li>
                 ))}
               </ul>

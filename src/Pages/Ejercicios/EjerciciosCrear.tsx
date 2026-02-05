@@ -123,7 +123,7 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                             <button 
                                 type="button" 
                                 onClick={handleGoBack} 
-                                className={AppStyles.btnSecondary} 
+                                className={AppStyles.btnSecondaryNotFlex} 
                                 disabled={loading}
                             >
                                 Cancelar
