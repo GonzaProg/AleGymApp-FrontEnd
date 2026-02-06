@@ -10,7 +10,9 @@
     "app/**/*"
   ],
   "publish": {
-    "provider": "github"
+    "provider": "github",
+    "owner": "GonzaProg",
+    "repo": "AleGymApp-FrontEnd"
   },
   "nsis": {
     "allowElevation": true,
@@ -19,7 +21,7 @@
   },
   "win": {
     "target": "nsis",
-    "icon": "assets/appIcon.ico"
+    "icon": "assets/gymmate.ico"
   },
   "mac": {
     "category": "your.app.category.type",
