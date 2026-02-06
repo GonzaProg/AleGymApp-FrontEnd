@@ -5,7 +5,7 @@ import { showConfirmDelete, showSuccess, showError } from "../../Helpers/Alerts"
 
 export const WhatsAppStatus = () => {
   const [status, setStatus] = useState<"connected" | "disconnected" | "loading" | "offline">("loading");
-  const [isIdle, setIsIdle] = useState(false);
+  const [_, setIsIdle] = useState(false);
   const { openModal } = useWhatsAppModal();
   
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
