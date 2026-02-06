@@ -1,15 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Hooks y Componentes
-import { useHome } from "../Hooks/Home/useHome";
+import { useOptimizedHome } from "../Hooks/Home/useOptimizedHome";
 import { PageLayout } from "../Components/UI/PageLayout";
 import { Card } from "../Components/UI/Card";
 import { HomeStyles } from "../Styles/HomeStyles"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
-import { StatsGrid } from "../Components/Dashboard/StatsGrid"; 
-import { useDashboardMetrics } from "../Hooks/Home/useDashboardMetrics"; 
-import { useLogout } from "../Hooks/Login/useLogout";
+import { StatsGrid } from "../Components/Dashboard/StatsGrid";
 
 // IMÁGENES
 import fondoGym from "../assets/GymFondo.jpg";
@@ -85,21 +84,18 @@ const Icons = {
 export const Home = () => {
   
   const { 
-    user, 
+    currentUser, 
     isEntrenador, 
     isAdmin,
     isLoading,
-    goToMyRoutines, 
-    goToUserPlan,
-  } = useHome();  
+    metrics,
+    logout,
+  } = useOptimizedHome();  
 
   const [activeTab, setActiveTab] = useState("Inicio");
   
   // --- NUEVO ESTADO: ID de la rutina a editar ---
   const [routineIdToEdit, setRoutineIdToEdit] = useState<number | null>(null);
-
-  const { logout } = useLogout();
-  const { metrics, loading: loadingMetrics } = useDashboardMetrics();
 
   // --- NUEVO HANDLER: Prepara la edición y cambia de tab ---
   const handleEditRoutine = (id: number) => {
@@ -120,7 +116,7 @@ export const Home = () => {
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
         <h2 className="text-3xl font-bold text-white relative z-10">
-          Hola, <span className="text-green-400">{user?.nombre}</span> 👋
+          Hola, <span className="text-green-400">{currentUser?.nombre}</span> 👋
         </h2>
         <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
           Aquí tienes un resumen de la actividad del gimnasio hoy.
@@ -131,14 +127,14 @@ export const Home = () => {
       </div>
 
       {/* MÉTRICAS*/}
-      {loadingMetrics ? (
+      {isLoading ? (
           <div className="grid grid-cols-4 gap-6 mt-8">
               {[1,2,3,4].map(i => (
                   <div key={i} className="h-32 bg-gray-800/50 rounded-2xl animate-pulse"></div>
               ))}
           </div>
       ) : metrics ? (
-          <StatsGrid metrics={metrics} />
+          <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />
       ) : null}
     </div>
   );
@@ -171,7 +167,7 @@ export const Home = () => {
   };
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
-  if (!user) return null; 
+  if (!currentUser) return null; 
 
   if (isEntrenador) {
     const currentBg = BackgroundMap[activeTab] || BackgroundMap["default"];
@@ -279,10 +275,15 @@ export const Home = () => {
   }
 
   // VISTA ALUMNO (Sin cambios)
+  const navigate = useNavigate();
+  
+  const goToMyRoutines = () => navigate("/my-routines");
+  const goToUserPlan = () => navigate("/planes/mi-plan");
+
   return (
     <PageLayout backgroundImage={fondoGym}>
       <h1 className="text-4xl font-bold text-white drop-shadow-lg mt-28">
-        Hola, <span className={HomeStyles.userName}>{user.nombre}</span> 👋
+        Hola, <span className={HomeStyles.userName}>{currentUser.nombre}</span> 👋
       </h1>
       <p className="text-gray-100 mt-2 mb-8 text-lg drop-shadow-md">
         Bienvenido a tu panel de control.

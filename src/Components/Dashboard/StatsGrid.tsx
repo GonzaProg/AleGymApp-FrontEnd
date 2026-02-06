@@ -2,30 +2,37 @@ import { type DashboardMetrics } from "../../API/Dashboard/DashboardApi";
 
 interface Props {
     metrics: DashboardMetrics;
+    userRole: string;
 }
 
-export const StatsGrid = ({ metrics }: Props) => {
+export const StatsGrid = ({ metrics, userRole }: Props) => {
+    const isEntrenador = userRole === 'Entrenador';
+    
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+        <div className={`grid gap-6 mt-8 ${isEntrenador ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
             
-            {/* CARD 1: Alumnos Activos */}
-            <StatCard 
-                title="Alumnos Activos" 
-                value={metrics.alumnosActivos} 
-                total={metrics.alumnosTotales}
-                icon="👥" 
-                color="from-green-500 to-emerald-600" 
-            />
+            {/* CARD 1: Alumnos Activos - Solo para Entrenador */}
+            {isEntrenador && (
+                <StatCard 
+                    title="Alumnos Activos" 
+                    value={metrics.alumnosActivos} 
+                    total={metrics.alumnosTotales}
+                    icon="👥" 
+                    color="from-green-500 to-emerald-600" 
+                />
+            )}
 
-            {/* CARD 2: Rutinas Creadas */}
-            <StatCard 
-                title="Rutinas Totales" 
-                value={metrics.rutinasTotales} 
-                icon="📝" 
-                color="from-blue-500 to-cyan-600" 
-            />
+            {/* CARD 2: Rutinas Creadas - Solo para Entrenador */}
+            {isEntrenador && (
+                <StatCard 
+                    title="Rutinas Totales" 
+                    value={metrics.rutinasTotales} 
+                    icon="📝" 
+                    color="from-blue-500 to-cyan-600" 
+                />
+            )}
 
-            {/* CARD 3: Ejercicios */}
+            {/* CARD 3: Ejercicios - Para todos */}
             <StatCard 
                 title="Ejercicios" 
                 value={metrics.ejerciciosTotales} 
@@ -33,13 +40,15 @@ export const StatsGrid = ({ metrics }: Props) => {
                 color="from-purple-500 to-violet-600" 
             />
 
-            {/* CARD 4: Eficiencia (Ejemplo calculado) */}
-            <StatCard 
-                title="Ratio Activos" 
-                value={`${Math.round((metrics.alumnosActivos / (metrics.alumnosTotales || 1)) * 100)}%`} 
-                icon="📈" 
-                color="from-orange-500 to-amber-600" 
-            />
+            {/* CARD 4: Eficiencia - Solo para Entrenador */}
+            {isEntrenador && (
+                <StatCard 
+                    title="Ratio Activos" 
+                    value={`${Math.round((metrics.alumnosActivos! / (metrics.alumnosTotales! || 1)) * 100)}%`} 
+                    icon="📈" 
+                    color="from-orange-500 to-amber-600" 
+                />
+            )}
         </div>
     );
 };

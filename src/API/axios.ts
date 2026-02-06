@@ -12,6 +12,9 @@ const getUserRole = () => {
 // Vite expone las variables de entorno en import.meta.env
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
+// Bandera global para evitar múltiples alertas de sesión caducada
+let isSessionExpiredAlertShown = false;
+
 const api = axios.create({
     baseURL: baseURL,
     headers: { "Content-Type": "application/json" }
@@ -125,10 +128,16 @@ api.interceptors.response.use(
                 localStorage.removeItem("user");
                 sessionStorage.clear();
 
-                // Solo mostramos alerta si NO estamos ya en el login
-                if (!window.location.pathname.includes("/login")) {
-                     alert("Tu sesión ha caducado por seguridad. Por favor, inicia sesión nuevamente.");
-                     window.location.href = "/login"; 
+                // Solo mostramos alerta si NO estamos ya en el login Y no se ha mostrado antes
+                if (!window.location.pathname.includes("/login") && !isSessionExpiredAlertShown) {
+                    isSessionExpiredAlertShown = true; // Marcamos que ya se mostró
+                    alert("Tu sesión ha caducado por seguridad. Por favor, inicia sesión nuevamente.");
+                    window.location.href = "/login"; 
+                    
+                    // Reseteamos la bandera después de un tiempo para permitir futuros expiraciones
+                    setTimeout(() => {
+                        isSessionExpiredAlertShown = false;
+                    }, 5000);
                 }
                 
                 return Promise.reject(refreshError);

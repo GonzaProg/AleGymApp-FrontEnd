@@ -6,10 +6,6 @@
   "author": "GV",
   "license": "MIT",
   "main": "build/src/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/GonzaProg/AleGymApp-FrontEnd.git"
-  },
   "scripts": {
     "build": "tsc && electron-rebuild",
     "electron:start-live": "node ./live-runner.js",
