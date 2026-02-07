@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 
 interface VideoProps {
   url: string;
@@ -7,37 +8,41 @@ interface VideoProps {
 export const VideoEjercicio = ({ url }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Función para inyectar optimización de Cloudinary si no la tiene
-  // Esto hace que el video pese la mitad sin perder calidad visible
-  const getOptimizedUrl = (originalUrl: string) => {
-    if (!originalUrl) return "";
-    // Solo aplicamos esto si es un link de Cloudinary
-    if (originalUrl.includes("cloudinary.com") && !originalUrl.includes("f_auto,q_auto")) {
-      return originalUrl.replace("/upload/", "/upload/f_auto,q_auto/");
-    }
-    return originalUrl;
-  };
-
-  const finalUrl = getOptimizedUrl(url);
+  // 1. Detectar si es archivo local (Offline)
+  const isNativeFile = url.startsWith('file://');
+  
+  // 2. Construir la URL final
+  const finalUrl = isNativeFile 
+    ? Capacitor.convertFileSrc(url) 
+    : url;
 
   useEffect(() => {
-    // Forzamos el play apenas carga el componente
     if (videoRef.current) {
-        videoRef.current.play().catch(err => console.log("Autoplay bloqueado:", err));
+        videoRef.current.load(); 
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                console.log("Autoplay bloqueado (interacción requerida):", err);
+            });
+        }
     }
   }, [finalUrl]);
 
   return (
-    <div className="w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative">
+    // 'bg-black' para bordes elegantes
+    <div className="w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative flex items-center justify-center">
       <video
         ref={videoRef}
         src={finalUrl}
-        className="w-full h-full object-contain" // object-contain para que se vea todo el video sin recortes
+        className="w-full h-full object-contain" 
         autoPlay
         loop
         muted
-        playsInline // Vital para iPhone
-        controls={false} // Sin barra de reproducción
+        playsInline
+        controls={false}
+        disablePictureInPicture
+        disableRemotePlayback
+        style={{ pointerEvents: 'none' }}
       />
     </div>
   );
