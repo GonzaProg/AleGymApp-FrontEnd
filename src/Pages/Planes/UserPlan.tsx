@@ -1,4 +1,3 @@
-import { AppStyles } from "../../Styles/AppStyles";
 import { UserPlanStyles } from "../../Styles/UserPlanStyles";
 import { Card } from "../../Components/UI/Card";
 import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
@@ -29,12 +28,7 @@ export const UserPlan = () => {
 
   return (
     <PageLayout backgroundImage={fondoGym}>
-        <div className="w-full max-w-4xl mx-auto space-y-6 mt-20">
-          
-          <div className={AppStyles.headerContainer}>
-            <h1 className={AppStyles.title + " text-4xl"}>Mi Plan</h1>
-            <p className={AppStyles.subtitle}>Estado de tu suscripción actual</p>
-          </div>
+        <div className="w-full max-w-4xl mx-auto space-y-6 mt-40">
 
           {myPlan ? (
             <div className="mb-10 animate-fade-in w-full">
