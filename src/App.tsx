@@ -20,11 +20,15 @@ import { WhatsAppModalProvider } from "./Context/WhatsAppModalContext";
 import { useAuthUser } from "./Hooks/Auth/useAuthUser";
 import type { JSX } from "react/jsx-dev-runtime";
 import { GymLockedScreen } from "./Components/GymLocked/GymLockedScreen";
+import { useUpdateListener } from "./Hooks/System/useUpdateListener";
 
 // Componente interno para manejar la lógica de bloqueo
 const AppContent = () => {
   const { isConfigured } = useGymConfig();
 
+  // ACTIVAMOS LA ESCUCHA DE ACTUALIZACIONES AQUÍ
+  useUpdateListener();
+  
   // SI LA PC NO TIENE CÓDIGO DE GIMNASIO -> MUESTRA PANTALLA DE CONFIGURACIÓN
   if (!isConfigured) {
     return <SetupScreen />;

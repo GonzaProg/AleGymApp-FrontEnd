@@ -28,7 +28,7 @@ export const WhatsAppStatus = () => {
       setStatus(data.isReady ? "connected" : "disconnected");
 
       // Si sigue activo, programamos la siguiente en 1 minuto (60000)
-      timeoutRef.current = setTimeout(checkStatus, 10000);
+      timeoutRef.current = setTimeout(checkStatus, 60000);
     } catch (error) {
       consecutiveErrorsRef.current += 1;
       console.warn(`Fallo ${consecutiveErrorsRef.current}/3 al conectar con WhatsApp Status`);
@@ -62,7 +62,7 @@ export const WhatsAppStatus = () => {
       isIdleRef.current = true;
       setIsIdle(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    }, 5000); 
+    }, 300000); 
   };
 
   useEffect(() => {
