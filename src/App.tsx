@@ -4,14 +4,12 @@ import { CreateRoutine } from "./Pages/Rutinas/CreateRoutine";
 import { Home } from "./Pages/Home";
 import { CreateUser } from "./Pages/Usuarios/CreateUser";
 import { Profile } from "./Pages/Usuarios/Profile";
-import { MyRoutines } from "./Pages/Rutinas/MyRoutines";
 import { DeleteRoutine } from "./Pages/Rutinas/DeleteRoutine";
 import { EjerciciosCrear } from './Pages/Ejercicios/EjerciciosCrear';
 import { EjerciciosGestion } from './Pages/Ejercicios/EjerciciosGestion';
 import { CreateNotification } from "./Pages/Notificaciones/CreateNotification";
 import { ForgotPassword } from "./Pages/Login/ForgotPassword";
 import { PlansManager } from "./Pages/Planes/PlansManager";
-import { UserPlan } from "./Pages/Planes/UserPlan";
 import { RenewPlan } from "./Pages/Planes/RenewPlan";
 import { UserProfile } from "./Pages/Usuarios/UserProfile";
 import { GymConfigProvider, useGymConfig } from "./Context/GymConfigContext";
@@ -97,8 +95,6 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/user-profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
 
-          {/* Ruta para Mis Rutinas */}
-          <Route path="/my-routines" element={<ProtectedRoute><MyRoutines /></ProtectedRoute>} />
           {/* Ruta para Eliminar Rutina */}
           <Route path="/delete-routine" element={<ProtectedRoute><DeleteRoutine /></ProtectedRoute>} />
 
@@ -113,7 +109,6 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
           {/* Rutas de Planes y Membresías */}
           <Route path="/planes" element={<ProtectedRoute><PlansManager /></ProtectedRoute>} />
-          <Route path="/planes/mi-plan" element={<ProtectedRoute><UserPlan /></ProtectedRoute>} />
 
           {/* Ruta para Renovar Planes de Usuarios*/}
           <Route path="/planes/renovar-gestion" element={<ProtectedRoute><RenewPlan /></ProtectedRoute>} />
