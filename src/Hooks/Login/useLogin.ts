@@ -1,39 +1,44 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthApi, type LoginDTO } from "../../API/Auth/AuthApi";
+import { useGymConfig } from "../../Context/GymConfigContext";
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const { gymCode } = useGymConfig(); // OBTENER CÓDIGO LOCAL
 
   // ESTADOS 
-  const [email, setEmail] = useState("");
+  const [dni, setDni] = useState(""); 
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false); 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  // NUEVO ESTADO: Para el modal de vencimiento
+  const [showExpiredModal, setShowExpiredModal] = useState(false);
 
   // EFECTO: CARGAR CREDENCIALES GUARDADAS AL INICIAR 
   useEffect(() => {
-    const savedEmail = localStorage.getItem("remember_email");
-    const savedPass = localStorage.getItem("remember_pass");
+    const savedDni = localStorage.getItem("remember_dni"); 
     
-    if (savedEmail && savedPass) {
-      setEmail(savedEmail);
-      setPassword(savedPass);
+    if (savedDni) {
+      setDni(savedDni);
       setRememberMe(true);
     }
   }, []);
 
   // HANDLERS PARA INPUTS 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
+  const handleDniChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (/^\d*$/.test(val)) { 
+        setDni(val);
+    }
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
-  // Nuevo handler para el checkbox
   const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   };
@@ -45,34 +50,60 @@ export const useLogin = () => {
     setLoading(true);
 
     try {
-      // 1. Preparamos los datos
+      // 1. Preparamos los datos INYECTANDO EL GYM CODE
       const credentials: LoginDTO = {
-        email: email,
+        dni: dni, 
         contraseña: password,
+        codigoGym: gymCode || undefined // Enviamos el código local
       };
 
       // 2. Llamada a la API
       const data = await AuthApi.login(credentials);
 
-      // 3. Guardar Token y Usuario (Sesión actual)
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // 4. LÓGICA RECORDAR USUARIO (Persistencia futura)
-      if (rememberMe) {
-        localStorage.setItem("remember_email", email);
-        localStorage.setItem("remember_pass", password); 
-      } else {
-        localStorage.removeItem("remember_email");
-        localStorage.removeItem("remember_pass");
-      }
-
-      // 5. Redirección
-      navigate("/home"); 
+      // --- LÓGICA DE PERSISTENCIA ---
+            if (rememberMe) {
+                // CASO A: PERSISTIR (LocalStorage)
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("refreshToken", data.refreshToken);
+                localStorage.setItem("user", JSON.stringify(data.user));
+                
+                // Limpiamos sessionStorage por si acaso había basura vieja
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("refreshToken");
+                sessionStorage.removeItem("user");
+            } else {
+                // CASO B: SESIÓN TEMPORAL (SessionStorage)
+                sessionStorage.setItem("token", data.token);
+                sessionStorage.setItem("refreshToken", data.refreshToken);
+                sessionStorage.setItem("user", JSON.stringify(data.user));
+                
+                // Limpiamos localStorage de sesiones previas
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("user");
+            }
+            
+            navigate("/home");
       
     } catch (err: any) {
-      if (err.response) {
-        setError(err.response.data.error || "Credenciales incorrectas");
+      // --- MANEJO DE ERRORES PERSONALIZADO (BLOQUEOS) ---
+      if (err.response && err.response.data) {
+          const { code, error: msg } = err.response.data;
+
+          if (code === "GYM_LOCKED") {
+              // MENSAJE AMIGABLE DE GYM BLOQUEADO
+              setError("⚠️ Mantenimiento Temporal. El sistema está en una breve pausa administrativa. Contacta a tu gimnasio.");
+          } else if (code === "USER_EXPIRED") {
+              // ABRIMOS MODAL DE VENCIMIENTO
+              setShowExpiredModal(true);
+              setError(null); // Limpiamos el error rojo para que solo salga el modal
+          } else if (code === "USER_LOCKED") {
+               // USUARIO INACTIVO (DEUDA)
+               setError("⛔ Acceso restringido. Tu cuenta está inactiva. Contacta a administración.");
+          } else {
+              // OTROS ERRORES (Pass incorrecta, etc)
+              setError(msg || "Credenciales incorrectas");
+          }
       } else {
         setError("Error al conectar con el servidor");
       }
@@ -82,12 +113,14 @@ export const useLogin = () => {
   };
 
   return {
-    email,
+    dni,      
     password,
     rememberMe, 
     error,
     loading, 
-    handleEmailChange,
+    showExpiredModal, // EXPORTAMOS EL ESTADO DEL MODAL
+    setShowExpiredModal,
+    handleDniChange,
     handlePasswordChange,
     handleRememberMeChange, 
     handleLogin

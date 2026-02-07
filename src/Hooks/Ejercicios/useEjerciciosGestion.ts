@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuthUser } from '../useAuthUser'; 
+import { useAuthUser } from '../Auth/useAuthUser'; 
 import { EjerciciosApi, type Ejercicio, type EjercicioDTO } from '../../API/Ejercicios/EjerciciosApi';
-import { showConfirm, showError } from '../../Helpers/Alerts';
-
-const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET; 
+import { showConfirmDelete, showError } from '../../Helpers/Alerts';
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
 export const useEjerciciosGestion = () => {
     const { isAdmin, isEntrenador } = useAuthUser(); 
@@ -37,7 +35,7 @@ export const useEjerciciosGestion = () => {
 
     const handleDelete = async (id: number) => {
         if (!isAdmin) return showError("Solo administradores pueden eliminar.");
-        const result = await showConfirm(
+        const result = await showConfirmDelete(
                 "¿Seguro que desea Eliminar este ejercicio?", 
                 "Esta acción no se puede deshacer."
             );
@@ -48,7 +46,10 @@ export const useEjerciciosGestion = () => {
         try {
             await EjerciciosApi.delete(id);
             setEjercicios(prev => prev.filter(e => e.id !== id));
-        } catch (err: any) { showError("Error al eliminar"); }
+        } catch (err: any) { 
+            const mensajeBackend = err.response?.data?.message || err.response?.data?.error;
+            showError(mensajeBackend || "Error al eliminar"); 
+        }
     };
 
     const startEdit = (ej: Ejercicio) => {
@@ -66,15 +67,6 @@ export const useEjerciciosGestion = () => {
         setSelectedImage(null);
     };
 
-    const uploadToCloudinary = async (file: File, type: 'video' | 'image'): Promise<string> => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', UPLOAD_PRESET);
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${type}/upload`, { method: 'POST', body: formData });
-        const data = await res.json();
-        return data.secure_url;
-    };
-
     const saveEdit = async (id: number) => {
         setUploading(true);
         try {
@@ -82,8 +74,8 @@ export const useEjerciciosGestion = () => {
             let finalImage = editForm.imagenUrl;
 
             const uploads = [];
-            if (selectedVideo) uploads.push(uploadToCloudinary(selectedVideo, 'video').then(u => finalVideo = u));
-            if (selectedImage) uploads.push(uploadToCloudinary(selectedImage, 'image').then(u => finalImage = u));
+            if (selectedVideo) uploads.push(CloudinaryApi.upload(selectedVideo, 'video').then(u => finalVideo = u));
+            if (selectedImage) uploads.push(CloudinaryApi.upload(selectedImage, 'image').then(u => finalImage = u));
             
             await Promise.all(uploads);
 

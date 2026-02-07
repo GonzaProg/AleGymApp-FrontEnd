@@ -1,6 +1,7 @@
 import { useRenewPlan } from "../../Hooks/Planes/useRenewPlan"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { RenewPlanStyles } from "../../Styles/RenewPlanStyles";
+import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
 
 export const RenewPlan = () => {
   const {
@@ -9,6 +10,8 @@ export const RenewPlan = () => {
     sugerencias,
     busqueda,
     loadingAction,
+    metodoPago,      
+    setMetodoPago,   
     setBusqueda,
     seleccionarAlumno,
     limpiarSeleccion,
@@ -27,7 +30,7 @@ export const RenewPlan = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col pt-6 animate-fade-in">
+    <div className={AppStyles.principalContainer}>
         <div className="container mx-auto px-4 max-w-5xl">
           
           {/* HEADER */}
@@ -37,15 +40,15 @@ export const RenewPlan = () => {
 
           {/* BUSCADOR  */}
           {!alumnoSeleccionado && (
-            <div className={RenewPlanStyles.searchWrapper}>
-              <div className={RenewPlanStyles.searchGlow}></div>
+            <div className={AppStyles.searchWrapper}>
+              <div className={`${AppStyles.searchGlow} bg-gradient-to-r from-green-600 to-blue-600`}></div>
               <div className="relative">
                 <input
                   type="text"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
                   placeholder="🔍 Buscar alumno por nombre..."
-                  className={RenewPlanStyles.searchInput}
+                  className={`${AppStyles.searchInput} focus:border-green-500 focus:ring-1 focus:ring-green-500`}
                 />
                 
                 {sugerencias.length > 0 && (
@@ -56,11 +59,13 @@ export const RenewPlan = () => {
                         onClick={() => seleccionarAlumno(alumno)}
                         className={AppStyles.suggestionItem}
                       >
-                        <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
+                        <div className={AppStyles.avatarSmall}>
                                         {alumno.nombre.charAt(0)}
                         </div>
-                        <span className="text-white font-medium">{alumno.nombre} {alumno.apellido}</span>
-                        <span className="text-xs text-gray-500 bg-gray-900 px-2 py-1 rounded">{alumno.email}</span>
+                        <div className="flex flex-col">
+                        <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
+                        <span className="text-xs text-gray-500">{alumno.email}</span>
+                    </div>
                       </li>
                     ))}
                   </ul>
@@ -117,6 +122,12 @@ export const RenewPlan = () => {
                     
                     <div className="space-y-3 text-gray-300">
                       <div className={RenewPlanStyles.infoRow}>
+                        <span>Duración:</span>
+                        <span className={RenewPlanStyles.infoValue}>
+                          {alumnoSeleccionado.planActual.duracionDias} días
+                        </span>
+                      </div>
+                      <div className={RenewPlanStyles.infoRow}>
                         <span>Vencimiento:</span>
                         <span className={RenewPlanStyles.infoValue}>
                           {new Date(alumnoSeleccionado.fechaVencimientoPlan).toLocaleDateString()}
@@ -136,10 +147,20 @@ export const RenewPlan = () => {
                   </div>
 
                   <div className="flex flex-col justify-center gap-4">
+                    
+                    {/* Selector de Pago para Renovación */}
+                    <div className="bg-gray-800/50 p-4 rounded-xl border border-white/10">
+                        <PaymentMethodSelect 
+                            value={metodoPago} 
+                            onChange={setMetodoPago}
+                            label="Método de Pago para Renovación" 
+                        />
+                    </div>
+
                     <button 
                       onClick={renovarPlan}
                       disabled={loadingAction}
-                      className={`${AppStyles.btnPrimary} w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+                      className={`${AppStyles.btnPrimary} flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       {loadingAction ? 'Procesando...' : '♻️ RENOVAR SUSCRIPCIÓN'}
                     </button>
@@ -147,7 +168,7 @@ export const RenewPlan = () => {
                     <button 
                       onClick={cancelarPlan}
                       disabled={loadingAction}
-                      className={`${AppStyles.btnSecondary} w-full`}
+                      className={`${AppStyles.btnSecondaryNotFlex}`}
                     >
                         Cancelar Plan Actual
                     </button>
@@ -159,6 +180,16 @@ export const RenewPlan = () => {
                 <div>
                     <div className={RenewPlanStyles.emptyStateBox}>
                        <p className={RenewPlanStyles.emptyStateText}>⚠️ Este usuario no tiene suscripción activa. Selecciona un plan.</p>
+                    </div>
+
+                    {/* Selector de Pago para Alta*/}
+                    <div className="mb-6 max-w-xs mx-auto">
+                        <PaymentMethodSelect 
+                            value={metodoPago} 
+                            onChange={setMetodoPago}
+                            className="text-center"
+                            selectClassName="text-center font-bold" // Centramos el texto dentro del input
+                        />
                     </div>
 
                     <div className={RenewPlanStyles.plansGrid}>

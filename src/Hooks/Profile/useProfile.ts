@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 import { UsuarioApi, type UpdateProfileDTO } from "../../API/Usuarios/UsuarioApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
 
-// LEEMOS LAS VARIABLES DEL .ENV
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const API_URL_CLOUDINARY = import.meta.env.VITE_API_URL_CLOUDINARY;
@@ -12,33 +11,30 @@ export const useProfile = () => {
   const { currentUser } = useAuthUser();
   const localId = currentUser?.id;
 
-  // Estado local para reflejar cambios instantáneamente sin recargar 
   const [displayUser, setDisplayUser] = useState(currentUser);
 
-  // Sincronizar si el contexto cambia externamente
   useEffect(() => {
     setDisplayUser(currentUser);
   }, [currentUser]);
 
-  // ESTADOS DE VISTA
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false); 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
-  // FORMULARIO DE EDICIÓN
+  // FORMULARIO DE EDICIÓN (Actualizado con nuevos campos)
   const [editForm, setEditForm] = useState<UpdateProfileDTO>({
     nombre: "",
+    dni: "",
     apellido: "",
     nombreUsuario: "",
-    email: "",
-    fotoPerfil: ""
+    fotoPerfil: "",
+    telefono: "",         
+    fechaNacimiento: ""   
   });
 
-  // ARCHIVOS (Cloudinary)
   const [selectedFile, setSelectedFile] = useState<File | null>(null); 
   const [imagePreview, setImagePreview] = useState<string | null>(null); 
 
-  // CONTRASEÑA
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [passForm, setPassForm] = useState({
     currentPassword: "",
@@ -46,20 +42,27 @@ export const useProfile = () => {
     confirmPassword: ""
   });
 
-  // CARGAR DATOS AL FORMULARIO CUANDO SE EDITA O CAMBIA EL USUARIO
+  // CARGAR DATOS
   useEffect(() => {
     if (displayUser) {
+      // Formatear fecha para el input type="date" (YYYY-MM-DD)
+      let fechaFormateada = "";
+      if (displayUser.fechaNacimiento) {
+          fechaFormateada = new Date(displayUser.fechaNacimiento).toISOString().split('T')[0];
+      }
+
       setEditForm({
         nombre: displayUser.nombre || "",
+        dni: displayUser.dni || "", 
         apellido: displayUser.apellido || "", 
         nombreUsuario: displayUser.nombreUsuario || "", 
-        email: displayUser.email || "", 
-        fotoPerfil: displayUser.fotoPerfil || "" 
+        fotoPerfil: displayUser.fotoPerfil || "",
+        telefono: displayUser.telefono || "",           
+        fechaNacimiento: fechaFormateada            
       });
     }
   }, [displayUser]);
 
-  // HANDLERS
   const handleEditChange = (field: keyof UpdateProfileDTO, value: string) => {
     setEditForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -95,15 +98,8 @@ export const useProfile = () => {
     }
   };
 
-  // GUARDAR PERFIL
   const handleSaveProfile = async () => {
     if (!localId) return;
-
-    // Validación Email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (editForm.email && !emailRegex.test(editForm.email)) {
-        return showError("El formato del correo electrónico no es válido.");
-    }
 
     setLoading(true);
 
@@ -121,19 +117,13 @@ export const useProfile = () => {
         fotoPerfil: finalImageUrl
       };
 
-      // 1. Actualizar en Backend
       const data = await UsuarioApi.update(localId, updatedDTO);
-
-      // 2. Crear objeto actualizado fusionando lo viejo con lo nuevo
-      const updatedUser = { ...displayUser, ...data };
-
-      // 3. Actualizar LocalStorage (para que persista al recargar manualmente)
-      localStorage.setItem("user", JSON.stringify(updatedUser));
       
-      // 4. Actualizar Estado Local 
+      // Actualizamos todo
+      const updatedUser = { ...displayUser, ...data };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
       setDisplayUser(updatedUser);
       
-      // 5. Limpieza UI
       setIsEditingProfile(false);
       setSelectedFile(null);
       setImagePreview(null);
@@ -148,7 +138,6 @@ export const useProfile = () => {
     }
   };
 
-  // CAMBIAR CONTRASEÑA 
   const handleChangePassword = async () => {
     if (!localId) return;
 
@@ -168,9 +157,7 @@ export const useProfile = () => {
       };
 
       await UsuarioApi.changePassword(localId, passwordData as any);
-      
       showSuccess("Contraseña modificada con éxito.");
-      
       setShowPasswordSection(false);
       setPassForm({ currentPassword: "", newPassword: "", confirmPassword: "" }); 
     } catch (error: any) {

@@ -14,7 +14,6 @@ export const useUserPlan = () => {
         setLoading(true);
         try {
             const miPlanInfo = await PlansApi.getMyPlan();
-            // La API suele devolver un objeto con { tienePlan: boolean, ... }
             if (miPlanInfo && miPlanInfo.tienePlan) {
                 setMyPlan(miPlanInfo);
             } else {

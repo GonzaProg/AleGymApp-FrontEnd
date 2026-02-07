@@ -15,7 +15,7 @@ export const CreateNotification = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center animate-fade-in">
+    <div className={AppStyles.principalContainer}>
         <div className="w-full max-w-2xl">
           
           <div className={AppStyles.headerContainer + " mb-14"}>

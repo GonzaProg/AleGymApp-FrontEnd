@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from "react-dom";
 import { useEjerciciosGestion } from '../../Hooks/Ejercicios/useEjerciciosGestion';
 import { AppStyles } from '../../Styles/AppStyles';
 import { EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
@@ -25,7 +26,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
     const handleNewExercise = () => {
         if (onNavigate) {
             // Si estamos en el Dashboard, cambiamos el tab internamente
-            onNavigate('crear_ejercicio');
+            onNavigate('Crear Ejercicio');
         } else {
             // Si accedimos por URL directa, usamos router
             navigate('/ejercicios/crear');
@@ -33,7 +34,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
     };
 
     return (
-        <div className="w-full h-full flex flex-col pt-2 animate-fade-in">
+        <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-7xl mx-auto space-y-6"> 
                 
                 {/* Header */}
@@ -120,17 +121,19 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
             </div>
 
             {/* MODALES */}
-            {videoUrl && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4" onClick={() => setVideoUrl(null)}>
+            {videoUrl && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4" onClick={() => setVideoUrl(null)}>
                     <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden border border-white/20">
                         <VideoEjercicio url={videoUrl} />
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
-            {imageUrl && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 cursor-zoom-out" onClick={() => setImageUrl(null)}>
+            {imageUrl && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 cursor-zoom-out" onClick={() => setImageUrl(null)}>
                     <img src={imageUrl} alt="Ejercicio" className="max-w-full max-h-[90vh] rounded-lg shadow-2xl border border-white/10" />
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

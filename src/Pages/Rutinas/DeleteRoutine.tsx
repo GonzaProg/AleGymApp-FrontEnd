@@ -17,7 +17,7 @@ export const DeleteRoutine = () => {
   } = useDeleteRoutine();
 
   return (
-    <div className="w-full h-full flex flex-col pt-6 animate-fade-in">
+    <div className={AppStyles.principalContainer}>
         <div className="container mx-auto px-4 max-w-5xl">
             
             {/* HEADER */}
@@ -53,13 +53,13 @@ export const DeleteRoutine = () => {
                                     onClick={() => handleSelectAlumno(alumno)} 
                                     className={`${AppStyles.suggestionItem} hover:bg-red-500/20`}
                                 >
-                                    <div className={`${AppStyles.avatarSmall} bg-gray-800 text-red-400 border-red-500/30`}>
+                                    <div className={AppStyles.avatarSmall.replace("text-green-400 border-green-500/30", "text-red-400 border-red-500/30")}>
                                         {alumno.nombre.charAt(0)}
                                     </div>
-                                    <span className="font-medium text-gray-200 group-hover:text-white">
-                                        {alumno.nombre} {alumno.apellido}
-                                    </span>
-                                    <span className="text-xs text-gray-500 bg-gray-900 px-2 py-1 rounded">{alumno.email}</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
+                                        <span className="text-xs text-gray-500">{alumno.email}</span>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
@@ -78,7 +78,7 @@ export const DeleteRoutine = () => {
                     {rutinas.length === 0 ? (
                         <div className={`${AppStyles.glassCard} text-center py-12 flex flex-col items-center justify-center border-dashed border-2 border-gray-700`}>
                             <span className="text-5xl opacity-30 mb-4 grayscale">📂</span>
-                            <p className="text-gray-400 text-lg">Este alumno no tiene rutinas asignadas.</p>
+                            <p className="text-gray-400 text-lg">Este alumno no tiene rutinas personales asignadas.</p>
                         </div>
                     ) : (
                         <div className="grid gap-4">

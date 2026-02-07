@@ -5,35 +5,46 @@ import fondoGym from "../../assets/Fondo-MyRoutines.jpg";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
-import { getExerciseThumbnail } from "../../Helpers/CloudinaryHelper"; // <--- IMPORTANTE
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
-export const MyRoutines = () => {
+// Prop opcional para detectar si está dentro del Swiper
+export const MyRoutines = ({ isEmbedded = false }: { isEmbedded?: boolean }) => {
   const { rutinas, loading, selectedRoutine, setSelectedRoutine, videoUrl, closeModal, closeVideo, handleOpenVideo } = useMyRoutines();
 
   return (
-    <div className={AppStyles.pageContainer}>
+    <div className={AppStyles.pageContainer + " min-h-screen bg-gray-900"}>
       
-      <div
-        className={AppStyles.fixedBackground}
-        style={{
-          backgroundImage: `url(${fondoGym})`
-        }}
-      />
-
       <Navbar />
 
-      <div className={AppStyles.contentContainer}>
-        <div className="w-full max-w-6xl space-y-6">
+      {/* Si NO es embedded, mostramos el fondo fijo y navbar tradicional (por compatibilidad) */}
+      {!isEmbedded && (
+        <>
+            <div
+                className={AppStyles.fixedBackground}
+                style={{
+                backgroundImage: `url(${fondoGym})`
+                }}
+            />
+        </>
+      )}
+
+      {/* Si ES embedded, quizás quieras un fondo propio o usar el del container padre. 
+          Aquí usamos el fondoGym pero en un div absoluto relativo al slide */}
+      {isEmbedded && (
+         <div className="absolute inset-0 z-0 opacity-80 pointer-events-none" 
+              style={{ backgroundImage: `url(${fondoGym})`, backgroundSize: 'cover' }} 
+         />
+      )}
+
+      <div className={`${AppStyles.contentContainer} ${isEmbedded ? 'pt-10 px-4' : ''} relative z-10`}>
+        <div className="w-full max-w-6xl space-y-6 mx-auto">
             
-          <div className={AppStyles.headerContainer + " mb-20"}>
-              <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
-                  <span className={AppStyles.title + " text-4xl"}>
-                      Mis Rutinas
-                  </span>
-                  <span className="ml-3 text-white">
-                      💪
-                  </span>
+          <div className={`${AppStyles.headerContainer} ${isEmbedded ? 'mb-10 text-center md:text-left' : 'mb-20'}`}>
+              <h2 className="text-3xl font-bold mb-1 text-white drop-shadow-lg flex items-center justify-center md:justify-start gap-2">
+                  <span className={AppStyles.title}>Mis Rutinas</span>
+                  <span>💪</span>
               </h2>
+              {isEmbedded && <p className="text-gray-400 text-sm mt-1">Desliza para ver tu Plan 👉</p>}
           </div>
       
           {loading ? (
@@ -105,9 +116,9 @@ export const MyRoutines = () => {
 
       {/* MODAL DETALLE (ESTILO NUEVO)  */}
       {selectedRoutine && (
-        <div className={AppStyles.modalOverlay}>
+        <div className={AppStyles.modalOverlay} onClick={closeModal}>
            {/* Hacemos el modal más ancho (max-w-4xl) para el diseño horizontal */}
-           <div className={`${AppStyles.modalContent} max-w-4xl`}>
+           <div className={`${AppStyles.modalContent} max-w-4xl`} onClick={(e) => e.stopPropagation()}>
               
               {/* Header Modal */}
               <div className={MyRoutinesStyles.modalHeader}>
@@ -124,7 +135,7 @@ export const MyRoutines = () => {
                  {selectedRoutine.detalles.map((d:any, i:number) => {
                     
                     // USAMOS EL HELPER AQUÍ PARA OBTENER LA IMAGEN
-                    const thumbnail = getExerciseThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
+                    const thumbnail = CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
 
                     return (
                         // --- TARJETA DE EJERCICIO ---
@@ -170,17 +181,6 @@ export const MyRoutines = () => {
                                             </span>
                                             <h4 className="font-bold text-white text-xl">{d.ejercicio.nombre}</h4>
                                         </div>
-
-                                        {/* OPCIONAL: Enlace al video debajo del título
-                                        {d.ejercicio.urlVideo && (
-                                            <p 
-                                                className="text-xs text-green-400 mt-2 flex items-center gap-1 cursor-pointer hover:underline w-fit" 
-                                                onClick={() => handleOpenVideo(d.ejercicio.urlVideo)}
-                                            >
-                                                <span>📹</span> Ver demostración
-                                            </p>
-                                        )}
-                                        */}
                                     </div>
                                 </div>
 
@@ -220,12 +220,12 @@ export const MyRoutines = () => {
       
       {/* MODAL VIDEO  */}
       {videoUrl && (
-        <div className={MyRoutinesStyles.videoContainer}>
+        <div className={MyRoutinesStyles.videoContainer} onClick={closeVideo}>
            <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
              <span className="text-2xl font-bold">&times;</span>
            </button>
            
-           <div className="w-full max-w-4xl aspect-video px-4">
+           <div className="w-full max-w-4xl aspect-video px-4" onClick={(e) => e.stopPropagation()}>
              <VideoEjercicio url={videoUrl} />
            </div>
            

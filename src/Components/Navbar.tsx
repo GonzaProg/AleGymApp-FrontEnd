@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 //import api from "../API/axios";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
+import { useLogout } from "../Hooks/Login/useLogout";
 
 // Icono Campanita código SVG
 const BellIcon = () => (
@@ -13,7 +14,6 @@ const BellIcon = () => (
 
 export const Navbar = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   // Hook de notificaciones
   const { notificaciones, unreadCount, markAsRead, refresh } = useNotificaciones();
@@ -34,21 +34,14 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      //await api.post("/api/users/logout");
-    } catch (error) {
-      console.error("Error al registrar salida", error);
-    } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      navigate("/login");
-    }
-  };
+  const { logout } = useLogout();
+
 
   const handleNotifClick = (notif: any) => {
-    markAsRead(notif.id);
+    // Solo marcar como leída si no lo está ya
+    if (!notif.leida) {
+      markAsRead(notif.id);
+    }
     // Si el texto es largo (> 100 chars), abrimos modal. Si es corto, solo marcamos leída.
     if (notif.mensaje.length > 100) {
         setSelectedNotif(notif);
@@ -70,14 +63,8 @@ export const Navbar = () => {
                 Gym<span className="text-green-500 group-hover:text-green-400">Mate</span>
             </span>
         </div>
-
-        {/* --- CENTRO: BOTONES (Solo Desktop) --- */}
-        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden md:flex gap-8 z-10">
-            <Link to="/home" className="text-gray-300 hover:text-green-400 font-medium text-sm transition-colors tracking-wider hover:scale-125 transform duration-200">Inicio</Link>
-            <Link to="/user-profile" className="text-gray-300 hover:text-green-400 font-medium text-sm transition-colors tracking-wider hover:scale-125 transform duration-200">Mi Perfil</Link>
-        </div>
         
-        {/* --- DERECHA: NOTIFICACIONES + PERFIL + SALIR --- */}
+        {/* --- DERECHA: NOTIFICACIONES + SALIR --- */}
         <div className="flex items-center gap-4 z-20">
           
           {/* --- CAMPANITA DE NOTIFICACIONES --- */}
@@ -96,7 +83,7 @@ export const Navbar = () => {
 
             {/* --- DROPDOWN NOTIFICACIONES --- */}
             {showDropdown && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-fade-in origin-top-right ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="absolute right top-full mt-2 transform -translate-x-1/2 w-64 sm:w-80 md:w-96 max-w-[90vw] bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-fade-in origin-top ring-1 ring-black ring-opacity-5 focus:outline-none">
                     
                     {/* Header del Dropdown */}
                     <div className="p-4 border-b border-white/10 bg-black/20">
@@ -146,28 +133,9 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* CÁPSULA DE USUARIO */}
-          <div 
-            onClick={() => navigate("/user-profile")} 
-            className="flex items-center gap-3 cursor-pointer hover:bg-white/10 border border-transparent hover:border-white/10 p-2 rounded-xl transition-all duration-300"
-          >
-            <div className="w-10 h-10 rounded-full bg-gray-700 border border-gray-600 overflow-hidden flex items-center justify-center text-white font-bold shadow-sm">
-              {user.fotoPerfil ? (
-                <img src={user.fotoPerfil} alt="User" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-lg">{user.nombre?.charAt(0)}</span>
-              )}
-            </div>
-
-            <div className="hidden sm:block text-right">
-              <p className="text-sm font-bold text-gray-200 leading-tight">{user.nombreUsuario}</p>
-              <p className="text-xs text-green-400 font-medium">{user.rol}</p>
-            </div>
-          </div>
-
           {/* BOTÓN SALIR */}
           <button 
-            onClick={handleLogout}
+            onClick={logout}
             className="text-white bg-red-600/70 hover:bg-red-600/90 border border-red-500/30 backdrop-blur-sm font-medium rounded-lg text-sm px-4 py-2 transition-all duration-300 shadow-lg hover:shadow-red-900/30"
           >
             Salir
@@ -198,7 +166,7 @@ export const Navbar = () => {
                 
                 {/* Body */}
                 <div className="p-8 overflow-y-auto max-h-[70vh]">
-                    <p className="text-gray-200 text-lg leading-relaxed whitespace-pre-wrap break-words">
+                    <p className="text-gray-200 text-lg leading-relaxed break-words">
                         {selectedNotif.mensaje}
                     </p>
                     

@@ -1,23 +1,27 @@
 import { useState } from "react";
-import { useAuthUser } from "../useAuthUser"; 
+import { useAuthUser } from "../Auth/useAuthUser"; 
 import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
+import { useGymConfig } from "../../Context/GymConfigContext"; 
 
 export const useCreateUser = () => {
   
   const { isAdmin } = useAuthUser();
+  const { gymCode } = useGymConfig(); // OBTENER CÓDIGO LOCAL
 
-  //  ESTADOS DEL FORMULARIO 
+  // ESTADOS DEL FORMULARIO 
   const [formData, setFormData] = useState<CreateUserDTO>({
+    dni: "",              
     nombre: "",
     apellido: "",
     nombreUsuario: "",
-    email: "",
     contraseña: "",
+    telefono: "",         
+    fechaNacimiento: "",  
     rol: "Alumno"
   });
 
-  const [loading, setLoading] = useState(false); // Agregamos estado de carga
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
@@ -28,17 +32,16 @@ export const useCreateUser = () => {
 
   const handleSubmit = async () => {
     // Validar campos vacíos
-    if (!formData.email || !formData.contraseña || !formData.nombreUsuario || !formData.nombre) {
-      return showError("Por favor completa los campos obligatorios");
+    if (!formData.dni || !formData.contraseña || !formData.nombreUsuario || !formData.nombre) {
+      return showError("Por favor completa los campos obligatorios (*)");
     }
 
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-        return showError("⚠️ Por favor ingresa una dirección de correo válida (ej: usuario@email.com)");
+    // Validar formato DNI
+    if (!/^\d+$/.test(formData.dni)) {
+        return showError("⚠️ El DNI debe contener solo números.");
     }
 
-    // Validación de seguridad: Solo admin puede crear Entrenadores
+    // Seguridad
     if (formData.rol === "Entrenador" && !isAdmin) {
         return showError("No tienes permisos para crear un Entrenador.");
     }
@@ -46,14 +49,29 @@ export const useCreateUser = () => {
     setLoading(true);
 
     try {
-      //  LLAMADA A LA API LIMPIA 
-      await AuthApi.createUser(formData);
+      // INYECTAR EL CÓDIGO DEL GIMNASIO AL CREAR
+      const dataToSend: any = {
+          ...formData,
+          codigoGym: gymCode || undefined
+      };
 
-      showSuccess(`Usuario ${formData.nombreUsuario} creado con éxito!`);
+      // No enviar fechaNacimiento si está vacío
+      if (!dataToSend.fechaNacimiento) {
+          delete dataToSend.fechaNacimiento;
+      }
+
+      // No enviar telefono si está vacío
+      if (!dataToSend.telefono) {
+          delete dataToSend.telefono;
+      }
+
+      await AuthApi.createUser(dataToSend);
+
+      await showSuccess(`Usuario ${formData.nombreUsuario} creado con éxito!`);
       window.location.reload();
 
     } catch (error: any) {
-      const msg = error.response?.data?.error || error.response?.data?.message || "Error al crear usuario";
+      const msg = error.response?.data?.error || error.message || "Error al crear usuario";
       showError("❌ Error: " + msg);
     } finally {
       setLoading(false);

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
-import { showError, showSuccess } from "../../Helpers/Alerts";
+import { showConfirmSuccess, showError, showSuccess } from "../../Helpers/Alerts";
 
 export const useRenewPlan = () => {
     // --- ESTADOS DE DATOS ---
@@ -13,6 +13,7 @@ export const useRenewPlan = () => {
     const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
     const [loading, setLoading] = useState(false);
     const [loadingAction, setLoadingAction] = useState(false); // Para spinners en botones
+    const [metodoPago, setMetodoPago] = useState("Transferencia");
 
     // 1. Carga inicial de datos
     useEffect(() => {
@@ -48,6 +49,7 @@ export const useRenewPlan = () => {
     const seleccionarAlumno = (alumno: any) => {
         setAlumnoSeleccionado(alumno);
         setBusqueda(""); // Limpiamos búsqueda para estética
+        setMetodoPago("Transferencia");
     };
 
     const limpiarSeleccion = () => {
@@ -56,18 +58,22 @@ export const useRenewPlan = () => {
     };
 
     // --- ACCIONES CON LA API ---
-
     const renovarPlan = async () => {
         if (!alumnoSeleccionado) return;
         setLoadingAction(true);
         try {
-            await PlansApi.renewPlan(alumnoSeleccionado.id);
-            showSuccess(`✅ Plan de ${alumnoSeleccionado.nombre} renovado.`);
-            // Actualizamos la lista localmente para no recargar toda la página
+            const response: any = await PlansApi.renewPlan(alumnoSeleccionado.id, metodoPago);
+            
+            switch (response.estadoRecibo) {
+                case 'ENVIADO': showSuccess(`✅ Renovado. Recibo enviado 📱`); break;
+                case 'DESACTIVADO': showSuccess(`✅ Renovado correctamente.\n(Recibo desactivado 🔕)`); break;
+                case 'ERROR': showSuccess(`⚠️ Renovado, pero FALLÓ el envío del recibo.`); break;
+                default: showSuccess(`✅ Renovado correctamente.`);
+            }
+
             await cargarDatosIniciales(); 
-            // Buscamos al usuario actualizado en la nueva lista para refrescar la vista
-            setAlumnoSeleccionado((prev: any) => ({...prev, estadoMembresia: 'Activo'})); // Optimista simple o recargar selección
-            limpiarSeleccion(); // Opcional: volver al buscador
+            setAlumnoSeleccionado((prev: any) => ({...prev, estadoMembresia: 'Activo'})); 
+            limpiarSeleccion(); 
         } catch (error: any) {
             showError(error.response?.data?.message || "Error al renovar");
         } finally {
@@ -77,7 +83,12 @@ export const useRenewPlan = () => {
 
     const cancelarPlan = async () => {
         if (!alumnoSeleccionado) return;
-        if (!confirm("¿Seguro que deseas cancelar la suscripción?")) return;
+
+        const result = await showConfirmSuccess( 
+                        `¿Cancelar plan?`,
+                        `¿Deseas cancelar la membresía de ${alumnoSeleccionado.nombre}?`);
+                        
+        if (!result.isConfirmed) return;
 
         setLoadingAction(true);
         try {
@@ -94,12 +105,24 @@ export const useRenewPlan = () => {
 
     const asignarPlan = async (plan: PlanDTO) => {
         if (!alumnoSeleccionado) return;
-        if (!confirm(`¿Asignar ${plan.nombre} a ${alumnoSeleccionado.nombre}?`)) return;
+
+        const result = await showConfirmSuccess( 
+                        `Asignar ${plan.nombre}`,
+                        `¿Deseas asignar el plan "${plan.nombre}" a ${alumnoSeleccionado.nombre}?`);
+                        
+        if (!result.isConfirmed) return;
 
         setLoadingAction(true);
         try {
-            await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!);
-            showSuccess("✅ Plan asignado correctamente.");
+            const response: any = await PlansApi.subscribeUser(alumnoSeleccionado.id, plan.id!, metodoPago);
+            
+            switch (response.estadoRecibo) {
+                case 'ENVIADO': showSuccess(`✅ Asignado. Recibo enviado 📱`); break;
+                case 'DESACTIVADO': showSuccess(`✅ Asignado correctamente.\n(Recibo desactivado 🔕)`); break;
+                case 'ERROR': showSuccess(`⚠️ Asignado, pero FALLÓ el envío del recibo.`); break;
+                default: showSuccess(`✅ Asignado correctamente.`);
+            }
+            
             await cargarDatosIniciales();
             limpiarSeleccion();
         } catch (error: any) {
@@ -117,6 +140,7 @@ export const useRenewPlan = () => {
         busqueda,
         loading,
         loadingAction,
+        metodoPago,
         
         // Acciones
         setBusqueda,
@@ -124,6 +148,7 @@ export const useRenewPlan = () => {
         limpiarSeleccion,
         renovarPlan,
         cancelarPlan,
-        asignarPlan
+        asignarPlan,
+        setMetodoPago
     };
 };

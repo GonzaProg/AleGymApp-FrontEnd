@@ -37,6 +37,43 @@ if (electronIsDev) {
   setupReloadWatcher(myCapacitorApp);
 }
 
+// --- CONFIGURACIÓN DE AUTO-UPDATER ---
+// Esto define cómo se comporta el actualizador
+autoUpdater.autoDownload = true; // Descarga la actualización automáticamente
+autoUpdater.allowPrerelease = false; // Solo versiones estables
+
+// Eventos para monitorear la actualización (útil para logs)
+autoUpdater.on('checking-for-update', () => {
+  console.log('Buscando actualizaciones...');
+});
+
+autoUpdater.on('update-available', (info) => {
+  console.log('Actualización disponible:', info.version);
+});
+
+autoUpdater.on('update-not-available', () => {
+  console.log('La app está actualizada.');
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('Error en el actualizador:', err);
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  console.log(`Descargando: ${progressObj.percent.toFixed(2)}%`);
+});
+
+// Cuando la actualización ya se descargó aviamos al Front
+autoUpdater.on('update-downloaded', (info) => {
+  console.log('Actualización descargada. Esperando reinicio...');
+  
+  // BUSCAMOS LA VENTANA Y ENVIAMOS EL AVISO
+  const win = myCapacitorApp.getMainWindow();
+  if (win) {
+    // Enviamos un evento llamado 'update_ready' al Frontend
+    win.webContents.send('update_ready');
+  }
+});
 // Run Application
 (async () => {
   // Wait for electron app to be ready.
@@ -46,7 +83,17 @@ if (electronIsDev) {
   // Initialize our app, build windows, and load content.
   await myCapacitorApp.init();
   // Check for updates if we are in a packaged app.
-  autoUpdater.checkForUpdatesAndNotify();
+
+  // CONFIGURACIÓN DE LA BARRA DE MENÚ
+  const win = myCapacitorApp.getMainWindow();
+  if (win) {
+    win.setAutoHideMenuBar(true); // Oculta la barra pero permite verla con la tecla 'Alt'
+    win.setMenuBarVisibility(false); // Asegura que inicie oculta
+  }
+
+  if (!electronIsDev) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
 })();
 
 // Handle when all of our windows are close (platforms have their own expectations).
