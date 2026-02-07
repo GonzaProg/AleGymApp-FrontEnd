@@ -1,110 +1,136 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../../API/axios";
 import { useWhatsAppModal } from "../../Context/WhatsAppModalContext";
-import { showConfirmDelete, showSuccess, showError } from "../../Helpers/Alerts"; // Importamos tus alertas
+import { showConfirmDelete, showSuccess, showError } from "../../Helpers/Alerts";
 
 export const WhatsAppStatus = () => {
-  const [status, setStatus] = useState<"connected" | "disconnected" | "loading">("loading");
+  const [status, setStatus] = useState<"connected" | "disconnected" | "loading" | "offline">("loading");
+  const [_, setIsIdle] = useState(false);
   const { openModal } = useWhatsAppModal();
+  
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const consecutiveErrorsRef = useRef(0);
+  // Ref para saber el estado real de isIdle dentro de funciones async sin depender del state
+  const isIdleRef = useRef(false);
 
+  // --- 1. FUNCIÓN DE SONDEO (UNIFICADA) ---
   const checkStatus = async () => {
+    // Limpiamos cualquier timeout pendiente para evitar duplicados
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    // Si el usuario está inactivo o el servidor ya se marcó como offline, no hacemos nada
+    if (isIdleRef.current || consecutiveErrorsRef.current >= 3) return;
+
     try {
       const { data } = await api.get("/whatsapp/status");
+      consecutiveErrorsRef.current = 0;
       setStatus(data.isReady ? "connected" : "disconnected");
+
+      // Si sigue activo, programamos la siguiente en 1 minuto (60000)
+      timeoutRef.current = setTimeout(checkStatus, 60000);
     } catch (error) {
-      console.error("Error checking WA status", error);
-      setStatus("disconnected");
+      consecutiveErrorsRef.current += 1;
+      console.warn(`Fallo ${consecutiveErrorsRef.current}/3 al conectar con WhatsApp Status`);
+
+      if (consecutiveErrorsRef.current >= 3) {
+        console.error("🛑 Servidor inalcanzable. Sondeo detenido.");
+        setStatus("offline");
+      } else {
+        // Reintento corto si aún hay intentos
+        timeoutRef.current = setTimeout(checkStatus, 15000);
+      }
     }
+  };
+
+  // --- 2. GESTIÓN DE INACTIVIDAD ---
+  const resetIdleTimer = () => {
+    // Si vuelve de inactividad
+    if (isIdleRef.current) {
+      console.log("⚡ Actividad detectada. Reiniciando sondeo.");
+      isIdleRef.current = false;
+      setIsIdle(false);
+      consecutiveErrorsRef.current = 0; // Opcional: resetear errores al volver
+      checkStatus();
+    }
+
+    if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+    
+    // Timer de inactividad (300000ms = 5min)
+    idleTimeoutRef.current = setTimeout(() => {
+      console.log("💤 Modo ahorro: Usuario inactivo.");
+      isIdleRef.current = true;
+      setIsIdle(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    }, 300000); 
   };
 
   useEffect(() => {
+    // Eventos para detectar actividad
+    window.addEventListener("mousemove", resetIdleTimer);
+    window.addEventListener("keydown", resetIdleTimer);
+    
+    // Arranque inicial
     checkStatus();
-    // Polling cada 10s para mantener actualizado el estado visual
-    const interval = setInterval(checkStatus, 10000);
-    return () => clearInterval(interval);
+    resetIdleTimer();
+
+    return () => {
+      window.removeEventListener("mousemove", resetIdleTimer);
+      window.removeEventListener("keydown", resetIdleTimer);
+      if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, []);
 
-  // --- LÓGICA DE VINCULAR (Abre Modal y genera QR) ---
-  const handleVincular = () => {
-    openModal(); 
-  };
+  // --- HANDLERS ---
+  const handleVincular = () => openModal();
 
-  // --- LÓGICA DE SALIR (Directa, sin modal, sin generar QR) ---
   const handleLogout = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita que clicks accidentales propaguen eventos
-
-    // 1. Pedimos confirmación para evitar desconexiones por error
-    const confirm = await showConfirmDelete(
-        "¿Desconectar WhatsApp?", 
-        "Dejarás de enviar mensajes automáticos. ¿Estás seguro?"
-    );
-
+    e.stopPropagation();
+    const confirm = await showConfirmDelete("¿Desconectar?", "Se detendrán los mensajes.");
     if (confirm.isConfirmed) {
-        try {
-            setStatus("loading"); // Feedback visual rápido
-            
-            // 2. Llamamos al endpoint de logout
-            await api.post("/whatsapp/logout");
-            
-            // 3. Actualizamos estado localmente a desconectado
-            setStatus("disconnected");
-            showSuccess("WhatsApp desconectado correctamente.");
-            
-            // NOTA: Al no llamar a openModal() ni a /init, el backend se queda quieto sin generar QRs.
-
-        } catch (error) {
-            console.error(error);
-            showError("No se pudo desconectar.");
-            setStatus("connected"); // Revertimos si falló
-        }
+      try {
+        setStatus("loading");
+        await api.post("/whatsapp/logout");
+        setStatus("disconnected");
+        showSuccess("Desconectado");
+      } catch (error) {
+        showError("Error al desconectar");
+        setStatus("connected");
+      }
     }
   };
 
+  const isServerDown = status === "offline";
+
   return (
     <div className="pt-6 px-4 py-2 border-t border-white/5">
-      
-      {/* CASO 1: CONECTADO (Status + Botón Salir) */}
       {status === "connected" ? (
         <div className="flex items-center justify-between bg-green-500/10 border border-green-500/20 p-2 rounded-lg group transition-all">
-            {/* Texto e Indicador */}
-            <div className="flex items-center gap-3 cursor-default">
-                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" />
-                <span className="text-sm font-bold text-green-400">
-                    WhatsApp Activo
-                </span>
-            </div>
-
-            {/* Botón de Salir (Solo Icono) */}
-            <button 
-                onClick={handleLogout}
-                title="Cerrar Sesión / Desconectar"
-                className="p-1.5 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-500/20 transition-all ml-2"
-            >
-                {/* Icono de Puerta/Salida (Logout) */}
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-                </svg>
-            </button>
+          <div className="flex items-center gap-3">
+            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_#22c55e]" />
+            <span className="text-sm font-bold text-green-400">WhatsApp Activo</span>
+          </div>
+          <button onClick={handleLogout} className="p-1.5 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+          </button>
         </div>
       ) : (
-        
-        /* CASO 2: DESCONECTADO O CARGANDO (Botón Vincular) */
         <button 
-            onClick={handleVincular}
-            disabled={status === "loading"}
-            className={`flex items-center gap-3 w-full p-2 rounded-lg transition-all ${
-                status === "loading" 
-                    ? "bg-gray-700/50 text-gray-400 cursor-wait"
-                    : "bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:shadow-lg hover:shadow-red-900/20"
-            }`}
+          onClick={isServerDown ? () => { consecutiveErrorsRef.current = 0; checkStatus(); } : handleVincular} 
+          disabled={status === "loading"}
+          className={`flex items-center gap-3 w-full p-2 rounded-lg transition-all ${
+            status === "loading" ? "bg-gray-700/50 text-gray-400 cursor-wait"
+            : isServerDown ? "bg-orange-500/10 text-orange-400 border border-orange-500/30"
+            : "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+          }`}
         >
-            <div className={`w-3 h-3 rounded-full ${
-                status === "loading" ? "bg-yellow-500 animate-spin" : "bg-red-500"
-            }`} />
-            
-            <span className="text-sm font-medium">
-                {status === "loading" ? "Verificando..." : "Vincular WhatsApp"}
-            </span>
+          <div className={`w-3 h-3 rounded-full ${status === "loading" ? "bg-yellow-500 animate-spin" : isServerDown ? "bg-orange-500" : "bg-red-500"}`} />
+          <span className="text-sm font-medium">
+            {status === "loading" ? "Verificando..." : isServerDown ? "Servidor offline (Reintentar)" : "Vincular WhatsApp"}
+          </span>
         </button>
       )}
     </div>

@@ -10,10 +10,9 @@
     "app/**/*"
   ],
   "publish": {
-    "provider": "github",
-    "owner": "GonzaProg",
-    "repo": "AleGymApp-FrontEnd"
+    "provider": "github"
   },
+
   "nsis": {
     "allowElevation": true,
     "oneClick": false,

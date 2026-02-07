@@ -63,12 +63,17 @@ autoUpdater.on('download-progress', (progressObj) => {
   console.log(`Descargando: ${progressObj.percent.toFixed(2)}%`);
 });
 
-// Cuando la actualización ya se descargó, avisa o reinicia
+// Cuando la actualización ya se descargó aviamos al Front
 autoUpdater.on('update-downloaded', (info) => {
-  console.log('Actualización descargada. Se instalará al cerrar la app.');
-  autoUpdater.quitAndInstall(); // Esto cierra la app y actualiza al instante
+  console.log('Actualización descargada. Esperando reinicio...');
+  
+  // BUSCAMOS LA VENTANA Y ENVIAMOS EL AVISO
+  const win = myCapacitorApp.getMainWindow();
+  if (win) {
+    // Enviamos un evento llamado 'update_ready' al Frontend
+    win.webContents.send('update_ready');
+  }
 });
-
 // Run Application
 (async () => {
   // Wait for electron app to be ready.
@@ -78,6 +83,14 @@ autoUpdater.on('update-downloaded', (info) => {
   // Initialize our app, build windows, and load content.
   await myCapacitorApp.init();
   // Check for updates if we are in a packaged app.
+
+  // CONFIGURACIÓN DE LA BARRA DE MENÚ
+  const win = myCapacitorApp.getMainWindow();
+  if (win) {
+    win.setAutoHideMenuBar(true); // Oculta la barra pero permite verla con la tecla 'Alt'
+    win.setMenuBarVisibility(false); // Asegura que inicie oculta
+  }
+
   if (!electronIsDev) {
     autoUpdater.checkForUpdatesAndNotify();
   }
