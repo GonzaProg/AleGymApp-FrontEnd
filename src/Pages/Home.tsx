@@ -82,6 +82,7 @@ const Icons = {
 };
 
 export const Home = () => {
+  const navigate = useNavigate();
   
   const { 
     currentUser, 
@@ -110,6 +111,13 @@ export const Home = () => {
       setRoutineIdToEdit(null);
       setActiveTab(tabName);
   };
+
+  // Handlers para vista Alumno
+  const goToMyRoutines = () => navigate("/my-routines");
+  const goToUserPlan = () => navigate("/planes/mi-plan");
+
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
+  if (!currentUser) return null;
 
   const AdminDashboardWelcome = () => (
     <div className="animate-fade-in-up space-y-6 mt-20">
@@ -175,7 +183,7 @@ export const Home = () => {
     return (
       <div className="flex h-screen bg-gray-900 overflow-hidden font-sans">
         
-        <WhatsAppModal />
+        {(isEntrenador || isAdmin) && <WhatsAppModal />}
 
         <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
           
@@ -246,7 +254,7 @@ export const Home = () => {
           </div>
 
           <div className="shrink-0 bg-[#1a1225]">
-             <WhatsAppStatus />
+             {(isEntrenador || isAdmin) && <WhatsAppStatus />}
              <div className="p-4">
                  <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
                    <span>{Icons.salir}</span>
@@ -273,12 +281,6 @@ export const Home = () => {
       </div>
     );
   }
-
-  // VISTA ALUMNO (Sin cambios)
-  const navigate = useNavigate();
-  
-  const goToMyRoutines = () => navigate("/my-routines");
-  const goToUserPlan = () => navigate("/planes/mi-plan");
 
   return (
     <PageLayout backgroundImage={fondoGym}>

@@ -19,14 +19,24 @@ export interface AdminMetrics {
 
 export const DashboardApi = {
     getMetrics: async (userRole: string): Promise<DashboardMetrics> => {
-        if (userRole === 'Entrenador') {
+        if (userRole === 'Usuario') {
+            // Usuario: no tiene acceso a métricas, retornar objeto vacío
+            return {
+                ejerciciosTotales: 0
+            };
+        } else if (userRole === 'Entrenador') {
             // Entrenador: trae todas las métricas
             const response = await api.get('/dashboard/metrics');
             return response.data;
-        } else {
+        } else if (userRole === 'Admin') {
             // Admin: solo trae ejercicios
             const response = await api.get('/dashboard/metrics/exercises');
             return response.data;
+        } else {
+            // Rol no reconocido: retornar objeto vacío
+            return {
+                ejerciciosTotales: 0
+            };
         }
     }
 };

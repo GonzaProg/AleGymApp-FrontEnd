@@ -63,8 +63,8 @@ export const useOptimizedHome = () => {
     }, []);
 
     const loadMetrics = async (userRole: string) => {
-        // Evitar múltiples cargas de métricas
-        if (metricsLoadedRef.current || !userRole || userRole === '') return;
+        // Evitar múltiples cargas de métricas y solo cargar para roles autorizados
+        if (metricsLoadedRef.current || !userRole || userRole === '' || userRole === 'Usuario') return;
         metricsLoadedRef.current = true;
 
         try {
