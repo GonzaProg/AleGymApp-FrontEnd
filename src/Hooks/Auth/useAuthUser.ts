@@ -5,7 +5,6 @@ export interface User {
     dni: string;
     nombre?: string;
     apellido?: string;
-    nombreUsuario?: string;
     telefono?: string;
     fechaNacimiento?: string;
     email?: string;

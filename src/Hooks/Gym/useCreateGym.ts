@@ -18,7 +18,7 @@ export const useCreateGym = () => {
 
     // --- ESTADO FORMULARIO DUEÑO ---
     const [ownerForm, setOwnerForm] = useState<CreateUserDTO>({
-        dni: "", nombre: "", apellido: "", nombreUsuario: "",
+        dni: "", nombre: "", apellido: "",
         contraseña: "", telefono: "", fechaNacimiento: "",
         rol: "Entrenador"
     });
@@ -100,7 +100,7 @@ export const useCreateGym = () => {
             setCodigo("");
             setSelectedLogo(null); // Reset logo
             setOwnerForm({
-                dni: "", nombre: "", apellido: "", nombreUsuario: "",
+                dni: "", nombre: "", apellido: "",
                 contraseña: "", telefono: "", fechaNacimiento: "",
                 rol: "Entrenador"
             });

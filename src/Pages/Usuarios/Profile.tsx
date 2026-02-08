@@ -88,25 +88,28 @@ export const Profile = () => {
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input label="Usuario" value={editForm.nombreUsuario} onChange={e => handleEditChange('nombreUsuario', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-                        
                         <div>
                             <label className={AppStyles.label}>DNI (No editable)</label>
-                            <div className="w-full bg-black/20 border border-white/5 text-gray-400 p-3 rounded-lg font-mono text-sm">
-                                {userData.dni}
-                            </div>
+                            <input 
+                                type="text" 
+                                value={editForm.dni} 
+                                readOnly 
+                                className={`${AppStyles.inputDark} bg-gray-800/50 cursor-not-allowed`}
+                            />
+                        </div>
+                        <div>
+                            <label className={AppStyles.label}>Teléfono</label>
+                            <Input 
+                                value={editForm.telefono || ""} 
+                                onChange={e => handleEditChange('telefono', e.target.value)} 
+                                className={AppStyles.inputDark} 
+                                labelClassName={AppStyles.label}
+                                placeholder="Ej: 11 1234 5678"
+                            />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input 
-                            label="Teléfono" 
-                            value={editForm.telefono || ""} 
-                            onChange={e => handleEditChange('telefono', e.target.value)} 
-                            className={AppStyles.inputDark} 
-                            labelClassName={AppStyles.label}
-                            placeholder="Ej: 11 1234 5678"
-                        />
                         <Input 
                             label="Fecha Nacimiento" 
                             type="date" 
@@ -132,7 +135,7 @@ export const Profile = () => {
                     </h2>
                     
                     <p className={ProfileStyles.usernameSubtitle}>
-                      @{userData.nombreUsuario}
+                      {userData.nombre} {userData.apellido}
                     </p>
                     
                     {/* Visualización de datos extra responsive */}

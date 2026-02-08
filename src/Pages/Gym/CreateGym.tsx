@@ -106,8 +106,8 @@ export const CreateGym = () => {
                                     <Input name="dni" value={ownerForm.dni} onChange={handleOwnerChange} className={AppStyles.inputDark} required />
                                 </div>
                                 <div className="col-span-1">
-                                    <label className={AppStyles.label}>Usuario (Nick)</label>
-                                    <Input name="nombreUsuario" value={ownerForm.nombreUsuario} onChange={handleOwnerChange} className={AppStyles.inputDark} required />
+                                    <label className={AppStyles.label}>Teléfono (WhatsApp)</label>
+                                    <Input name="telefono" value={ownerForm.telefono} onChange={handleOwnerChange} className={AppStyles.inputDark} />
                                 </div>
                                 
                                 {/* Datos Cuenta */}
@@ -125,11 +125,6 @@ export const CreateGym = () => {
                                         onChange={handleOwnerChange} 
                                         className={AppStyles.inputDark} 
                                     />
-                                </div>
-
-                                <div className="col-span-1">
-                                    <label className={AppStyles.label}>Teléfono (WhatsApp)</label>
-                                    <Input name="telefono" value={ownerForm.telefono} onChange={handleOwnerChange} className={AppStyles.inputDark} />
                                 </div>
 
                                 <div className="col-span-2 mt-4 flex gap-4">

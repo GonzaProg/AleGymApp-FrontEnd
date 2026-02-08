@@ -5,7 +5,6 @@ export interface CreateUserDTO {
     dni: string;          
     nombre: string;
     apellido: string;
-    nombreUsuario: string;
     contraseña: string;
     telefono?: string;    
     fechaNacimiento?: string;
