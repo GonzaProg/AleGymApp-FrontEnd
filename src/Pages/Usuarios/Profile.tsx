@@ -89,15 +89,6 @@ export const Profile = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={AppStyles.label}>DNI (No editable)</label>
-                            <input 
-                                type="text" 
-                                value={editForm.dni} 
-                                readOnly 
-                                className={`${AppStyles.inputDark} bg-gray-800/50 cursor-not-allowed`}
-                            />
-                        </div>
-                        <div>
                             <label className={AppStyles.label}>Teléfono</label>
                             <Input 
                                 value={editForm.telefono || ""} 
@@ -107,21 +98,31 @@ export const Profile = () => {
                                 placeholder="Ej: 11 1234 5678"
                             />
                         </div>
+                        <div>
+                            <label className={AppStyles.label}>Fecha Nacimiento</label>
+                            <Input 
+                                type="date" 
+                                value={editForm.fechaNacimiento || ""} 
+                                onChange={e => handleEditChange('fechaNacimiento', e.target.value)} 
+                                className={AppStyles.inputDark} 
+                                labelClassName={AppStyles.label}
+                            />
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input 
-                            label="Fecha Nacimiento" 
-                            type="date" 
-                            value={editForm.fechaNacimiento || ""} 
-                            onChange={e => handleEditChange('fechaNacimiento', e.target.value)} 
-                            className={AppStyles.inputDark} 
+                            label="DNI (No editable)"
+                            type="text" 
+                            value={editForm.dni} 
+                            readOnly 
+                            className={`${AppStyles.inputDark} bg-gray-800/50 cursor-not-allowed`}
                             labelClassName={AppStyles.label}
-                        />
+                            />
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-center gap-4 pt-6">
-                      <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={`${AppStyles.btnSecondary} w-full md:w-auto`}>Cancelar</Button>
+                      <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={`${AppStyles.btnSecondaryNotFlex} w-full md:w-auto`}>Cancelar</Button>
                       <Button onClick={handleSaveProfile} className={`${AppStyles.btnPrimary} w-full md:w-auto`} disabled={uploadingImage}>
                         {uploadingImage ? 'Guardando...' : 'Guardar Cambios'}
                       </Button>
@@ -129,14 +130,10 @@ export const Profile = () => {
                   </div>
                 ) : (
                   // MODO VISTA
-                  <div className="space-y-6">
+                  <div className="space-y-10">
                     <h2 className={ProfileStyles.nameTitle}>
                       {userData.nombre} <span className="text-green-500">{userData.apellido}</span>
                     </h2>
-                    
-                    <p className={ProfileStyles.usernameSubtitle}>
-                      {userData.nombre} {userData.apellido}
-                    </p>
                     
                     {/* Visualización de datos extra responsive */}
                     <div className="grid grid-cols-1 gap-3 mt-6 w-full md:flex md:flex-row md:justify-center md:gap-4 bg-white/5 p-4 rounded-xl">
@@ -203,7 +200,7 @@ export const Profile = () => {
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-center gap-4">
-                    <Button variant="ghost" onClick={handleCancelPassword} className={`${AppStyles.btnSecondary} w-full md:w-auto`}>Cancelar</Button>
+                    <Button variant="ghost" onClick={handleCancelPassword} className={`${AppStyles.btnSecondaryNotFlex} w-full md:w-auto`}>Cancelar</Button>
                     <Button onClick={handleChangePassword} className={`${AppStyles.btnDanger} w-full md:w-auto`}>Actualizar</Button>
                 </div>
               </div>

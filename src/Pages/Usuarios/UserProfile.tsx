@@ -94,26 +94,42 @@ export const UserProfile = () => {
                       <Input label="Apellido" value={editForm.apellido} onChange={e => handleEditChange('apellido', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className={AppStyles.label}>DNI (No editable)</label>
-                        <input 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className={AppStyles.label}>Teléfono</label>
+                            <Input 
+                                value={editForm.telefono || ""} 
+                                onChange={e => handleEditChange('telefono', e.target.value)} 
+                                className={AppStyles.inputDark} 
+                                labelClassName={AppStyles.label}
+                                placeholder="Ej: 11 1234 5678"
+                            />
+                        </div>
+                        <div>
+                            <label className={AppStyles.label}>Fecha Nacimiento</label>
+                            <Input 
+                                type="date" 
+                                value={editForm.fechaNacimiento || ""} 
+                                onChange={e => handleEditChange('fechaNacimiento', e.target.value)} 
+                                className={AppStyles.inputDark} 
+                                labelClassName={AppStyles.label}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Input 
+                            label="DNI (No editable)"
                             type="text" 
                             value={editForm.dni} 
                             readOnly 
                             className={`${AppStyles.inputDark} bg-gray-800/50 cursor-not-allowed`}
-                        />
-                      </div>
-                      <Input label="Teléfono" value={editForm.telefono} onChange={e => handleEditChange('telefono', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input label="Fecha Nacimiento" type="date" value={editForm.fechaNacimiento} onChange={e => handleEditChange('fechaNacimiento', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-                        <div></div>
+                            labelClassName={AppStyles.label}
+                            />
                     </div>
 
                     <div className="flex justify-center gap-4 pt-6">
-                      <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={AppStyles.btnSecondary}>Cancelar</Button>
+                      <Button variant="ghost" onClick={() => setIsEditingProfile(false)} className={AppStyles.btnSecondaryNotFlex}>Cancelar</Button>
                       <Button onClick={handleSaveProfile} className={AppStyles.btnPrimary} disabled={uploadingImage}>
                         {uploadingImage ? 'Guardando...' : 'Guardar Cambios'}
                       </Button>
@@ -121,15 +137,11 @@ export const UserProfile = () => {
                   </div>
                 ) : (
                   // MODO VISTA
-                  <div className="space-y-6">
+                  <div className="space-y-10">
                     <h2 className={ProfileStyles.nameTitle}>
                       {userData.nombre} <span className="text-green-500">{userData.apellido}</span>
                     </h2>
                     
-                    <p className={ProfileStyles.usernameSubtitle}>
-                      {userData.nombre} {userData.apellido}
-                    </p>
-
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 place-items-center bg-white/5 border border-white/10 p-6 rounded-xl">
                         <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-xl flex flex-col min-w-[100px]">
                             <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">DNI</span>
@@ -193,7 +205,7 @@ export const UserProfile = () => {
                 </div>
 
                 <div className="flex justify-center gap-4">
-                    <Button variant="ghost" onClick={handleCancelPassword} className={AppStyles.btnSecondary}>Cancelar</Button>
+                    <Button variant="ghost" onClick={handleCancelPassword} className={AppStyles.btnSecondaryNotFlex}>Cancelar</Button>
                     <Button onClick={handleChangePassword} className={AppStyles.btnDanger}>Actualizar</Button>
                 </div>
               </div>
