@@ -46,19 +46,15 @@ export const CreateUser = () => {
                     
                     {/* Fila 3 */}
                     <Input 
-                        label="Nombre de Usuario *" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange} 
-                        className={AppStyles.inputDark} labelClassName={AppStyles.label}
-                    />
-                    <Input 
                         label="Teléfono" type="tel" name="telefono" value={formData.telefono} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
-
-                    {/* Fila 4 */}
                     <Input 
                         label="Fecha Nacimiento" type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}
                     />
+
+                    {/* Fila 4 */}
                     <Input 
                         label="Contraseña *" type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}

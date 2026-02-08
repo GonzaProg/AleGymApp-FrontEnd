@@ -12,7 +12,6 @@ export const useRegister = (onSuccess: () => void) => {
         dni: "",
         nombre: "",
         apellido: "",
-        nombreUsuario: "",
         contraseña: "",
         confirmarContrasena: "",
         telefono: "",

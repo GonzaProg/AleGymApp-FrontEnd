@@ -95,17 +95,21 @@ export const UserProfile = () => {
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
-                      <Input label="Usuario" value={editForm.nombreUsuario} onChange={e => handleEditChange('nombreUsuario', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
-                      {/* DNI NO EDITABLE */}
                       <div>
-                         <label className={AppStyles.label}>DNI (No editable)</label>
-                         <div className="w-full bg-black/10 border border-white/5 text-gray-400 p-3 rounded-lg">{userData.dni}</div>
+                        <label className={AppStyles.label}>DNI (No editable)</label>
+                        <input 
+                            type="text" 
+                            value={editForm.dni} 
+                            readOnly 
+                            className={`${AppStyles.inputDark} bg-gray-800/50 cursor-not-allowed`}
+                        />
                       </div>
+                      <Input label="Teléfono" value={editForm.telefono} onChange={e => handleEditChange('telefono', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
-                        <Input label="Teléfono" value={editForm.telefono} onChange={e => handleEditChange('telefono', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
                         <Input label="Fecha Nacimiento" type="date" value={editForm.fechaNacimiento} onChange={e => handleEditChange('fechaNacimiento', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
+                        <div></div>
                     </div>
 
                     <div className="flex justify-center gap-4 pt-6">
@@ -123,7 +127,7 @@ export const UserProfile = () => {
                     </h2>
                     
                     <p className={ProfileStyles.usernameSubtitle}>
-                      @{userData.nombreUsuario} • {userData.email}
+                      {userData.nombre} {userData.apellido}
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 place-items-center bg-white/5 border border-white/10 p-6 rounded-xl">

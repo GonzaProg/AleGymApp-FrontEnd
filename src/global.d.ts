@@ -3,7 +3,14 @@ export {};
 
 declare global {
   interface Window {
-    require: any;
+    // Declaramos nuestra API personalizada
+    electronAPI: {
+      on: (channel: string, func: (...args: any[]) => void) => void;
+      removeAllListeners: (channel: string) => void;
+    };
+    // Mantenemos el require por si acaso alguna librería de dev lo usa, 
+    // pero en prod usaremos electronAPI
+    require: any; 
   }
 }
 

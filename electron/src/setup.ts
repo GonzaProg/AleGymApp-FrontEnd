@@ -106,17 +106,17 @@ export class ElectronCapacitorApp {
       defaultHeight: 800,
     });
     // Setup preload script path and construct our main window.
-    const preloadPath = join(app.getAppPath(), 'build', 'src', 'preload.js');
+    const preloadPath = join(__dirname, 'preload.js');
     this.MainWindow = new BrowserWindow({
-      icon,
+      icon: join(__dirname, '../assets/gimmate.png'),
       show: false,
       x: this.mainWindowState.x,
       y: this.mainWindowState.y,
       width: this.mainWindowState.width,
       height: this.mainWindowState.height,
       webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
+        nodeIntegration: false,
+        contextIsolation: true,
         // Use preload to inject the electron varriant overrides for capacitor plugins.
         // preload: join(app.getAppPath(), "node_modules", "@capacitor-community", "electron", "dist", "runtime", "electron-rt.js"),
         preload: preloadPath,

@@ -26,7 +26,6 @@ export const useProfile = () => {
     nombre: "",
     dni: "",
     apellido: "",
-    nombreUsuario: "",
     fotoPerfil: "",
     telefono: "",         
     fechaNacimiento: ""   
@@ -55,7 +54,6 @@ export const useProfile = () => {
         nombre: displayUser.nombre || "",
         dni: displayUser.dni || "", 
         apellido: displayUser.apellido || "", 
-        nombreUsuario: displayUser.nombreUsuario || "", 
         fotoPerfil: displayUser.fotoPerfil || "",
         telefono: displayUser.telefono || "",           
         fechaNacimiento: fechaFormateada            
