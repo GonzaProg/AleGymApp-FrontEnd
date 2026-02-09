@@ -45,7 +45,7 @@ export const useEditGym = (onSuccess?: () => void) => {
 
             // Subir nuevo logo si existe
             if (selectedLogo) {
-                logoUrl = await CloudinaryApi.upload(selectedLogo);
+                logoUrl = await CloudinaryApi.upload(selectedLogo, 'logos');
             }
 
             const updateData: CreateUpdateGymDTO = {

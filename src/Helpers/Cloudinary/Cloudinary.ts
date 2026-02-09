@@ -1,25 +1,47 @@
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const VITE_API_URL_CLOUDINARY = import.meta.env.VITE_API_URL_CLOUDINARY;
 const API_URL_BASE = `${VITE_API_URL_CLOUDINARY}${CLOUD_NAME}`;
 
+const PRESETS = {
+    usuarios: import.meta.env.VITE_PRESET_USUARIOS,
+    ejercicios: import.meta.env.VITE_PRESET_EJERCICIOS
+};
+
+type UploadType = 'usuarios' | 'ejercicios' | 'logos';
+
 export const CloudinaryApi = {
     
-    // Sube un archivo a Cloudinary
-    upload: async (file: File, resourceType: 'image' | 'video' = 'image'): Promise<string> => {
+    // AÑADIDO: parametro 'customPath'
+    upload: async (file: File, type: UploadType, customPath?: string, resourceType: 'image' | 'video' = 'image'): Promise<string> => {
         
-        // Validaciones básicas de entorno
-        if (!CLOUD_NAME || !UPLOAD_PRESET) {
-            throw new Error("Faltan configurar las variables de entorno de Cloudinary (VITE_CLOUDINARY_...)");
+        // Mapeo: Si es 'logos', usamos el preset de USUARIOS (u otro si creaste uno)
+        // pero le cambiaremos la carpeta abajo.
+        const presetKey = type === 'logos' ? 'usuarios' : type;
+        const selectedPreset = PRESETS[presetKey];
+
+        if (!CLOUD_NAME || !selectedPreset) {
+            throw new Error(`Falta configuración de Cloudinary para el tipo: ${type}`);
         }
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', UPLOAD_PRESET);
+        formData.append('upload_preset', selectedPreset);
+
+        // LÓGICA DE CARPETAS
+        if (customPath) {
+            // Si mandamos ruta específica (ej: "Usuarios/Gym_1"), usamos esa.
+            formData.append('folder', customPath);
+        } else {
+            let defaultFolder = '';
+            switch (type) {
+                case 'usuarios': defaultFolder = 'Usuarios/General'; break;
+                case 'ejercicios': defaultFolder = 'Ejercicios'; break;
+                case 'logos': defaultFolder = 'Logos'; break;
+            }
+            formData.append('folder', defaultFolder);
+        }
 
         try {
-            // Usamos fetch nativo para no enviar los Headers de Autorización de tu Backend (Axios interceptor)
-            // ya que Cloudinary rechazaría el token de tu backend.
             const response = await fetch(`${API_URL_BASE}/${resourceType}/upload`, {
                 method: 'POST',
                 body: formData
@@ -27,33 +49,23 @@ export const CloudinaryApi = {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error?.message || "Error desconocido al subir a Cloudinary");
+                throw new Error(errorData.error?.message || "Error al subir a Cloudinary");
             }
 
             const data = await response.json();
-            return data.secure_url; // Retornamos la URL HTTPS
+            return data.secure_url;
 
         } catch (error) {
             console.error(`Error CloudinaryService (${resourceType}):`, error);
-            throw error; // Re-lanzamos para que el componente maneje la alerta
+            throw error;
         }
     },
 
-    // Obtiene la miniatura a partir de la URL del video o imagen
     getThumbnail: (imagenUrl?: string, videoUrl?: string): string | null => {
-        // 1. Prioridad: Imagen manual subida
-        if (imagenUrl && imagenUrl.trim() !== "") {
-            return imagenUrl;
-        }
-
-        // 2. Si no hay imagen, pero hay video de Cloudinary, generamos la miniatura.
+        if (imagenUrl && imagenUrl.trim() !== "") return imagenUrl;
         if (videoUrl && videoUrl.includes("cloudinary.com")) {
-            // Reemplazamos la extensión del video (.mp4, .mov, etc) por .jpg
-            // Esta Regex busca el último punto y reemplaza lo que sigue por .jpg
             return videoUrl.replace(/\.[^/.]+$/, ".jpg");
         }
-
-        // 3. Si no hay nada
         return null;
     }
 };

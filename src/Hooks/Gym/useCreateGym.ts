@@ -44,7 +44,7 @@ export const useCreateGym = () => {
             // 1. Subir logo si existe
             if (selectedLogo) {
                 // Por defecto sube como 'image', así que no hace falta el 2do parámetro
-                logoUrl = await CloudinaryApi.upload(selectedLogo);
+                logoUrl = await CloudinaryApi.upload(selectedLogo, 'logos');
             }
 
             // 2. Crear Gym con la URL

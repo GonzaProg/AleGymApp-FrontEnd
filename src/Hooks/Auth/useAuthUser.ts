@@ -11,6 +11,12 @@ export interface User {
     fotoPerfil?: string;
     rol: string; 
     token?: string;
+    gym?: {
+        id: number;
+        nombre: string;
+        logoUrl?: string;
+        codigoAcceso?: string;
+    };
 }
 
 export const useAuthUser = () => {
