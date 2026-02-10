@@ -74,8 +74,8 @@ export const useEjerciciosGestion = () => {
             let finalImage = editForm.imagenUrl;
 
             const uploads = [];
-            if (selectedVideo) uploads.push(CloudinaryApi.upload(selectedVideo, 'video').then(u => finalVideo = u));
-            if (selectedImage) uploads.push(CloudinaryApi.upload(selectedImage, 'image').then(u => finalImage = u));
+            if (selectedVideo) uploads.push(CloudinaryApi.upload(selectedVideo, 'ejercicios', 'Ejercicios', 'video').then(u => finalVideo = u));
+            if (selectedImage) uploads.push(CloudinaryApi.upload(selectedImage, 'ejercicios', 'Ejercicios', 'image').then(u => finalImage = u));
             
             await Promise.all(uploads);
 
