@@ -1,6 +1,5 @@
 import { useCreateRoutine } from "../../Hooks/CreateRoutine/useCreateRoutine";
-import { Input } from "../../Components/UI/Input";
-import { Button } from "../../Components/UI/Button";
+import { Input, Button, ExerciseSearch } from "../../Components/UI";
 import { AppStyles } from "../../Styles/AppStyles";
 
 // Define tipos para las props
@@ -74,13 +73,17 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
             <div className={AppStyles.gradientDivider}></div>
             <h3 className={AppStyles.sectionTitle}><span className={AppStyles.numberBadge}>2</span> Ejercicios</h3>
             
-            <Input 
-              as="select" label="Ejercicio" value={ejercicioId} onChange={e => setEjercicioId(e.target.value)}
-              className={`${AppStyles.inputDark} appearance-none cursor-pointer pr-10`} labelClassName={AppStyles.label}
-            >
-                <option className={AppStyles.darkBackgroundSelect} value="">-- Seleccionar --</option>
-                {ejercicios.map(e => <option className={AppStyles.darkBackgroundSelect} key={e.id} value={e.id}>{e.nombre}</option>)}
-            </Input>
+            <div className="mt-4">
+              <label className={AppStyles.label}>Ejercicio</label>
+              <ExerciseSearch
+                exercises={ejercicios}
+                value={ejercicioId}
+                onChange={setEjercicioId}
+                placeholder="Seleccionar ejercicio..."
+                className={AppStyles.inputDark}
+                labelClassName={AppStyles.label}
+              />
+            </div>
 
             <div className="grid grid-cols-3 gap-4 mt-4">
               <Input label="Series" type="number" value={series} onChange={handleSeriesChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />

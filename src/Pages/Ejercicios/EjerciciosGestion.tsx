@@ -49,7 +49,6 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                     </button>
                 </div>
 
-                {/* ... (El resto de la tabla y modales sigue IDÉNTICO a lo que te pasé antes) ... */}
                 <div className={TableStyles.tableContainer}>
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/50 to-green-500/50"></div>
                     <div className="overflow-x-auto">
