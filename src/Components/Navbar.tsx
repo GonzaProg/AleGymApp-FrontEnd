@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 //import api from "../API/axios";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
-import { useLogout } from "../Hooks/Login/useLogout";
 
 // Icono Campanita código SVG
 const BellIcon = () => (
@@ -34,8 +33,7 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { logout } = useLogout();
-
+  
 
   const handleNotifClick = (notif: any) => {
     // Solo marcar como leída si no lo está ya
@@ -83,7 +81,7 @@ export const Navbar = () => {
 
             {/* --- DROPDOWN NOTIFICACIONES --- */}
             {showDropdown && (
-                <div className="absolute right top-full mt-2 transform -translate-x-1/2 w-64 sm:w-80 md:w-96 max-w-[90vw] bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-fade-in origin-top ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="absolute -right-28 top-full mt-2 transform -translate-x-1/2 w-64 sm:w-80 md:w-96 max-w-[90vw] bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-fade-in origin-top ring-1 ring-black ring-opacity-5 focus:outline-none">
                     
                     {/* Header del Dropdown */}
                     <div className="p-4 border-b border-white/10 bg-black/20">
@@ -133,14 +131,7 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* BOTÓN SALIR */}
-          <button 
-            onClick={logout}
-            className="text-white bg-red-600/70 hover:bg-red-600/90 border border-red-500/30 backdrop-blur-sm font-medium rounded-lg text-sm px-4 py-2 transition-all duration-300 shadow-lg hover:shadow-red-900/30"
-          >
-            Salir
-          </button>
-        </div>
+                  </div>
       </div>
     </nav>
 

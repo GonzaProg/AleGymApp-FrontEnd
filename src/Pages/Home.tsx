@@ -14,7 +14,9 @@ import { MobileNavbar } from "../Components/Mobile/MobileNavbar";
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
 import { StatsGrid } from "../Components/Dashboard/StatsGrid";
-import { HomeStyles } from "../Styles/HomeStyles"; 
+import { HomeStyles } from "../Styles/HomeStyles";
+import { BackgroundLayout } from "../Components/BackgroundLayout"; 
+import { Navbar } from "../Components/Navbar";
 
 // Importación de Vistas de Alumno
 import { MyRoutines } from "./Rutinas/MyRoutines";
@@ -39,37 +41,8 @@ import { Preferences } from "../Pages/Config/Preferences";
 import { ManualReceipt } from "../Pages/Planes/ReciboManual";
 import { GeneralRoutinesManager } from "../Pages/Rutinas/GeneralRoutinesManager";
 
-// IMÁGENES
-import fondoGym from "../assets/GymFondo.jpg";
-import fondoCreateRoutine from "../assets/Fondo-CreateRoutine.jpg";
-import fondoCreateuser from "../assets/Fondo-CreateUser.jpg";
-import fondoDeleteRoutine from "../assets/Fondo-DeleteRoutine.jpg";
-import fondoMiPlan from "../assets/Fondo-MiPlan.jpg";
-import fondoNotificaciones from "../assets/Fondo-Notificaciones.jpg";
-import fondoPerfil from "../assets/Fondo-Perfil.jpg";
-import fondoPagos from "../assets/Fondo-MiPlan.jpg"; 
-
-const BackgroundMap: Record<string, string> = {
-  "Inicio": fondoGym,
-  "Planes": fondoMiPlan, 
-  "Historial Pagos": fondoPagos, 
-  "Crear Rutina": fondoCreateRoutine,
-  "Ejercicios": fondoCreateRoutine,
-  "Crear Ejercicio": fondoCreateRoutine,
-  "Notificaciones": fondoNotificaciones,
-  "Usuarios": fondoCreateuser,
-  "Borrar Rutina": fondoDeleteRoutine,
-  "Enviar PDF": fondoCreateRoutine,
-  "Renovar": fondoCreateRoutine,
-  "Perfil": fondoPerfil,
-  "Preferencias": fondoPerfil, 
-  "default": fondoGym,
-  "Nuevo Gimnasio": fondoCreateRoutine,
-  "Gestión Gimnasios": fondoCreateRoutine,
-  "Enviar Recibo Manualmente": fondoCreateRoutine, 
-  "Rutinas Generales": fondoCreateRoutine,
-  "Crear Rutina General": fondoCreateRoutine,
-};
+// IMÁGENES (Eliminadas - reemplazadas por BackgroundLayout)
+// Todas las imágenes de fondo han sido reemplazadas por el efecto Neon Aurora 
 
 const Icons = {
   dashboard: "🏠",
@@ -140,8 +113,6 @@ export const Home = () => {
   // VISTA ENTRENADOR / ADMIN (DASHBOARD ESCRITORIO)
   // =================================================================
   if (isEntrenador || isAdmin) {
-    const currentBg = BackgroundMap[activeTab] || BackgroundMap["default"];
-
     const AdminDashboardWelcome = () => (
         <div className="animate-fade-in-up space-y-6 mt-20">
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
@@ -150,8 +121,12 @@ export const Home = () => {
               Hola, <span className="text-green-400">{currentUser?.nombre}</span> 👋
             </h2>
             <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
-              Aquí tienes un resumen de la actividad del gimnasio hoy. Todo parece estar en orden 😎
+              Aquí tienes un resumen de la actividad del gimnasio.
             </p>
+            <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
+              Todo parece estar en orden 😎
+            </p>
+
           </div>
           {metrics && <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />}
         </div>
@@ -182,57 +157,58 @@ export const Home = () => {
     };
 
     return (
-      <div className="flex h-screen bg-gray-900 overflow-hidden font-sans">
-        <WhatsAppModal />
-        <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
-          <div className="flex-1 overflow-hidden flex flex-col">
-            <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => handleSidebarClick("Inicio")}>
-               <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">GYMMate</span>
-            </div>
-            <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
-               <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
-               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
-               <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
-               <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
-               <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
-               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
-               <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
-               <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
-               <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
-               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
-               <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
-               <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
-               <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
-               <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
-               <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
-               <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
-               {isAdmin && (
+      <BackgroundLayout>
+        <div className="flex h-screen overflow-hidden font-sans">
+          <WhatsAppModal />
+          <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
+            <div className="flex-1 overflow-hidden flex flex-col">
+              <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => handleSidebarClick("Inicio")}>
+                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">GYMMate</span>
+              </div>
+              <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
+                <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
+                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
+                <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
+                <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
+                <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
+                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
+                <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
+                <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
+                <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
+                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
+                <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
+                <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
+                <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
+                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
+                <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
+                <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
+                {isAdmin && (
                   <>
-                     <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Administración</p>
-                     <SidebarItem icon={Icons.nuevoGym} label="Nuevo Gimnasio" active={activeTab === "Nuevo Gimnasio"} onClick={() => handleSidebarClick("Nuevo Gimnasio")} />
-                     <SidebarItem icon={Icons.gestionGyms} label="Gestión Gimnasios" active={activeTab === "Gestión Gimnasios"} onClick={() => handleSidebarClick("Gestión Gimnasios")} />
-                     <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
-                     <SidebarItem icon={Icons.usuarios} label="Usuarios" active={activeTab === "Usuarios"} onClick={() => handleSidebarClick("Usuarios")} />
+                    <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Administración</p>
+                    <SidebarItem icon={Icons.nuevoGym} label="Nuevo Gimnasio" active={activeTab === "Nuevo Gimnasio"} onClick={() => handleSidebarClick("Nuevo Gimnasio")} />
+                    <SidebarItem icon={Icons.gestionGyms} label="Gestión Gimnasios" active={activeTab === "Gestión Gimnasios"} onClick={() => handleSidebarClick("Gestión Gimnasios")} />
+                    <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
+                    <SidebarItem icon={Icons.usuarios} label="Usuarios" active={activeTab === "Usuarios"} onClick={() => handleSidebarClick("Usuarios")} />
                   </>
-               )}
-            </nav>
-          </div>
-          <div className="shrink-0 bg-[#1a1225]">
+                )}
+              </nav>
+            </div>
+            <div className="shrink-0 bg-[#1a1225]">
               <WhatsAppStatus />
               <div className="p-4">
-                  <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
-                      <span>{Icons.salir}</span> Cerrar Sesión
-                  </button>
+                <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
+                  <span>{Icons.salir}</span> Cerrar Sesión
+                </button>
               </div>
-          </div>
-        </aside>
-        <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-          <div className="absolute inset-0 z-0 opacity-40 pointer-events-none transition-all duration-700 ease-in-out" style={{ backgroundImage: `url(${currentBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-          <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
+            </div>
+          </aside>
+          <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
+            <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
               {renderAdminContent()}
-          </div>
-        </main>
-      </div>
+            </div>
+          </main>
+        </div>
+      </BackgroundLayout>
     );
   }
 
@@ -240,40 +216,47 @@ export const Home = () => {
   // VISTA ALUMNOS (MOBILE SWIPE INTERFACE)
   // =================================================================
   return (
-    <div className="h-screen w-screen bg-gray-900 overflow-hidden relative">
-      <Swiper
-        ref={swiperRef}
-        modules={[Pagination]}
-        spaceBetween={0}
-        slidesPerView={1}
-        onSlideChange={handleSlideChange}
-        className="h-full w-full pb-20" // Espacio para el navbar
-        style={{ scrollBehavior: 'smooth' }}
-      >
-        {/* SLIDE 0: RUTINAS (HOME) */}
-        <SwiperSlide className="overflow-y-auto h-full">
+    <BackgroundLayout>
+      
+      <div className="absolute top-0 left-0 w-full z-50">
+        <Navbar />
+      </div>
+      
+      <div className="h-screen w-screen overflow-hidden relative">
+        <Swiper
+          ref={swiperRef}
+          modules={[Pagination]}
+          spaceBetween={0}
+          slidesPerView={1}
+          onSlideChange={handleSlideChange}
+          className="h-full w-full pb-24" // Espacio para el navbar
+          style={{ scrollBehavior: 'smooth' }}
+        >
+          {/* SLIDE 0: RUTINAS (HOME) */}
+          <SwiperSlide className="overflow-y-auto h-full">
             <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-                <MyRoutines isEmbedded={true} /> 
+              <MyRoutines /> 
             </div>
-        </SwiperSlide>
+          </SwiperSlide>
 
-        {/* SLIDE 1: MI PLAN */}
-        <SwiperSlide className="overflow-y-auto h-full">
-             <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-                <UserPlan />
-             </div>
-        </SwiperSlide>
+          {/* SLIDE 1: MI PLAN */}
+          <SwiperSlide className="overflow-y-auto h-full">
+            <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+              <UserPlan />
+            </div>
+          </SwiperSlide>
 
-        {/* SLIDE 2: PERFIL */}
-        <SwiperSlide className="overflow-y-auto h-full">
-             <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-                <UserProfile />
-             </div>
-        </SwiperSlide>
-      </Swiper>
+          {/* SLIDE 2: PERFIL */}
+          <SwiperSlide className="overflow-y-auto h-full">
+            <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+              <UserProfile />
+            </div>
+          </SwiperSlide>
+        </Swiper>
 
-      <MobileNavbar activeTab={activeSlide} setActiveTab={handleMenuClick} />
-    </div>
+        <MobileNavbar activeTab={activeSlide} setActiveTab={handleMenuClick} />
+      </div>
+    </BackgroundLayout>
   );
 };
 
