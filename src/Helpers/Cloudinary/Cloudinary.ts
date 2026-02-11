@@ -1,3 +1,5 @@
+import api from '../../API/axios';
+
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const VITE_API_URL_CLOUDINARY = import.meta.env.VITE_API_URL_CLOUDINARY;
 const API_URL_BASE = `${VITE_API_URL_CLOUDINARY}${CLOUD_NAME}`;
@@ -14,7 +16,7 @@ export const CloudinaryApi = {
     // AÑADIDO: parametro 'customPath'
     upload: async (file: File, type: UploadType, customPath?: string, resourceType: 'image' | 'video' = 'image'): Promise<string> => {
         
-        // Mapeo: Si es 'logos', usamos el preset de USUARIOS (u otro si creaste uno)
+        // Mapeo: Si es 'logos', usamos el preset de USUARIOS
         // pero le cambiaremos la carpeta abajo.
         const presetKey = type === 'logos' ? 'usuarios' : type;
         const selectedPreset = PRESETS[presetKey];
@@ -67,5 +69,17 @@ export const CloudinaryApi = {
             return videoUrl.replace(/\.[^/.]+$/, ".jpg");
         }
         return null;
-    }
+    },
+
+    delete: async (url: string, resourceType: 'image' | 'video' = 'image') => {
+        if (!url || !url.includes("cloudinary.com")) return;
+
+        try {
+            // Llamamos al backend, no a Cloudinary directo
+            await api.post('/cloudinary/delete', { url, type: resourceType });
+        } catch (error) {
+            console.error("Error eliminando archivo antiguo:", error);
+            // Fallo silencioso: no queremos detener la app si falla el borrado de basura
+        }
+    },
 };

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useAuthUser } from "../Auth/useAuthUser"; 
 import { UsuarioApi, type UpdateProfileDTO } from "../../API/Usuarios/UsuarioApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
-// IMPORTANTE: Importamos el Helper centralizado
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary"; 
 
 export const useProfile = () => {
@@ -72,9 +71,6 @@ export const useProfile = () => {
     }
   };
 
-  // --- FUNCIÓN 'uploadToCloudinary' ELIMINADA ---
-  // Ahora usamos CloudinaryApi.upload directamente abajo
-
   const handleSaveProfile = async () => {
     if (!localId) return;
 
@@ -85,6 +81,12 @@ export const useProfile = () => {
 
       if (selectedFile) {
           setUploadingImage(true);
+
+          // 1. BORRAR FOTO ANTERIOR
+          if (editForm.fotoPerfil && editForm.fotoPerfil.includes("cloudinary")) {
+              await CloudinaryApi.delete(editForm.fotoPerfil, 'image');
+          }
+          
           // 1. OBTENEMOS DATOS DEL GYM
           // Usamos el codigo de acceso del gym para que sea único. 
           // Si no tiene gym (ej: Admin global), va a 'Usuarios/Admin'
