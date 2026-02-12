@@ -3,6 +3,7 @@ import api from '../axios';
 export interface PlanDTO {
     id?: number;
     nombre: string;
+    tipo: 'Gym' | 'Natacion' | 'Pilates';
     precio: number;
     duracionDias: number;
     diasPorSemana: number;

@@ -147,6 +147,7 @@ export const PlansManager = () => {
 const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
     const [form, setForm] = useState({
         nombre: initialData?.nombre || "",
+        tipo: initialData?.tipo || "Gym", // <--- NUEVO DEFAULT
         precio: initialData?.precio || "",
         duracionDias: initialData?.duracionDias || "",
         diasPorSemana: initialData?.diasPorSemana || "",
@@ -164,10 +165,25 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <label className={AppStyles.label}>Nombre del Plan</label>
-                <Input name="nombre" value={form.nombre} onChange={handleChange} required className={AppStyles.inputDark} placeholder="Ej: Mensual / Semanal" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className={AppStyles.label}>Nombre del Plan</label>
+                    <Input name="nombre" value={form.nombre} onChange={handleChange} required className={AppStyles.inputDark} placeholder="Ej: Full Pass" />
+                </div>
+                <div>
+                    <label className={AppStyles.label}>Categoría</label>
+                    <select 
+                        name="tipo" 
+                        value={form.tipo} 
+                        onChange={handleChange} 
+                        className={AppStyles.inputDark + " appearance-none cursor-pointer"}
+                    >
+                        <option value="Gym">Gimnasio / Musculación</option>
+                        <option value="Natacion">Natación</option>
+                    </select>
+                </div>
             </div>
+
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className={AppStyles.label}>Precio ($)</label>
@@ -178,7 +194,8 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
                     <Input type="number" name="duracionDias" min="0" value={form.duracionDias} onChange={handleChange} required className={AppStyles.inputDark} />
                 </div>
             </div>
-            <div>
+            
+             <div>
                 <label className={AppStyles.label}>Días por Semana (1-7)</label>
                 <Input type="number" min="1" max="7" name="diasPorSemana" value={form.diasPorSemana} onChange={handleChange} required className={AppStyles.inputDark} />
             </div>
