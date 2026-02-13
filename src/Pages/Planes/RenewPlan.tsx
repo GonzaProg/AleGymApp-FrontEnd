@@ -140,7 +140,7 @@ export const RenewPlan = () => {
                                           className="bg-green-600 hover:bg-green-500 text-white p-2 rounded-lg transition shadow-lg disabled:opacity-50"
                                           title="Renovar este plan"
                                       >
-                                          {loadingAction ? '...' : '♻️'}
+                                          {loadingAction ? '...' : '♻️ Renovar'}
                                       </button>
                                       <button 
                                           onClick={() => cancelarPlan()}
@@ -148,7 +148,7 @@ export const RenewPlan = () => {
                                           className="bg-red-900/50 hover:bg-red-600 text-white p-2 rounded-lg transition border border-red-800/50 disabled:opacity-50"
                                           title="Cancelar este plan"
                                       >
-                                          {loadingAction ? '...' : '✕'}
+                                          {loadingAction ? '...' : '✕ Cancelar'}
                                       </button>
                                   </div>
                               </div>

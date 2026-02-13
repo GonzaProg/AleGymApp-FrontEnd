@@ -15,11 +15,17 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                             {user.fotoPerfil ? <img src={user.fotoPerfil} className="w-full h-full rounded-full object-cover" /> : <div className="w-full h-full bg-gray-800 rounded-full flex items-center justify-center text-4xl">{user.nombre[0]}</div>}
                         </div>
                         <h2 className="text-2xl font-bold text-white text-center">{user.nombre} {user.apellido}</h2>
-                        <span className="text-green-400 text-xs font-black tracking-tighter uppercase mb-6 bg-green-500/10 px-3 py-1 rounded-full">Alumno Activo</span>
+                        <span className={`text-xs font-black tracking-tighter uppercase mb-6 mt-2 px-3 py-1 rounded-full ${
+                            user.userPlans?.some(up => up.activo) 
+                                ? 'text-green-400 bg-green-500/10' 
+                                : 'text-red-400 bg-red-500/10'
+                        }`}>
+                            Alumno {user.userPlans?.some(up => up.activo) ? 'Activo' : 'Inactivo'}
+                        </span>
                         
                         <div className="w-full space-y-4 border-t border-white/5 pt-6">
-                            <div className="flex justify-between text-sm"><span className="text-gray-500">DNI</span><span className="text-white font-mono">{user.dni}</span></div>
-                            <div className="flex justify-between text-sm"><span className="text-gray-500">Teléfono</span><span className="text-white">{user.telefono || '-'}</span></div>
+                            <div className="flex justify-between text-sm"><span className="text-gray-500">DNI</span><span className="text-white font-mono text-base">{user.dni}</span></div>
+                            <div className="flex justify-between text-sm"><span className="text-gray-500">Teléfono</span><span className="text-white text-base">{user.telefono || '-'}</span></div>
                         </div>
                     </div>
                 </Card>
@@ -30,7 +36,10 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                         <span className="text-green-500">⚡</span> ESTADO DE SUSCRIPCIONES
                     </h3>
                     <div className="grid gap-4">
-                        {user.userPlans?.map(up => (
+                        {user.userPlans
+                            ?.sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime())
+                            .slice(-5)
+                            .map(up => (
                             <div key={up.id} className={`p-6 rounded-2xl border flex justify-between items-center bg-gray-900/60 backdrop-blur-md relative overflow-hidden ${up.activo ? 'border-green-500/30' : 'border-red-500/20 opacity-60'}`}>
                                 {up.activo && <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>}
                                 <div>
