@@ -23,7 +23,7 @@ import { MyRoutines } from "./Rutinas/MyRoutines";
 import { UserPlan } from "./Planes/UserPlan";
 import { UserProfile } from "./Usuarios/UserProfile"; 
 
-// Importación de páginas Admin
+// Importación de páginas
 import { PlansManager } from "../Pages/Planes/PlansManager";
 import { CreateRoutine } from "../Pages/Rutinas/CreateRoutine";
 import { EjerciciosGestion } from "../Pages/Ejercicios/EjerciciosGestion";
@@ -40,6 +40,7 @@ import { HistorialPagos } from "../Pages/Pagos/HistorialPagos";
 import { Preferences } from "../Pages/Config/Preferences"; 
 import { ManualReceipt } from "../Pages/Planes/ReciboManual";
 import { GeneralRoutinesManager } from "../Pages/Rutinas/GeneralRoutinesManager";
+import { UsersManager } from "../Pages/Usuarios/UsersManager";
 
 // IMÁGENES (Eliminadas - reemplazadas por BackgroundLayout)
 // Todas las imágenes de fondo han sido reemplazadas por el efecto Neon Aurora 
@@ -143,7 +144,8 @@ export const Home = () => {
           case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
           case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
           case "Notificaciones": return <CreateNotification />;
-          case "Usuarios": return <CreateUser />;
+          case "Nuevo Usuario": return <CreateUser />;
+          case "Gestionar Usuarios": return <UsersManager />;
           case "Borrar Rutina": return <DeleteRoutine />;
           case "Enviar PDF": return <SendRoutinePDF />; 
           case "Renovar": return <RenewPlan />;
@@ -176,11 +178,12 @@ export const Home = () => {
                 <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
                 <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
                 <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
-                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
+                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Social</p>
                 <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
                 <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
                 <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
-                <SidebarItem icon={Icons.usuarios} label="Nuevo Usuario" active={activeTab === "Usuarios"} onClick={() => handleSidebarClick("Usuarios")} />
+                <SidebarItem icon={Icons.usuarios} label="Nuevo Usuario" active={activeTab === "Nuevo Usuario"} onClick={() => handleSidebarClick("Nuevo Usuario")} />
+                <SidebarItem icon={Icons.usuarios} label="Gestionar Usuarios" active={activeTab === "Gestionar Usuarios"} onClick={() => handleSidebarClick("Gestionar Usuarios")} />
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
                 <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
                 <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
