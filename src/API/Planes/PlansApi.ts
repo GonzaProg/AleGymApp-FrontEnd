@@ -3,11 +3,24 @@ import api from '../axios';
 export interface PlanDTO {
     id?: number;
     nombre: string;
+    tipo: 'Gym' | 'Natacion' | 'Pilates';
     precio: number;
     duracionDias: number;
     diasPorSemana: number;
     descripcion: string;
     fechaActualizacion?: Date;
+}
+
+// DTO para la lista de planes activos de un usuario
+export interface UserPlanDTO {
+    userPlanId: number; // ID único de la suscripción
+    planId: number;
+    nombre: string;
+    tipo: string;
+    precio: number;
+    fechaInicio: string;
+    fechaVencimiento: string;
+    diasRestantes: number;
 }
 
 export const PlansApi = {
@@ -17,39 +30,39 @@ export const PlansApi = {
         return response.data;
     },
 
-    // 2. Obtener mi plan activo (Usuario logueado)
+    // 2. Obtener MIS planes activos (Devuelve { tienePlan: boolean, planes: UserPlanDTO[] })
     getMyPlan: async () => {
         const response = await api.get('/planes/mi-plan');
         return response.data;
     },
 
-    // 3. Crear Plan (Solo Admin/Entrenador)
+    // 3. Crear Plan
     create: async (data: PlanDTO) => {
         const response = await api.post('/planes/crear', data);
         return response.data;
     },
 
-    // 4. Editar Plan (Solo Admin/Entrenador)
+    // 4. Editar Plan
     update: async (id: number, data: PlanDTO) => {
         const response = await api.put(`/planes/${id}`, data);
         return response.data;
     },
 
-    // 5. Suscribir Usuario (Admin/Entrenador)
+    // 5. Suscribir Usuario
     subscribeUser: async (userId: number, planId: number, metodoPago: string = "Transferencia") => {
         const response = await api.post('/planes/suscribir', { userId, planId, metodoPago });
         return response.data;
     },
 
-    // 6. Renovar Plan (Solo Admin/Entrenador)
-    renewPlan: async (userId: number, metodoPago: string = "Transferencia") => {
-        const response = await api.post('/planes/renovar', { userId, metodoPago });
+    // 6. Renovar Plan (CAMBIO: Recibe userPlanId)
+    renewPlan: async (userPlanId: number, metodoPago: string = "Transferencia") => {
+        const response = await api.post('/planes/renovar', { userPlanId, metodoPago });
         return response.data;
     },
 
-    // 7. Cancelar Plan (Solo Admin/Entrenador)
-    cancelPlan: async (userId: number) => {
-        const response = await api.post('/planes/cancelar', { userId });
+    // 7. Cancelar Plan (CAMBIO: Recibe userPlanId)
+    cancelPlan: async (userPlanId: number) => {
+        const response = await api.post('/planes/cancelar', { userPlanId });
         return response.data;
     },
 

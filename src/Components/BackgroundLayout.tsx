@@ -5,92 +5,99 @@ interface BackgroundLayoutProps {
   className?: string;
 }
 
+// 1. NUEVO ICONO DE MANCUERNA (Estilo Outline/Líneas)
+const DumbbellIcon = ({ style }: { style: React.CSSProperties }) => (
+  <div style={style} className="text-white/50"> 
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1.5"
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      width="100%" 
+      height="100%"
+    >
+      {/* Barra central */}
+      <rect x="7" y="11" width="10" height="2" rx="0.5" />
+
+      {/* 1. Discos GRANDES (Los más cercanos al centro) */}
+      <rect x="5" y="6" width="2" height="12" rx="1" />
+      <rect x="17" y="6" width="2" height="12" rx="1" />
+
+      {/* 2. Discos MEDIANOS */}
+      <rect x="3" y="7.5" width="2" height="9" rx="0.5" />
+      <rect x="19" y="7.5" width="2" height="9" rx="0.5" />
+
+      {/* 3. Discos PEQUEÑOS (Los de los extremos) */}
+      <rect x="1" y="9" width="2" height="6" rx="0.5" />
+      <rect x="21" y="9" width="2" height="6" rx="0.5" />
+    </svg>
+  </div>
+);
+
 export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, className = "" }) => {
   return (
     <div style={styles.container} className={className}>
-      {/* --- CAPA 0: NEON AURORA ANIMADA (Z-Index 0) --- */}
+      {/* --- CAPA 0: NEON AURORA ANIMADA --- */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        {/* Aurora Norte - Violeta/Blue */}
+        
+        {/* Auroras */}
         <div style={styles.auroraNorth}></div>
-        
-        {/* Aurora Sur - Cyan/Green */}
         <div style={styles.auroraSouth}></div>
-        
-        {/* Aurora Este - Pink/Orange */}
         <div style={styles.auroraEast}></div>
-        
-        {/* Aurora Oeste - Purple/Blue */}
         <div style={styles.auroraWest}></div>
         
-        {/* Estrellas parpadeantes */}
+        {/* 2. MANCUERNAS PARPADEANTES */}
         <div style={styles.starsContainer}>
-          {[...Array(20)].map((_, i) => (
-            <div key={i} style={{
-              ...styles.star,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
-            }} />
-          ))}
+          {[...Array(20)].map((_, i) => { 
+            const randomSize = 20 + Math.random() * 25; 
+            const randomRotation = Math.random() * 360;
+            
+            return (
+              <DumbbellIcon 
+                key={i} 
+                style={{
+                  ...styles.star,
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  width: `${randomSize}px`,
+                  height: `${randomSize}px`,
+                  transform: `rotate(${randomRotation}deg)`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  animationDuration: `${4 + Math.random() * 4}s`,
+                }} 
+              />
+            )
+          })}
         </div>
         
         {/* Nebulosa central */}
         <div style={styles.nebula}></div>
       </div>
 
-      {/* --- CAPA 1: CONTENIDO REAL (Z-Index 10) --- */}
+      {/* --- CAPA 1: CONTENIDO REAL --- */}
       <div className="relative z-10 flex-1 flex flex-col w-full h-full">
         {children}
       </div>
       
-      {/* --- ESTILOS CSS GLOBALES PARA ANIMACIONES --- */}
+      {/* CSS Animaciones */}
       <style>{`
         @keyframes aurora {
-          0%, 100% {
-            transform: translateY(0) rotate(0deg) scale(1);
-            opacity: 0.3;
-          }
-          25% {
-            transform: translateY(-20px) rotate(1deg) scale(1.1);
-            opacity: 0.5;
-          }
-          50% {
-            transform: translateY(10px) rotate(-1deg) scale(0.9);
-            opacity: 0.4;
-          }
-          75% {
-            transform: translateY(-10px) rotate(2deg) scale(1.05);
-            opacity: 0.6;
-          }
+          0%, 100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.3; }
+          25% { transform: translateY(-20px) rotate(1deg) scale(1.1); opacity: 0.5; }
+          50% { transform: translateY(10px) rotate(-1deg) scale(0.9); opacity: 0.4; }
+          75% { transform: translateY(-10px) rotate(2deg) scale(1.05); opacity: 0.6; }
         }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translate(0, 0) rotate(0deg);
-          }
-          33% {
-            transform: translate(30px, -30px) rotate(120deg);
-          }
-          66% {
-            transform: translate(-20px, 20px) rotate(240deg);
-          }
-        }
-        
+        /* Ajusté la animación twinkle para que el brillo en el trazo se vea mejor */
         @keyframes twinkle {
-          0%, 100% { opacity: 0; }
-          50% { opacity: 1; }
+          0%, 100% { opacity: 0; transform: scale(0.5); }
+          50% { opacity: 0.7; transform: scale(1); filter: drop-shadow(0 0 3px rgba(255,255,255,0.8)); }
         }
-        
         @keyframes pulse {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.2;
-          }
-          50% {
-            transform: scale(1.2);
-            opacity: 0.4;
-          }
+          0%, 100% { transform: scale(1); opacity: 0.2; }
+          50% { transform: scale(1.2); opacity: 0.4; }
         }
       `}</style>
     </div>
@@ -162,12 +169,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   star: {
     position: 'absolute',
-    width: '2px',
-    height: '2px',
-    backgroundColor: '#ffffff',
-    borderRadius: '50%',
-    animation: 'twinkle 3s infinite',
-    boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)',
+    animationName: 'twinkle',
+    animationIterationCount: 'infinite',
+    animationTimingFunction: 'ease-in-out',
   },
   nebula: {
     position: 'absolute',
