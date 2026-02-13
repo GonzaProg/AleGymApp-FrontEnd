@@ -9,8 +9,10 @@ import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
 
 export const PlansManager = () => {
   const { 
-    planes, 
+    planesFiltrados,
     loading, 
+    filtroTipo,
+    setFiltroTipo,
     isModalOpen, 
     isSubscribeModalOpen, 
     editingPlan, 
@@ -38,9 +40,26 @@ export const PlansManager = () => {
         <div className="w-full max-w-7xl mx-auto">
           {/* Encabezado Admin */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 w-full gap-4">
-            <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
-              <p className={AppStyles.subtitle}>Gestiona las suscripciones del gimnasio</p>
+            <div className="flex flex-col gap-4 flex-1">
+              <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
+                <p className={AppStyles.subtitle}>Gestiona las suscripciones del gimnasio</p>
+              </div>
+              
+              {/* Buscador por tipo */}
+              <div className="flex items-center gap-2">
+                <label className="text-white text-sm font-medium">Filtrar por:</label>
+                <select 
+                  value={filtroTipo}
+                  onChange={(e) => setFiltroTipo(e.target.value as 'Gym' | 'Natacion' | 'Todos')}
+                  className={`${AppStyles.inputDark} appearance-none cursor-pointer max-w-36 min-w-32 text-center`}
+                >
+                  <option value="Gym" className={AppStyles.darkBackgroundSelect}>Gimnasio</option>
+                  <option value="Natacion" className={AppStyles.darkBackgroundSelect}>Natación</option>
+                  <option value="Todos" className={AppStyles.darkBackgroundSelect}>Todos</option>
+                </select>
+              </div>
             </div>
+            
             <Button onClick={openCreateModal} className={AppStyles.btnPrimary}>
               + NUEVO PLAN
             </Button>
@@ -49,7 +68,7 @@ export const PlansManager = () => {
           {/* Catálogo de Planes */}
           {loading ? <p className="text-white text-center py-10">Cargando catálogo...</p> : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20 w-full">
-              {planes.map((plan) => (
+              {planesFiltrados.map((plan) => (
                 <Card key={plan.id} className={`${AppStyles.glassCard} hover:border-green-500/50 transition-all relative group flex flex-col`}>
                   
                   <div className="flex justify-between items-start mb-2">
@@ -178,8 +197,8 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
                         onChange={handleChange} 
                         className={AppStyles.inputDark + " appearance-none cursor-pointer"}
                     >
-                        <option value="Gym">Gimnasio / Musculación</option>
-                        <option value="Natacion">Natación</option>
+                        <option value="Gym" className={AppStyles.darkBackgroundSelect}>Gimnasio / Musculación</option>
+                        <option value="Natacion" className={AppStyles.darkBackgroundSelect}>Natación</option>
                     </select>
                 </div>
             </div>

@@ -1,6 +1,20 @@
 import api from '../axios';
 
 // Interfaz completa del Alumno 
+// Definición de la suscripción individual
+export interface UserPlanInfo {
+    id: number;
+    activo: boolean;
+    fechaInicio: string;
+    fechaVencimiento: string;
+    plan: {
+        id: number;
+        nombre: string;
+        tipo: 'Gym' | 'Natacion';
+        precio: number;
+    }
+}
+
 export interface AlumnoDTO {
     id: number;
     dni: string;            
@@ -9,16 +23,11 @@ export interface AlumnoDTO {
     telefono?: string;      
     fechaNacimiento?: string; 
     fotoPerfil?: string;
-    planActual?: {
-        id: number;
-        nombre: string;
-        precio: number;
-        duracionDias: number;
-    };
+    // CAMBIO: Ahora es una lista de planes
+    userPlans?: UserPlanInfo[]; 
     fechaVencimientoPlan?: string; 
     estadoMembresia?: string;
 }
-
 // Interfaz para Editar Perfil
 export interface UpdateProfileDTO {
     nombre: string;

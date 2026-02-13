@@ -4,18 +4,14 @@ import { UsuarioApi, type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
 import { showError, showSuccess, showConfirmSuccess } from "../../Helpers/Alerts";
 
 export const usePlans = () => {
-    // --- ESTADOS DE DATOS ---
     const [planes, setPlanes] = useState<PlanDTO[]>([]);
     const [loading, setLoading] = useState(false);
-    
-    // --- ESTADOS DE BUSQUEDA DE ALUMNOS ---
+    const [filtroTipo, setFiltroTipo] = useState<'Gym' | 'Natacion' | 'Todos'>('Gym');
     const [todosLosAlumnos, setTodosLosAlumnos] = useState<AlumnoDTO[]>([]);
     const [busqueda, setBusqueda] = useState("");
     const [sugerencias, setSugerencias] = useState<AlumnoDTO[]>([]);
     const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
     const [alumnoSeleccionadoId, setAlumnoSeleccionadoId] = useState<number | null>(null);
-
-    // --- ESTADOS DE UI ---
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<PlanDTO | null>(null);
@@ -29,15 +25,12 @@ export const usePlans = () => {
     const loadData = async () => {
         setLoading(true);
         try {
-            // Carga paralela de planes y alumnos para el admin
             const [listaPlanes, dataAlumnos] = await Promise.all([
                 PlansApi.getAll(),
-                UsuarioApi.getAlumnos(true) // true para traer planActual
+                UsuarioApi.getAlumnos(true) 
             ]);
-            
             setPlanes(listaPlanes);
             setTodosLosAlumnos(dataAlumnos);
-
         } catch (err: any) {
             console.error(err);
             showError("Error al cargar los datos.");
@@ -46,7 +39,11 @@ export const usePlans = () => {
         }
     };
 
-    // --- LOGICA DE BUSCADOR ---
+    const planesFiltrados = planes.filter(plan => {
+        if (filtroTipo === 'Todos') return true;
+        return plan.tipo === filtroTipo;
+    });
+
     const handleSearchChange = (text: string) => {
         setBusqueda(text);
         if (text.length > 0) {
@@ -69,17 +66,8 @@ export const usePlans = () => {
         setMostrarSugerencias(false);
     };
 
-    // --- FUNCIONES DEL MODAL ---
-    const openCreateModal = () => {
-        setEditingPlan(null);
-        setIsModalOpen(true);
-    };
-
-    const openEditModal = (plan: PlanDTO) => {
-        setEditingPlan(plan);
-        setIsModalOpen(true);
-    };
-
+    const openCreateModal = () => { setEditingPlan(null); setIsModalOpen(true); };
+    const openEditModal = (plan: PlanDTO) => { setEditingPlan(plan); setIsModalOpen(true); };
     const openSubscribeModal = (plan: PlanDTO) => {
         setSelectedPlanToSubscribe(plan);
         setBusqueda("");
@@ -91,7 +79,7 @@ export const usePlans = () => {
 
     const handleSavePlan = async (formData: PlanDTO) => {
         try {
-            if (editingPlan && editingPlan.id) {
+            if (editingPlan?.id) {
                 await PlansApi.update(editingPlan.id, formData);
                 showSuccess("Plan actualizado correctamente.");
             } else {
@@ -105,81 +93,77 @@ export const usePlans = () => {
         }
     };
 
-    // --- LOGICA PRINCIPAL DE SUSCRIPCIÓN ---
     const handleSubscribeUser = async () => {
         if (!selectedPlanToSubscribe || !alumnoSeleccionadoId) {
             return showError("Por favor selecciona un alumno primero.");
         }
 
         const alumnoObj = todosLosAlumnos.find(u => u.id === alumnoSeleccionadoId);
+        
+        // SEGURIDAD: Validamos que el alumno exista
+        if (!alumnoObj) {
+            return showError("El alumno seleccionado no es válido.");
+        }
 
-        if (alumnoObj && alumnoObj.planActual) {
-            const result = await showConfirmSuccess( 
-                `⚠️ ${alumnoObj.nombre} ya tiene activo el plan "${alumnoObj.planActual.nombre}".\n\n`,
-                `¿Deseas darlo de baja y activar el nuevo plan "${selectedPlanToSubscribe.nombre}" ahora mismo?\n`);
+        // Buscamos si ya tiene un plan ACTIVO del MISMO TIPO
+        const planMismoTipo = alumnoObj.userPlans?.find(
+            (up) => up.activo && up.plan.tipo === selectedPlanToSubscribe.tipo
+        );
+
+        if (planMismoTipo) {
+            const result = await showConfirmSuccess(
+                `Sustituir Plan de ${selectedPlanToSubscribe.tipo}`,
+                `⚠️ ${alumnoObj.nombre} ya tiene el plan "${planMismoTipo.plan.nombre}".\n\n` +
+                `¿Deseas darlo de baja y activar el nuevo plan "${selectedPlanToSubscribe.nombre}"?`
+            );
             
             if (!result.isConfirmed) return;
+
+            try {
+                setLoading(true);
+                // Usamos el ID de la suscripción específica (UserPlan.id)
+                await PlansApi.cancelPlan(planMismoTipo.id);
+            } catch (err) {
+                setLoading(false);
+                return showError("No se pudo dar de baja el plan anterior.");
+            }
         } else {
-            const nombreAlumno = alumnoObj ? alumnoObj.nombre : "este alumno";
             const result = await showConfirmSuccess(
-                "¿Confirmar?", 
-                `¿Confirmas asignar "${selectedPlanToSubscribe.nombre}" a ${nombreAlumno}?`
+                "¿Confirmar Asignación?",
+                `¿Asignar "${selectedPlanToSubscribe.nombre}" a ${alumnoObj.nombre}?`
             );
-            if (!result.isConfirmed) return; 
+            if (!result.isConfirmed) return;
         }
 
         try {
-            // Recibimos estadoRecibo en lugar de whatsappEnviado
-            const response: any = await PlansApi.subscribeUser(alumnoSeleccionadoId, selectedPlanToSubscribe.id!, metodoPago);
+            const response: any = await PlansApi.subscribeUser(
+                alumnoSeleccionadoId, 
+                selectedPlanToSubscribe.id!, 
+                metodoPago
+            );
             
-            // LÓGICA DE MENSAJES SEGÚN ESTADO REAL
             switch (response.estadoRecibo) {
-                case 'ENVIADO':
-                    showSuccess(`✅ Plan asignado. Recibo enviado por WhatsApp 📱`);
-                    break;
-                case 'DESACTIVADO':
-                    // Mensaje informativo (no es error, es configuración)
-                    showSuccess(`✅ Plan asignado correctamente.\n(Recibo automático desactivado 🔕)`);
-                    break;
-                case 'ERROR':
-                    // Mensaje de advertencia (se asignó el plan, pero falló el envío)
-                    showSuccess(`⚠️ Plan asignado, pero FALLÓ el envío del recibo.\n(Verifica conexión o número)`);
-                    break;
-                case 'SIN_TELEFONO':
-                    showSuccess(`✅ Plan asignado. (Usuario sin teléfono para recibo)`);
-                    break;
-                default:
-                    showSuccess(`✅ Plan asignado correctamente.`);
+                case 'ENVIADO': showSuccess(`✅ Plan asignado y recibo enviado.`); break;
+                case 'ERROR': showSuccess(`⚠️ Plan asignado, pero falló el envío del recibo.`); break;
+                default: showSuccess(`✅ Plan asignado correctamente.`);
             }
 
             setIsSubscribeModalOpen(false);
-            loadData(); 
+            loadData();
         } catch (error: any) {
-            showError("Error al asignar: " + (error.response?.data?.message || error.message));
+            showError("Error: " + (error.response?.data?.error || error.message));
+        } finally {
+            setLoading(false);
         }
     };
-
+    
     return {
-        planes,
-        loading,
-        isModalOpen,
-        isSubscribeModalOpen,
-        editingPlan,
-        selectedPlanToSubscribe,
-        busqueda,
-        sugerencias,
-        mostrarSugerencias,
-        metodoPago,
-        setIsModalOpen,
-        setIsSubscribeModalOpen,
-        setMostrarSugerencias,
-        openCreateModal,
-        openEditModal,
-        openSubscribeModal,
-        handleSavePlan,
-        handleSubscribeUser,
-        handleSearchChange,
-        handleSelectAlumno,
-        setMetodoPago
+        planes, planesFiltrados, loading, filtroTipo, setFiltroTipo,
+        isModalOpen, isSubscribeModalOpen, editingPlan, selectedPlanToSubscribe,
+        busqueda, sugerencias, mostrarSugerencias, metodoPago,
+        setIsModalOpen, setIsSubscribeModalOpen, setMostrarSugerencias,
+        openCreateModal, openEditModal, openSubscribeModal,
+        handleSavePlan, handleSubscribeUser, handleSearchChange,
+        handleSelectAlumno, setMetodoPago
     };
 };

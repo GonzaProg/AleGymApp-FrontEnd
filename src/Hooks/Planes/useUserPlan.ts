@@ -1,34 +1,36 @@
 import { useState, useEffect } from "react";
-import { PlansApi } from "../../API/Planes/PlansApi";
+import { PlansApi, type UserPlanDTO } from "../../API/Planes/PlansApi";
 
 export const useUserPlan = () => {
-    const [myPlan, setMyPlan] = useState<any>(null);
+    // Ahora 'activePlans' es un array
+    const [activePlans, setActivePlans] = useState<UserPlanDTO[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchMyPlan();
+        fetchMyPlans();
     }, []);
 
-    const fetchMyPlan = async () => {
+    const fetchMyPlans = async () => {
         setLoading(true);
         try {
-            const miPlanInfo = await PlansApi.getMyPlan();
-            if (miPlanInfo && miPlanInfo.tienePlan) {
-                setMyPlan(miPlanInfo);
+            const result = await PlansApi.getMyPlan();
+            
+            if (result && result.tienePlan && Array.isArray(result.planes)) {
+                setActivePlans(result.planes);
             } else {
-                setMyPlan(null);
+                setActivePlans([]);
             }
         } catch (err) {
-            console.error("Error al cargar mi plan:", err);
-            setError("No se pudo cargar la información del plan.");
+            console.error("Error al cargar mis planes:", err);
+            setError("No se pudo cargar la información de tus planes.");
         } finally {
             setLoading(false);
         }
     };
 
     return {
-        myPlan,
+        activePlans, // Array de planes
         loading,
         error
     };
