@@ -28,6 +28,7 @@ const processQueue = (error: any, token: string | null = null) => {
 };
 
 let isSessionExpiredAlertShown = false;
+let isAccessDeniedAlertShown = false;
 
 const api = axios.create({
     baseURL: baseURL,
@@ -72,14 +73,17 @@ api.interceptors.response.use(
             if (errorCode === "USER_LOCKED" || errorCode === "USER_EXPIRED") {
                 limpiarSesion();
                 const msg = error.response?.data?.error || "Tu cuenta no está activa.";
-                alert(`⛔ Acceso denegado: ${msg}`);
-                window.location.href = "/login";
+                if (!isAccessDeniedAlertShown) {
+                    isAccessDeniedAlertShown = true;
+                    alert(`⛔ Acceso denegado: ${msg}`);
+                    window.location.href = "/login";
+                    setTimeout(() => { isAccessDeniedAlertShown = false; }, 5000);
+                }
                 return Promise.reject(error);
             }
         }
 
         // --- CASO 2: TOKEN VENCIDO (401) ---
-        
         // Si falla el login, no hacemos refresh, devolvemos error directo
         if (originalRequest.url.includes('/auth/login')) {
             return Promise.reject(error);

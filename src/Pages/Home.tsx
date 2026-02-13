@@ -172,13 +172,15 @@ export const Home = () => {
                 <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
                 <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
-                <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
                 <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
+                <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
                 <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
+                <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Comunicación</p>
                 <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
                 <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
                 <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
+                <SidebarItem icon={Icons.usuarios} label="Nuevo Usuario" active={activeTab === "Usuarios"} onClick={() => handleSidebarClick("Usuarios")} />
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
                 <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
                 <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
@@ -187,8 +189,6 @@ export const Home = () => {
                     <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Administración</p>
                     <SidebarItem icon={Icons.nuevoGym} label="Nuevo Gimnasio" active={activeTab === "Nuevo Gimnasio"} onClick={() => handleSidebarClick("Nuevo Gimnasio")} />
                     <SidebarItem icon={Icons.gestionGyms} label="Gestión Gimnasios" active={activeTab === "Gestión Gimnasios"} onClick={() => handleSidebarClick("Gestión Gimnasios")} />
-                    <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
-                    <SidebarItem icon={Icons.usuarios} label="Usuarios" active={activeTab === "Usuarios"} onClick={() => handleSidebarClick("Usuarios")} />
                   </>
                 )}
               </nav>

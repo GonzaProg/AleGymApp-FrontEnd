@@ -41,35 +41,31 @@ export const useEjerciciosCrear = () => {
         setLoading(true);
 
         try {
-            let finalVideoUrl = "";
-            let finalImageUrl = "";
+            // CORRECCIÓN AQUÍ: Priorizamos la lógica de Admin
+            if (isAdmin) {
+                // Lógica Admin: Sube archivos y crea completo
+                let finalVideoUrl = "";
+                let finalImageUrl = "";
 
-            const uploadPromises: Promise<void>[] = [];
+                if (selectedVideo) {
+                    finalVideoUrl = await CloudinaryApi.upload(selectedVideo, 'ejercicios', 'Ejercicios', 'video');
+                }
+                
+                if (selectedImage) {
+                    finalImageUrl = await CloudinaryApi.upload(selectedImage, 'ejercicios', 'Ejercicios', 'image');
+                }
 
-            if (selectedVideo) {
-                // AQUI EL CAMBIO: Pasamos 'ejercicios' como segundo parámetro
-                uploadPromises.push(
-                    CloudinaryApi.upload(selectedVideo, 'ejercicios', 'Ejercicios', 'video')
-                        .then(url => { finalVideoUrl = url; })
-                );
+                const ejercicioData: EjercicioDTO = {
+                    nombre: form.nombre,
+                    urlVideo: finalVideoUrl || undefined,
+                    imagenUrl: finalImageUrl || undefined
+                };
+
+                await EjerciciosApi.create(ejercicioData);
+            } else {
+                // Lógica Entrenador: Solo crea el nombre, ignora archivos si hubiese
+                await EjerciciosApi.createBasic(form.nombre);
             }
-            if (selectedImage) {
-                // AQUI EL CAMBIO: Pasamos 'ejercicios'
-                uploadPromises.push(
-                    CloudinaryApi.upload(selectedImage, 'ejercicios', 'Ejercicios', 'image')
-                        .then(url => { finalImageUrl = url; })
-                );
-            }
-
-            await Promise.all(uploadPromises);
-
-            const ejercicioData: EjercicioDTO = {
-                nombre: form.nombre,
-                urlVideo: finalVideoUrl,
-                imagenUrl: finalImageUrl
-            };
-
-            await EjerciciosApi.create(ejercicioData);
             
             await showSuccess("Ejercicio creado correctamente.");
             

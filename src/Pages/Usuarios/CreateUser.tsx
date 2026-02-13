@@ -12,7 +12,7 @@ export const CreateUser = () => {
           
             {/* Título */}
             <div className={AppStyles.headerContainer + " mt-24 mb-6"}>
-                <p className={AppStyles.subtitle}>Completa los datos para dar de alta un acceso.</p>
+                <p className={AppStyles.subtitle}>Completa los datos para crear un nuevo usuario.</p>
             </div>
 
             {/* TARJETA */}

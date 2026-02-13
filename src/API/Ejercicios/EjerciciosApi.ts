@@ -21,9 +21,15 @@ export const EjerciciosApi = {
         return response.data;
     },
 
-    // 2. Crear
+    // 2. Crear (completo - solo admin)
     create: async (data: EjercicioDTO): Promise<Ejercicio> => {
         const response = await api.post('/ejercicios', data);
+        return response.data;
+    },
+
+    // 2b. Crear básico (solo nombre - admin y entrenador)
+    createBasic: async (nombre: string): Promise<Ejercicio> => {
+        const response = await api.post('/ejercicios/basico', { nombre });
         return response.data;
     },
 
