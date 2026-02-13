@@ -27,6 +27,11 @@ export interface AlumnoDTO {
     userPlans?: UserPlanInfo[]; 
     fechaVencimientoPlan?: string; 
     estadoMembresia?: string;
+    planResumen?: {
+        estado: 'Activo' | 'Vencido' | 'Sin Plan';
+        nombre?: string;
+        vencimiento?: string;
+    };
 }
 // Interfaz para Editar Perfil
 export interface UpdateProfileDTO {
@@ -44,14 +49,27 @@ export interface ChangePasswordDTO {
     confirmPassword?: string;
 }
 
+// Interfaz para la respuesta paginada
+export interface GetAlumnosResponse {
+    total: number;
+    alumnos: AlumnoDTO[];
+}
+
 export const UsuarioApi = {
-    // Obtener alumnos
-    getAlumnos: async (includePlan: boolean = false) => {
-        const query = includePlan ? '?includePlan=true' : '';
-        const response = await api.get(`/users/alumnos${query}`); 
+// MODIFICADO: Ahora acepta opciones de filtrado y paginación
+    getAlumnos: async (options?: { includePlan?: boolean, search?: string, showAll?: boolean }): Promise<GetAlumnosResponse> => {
+        const params = new URLSearchParams();
+        
+        if (options?.includePlan) params.append('includePlan', 'true');
+        if (options?.showAll) params.append('showAll', 'true');
+        if (options?.search) params.append('search', options.search);
+
+        const response = await api.get(`/users/alumnos?${params.toString()}`); 
+        
+        // El backend ahora devuelve { total, alumnos }
         return response.data;
     },
-
+    
     // Actualizar Perfil
     update: async (id: number, data: UpdateProfileDTO) => {
         const response = await api.put(`/users/${id}`, data);

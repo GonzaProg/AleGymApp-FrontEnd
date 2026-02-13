@@ -7,9 +7,9 @@ export const ManualReceipt = () => {
         alumnoSeleccionado,
         sugerencias,
         busqueda,
-        setBusqueda,
-        seleccionarAlumno,
-        limpiarSeleccion,
+        handleSearchChange,
+        handleSelectAlumno,
+        clearSelection,
         enviarRecibo,
         sending
     } = useManualReceipt();
@@ -34,7 +34,7 @@ export const ManualReceipt = () => {
                             <input
                                 type="text"
                                 value={busqueda}
-                                onChange={(e) => setBusqueda(e.target.value)}
+                                onChange={(e) => handleSearchChange(e.target.value)}
                                 placeholder="🔍 Buscar alumno por nombre..."
                                 className={`${AppStyles.searchInput} focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500`}
                             />
@@ -44,16 +44,13 @@ export const ManualReceipt = () => {
                                     {sugerencias.map((alumno) => (
                                         <li
                                             key={alumno.id}
-                                            onClick={() => seleccionarAlumno(alumno)}
+                                            onClick={() => handleSelectAlumno(alumno)}
                                             className={AppStyles.suggestionItem}
                                         >
                                             <div className={AppStyles.avatarSmall.replace("bg-gray-800 text-green-400 border-green-500/30", "bg-cyan-900/50 text-cyan-400 border-cyan-500/30")}>
                                                 {alumno.nombre.charAt(0)}
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
-                                                <span className="text-xs text-gray-500">{alumno.email}</span>
-                                            </div>
+                                            <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -82,7 +79,7 @@ export const ManualReceipt = () => {
                                     </div>
                                     <div>
                                         <h2 className="text-2xl font-bold text-white">{alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido}</h2>
-                                        <button onClick={limpiarSeleccion} className="text-xs text-gray-400 hover:text-cyan-400 underline transition-colors">
+                                        <button onClick={clearSelection} className="text-xs text-gray-400 hover:text-cyan-400 underline transition-colors">
                                             Cambiar usuario
                                         </button>
                                     </div>

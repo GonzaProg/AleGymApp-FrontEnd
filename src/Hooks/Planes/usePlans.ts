@@ -1,22 +1,30 @@
 import { useState, useEffect } from "react";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
-import { UsuarioApi, type AlumnoDTO } from "../../API/Usuarios/UsuarioApi"; 
 import { showError, showSuccess, showConfirmSuccess } from "../../Helpers/Alerts";
+import { useAlumnoSearch } from "../useAlumnoSearch";
 
 export const usePlans = () => {
     const [planes, setPlanes] = useState<PlanDTO[]>([]);
     const [loading, setLoading] = useState(false);
     const [filtroTipo, setFiltroTipo] = useState<'Gym' | 'Natacion' | 'Todos'>('Gym');
-    const [todosLosAlumnos, setTodosLosAlumnos] = useState<AlumnoDTO[]>([]);
-    const [busqueda, setBusqueda] = useState("");
-    const [sugerencias, setSugerencias] = useState<AlumnoDTO[]>([]);
-    const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
     const [alumnoSeleccionadoId, setAlumnoSeleccionadoId] = useState<number | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubscribeModalOpen, setIsSubscribeModalOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<PlanDTO | null>(null);
     const [selectedPlanToSubscribe, setSelectedPlanToSubscribe] = useState<PlanDTO | null>(null);
     const [metodoPago, setMetodoPago] = useState("Transferencia");
+
+    // Usamos el hook centralizado para la búsqueda de alumnos
+    const {
+        busqueda,
+        sugerencias,
+        mostrarSugerencias,
+        todosLosAlumnos,
+        handleSearchChange,
+        handleSelectAlumno,
+        setMostrarSugerencias,
+        clearSelection
+    } = useAlumnoSearch({ includePlan: true, initialLoad: true });
 
     useEffect(() => {
         loadData();
@@ -25,12 +33,8 @@ export const usePlans = () => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [listaPlanes, dataAlumnos] = await Promise.all([
-                PlansApi.getAll(),
-                UsuarioApi.getAlumnos(true) 
-            ]);
+            const listaPlanes = await PlansApi.getAll();
             setPlanes(listaPlanes);
-            setTodosLosAlumnos(dataAlumnos);
         } catch (err: any) {
             console.error(err);
             showError("Error al cargar los datos.");
@@ -44,53 +48,19 @@ export const usePlans = () => {
         return plan.tipo === filtroTipo;
     });
 
-    const handleSearchChange = (text: string) => {
-        setBusqueda(text);
-        if (text.length > 0) {
-            const filtrados = todosLosAlumnos.filter((alumno) => {
-                const nombreCompleto = `${alumno.nombre} ${alumno.apellido}`.toLowerCase();
-                return nombreCompleto.includes(text.toLowerCase());
-            });
-            setSugerencias(filtrados);
-            setMostrarSugerencias(true);
-        } else {
-            setSugerencias([]);
-            setMostrarSugerencias(false);
-            setAlumnoSeleccionadoId(null);
-        }
-    };
-
-    const handleSelectAlumno = (alumno: AlumnoDTO) => {
-        setBusqueda(`${alumno.nombre} ${alumno.apellido}`);
+    const handleSelectAlumnoWithId = (alumno: any) => {
+        handleSelectAlumno(alumno);
         setAlumnoSeleccionadoId(alumno.id);
-        setMostrarSugerencias(false);
     };
-
     const openCreateModal = () => { setEditingPlan(null); setIsModalOpen(true); };
     const openEditModal = (plan: PlanDTO) => { setEditingPlan(plan); setIsModalOpen(true); };
+
     const openSubscribeModal = (plan: PlanDTO) => {
         setSelectedPlanToSubscribe(plan);
-        setBusqueda("");
+        clearSelection();
         setAlumnoSeleccionadoId(null);
-        setSugerencias([]);
         setMetodoPago("Transferencia");
         setIsSubscribeModalOpen(true);
-    };
-
-    const handleSavePlan = async (formData: PlanDTO) => {
-        try {
-            if (editingPlan?.id) {
-                await PlansApi.update(editingPlan.id, formData);
-                showSuccess("Plan actualizado correctamente.");
-            } else {
-                await PlansApi.create(formData);
-                showSuccess("Plan creado correctamente.");
-            }
-            setIsModalOpen(false);
-            loadData();
-        } catch (err: any) {
-            showError("Error: " + (err.response?.data?.message || err.message));
-        }
     };
 
     const handleSubscribeUser = async () => {
@@ -156,7 +126,23 @@ export const usePlans = () => {
             setLoading(false);
         }
     };
-    
+
+    const handleSavePlan = async (formData: PlanDTO) => {
+        try {
+            if (editingPlan?.id) {
+                await PlansApi.update(editingPlan.id, formData);
+                showSuccess("Plan actualizado correctamente.");
+            } else {
+                await PlansApi.create(formData);
+                showSuccess("Plan creado correctamente.");
+            }
+            setIsModalOpen(false);
+            loadData();
+        } catch (err: any) {
+            showError("Error: " + (err.response?.data?.message || err.message));
+        }
+    };
+
     return {
         planes, planesFiltrados, loading, filtroTipo, setFiltroTipo,
         isModalOpen, isSubscribeModalOpen, editingPlan, selectedPlanToSubscribe,
@@ -164,6 +150,6 @@ export const usePlans = () => {
         setIsModalOpen, setIsSubscribeModalOpen, setMostrarSugerencias,
         openCreateModal, openEditModal, openSubscribeModal,
         handleSavePlan, handleSubscribeUser, handleSearchChange,
-        handleSelectAlumno, setMetodoPago
+        handleSelectAlumno: handleSelectAlumnoWithId, setMetodoPago
     };
 };

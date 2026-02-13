@@ -1,22 +1,28 @@
 import { useState, useEffect } from "react";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
-import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { showSuccess, showError, showConfirmSuccess } from "../../Helpers/Alerts";
+import { useAlumnoSearch } from "../useAlumnoSearch";
 
 export const useGeneralRoutinesManager = () => {
     // Datos
     const [rutinas, setRutinas] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
 
     // Buscador y Modal
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [selectedRutina, setSelectedRutina] = useState<any | null>(null);
-    
-    const [busqueda, setBusqueda] = useState("");
-    const [sugerencias, setSugerencias] = useState<any[]>([]);
-    const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
-    const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
+
+    // Usamos el hook centralizado para la búsqueda de alumnos
+    const {
+        busqueda,
+        sugerencias,
+        mostrarSugerencias,
+        alumnoSeleccionado,
+        handleSearchChange,
+        handleSelectAlumno,
+        setMostrarSugerencias,
+        clearSelection
+    } = useAlumnoSearch({ initialLoad: true });
 
     // 1. Carga Inicial
     useEffect(() => {
@@ -26,12 +32,8 @@ export const useGeneralRoutinesManager = () => {
     const loadData = async () => {
         setLoading(true);
         try {
-            const [dataRutinas, dataAlumnos] = await Promise.all([
-                RutinasApi.getGenerales(),
-                UsuarioApi.getAlumnos()
-            ]);
+            const dataRutinas = await RutinasApi.getGenerales();
             setRutinas(dataRutinas);
-            setTodosLosAlumnos(dataAlumnos);
         } catch (error) {
             console.error(error);
             showError("Error cargando rutinas generales");
@@ -40,34 +42,10 @@ export const useGeneralRoutinesManager = () => {
         }
     };
 
-    // 2. Lógica Buscador (Reutilizada)
-    const handleSearchChange = (text: string) => {
-        setBusqueda(text);
-        if (text.length > 0) {
-            const filtrados = todosLosAlumnos.filter((u) => 
-                `${u.nombre} ${u.apellido}`.toLowerCase().includes(text.toLowerCase())
-            );
-            setSugerencias(filtrados);
-            setMostrarSugerencias(true);
-        } else {
-            setSugerencias([]);
-            setMostrarSugerencias(false);
-            setAlumnoSeleccionado(null);
-        }
-    };
-
-    const handleSelectAlumno = (alumno: any) => {
-        setBusqueda(`${alumno.nombre} ${alumno.apellido}`);
-        setAlumnoSeleccionado(alumno);
-        setMostrarSugerencias(false);
-    };
-
     // 3. Abrir Modal Asignar
     const openAssignModal = (rutina: any) => {
         setSelectedRutina(rutina);
-        setBusqueda("");
-        setAlumnoSeleccionado(null);
-        setSugerencias([]);
+        clearSelection();
         setIsAssignModalOpen(true);
     };
 

@@ -56,10 +56,7 @@ export const DeleteRoutine = () => {
                                     <div className={AppStyles.avatarSmall.replace("text-green-400 border-green-500/30", "text-red-400 border-red-500/30")}>
                                         {alumno.nombre.charAt(0)}
                                     </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
-                                        <span className="text-xs text-gray-500">{alumno.email}</span>
-                                    </div>
+                                    <span className="text-gray-200 font-medium">{alumno.nombre} {alumno.apellido}</span>
                                 </li>
                             ))}
                         </ul>

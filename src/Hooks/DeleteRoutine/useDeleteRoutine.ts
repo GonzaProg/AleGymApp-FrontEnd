@@ -1,62 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 // 1. Importamos las APIs y el Auth
-import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { useAuthUser } from "../Auth/useAuthUser"; 
 import { showSuccess, showError, showConfirmDelete } from "../../Helpers/Alerts";
+import { useAlumnoSearch } from "../useAlumnoSearch";
 
 export const useDeleteRoutine = () => {
   // --- SEGURIDAD ---
   const { isAdmin, isEntrenador } = useAuthUser(); // Traemos el rol del usuario
 
   // --- ESTADOS ---
-  const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
   const [rutinas, setRutinas] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); // Útil para mostrar spinners
 
-  // Buscador
-  const [busqueda, setBusqueda] = useState("");
-  const [sugerencias, setSugerencias] = useState<any[]>([]);
-  const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
-  const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any>(null);
-
-  // 1. Cargar lista de alumnos (Al montar)
-  useEffect(() => {
-    const fetchAlumnos = async () => {
-      try {
-        // Llamada limpia a la API
-        const data = await UsuarioApi.getAlumnos();
-        setTodosLosAlumnos(data);
-      } catch (error) {
-        console.error("Error cargando alumnos", error);
-      }
-    };
-    fetchAlumnos();
-  }, []);
-
-  // 2. Lógica del Buscador
-  const handleSearchChange = (text: string) => {
-    setBusqueda(text);
-    if (text.length > 0) {
-      const filtrados = todosLosAlumnos.filter((alumno) => {
-        const nombreCompleto = `${alumno.nombre} ${alumno.apellido}`.toLowerCase();
-        return nombreCompleto.includes(text.toLowerCase());
-      });
-      setSugerencias(filtrados);
-      setMostrarSugerencias(true);
-    } else {
-      setSugerencias([]);
-      setMostrarSugerencias(false);
-      setAlumnoSeleccionado(null);
-      setRutinas([]);
-    }
-  };
+  // Usamos el hook centralizado para la búsqueda de alumnos
+  const {
+    busqueda,
+    sugerencias,
+    mostrarSugerencias,
+    alumnoSeleccionado,
+    handleSearchChange,
+    handleSelectAlumno,
+    setMostrarSugerencias,
+    clearSelection
+  } = useAlumnoSearch({ initialLoad: true });
 
   // Seleccionar Alumno y cargar sus rutinas
-  const handleSelectAlumno = async (alumno: any) => {
-    setBusqueda(`${alumno.nombre} ${alumno.apellido}`);
-    setAlumnoSeleccionado(alumno);
-    setMostrarSugerencias(false);
+  const handleSelectAlumnoWithRutinas = async (alumno: any) => {
+    handleSelectAlumno(alumno);
     setLoading(true);
 
     try {
@@ -113,7 +84,8 @@ export const useDeleteRoutine = () => {
     isEntrenador,
     setMostrarSugerencias,
     handleSearchChange,
-    handleSelectAlumno,
+    handleSelectAlumno: handleSelectAlumnoWithRutinas,
     handleDelete,
+    clearSelection
   };
 };
