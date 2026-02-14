@@ -12,10 +12,10 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
   const {
     ejercicios, busqueda, sugerencias, mostrarSugerencias, nombreRutina, detalles,
     ejercicioId, series, reps, peso,
-    setNombreRutina, setEjercicioId, setMostrarSugerencias, setDetalles,
+    setNombreRutina, setEjercicioId, setMostrarSugerencias,
     handleSearchChange, handleSelectAlumno, handleSeriesChange, handleRepsChange, handlePesoChange, handleAddExercise, handleSubmit,
     // Nuevos del hook
-    editIndex, handleEditRow, cancelEditRow
+    editIndex, handleEditRow, cancelEditRow, handleDeleteRow
   } = useCreateRoutine(isGeneral, routineIdToEdit); 
 
   return (
@@ -121,7 +121,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                       <td className="p-4 text-center text-green-400">{d.peso}</td>
                       <td className="p-4 text-right flex justify-end gap-2">
                         <button onClick={() => handleEditRow(index)} className="text-yellow-500 bg-yellow-500/10 p-2 rounded">✏️</button>
-                        <button onClick={() => setDetalles(detalles.filter((_, i) => i !== index))} className="text-red-500 bg-red-500/10 p-2 rounded">🗑️</button>
+                        <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 p-2 rounded">🗑️</button>
                       </td>
                     </tr>
                   ))}

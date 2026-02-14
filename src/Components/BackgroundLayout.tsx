@@ -51,7 +51,7 @@ export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, cl
         
         {/* 2. MANCUERNAS PARPADEANTES */}
         <div style={styles.starsContainer}>
-          {[...Array(20)].map((_, i) => { 
+          {[...Array(8)].map((_, i) => { 
             const randomSize = 20 + Math.random() * 25; 
             const randomRotation = Math.random() * 360;
             
