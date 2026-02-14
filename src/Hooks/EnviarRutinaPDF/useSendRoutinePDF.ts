@@ -54,8 +54,11 @@ export const useSendRoutinePDF = () => {
     setSendingId(rutinaId); // Activamos spinner solo en este botón
 
     try {
-      // Llamamos al endpoint específico
-      await api.post(`/rutinas/${rutinaId}/enviar-whatsapp`);
+      // Enviamos el ID del alumno seleccionado para rutinas generales
+      const payload = alumnoSeleccionado ? { alumnoId: alumnoSeleccionado.id } : {};
+      
+      // Llamamos al endpoint específico con el payload
+      await api.post(`/rutinas/${rutinaId}/enviar-whatsapp`, payload);
       
       showSuccess("PDF enviado correctamente 📤");
     } catch (error: any) {
