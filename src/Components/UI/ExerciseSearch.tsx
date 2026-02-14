@@ -47,6 +47,13 @@ export const ExerciseSearch = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Limpiar searchTerm cuando el value se limpia externamente
+  useEffect(() => {
+    if (!value) {
+      setSearchTerm("");
+    }
+  }, [value]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);

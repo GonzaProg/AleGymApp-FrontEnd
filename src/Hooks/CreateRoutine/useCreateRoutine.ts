@@ -21,92 +21,110 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   const [detalles, setDetalles] = useState<any[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  // Usamos el hook centralizado para la búsqueda de alumnos
+  // Usamos el hook centralizado
   const {
     busqueda,
     sugerencias,
     mostrarSugerencias,
     handleSearchChange,
     handleSelectAlumno,
-    setMostrarSugerencias
+    setMostrarSugerencias,
+    setBusqueda // Necesario para pre-cargar el nombre al editar
   } = useAlumnoSearch();
 
-  // Handler para seleccionar alumno con ID
+  // 1. CARGA INICIAL
+  // Quitamos las funciones del array de dependencias para evitar el bucle infinito
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchData = async () => {
+      try {
+        const dataEjercicios = await EjerciciosApi.getAll();
+        if (mounted) setEjercicios(dataEjercicios);
+
+        // SI HAY ID, ES EDICIÓN
+        if (routineIdToEdit) {
+            const rutina = await RutinasApi.getOne(routineIdToEdit);
+            
+            if (mounted) {
+                setNombreRutina(rutina.nombreRutina);
+                
+                // Cargar datos del alumno en el buscador y en el estado local
+                if (rutina.usuarioAlumno) {
+                    setBusqueda(`${rutina.usuarioAlumno.nombre} ${rutina.usuarioAlumno.apellido}`);
+                    setAlumnoId(rutina.usuarioAlumno.id.toString());
+                }
+
+                // Mapear detalles
+                const detallesFormateados = rutina.detalles.map((d: any) => ({
+                    ejercicioId: d.ejercicio.id,
+                    nombreEjercicio: d.ejercicio.nombre,
+                    series: d.series,
+                    repeticiones: d.repeticiones,
+                    peso: d.peso
+                }));
+                setDetalles(detallesFormateados);
+            }
+        }
+      } catch (error) { 
+          console.error(error); 
+      }
+    };
+
+    fetchData();
+
+    return () => { mounted = false; };
+  }, [routineIdToEdit]); // <--- FIX: Solo se ejecuta si cambia el ID de edición
+
+  // --- HANDLERS ALUMNO ---
   const handleSelectAlumnoWithId = (alumno: any) => {
     handleSelectAlumno(alumno);
     setAlumnoId(alumno.id);
   };
 
-  // Handler para cambios en búsqueda que resetea el ID
   const handleSearchChangeWithReset = (text: string) => {
     handleSearchChange(text);
-    // Si el usuario borra y escribe algo nuevo, reseteamos el ID seleccionado
     if (alumnoId) setAlumnoId(""); 
   };
 
-  // 1. CARGA INICIAL (Solo Ejercicios y Datos de Edición)
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const dataEjercicios = await EjerciciosApi.getAll();
-        setEjercicios(dataEjercicios);
-
-        // SI HAY ID, ES EDICIÓN: CARGAMOS LA RUTINA
-        if (routineIdToEdit) {
-            const rutina = await RutinasApi.getOne(routineIdToEdit);
-            setNombreRutina(rutina.nombreRutina);
-            
-            // Si es edición, seteamos el nombre del alumno en el buscador para que se vea
-            if (rutina.usuarioAlumno) {
-                handleSearchChangeWithReset(`${rutina.usuarioAlumno.nombre} ${rutina.usuarioAlumno.apellido}`);
-                setAlumnoId(rutina.usuarioAlumno.id.toString());
-            }
-
-            const detallesFormateados = rutina.detalles.map((d: any) => ({
-                ejercicioId: d.ejercicio.id,
-                nombreEjercicio: d.ejercicio.nombre,
-                series: d.series,
-                repeticiones: d.repeticiones,
-                peso: d.peso
-            }));
-            setDetalles(detallesFormateados);
-        }
-
-      } catch (error) { console.error(error); }
-    };
-    fetchData();
-  }, [isGeneral, routineIdToEdit, handleSearchChangeWithReset]);
-
+  // --- HANDLERS INPUTS ---
   const handleSeriesChange = (e: any) => setSeries(e.target.value);
   const handleRepsChange = (e: any) => setReps(e.target.value);
   const handlePesoChange = (e: any) => setPeso(e.target.value);
 
-  // 3. LÓGICA AGREGAR / ACTUALIZAR FILA
+  // --- LÓGICA TABLA (Agregar/Editar) ---
   const handleAddExercise = () => {
     if (!ejercicioId) return showError("Selecciona un ejercicio");
+    if (Number(series) <= 0 || Number(reps) <= 0) return showError("Series y Reps deben ser mayor a 0");
     
     const pesoFinal = peso.trim() === "" ? "A elección" : peso;
-    const ejercicioNombre = ejercicios.find((e) => e.id === parseInt(ejercicioId))?.nombre;
+    const ejercicioEncontrado = ejercicios.find((e) => e.id === Number(ejercicioId));
+    const ejercicioNombre = ejercicioEncontrado?.nombre || "Desconocido";
 
     const nuevoDetalle = {
-      ejercicioId: parseInt(ejercicioId),
+      ejercicioId: Number(ejercicioId),
       nombreEjercicio: ejercicioNombre,
-      series: parseInt(series.toString()),
-      repeticiones: parseInt(reps.toString()),
+      series: Number(series),
+      repeticiones: Number(reps),
       peso: pesoFinal,
     };
 
     if (editIndex !== null) {
-        const copia = [...detalles];
-        copia[editIndex] = nuevoDetalle;
-        setDetalles(copia);
+        // Editar
+        setDetalles(prev => {
+            const copia = [...prev];
+            copia[editIndex] = nuevoDetalle;
+            return copia;
+        });
         setEditIndex(null); 
         showSuccess("Fila actualizada");
     } else {
-        setDetalles([...detalles, nuevoDetalle]);
+        // Agregar
+        setDetalles(prev => [...prev, nuevoDetalle]);
     }
 
-    setSeries(4); setReps(10); setPeso("");
+    // Reset inputs
+    setSeries(4); setReps(10); setPeso(""); setEjercicioId("");
   };
 
   const handleEditRow = (index: number) => {
@@ -116,6 +134,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       setReps(item.repeticiones);
       setPeso(item.peso === "A elección" ? "" : item.peso);
       setEditIndex(index);
+      // Scroll suave hacia arriba
       window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -124,15 +143,25 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       setSeries(4); setReps(10); setPeso(""); setEjercicioId("");
   };
 
+  const handleDeleteRow = (index: number) => {
+      setDetalles(prev => prev.filter((_, i) => i !== index));
+      if (editIndex === index) cancelEditRow();
+  };
+
   // 4. GUARDAR
   const handleSubmit = async () => {
-    if ((!isGeneral && !alumnoId) || !nombreRutina || detalles.length === 0) {
-      return showError("Completa todos los Datos Generales y agrega al menos un Ejercicio");
+    // Validaciones
+    if (!nombreRutina.trim()) return showError("El nombre de la rutina es obligatorio");
+    if (detalles.length === 0) return showError("Agrega al menos un ejercicio");
+    
+    // Si NO es general y NO hay ID de alumno (ni nuevo ni precargado)
+    if (!isGeneral && !alumnoId) {
+        return showError("Debes seleccionar un alumno");
     }
 
     try {
       const body = {
-        usuarioAlumnoId: isGeneral ? null : parseInt(alumnoId),
+        usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
         nombreRutina,
         detalles,
         esGeneral: isGeneral
@@ -149,17 +178,28 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       window.location.reload();
 
     } catch (error: any) {
+      console.error(error);
       showError("Error al guardar la rutina");
     }
   };
 
   return {
-    ejercicios, busqueda, sugerencias, mostrarSugerencias, nombreRutina, detalles,
-    ejercicioId, series, reps, peso,
-    setNombreRutina, setEjercicioId, setMostrarSugerencias, setDetalles,
-    handleSearchChange: handleSearchChangeWithReset, handleSelectAlumno: handleSelectAlumnoWithId, 
-    handleSeriesChange, handleRepsChange, handlePesoChange, 
-    handleAddExercise, handleSubmit,
-    editIndex, handleEditRow, cancelEditRow
+    // Datos
+    ejercicios, nombreRutina, detalles,
+    // Buscador
+    busqueda, sugerencias, mostrarSugerencias, 
+    handleSearchChange: handleSearchChangeWithReset, 
+    handleSelectAlumno: handleSelectAlumnoWithId,
+    setMostrarSugerencias, setNombreRutina,
+    // Formulario
+    ejercicioId, setEjercicioId,
+    series, handleSeriesChange,
+    reps, handleRepsChange,
+    peso, handlePesoChange,
+    // Acciones Tabla
+    handleAddExercise, 
+    editIndex, handleEditRow, cancelEditRow, handleDeleteRow,
+    // Submit
+    handleSubmit
   };
 };
