@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, Suspense, lazy } from "react";
 
 // Swiper Imports
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -18,73 +18,69 @@ import { HomeStyles } from "../Styles/HomeStyles";
 import { BackgroundLayout } from "../Components/BackgroundLayout"; 
 import { Navbar } from "../Components/Navbar";
 
-// Importación de Vistas de Alumno
-import { MyRoutines } from "./Rutinas/MyRoutines";
-import { UserPlan } from "./Planes/UserPlan";
-import { UserProfile } from "./Usuarios/UserProfile"; 
+// --- IMPORTACIONES PEREZOSAS ---
+// Usamos .then(module => ({ default: module.Nombre }))
+const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
+const UserPlan = lazy(() => import("./Planes/UserPlan").then(module => ({ default: module.UserPlan })));
+const UserProfile = lazy(() => import("./Usuarios/UserProfile").then(module => ({ default: module.UserProfile })));
 
-// Importación de páginas
-import { PlansManager } from "../Pages/Planes/PlansManager";
-import { CreateRoutine } from "../Pages/Rutinas/CreateRoutine";
-import { EjerciciosGestion } from "../Pages/Ejercicios/EjerciciosGestion";
-import { EjerciciosCrear } from "../Pages/Ejercicios/EjerciciosCrear";
-import { CreateNotification } from "../Pages/Notificaciones/CreateNotification";
-import { CreateUser } from "../Pages/Usuarios/CreateUser";
-import { DeleteRoutine } from "../Pages/Rutinas/DeleteRoutine";
-import { RenewPlan } from "../Pages/Planes/RenewPlan";
-import { Profile } from "../Pages/Usuarios/Profile"; 
-import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
-import { CreateGym } from "../Pages/Gym/CreateGym";
-import { GymManagement } from "../Pages/Gym/GymManagement"; 
-import { Preferences } from "../Pages/Config/Preferences"; 
-import { ManualReceipt } from "../Pages/Planes/ReciboManual";
-import { GeneralRoutinesManager } from "../Pages/Rutinas/GeneralRoutinesManager";
-import { UsersManager } from "../Pages/Usuarios/UsersManager";
-import { MetricasFinancieras } from "./Pagos/MetricasFinancieras";
-
-// IMÁGENES (Eliminadas - reemplazadas por BackgroundLayout)
-// Todas las imágenes de fondo han sido reemplazadas por el efecto Neon Aurora 
+// Vistas de Admin (Lazy Loading)
+const PlansManager = lazy(() => import("../Pages/Planes/PlansManager").then(module => ({ default: module.PlansManager })));
+const CreateRoutine = lazy(() => import("../Pages/Rutinas/CreateRoutine").then(module => ({ default: module.CreateRoutine })));
+const GeneralRoutinesManager = lazy(() => import("../Pages/Rutinas/GeneralRoutinesManager").then(module => ({ default: module.GeneralRoutinesManager })));
+const EjerciciosGestion = lazy(() => import("../Pages/Ejercicios/EjerciciosGestion").then(module => ({ default: module.EjerciciosGestion })));
+const EjerciciosCrear = lazy(() => import("../Pages/Ejercicios/EjerciciosCrear").then(module => ({ default: module.EjerciciosCrear })));
+const CreateNotification = lazy(() => import("../Pages/Notificaciones/CreateNotification").then(module => ({ default: module.CreateNotification })));
+const CreateUser = lazy(() => import("../Pages/Usuarios/CreateUser").then(module => ({ default: module.CreateUser })));
+const UsersManager = lazy(() => import("../Pages/Usuarios/UsersManager").then(module => ({ default: module.UsersManager })));
+const DeleteRoutine = lazy(() => import("../Pages/Rutinas/DeleteRoutine").then(module => ({ default: module.DeleteRoutine })));
+const SendRoutinePDF = lazy(() => import("../Pages/Rutinas/SendRoutinePDF").then(module => ({ default: module.SendRoutinePDF })));
+const RenewPlan = lazy(() => import("../Pages/Planes/RenewPlan").then(module => ({ default: module.RenewPlan })));
+const Profile = lazy(() => import("../Pages/Usuarios/Profile").then(module => ({ default: module.Profile })));
+const Preferences = lazy(() => import("../Pages/Config/Preferences").then(module => ({ default: module.Preferences })));
+const CreateGym = lazy(() => import("../Pages/Gym/CreateGym").then(module => ({ default: module.CreateGym })));
+const GymManagement = lazy(() => import("../Pages/Gym/GymManagement").then(module => ({ default: module.GymManagement })));
+const ManualReceipt = lazy(() => import("../Pages/Planes/ReciboManual").then(module => ({ default: module.ManualReceipt })));
+const MetricasFinancieras = lazy(() => import("./Pagos/MetricasFinancieras").then(module => ({ default: module.MetricasFinancieras })));
 
 const Icons = {
-  dashboard: "🏠",
-  rutinas: "💪",
-  planes: "💎",
-  finanzas: "📈",
-  crearRutina: "📝",
-  ejercicios: "🏋️",
-  notificaciones: "📢",
-  usuarios: "👥",
-  borrar: "🗑️",
-  enviarPDF: "📤", 
-  renovar: "🔄",
-  salir: "🚪",
-  perfil: "👤",
-  preferencias: "⚙️", 
-  nuevoGym: "🏢",
-  gestionGyms: "⚙️",
-  reciboManual: "🧾",
-  crearRutinaGeneral: "📚",
+  dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈", crearRutina: "📝",
+  ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥", borrar: "🗑️",
+  enviarPDF: "📤", renovar: "🔄", salir: "🚪", perfil: "👤", preferencias: "⚙️", 
+  nuevoGym: "🏢", gestionGyms: "⚙️", reciboManual: "🧾", crearRutinaGeneral: "📚",
+};
+
+const TabLoading = () => (
+    <div className="flex flex-col items-center justify-center h-64 text-white/50 animate-pulse gap-4">
+        <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+);
+
+// Componente Wrapper para renderizar solo si se ha visitado
+// Esto reduce drasticamente el peso inicial del DOM
+const LazySlideContent = ({ children, index, activeIndex, visited }: { children: any, index: number, activeIndex: number, visited: boolean }) => {
+    // Si ya lo visitamos O es el actual, lo mostramos. Si no, mostramos un placeholder vacío.
+    // El placeholder mantiene la altura mínima para que el Swiper no colapse.
+    if (visited || index === activeIndex) {
+        return <Suspense fallback={<TabLoading />}>{children}</Suspense>;
+    }
+    return <div className="h-full w-full" />; // Placeholder invisible
 };
 
 export const Home = () => {
-  const { 
-    currentUser, 
-    isEntrenador, 
-    isAdmin,
-    isLoading,
-    metrics,
-    logout,
-  } = useOptimizedHome();  
+  const { currentUser, isEntrenador, isAdmin, isLoading, metrics, logout } = useOptimizedHome();  
 
   // ESTADOS ADMIN
   const [activeTab, setActiveTab] = useState("Inicio");
   const [routineIdToEdit, setRoutineIdToEdit] = useState<number | null>(null);
 
-  // ESTADOS ALUMNO (Swiper)
+  // ESTADOS ALUMNO
   const [activeSlide, setActiveSlide] = useState(0); 
   const swiperRef = useRef<any>(null);
+  
+  // Optimización: Guardamos qué slides ya visitó el usuario
+  const [visitedSlides, setVisitedSlides] = useState<Set<number>>(new Set([0]));
 
-  // --- HANDLERS ADMIN ---
   const handleEditRoutine = (id: number) => {
       setRoutineIdToEdit(id);
       setActiveTab("Crear Rutina General");
@@ -95,9 +91,15 @@ export const Home = () => {
       setActiveTab(tabName);
   };
 
-  // --- HANDLERS ALUMNO ---
   const handleSlideChange = (swiper: any) => {
-    setActiveSlide(swiper.activeIndex);
+    const newIndex = swiper.activeIndex;
+    setActiveSlide(newIndex);
+    // Agregamos el nuevo índice a los visitados
+    setVisitedSlides(prev => {
+        const newSet = new Set(prev);
+        newSet.add(newIndex);
+        return newSet;
+    });
   };
 
   const handleMenuClick = (index: number) => {
@@ -111,7 +113,7 @@ export const Home = () => {
   if (!currentUser) return null; 
 
   // =================================================================
-  // VISTA ENTRENADOR / ADMIN (DASHBOARD ESCRITORIO)
+  // VISTA ENTRENADOR / ADMIN
   // =================================================================
   if (isEntrenador || isAdmin) {
     const AdminDashboardWelcome = () => (
@@ -124,38 +126,40 @@ export const Home = () => {
             <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
               Aquí tienes un resumen de la actividad del gimnasio.
             </p>
-            <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
-              Todo parece estar en orden 😎
-            </p>
-
           </div>
           {metrics && <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />}
         </div>
     );
 
     const renderAdminContent = () => {
-        switch (activeTab) {
-          case "Inicio": return <AdminDashboardWelcome/>;
-          case "Planes": return <PlansManager />;
-          case "Finanzas": return <MetricasFinancieras />;
-          case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
-          case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
-          case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} />;
-          case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
-          case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
-          case "Notificaciones": return <CreateNotification />;
-          case "Nuevo Usuario": return <CreateUser />;
-          case "Gestionar Usuarios": return <UsersManager />;
-          case "Borrar Rutina": return <DeleteRoutine />;
-          case "Enviar PDF": return <SendRoutinePDF />; 
-          case "Renovar": return <RenewPlan />;
-          case "Perfil": return <Profile />;
-          case "Preferencias": return <Preferences />; 
-          case "Nuevo Gimnasio": return <CreateGym />;
-          case "Gestión Gimnasios": return <GymManagement />; 
-          case "Enviar Recibo Manualmente": return <ManualReceipt />;
-          default: return <AdminDashboardWelcome />;
-        }
+        return (
+            <Suspense fallback={<TabLoading />}>
+                {(() => {
+                    switch (activeTab) {
+                        case "Inicio": return <AdminDashboardWelcome/>;
+                        case "Planes": return <PlansManager />;
+                        case "Finanzas": return <MetricasFinancieras />;
+                        case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
+                        case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
+                        case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} />;
+                        case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
+                        case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
+                        case "Notificaciones": return <CreateNotification />;
+                        case "Nuevo Usuario": return <CreateUser />;
+                        case "Gestionar Usuarios": return <UsersManager />;
+                        case "Borrar Rutina": return <DeleteRoutine />;
+                        case "Enviar PDF": return <SendRoutinePDF />; 
+                        case "Renovar": return <RenewPlan />;
+                        case "Perfil": return <Profile />;
+                        case "Preferencias": return <Preferences />; 
+                        case "Nuevo Gimnasio": return <CreateGym />;
+                        case "Gestión Gimnasios": return <GymManagement />; 
+                        case "Enviar Recibo Manualmente": return <ManualReceipt />;
+                        default: return <AdminDashboardWelcome />;
+                    }
+                })()}
+            </Suspense>
+        );
     };
 
     return (
@@ -216,45 +220,53 @@ export const Home = () => {
   }
 
   // =================================================================
-  // VISTA ALUMNOS (MOBILE SWIPE INTERFACE)
+  // VISTA ALUMNOS (OPTIMIZADA)
   // =================================================================
   return (
     <BackgroundLayout>
-      
       <div className="absolute top-0 left-0 w-full z-50">
         <Navbar />
       </div>
       
       <div className="h-screen w-screen overflow-hidden relative">
+        {/* Swiper optimizado para móviles */}
         <Swiper
-          ref={swiperRef}
-          modules={[Pagination]}
-          spaceBetween={0}
-          slidesPerView={1}
-          onSlideChange={handleSlideChange}
-          className="h-full w-full pb-24" // Espacio para el navbar
-          style={{ scrollBehavior: 'smooth' }}
+            ref={swiperRef}
+            modules={[Pagination]}
+            spaceBetween={0}
+            slidesPerView={1}
+            onSlideChange={handleSlideChange}
+            className="h-full w-full pb-24"
+            // CSS touch-action ayuda al navegador a saber que es un swipe horizontal
+            style={{ touchAction: 'pan-y' }} 
+            speed={300} // Velocidad de transición rápida pero suave
         >
-          {/* SLIDE 0: RUTINAS (HOME) */}
-          <SwiperSlide className="overflow-y-auto h-full">
-            <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-              <MyRoutines /> 
-            </div>
-          </SwiperSlide>
+            {/* SLIDE 0: RUTINAS */}
+            <SwiperSlide className="overflow-y-auto h-full">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                    <LazySlideContent index={0} activeIndex={activeSlide} visited={visitedSlides.has(0)}>
+                        <MyRoutines /> 
+                    </LazySlideContent>
+                </div>
+            </SwiperSlide>
 
-          {/* SLIDE 1: MI PLAN */}
-          <SwiperSlide className="overflow-y-auto h-full">
-            <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-              <UserPlan />
-            </div>
-          </SwiperSlide>
+            {/* SLIDE 1: MI PLAN */}
+            <SwiperSlide className="overflow-y-auto h-full">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                    <LazySlideContent index={1} activeIndex={activeSlide} visited={visitedSlides.has(1)}>
+                        <UserPlan />
+                    </LazySlideContent>
+                </div>
+            </SwiperSlide>
 
-          {/* SLIDE 2: PERFIL */}
-          <SwiperSlide className="overflow-y-auto h-full">
-            <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-              <UserProfile />
-            </div>
-          </SwiperSlide>
+            {/* SLIDE 2: PERFIL */}
+            <SwiperSlide className="overflow-y-auto h-full">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                    <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
+                        <UserProfile />
+                    </LazySlideContent>
+                </div>
+            </SwiperSlide>
         </Swiper>
 
         <MobileNavbar activeTab={activeSlide} setActiveTab={handleMenuClick} />
