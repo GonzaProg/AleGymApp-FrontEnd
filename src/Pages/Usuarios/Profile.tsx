@@ -1,11 +1,18 @@
 import { useProfile } from "../../Hooks/Profile/useProfile";
+import { useLogout } from "../../Hooks/Login/useLogout"; // Importamos el hook de logout
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles"; 
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
 import { formatearFechaUTC } from "../../Helpers/DateUtils";
 
-export const Profile = () => {
+interface ProfileProps {
+  isMobile?: boolean; // Prop para diferenciar el contexto
+}
+
+export const Profile = ({ isMobile = false }: ProfileProps) => {
+  const { logout } = useLogout();
+  
   const { 
     loading, 
     userData, 
@@ -25,21 +32,25 @@ export const Profile = () => {
     imagePreview
   } = useProfile();
 
-  if (loading) return <div className="h-full flex items-center justify-center text-gray-300">Cargando...</div>;
-  if (!userData) return <div className="h-full flex items-center justify-center text-red-400">Error: No se pudo cargar el usuario.</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-300">Cargando...</div>;
+  if (!userData) return <div className="min-h-screen flex items-center justify-center text-red-400">Error: No se pudo cargar el usuario.</div>;
 
   const avatarSrc = imagePreview || (isEditingProfile ? editForm.fotoPerfil : userData.fotoPerfil);
   
-  // Estilos para la barra de desplazamiento oscura
-  const darkScrollbarClass = "[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-600";
+  // Estilos condicionales según el entorno
+  const containerClasses = isMobile 
+    ? `${AppStyles.contentContainer} pt-32 pb-24` // Estilo Mobile (Swiper)
+    : `w-full h-full flex flex-col pt-6 px-4 pb-10 animate-fade-in overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-600`; // Estilo Desktop
+
+  const cardWidthClass = isMobile ? "w-full max-w-3xl space-y-8 mx-auto" : "w-full max-w-3xl mx-auto space-y-8";
 
   return (
-    // Añadido darkScrollbarClass al contenedor principal
-    <div className={`w-full h-full flex flex-col pt-6 px-4 pb-10 animate-fade-in overflow-y-auto ${darkScrollbarClass}`}>
-        <div className="w-full max-w-3xl mx-auto space-y-8">
+    <div className={containerClasses}>
+        
+        <div className={cardWidthClass}>
 
           {/* --- CARD PERFIL --- */}
-          <div className="w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
+          <div className="w-full backdrop-blur-xl bg-gray-900/60 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
             
             <div className={ProfileStyles.coverGradient}></div>
 
@@ -95,7 +106,7 @@ export const Profile = () => {
                                 onChange={e => handleEditChange('telefono', e.target.value)} 
                                 className={AppStyles.inputDark} 
                                 labelClassName={AppStyles.label}
-                                placeholder="Ej: 11 1234 5678"
+                                placeholder="Ej: 3445 123456"
                             />
                         </div>
                         <div>
@@ -136,7 +147,7 @@ export const Profile = () => {
                     </h2>
                     
                     {/* Visualización de datos extra responsive */}
-                    <div className="grid grid-cols-1 gap-3 mt-6 w-full md:flex md:flex-row md:justify-center md:gap-4 bg-white/5 p-4 rounded-xl">
+                    <div className="grid grid-cols-1 gap-3 mt-6 w-full md:flex md:flex-row md:justify-center md:gap-4 bg-white/5 p-4 rounded-xl border border-white/10 backdrop-blur-sm">
                         
                         <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl flex flex-col justify-center items-center w-full md:w-auto md:min-w-[140px]">
                             <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-1">DNI</span>
@@ -173,19 +184,19 @@ export const Profile = () => {
           </div>
 
           {/* --- CARD SEGURIDAD --- */}
-          <div className={AppStyles.glassCard + " p-6 md:p-8"}>
+          <div className={AppStyles.glassCard + " p-6 md:p-8 bg-gray-900/60"}>
             {!showPasswordSection ? (
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-                 <div className="flex flex-col md:flex-row items-center gap-4">
+                  <div className="flex flex-col md:flex-row items-center gap-4">
                     <span className="text-3xl bg-gray-800 p-2 rounded-lg">🔒</span>
                     <div>
                         <span className="font-bold text-gray-100 text-xl block">Seguridad</span>
                         <span className="text-gray-500 text-sm">Gestiona tu contraseña</span>
                     </div>
-                 </div>
-                 <button onClick={() => setShowPasswordSection(true)} className="text-green-500 hover:text-green-400 font-bold text-base tracking-wider hover:bg-green-500/10 px-4 py-2 rounded-lg transition-all w-full md:w-auto border border-green-500/20 md:border-transparent mt-2 md:mt-0">
-                    Cambiar Contraseña
-                 </button>
+                  </div>
+                  <button onClick={() => setShowPasswordSection(true)} className="text-green-500 hover:text-green-400 font-bold text-base tracking-wider hover:bg-green-500/10 px-4 py-2 rounded-lg transition-all w-full md:w-auto border border-green-500/20 md:border-transparent mt-2 md:mt-0">
+                     Cambiar Contraseña
+                  </button>
               </div>
             ) : (
               <div className="animate-fade-in-up space-y-6">
@@ -206,6 +217,25 @@ export const Profile = () => {
               </div>
             )}
           </div>
+
+          {/* --- CARD CERRAR SESIÓN (SOLO MOBILE/ALUMNO) --- */}
+          {isMobile && (
+            <div className={AppStyles.glassCard + " p-8 bg-gray-900/60"}>                
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                      <span className="text-3xl bg-red-900/30 p-2 rounded-lg">🚪</span>
+                      <span className="font-bold text-gray-100 text-base block">Cerrar Sesión</span>
+                    </div>
+                    <button 
+                      onClick={logout} 
+                      className={AppStyles.btnSecondaryNotFlex}
+                    >
+                       Salir
+                    </button>
+                </div>
+            </div>
+          )}
+
         </div>
     </div>
   );

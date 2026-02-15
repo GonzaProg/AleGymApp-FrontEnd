@@ -22,7 +22,7 @@ import { Navbar } from "../Components/Navbar";
 // Usamos .then(module => ({ default: module.Nombre }))
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
 const UserPlan = lazy(() => import("./Planes/UserPlan").then(module => ({ default: module.UserPlan })));
-const UserProfile = lazy(() => import("./Usuarios/UserProfile").then(module => ({ default: module.UserProfile })));
+const Profile = lazy(() => import("./Usuarios/Profile").then(module => ({ default: module.Profile })));
 
 // Vistas de Admin (Lazy Loading)
 const PlansManager = lazy(() => import("../Pages/Planes/PlansManager").then(module => ({ default: module.PlansManager })));
@@ -36,7 +36,6 @@ const UsersManager = lazy(() => import("../Pages/Usuarios/UsersManager").then(mo
 const DeleteRoutine = lazy(() => import("../Pages/Rutinas/DeleteRoutine").then(module => ({ default: module.DeleteRoutine })));
 const SendRoutinePDF = lazy(() => import("../Pages/Rutinas/SendRoutinePDF").then(module => ({ default: module.SendRoutinePDF })));
 const RenewPlan = lazy(() => import("../Pages/Planes/RenewPlan").then(module => ({ default: module.RenewPlan })));
-const Profile = lazy(() => import("../Pages/Usuarios/Profile").then(module => ({ default: module.Profile })));
 const Preferences = lazy(() => import("../Pages/Config/Preferences").then(module => ({ default: module.Preferences })));
 const CreateGym = lazy(() => import("../Pages/Gym/CreateGym").then(module => ({ default: module.CreateGym })));
 const GymManagement = lazy(() => import("../Pages/Gym/GymManagement").then(module => ({ default: module.GymManagement })));
@@ -263,7 +262,7 @@ export const Home = () => {
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
                     <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
-                        <UserProfile />
+                        <Profile isMobile={true} />
                     </LazySlideContent>
                 </div>
             </SwiperSlide>
