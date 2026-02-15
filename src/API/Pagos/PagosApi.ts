@@ -52,5 +52,16 @@ export const PagosApi = {
     getMetricsByType: async (): Promise<MetricsByTypeDTO> => {
         const response = await api.get('/pagos/metrics/types');
         return response.data;
+    },
+
+    getHistorialPorUsuario: async (userId: number): Promise<PagoDTO[]> => {
+        const response = await api.get(`/pagos/historial/${userId}`);
+        return response.data;
+    },
+
+    // NUEVO: Revertir pago
+    revertirPago: async (pagoId: number) => {
+        const response = await api.post('/pagos/revertir', { pagoId });
+        return response.data;
     }
 };
