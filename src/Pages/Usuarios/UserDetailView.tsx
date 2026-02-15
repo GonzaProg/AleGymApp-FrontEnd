@@ -4,7 +4,7 @@ import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
 
 export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () => void }) => {
     return (
-        <div className="w-full max-w-5xl mx-auto animate-fade-in-up">
+        <div className="w-full max-w-5xl mx-auto mt-14 animate-fade-in-up">
             <button onClick={onBack} className={`${AppStyles.btnBack} mb-8`}>← Volver a la lista</button>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
