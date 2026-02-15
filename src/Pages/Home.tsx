@@ -36,11 +36,11 @@ import { Profile } from "../Pages/Usuarios/Profile";
 import { SendRoutinePDF } from "../Pages/Rutinas/SendRoutinePDF"; 
 import { CreateGym } from "../Pages/Gym/CreateGym";
 import { GymManagement } from "../Pages/Gym/GymManagement"; 
-import { HistorialPagos } from "../Pages/Pagos/HistorialPagos"; 
 import { Preferences } from "../Pages/Config/Preferences"; 
 import { ManualReceipt } from "../Pages/Planes/ReciboManual";
 import { GeneralRoutinesManager } from "../Pages/Rutinas/GeneralRoutinesManager";
 import { UsersManager } from "../Pages/Usuarios/UsersManager";
+import { MetricasFinancieras } from "./Pagos/MetricasFinancieras";
 
 // IMÁGENES (Eliminadas - reemplazadas por BackgroundLayout)
 // Todas las imágenes de fondo han sido reemplazadas por el efecto Neon Aurora 
@@ -49,7 +49,7 @@ const Icons = {
   dashboard: "🏠",
   rutinas: "💪",
   planes: "💎",
-  pagos: "💰",
+  finanzas: "📈",
   crearRutina: "📝",
   ejercicios: "🏋️",
   notificaciones: "📢",
@@ -137,7 +137,7 @@ export const Home = () => {
         switch (activeTab) {
           case "Inicio": return <AdminDashboardWelcome/>;
           case "Planes": return <PlansManager />;
-          case "Historial Pagos": return <HistorialPagos />; 
+          case "Finanzas": return <MetricasFinancieras />;
           case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
           case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
           case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} />;
@@ -172,7 +172,7 @@ export const Home = () => {
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
                 <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
                 <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
-                <SidebarItem icon={Icons.pagos} label="Finanzas" active={activeTab === "Historial Pagos"} onClick={() => handleSidebarClick("Historial Pagos")} />
+                <SidebarItem icon={Icons.finanzas} label="Finanzas" active={activeTab === "Finanzas"} onClick={() => handleSidebarClick("Finanzas")} />
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
                 <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
                 <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
