@@ -116,7 +116,7 @@ export const FinancialDashboard = () => {
             {/* 3. BARRA DE CONTROL PARA DETALLES */}
             <div className="mt-8 pt-4 border-t border-white/5 flex flex-col md:flex-row justify-end items-center gap-4">
                 <span className="text-xs text-gray-500 uppercase font-bold tracking-widest">
-                    Ver desglose por actividad
+                    Ver desglose por tipos
                 </span>
                 <ToggleSwitch 
                     checked={showDetails} 
