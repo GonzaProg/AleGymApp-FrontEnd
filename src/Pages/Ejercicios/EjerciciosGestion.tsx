@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from "react-dom";
 import { useEjerciciosGestion } from '../../Hooks/Ejercicios/useEjerciciosGestion';
@@ -12,6 +13,7 @@ interface Props {
 
 export const EjerciciosGestion = ({ onNavigate }: Props) => {
     const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
     
     const { 
         ejercicios, loading, uploading, editingId, editForm, 
@@ -23,6 +25,15 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
     } = useEjerciciosGestion();
 
     const { isAdmin } = useAuthUser();
+
+    const filteredEjercicios = useMemo(() => {
+        const q = searchTerm.trim().toLowerCase();
+        if (!q) return ejercicios;
+        return ejercicios.filter((e) => {
+            if (editingId != null && e.id === editingId) return true;
+            return e.nombre.toLowerCase().includes(q);
+        });
+    }, [ejercicios, searchTerm, editingId]);
 
     const handleNewExercise = () => {
         if (onNavigate) {
@@ -37,7 +48,15 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
             <div className="w-full max-w-7xl mx-auto space-y-6"> 
                 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:justify-end gap-4 mt-10">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-10">
+                    <div className="w-full md:max-w-xs">
+                        <input
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Buscar ejercicio..."
+                            className={`${AppStyles.inputDark} h-10 text-sm bg-gray-900/60`}
+                        />
+                    </div>
                     <button 
                         onClick={handleNewExercise} 
                         className={`${AppStyles.btnPrimary} flex items-center gap-2 px-6 flex-none w-auto`}
@@ -61,7 +80,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr><td colSpan={4} className="p-8 text-center text-gray-400 italic">Cargando...</td></tr>
-                                ) : ejercicios.map((ej) => {
+                                ) : filteredEjercicios.map((ej) => {
                                     const isEditing = editingId === ej.id;
                                     return (
                                         <tr key={ej.id} className={TableStyles.tr}>
