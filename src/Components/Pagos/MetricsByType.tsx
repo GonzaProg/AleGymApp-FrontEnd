@@ -138,6 +138,6 @@ const getColorByType = (type: string) => {
     switch (type) {
         case 'Gym': return {bg: 'bg-green-500', text: "text-green-500"};
         case 'Natacion': return {bg: 'bg-blue-500', text: "text-blue-500"};
-        default: return {bg: 'bg-green-500', text: "text-green-500"};
-    }
+        case 'Productos': return { bg: 'bg-yellow-500', text: "text-yellow-500" };
+        default: return { bg: 'bg-purple-500', text: "text-purple-500" };    }
 };

@@ -6,20 +6,28 @@ const API_URL_BASE = `${VITE_API_URL_CLOUDINARY}${CLOUD_NAME}`;
 
 const PRESETS = {
     usuarios: import.meta.env.VITE_PRESET_USUARIOS,
-    ejercicios: import.meta.env.VITE_PRESET_EJERCICIOS
+    ejercicios: import.meta.env.VITE_PRESET_EJERCICIOS,
+    // Puedes crear un VITE_PRESET_PRODUCTOS en tu .env o reutilizar el de usuarios
+    // Si no lo creas, usará el de usuarios por defecto en la lógica de abajo
+    productos: import.meta.env.VITE_PRESET_PRODUCTOS || import.meta.env.VITE_PRESET_USUARIOS 
 };
 
-type UploadType = 'usuarios' | 'ejercicios' | 'logos';
+// 1. AÑADIMOS 'productos' AL TIPO
+type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos';
 
 export const CloudinaryApi = {
     
-    // AÑADIDO: parametro 'customPath'
     upload: async (file: File, type: UploadType, customPath?: string, resourceType: 'image' | 'video' = 'image'): Promise<string> => {
         
-        // Mapeo: Si es 'logos', usamos el preset de USUARIOS
-        // pero le cambiaremos la carpeta abajo.
-        const presetKey = type === 'logos' ? 'usuarios' : type;
-        const selectedPreset = PRESETS[presetKey];
+        // 2. LÓGICA DE PRESETS
+        let presetKey = type;
+        
+        // Mapeos especiales si reutilizamos presets
+        if (type === 'logos') presetKey = 'usuarios';
+        if (type === 'productos' && !PRESETS.productos) presetKey = 'usuarios'; // Fallback
+
+        // @ts-ignore (Para que TS confíe en el acceso dinámico)
+        const selectedPreset = PRESETS[presetKey] || PRESETS[type];
 
         if (!CLOUD_NAME || !selectedPreset) {
             throw new Error(`Falta configuración de Cloudinary para el tipo: ${type}`);
@@ -29,9 +37,8 @@ export const CloudinaryApi = {
         formData.append('file', file);
         formData.append('upload_preset', selectedPreset);
 
-        // LÓGICA DE CARPETAS
+        // 3. LÓGICA DE CARPETAS (Default folders)
         if (customPath) {
-            // Si mandamos ruta específica (ej: "Usuarios/Gym_1"), usamos esa.
             formData.append('folder', customPath);
         } else {
             let defaultFolder = '';
@@ -39,6 +46,7 @@ export const CloudinaryApi = {
                 case 'usuarios': defaultFolder = 'Usuarios/General'; break;
                 case 'ejercicios': defaultFolder = 'Ejercicios'; break;
                 case 'logos': defaultFolder = 'Logos'; break;
+                case 'productos': defaultFolder = 'Productos/General'; break;
             }
             formData.append('folder', defaultFolder);
         }
@@ -75,11 +83,9 @@ export const CloudinaryApi = {
         if (!url || !url.includes("cloudinary.com")) return;
 
         try {
-            // Llamamos al backend, no a Cloudinary directo
             await api.post('/cloudinary/delete', { url, type: resourceType });
         } catch (error) {
             console.error("Error eliminando archivo antiguo:", error);
-            // Fallo silencioso: no queremos detener la app si falla el borrado de basura
         }
     },
 };

@@ -41,12 +41,14 @@ const CreateGym = lazy(() => import("../Pages/Gym/CreateGym").then(module => ({ 
 const GymManagement = lazy(() => import("../Pages/Gym/GymManagement").then(module => ({ default: module.GymManagement })));
 const ManualReceipt = lazy(() => import("../Pages/Planes/ReciboManual").then(module => ({ default: module.ManualReceipt })));
 const MetricasFinancieras = lazy(() => import("./Pagos/MetricasFinancieras").then(module => ({ default: module.MetricasFinancieras })));
+const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager").then(module => ({ default: module.ProductosManager })));
 
 const Icons = {
   dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈", crearRutina: "📝",
   ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥", borrar: "🗑️",
   enviarPDF: "📤", renovar: "🔄", salir: "🚪", perfil: "👤", preferencias: "⚙️", 
   nuevoGym: "🏢", gestionGyms: "⚙️", reciboManual: "🧾", crearRutinaGeneral: "📚",
+  tienda: "🛍️",
 };
 
 const TabLoading = () => (
@@ -154,6 +156,7 @@ export const Home = () => {
                         case "Nuevo Gimnasio": return <CreateGym />;
                         case "Gestión Gimnasios": return <GymManagement />; 
                         case "Enviar Recibo Manualmente": return <ManualReceipt />;
+                        case "Productos": return <ProductosManager />;
                         default: return <AdminDashboardWelcome />;
                     }
                 })()}
@@ -172,24 +175,32 @@ export const Home = () => {
               </div>
               <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
                 <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
+                
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
                 <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
                 <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
                 <SidebarItem icon={Icons.finanzas} label="Finanzas" active={activeTab === "Finanzas"} onClick={() => handleSidebarClick("Finanzas")} />
+                
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
                 <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
                 <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
                 <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
                 <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
+                
+                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Tienda</p>
+                <SidebarItem icon={Icons.tienda} label="Productos / Tienda" active={activeTab === "Productos"} onClick={() => handleSidebarClick("Productos")} />
+                
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Social</p>
                 <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
                 <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
                 <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
                 <SidebarItem icon={Icons.usuarios} label="Nuevo Usuario" active={activeTab === "Nuevo Usuario"} onClick={() => handleSidebarClick("Nuevo Usuario")} />
                 <SidebarItem icon={Icons.usuarios} label="Gestionar Usuarios" active={activeTab === "Gestionar Usuarios"} onClick={() => handleSidebarClick("Gestionar Usuarios")} />
+                
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
                 <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
                 <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
+                
                 {isAdmin && (
                   <>
                     <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Administración</p>
