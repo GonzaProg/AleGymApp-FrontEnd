@@ -80,6 +80,34 @@ export const useUserRoutinesManager = () => {
         }
     };
 
+    // Desvincular Rutina General
+    const handleUnlink = async (rutina: any) => {
+        if (!rutina.esGeneral) {
+            showError("Solo se pueden desvincular rutinas generales");
+            return;
+        }
+
+        if (!alumnoSeleccionado) {
+            showError("No hay alumno seleccionado");
+            return;
+        }
+
+        const confirm = await showConfirmSuccess(
+            "¿Desvincular Rutina General?",
+            `Se desvinculará "${rutina.nombreRutina}" del alumno ${alumnoSeleccionado.nombre} ${alumnoSeleccionado.apellido}.`
+        );
+
+        if (!confirm.isConfirmed) return;
+
+        try {
+            await RutinasApi.desvincularGeneral(rutina.id, alumnoSeleccionado.id);
+            showSuccess("Rutina general desvinculada correctamente.");
+            loadRutinasAlumno(); // Recargar las rutinas del alumno
+        } catch (error) {
+            showError("No se pudo desvincular la rutina.");
+        }
+    };
+
     return {
         rutinasAlumno,
         loading,
@@ -92,6 +120,7 @@ export const useUserRoutinesManager = () => {
         alumnoSeleccionado,
         clearSelection,
         handleDelete,
+        handleUnlink,
         canEditRoutine
     };
 };

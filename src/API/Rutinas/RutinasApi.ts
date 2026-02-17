@@ -29,6 +29,12 @@ export const RutinasApi = {
         return response.data;
     },
 
+    // Desvincular una rutina general de un alumno
+    desvincularGeneral: async (rutinaId: number, alumnoId: number) => {
+        const response = await api.post('/rutinas/desvincular-general', { rutinaId, alumnoId });
+        return response.data;
+    },
+
     update: async (id: number, data: any) => {
         const response = await api.put(`/rutinas/${id}`, data);
         return response.data;

@@ -9,7 +9,7 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
         rutinasAlumno, loading,
         busqueda, handleSearchChange, sugerencias, mostrarSugerencias, setMostrarSugerencias,
         handleSelectAlumno, alumnoSeleccionado, clearSelection,
-        handleDelete, canEditRoutine
+        handleDelete, handleUnlink, canEditRoutine
     } = useUserRoutinesManager();
 
     return (
@@ -118,9 +118,15 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
                                             </>
                                         )}
                                         {!canEditRoutine(rutina) && (
-                                            <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded border border-blue-500/30" title="Rutina General - Solo se puede editar desde Rutinas Generales">
-                                                GENERAL
-                                            </span>
+                                            <>
+                                                <button 
+                                                    onClick={() => handleUnlink(rutina)}
+                                                    className={`${AppStyles.btnIconBase} bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border-orange-500/20`} 
+                                                    title="Desvincular Rutina General del Alumno"
+                                                >
+                                                    🔗
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 </div>

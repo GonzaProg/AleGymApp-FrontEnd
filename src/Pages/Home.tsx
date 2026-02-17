@@ -48,7 +48,7 @@ const Icons = {
   ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥",
   enviarPDF: "📤", renovar: "🔄", salir: "🚪", perfil: "👤", preferencias: "⚙️", 
   nuevoGym: "🏢", gestionGyms: "⚙️", reciboManual: "🧾", crearRutinaGeneral: "📚",
-  tienda: "🛍️", rutinasUsuarios: "👥",
+  tienda: "🛍️", rutinasUsuarios: "📄📄",
 };
 
 const TabLoading = () => (
