@@ -33,7 +33,7 @@ const EjerciciosCrear = lazy(() => import("../Pages/Ejercicios/EjerciciosCrear")
 const CreateNotification = lazy(() => import("../Pages/Notificaciones/CreateNotification").then(module => ({ default: module.CreateNotification })));
 const CreateUser = lazy(() => import("../Pages/Usuarios/CreateUser").then(module => ({ default: module.CreateUser })));
 const UsersManager = lazy(() => import("../Pages/Usuarios/UsersManager").then(module => ({ default: module.UsersManager })));
-const DeleteRoutine = lazy(() => import("../Pages/Rutinas/DeleteRoutine").then(module => ({ default: module.DeleteRoutine })));
+const UserRoutinesManager = lazy(() => import("../Pages/Rutinas/UserRoutinesManager").then(module => ({ default: module.UserRoutinesManager })));
 const SendRoutinePDF = lazy(() => import("../Pages/Rutinas/SendRoutinePDF").then(module => ({ default: module.SendRoutinePDF })));
 const RenewPlan = lazy(() => import("../Pages/Planes/RenewPlan").then(module => ({ default: module.RenewPlan })));
 const Preferences = lazy(() => import("../Pages/Config/Preferences").then(module => ({ default: module.Preferences })));
@@ -45,10 +45,10 @@ const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager"
 
 const Icons = {
   dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈", crearRutina: "📝",
-  ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥", borrar: "🗑️",
+  ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥",
   enviarPDF: "📤", renovar: "🔄", salir: "🚪", perfil: "👤", preferencias: "⚙️", 
   nuevoGym: "🏢", gestionGyms: "⚙️", reciboManual: "🧾", crearRutinaGeneral: "📚",
-  tienda: "🛍️",
+  tienda: "🛍️", rutinasUsuarios: "👥",
 };
 
 const TabLoading = () => (
@@ -142,13 +142,13 @@ export const Home = () => {
                         case "Finanzas": return <MetricasFinancieras />;
                         case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
                         case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
+                        case "Rutinas Usuarios": return <UserRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
                         case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} />;
                         case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
                         case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
                         case "Notificaciones": return <CreateNotification />;
                         case "Nuevo Usuario": return <CreateUser />;
                         case "Gestionar Usuarios": return <UsersManager />;
-                        case "Borrar Rutina": return <DeleteRoutine />;
                         case "Enviar PDF": return <SendRoutinePDF />; 
                         case "Renovar": return <RenewPlan />;
                         case "Perfil": return <Profile />;
@@ -175,7 +175,6 @@ export const Home = () => {
               </div>
               <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
                 <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
-                
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
                 <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
                 <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
@@ -183,8 +182,8 @@ export const Home = () => {
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
                 <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
+                <SidebarItem icon={Icons.rutinasUsuarios} label="Rutinas Usuarios" active={activeTab === "Rutinas Usuarios"} onClick={() => handleSidebarClick("Rutinas Usuarios")} />
                 <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
-                <SidebarItem icon={Icons.borrar} label="Borrar Rutina Personalizada" active={activeTab === "Borrar Rutina"} onClick={() => handleSidebarClick("Borrar Rutina")} />
                 <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Tienda</p>
