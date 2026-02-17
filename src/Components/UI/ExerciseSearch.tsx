@@ -88,10 +88,13 @@ export const ExerciseSearch = ({
   };
 
   const handleBlur = () => {
-    // Si no hay selección válida, limpiar
-    if (!value) {
-      setSearchTerm("");
-    }
+    // En click sobre una opción, el input pierde el foco antes de que el parent actualice `value`.
+    // Evitamos limpiar acá para no interferir con la selección.
+    window.setTimeout(() => {
+      if (!value && !isOpen) {
+        setSearchTerm("");
+      }
+    }, 0);
   };
 
   // Obtener el nombre del ejercicio seleccionado
@@ -133,7 +136,10 @@ export const ExerciseSearch = ({
               {filteredExercises.map((exercise) => (
                 <li
                   key={exercise.id}
-                  onClick={() => handleSelectExercise(exercise)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleSelectExercise(exercise);
+                  }}
                   className={`px-4 py-3 cursor-pointer transition-colors hover:bg-white/10 ${
                     value === exercise.id.toString() ? 'bg-green-500/20 text-green-400' : 'text-gray-200'
                   }`}

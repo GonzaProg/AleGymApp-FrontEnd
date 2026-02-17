@@ -1,4 +1,4 @@
-import { useMyRoutines } from "../../Hooks/MyRoutines/useMyRoutines";
+import { useMyRoutines } from "../../Hooks/Rutinas/useMyRoutines";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 

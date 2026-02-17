@@ -1,4 +1,4 @@
-import { useCreateRoutine } from "../../Hooks/CreateRoutine/useCreateRoutine";
+import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button, ExerciseSearch } from "../../Components/UI";
 import { AppStyles } from "../../Styles/AppStyles";
 
@@ -69,7 +69,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
           </div>
 
           {/* COLUMNA 2 */}
-          <div className={AppStyles.glassCard}>
+          <div className={`${AppStyles.glassCard} overflow-visible z-50`}>
             <div className={AppStyles.gradientDivider}></div>
             <h3 className={AppStyles.sectionTitle}><span className={AppStyles.numberBadge}>2</span> Ejercicios</h3>
             

@@ -3,7 +3,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { Card } from "../../Components/UI/Card";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
-import { useGeneralRoutinesManager } from "../../Hooks/GeneralRoutinesManager/useGeneralRoutinesManager";
+import { useGeneralRoutinesManager } from "../../Hooks/Rutinas/useGeneralRoutinesManager";
 
 export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: string) => void, onEdit: (id: number) => void }) => {
     const {

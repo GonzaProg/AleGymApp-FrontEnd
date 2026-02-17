@@ -1,4 +1,4 @@
-import { useDeleteRoutine } from "../../Hooks/DeleteRoutine/useDeleteRoutine";
+import { useDeleteRoutine } from "../../Hooks/Rutinas/useDeleteRoutine";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
 import { DeleteRoutineStyles } from "../../Styles/DeleteRoutineStyles";
