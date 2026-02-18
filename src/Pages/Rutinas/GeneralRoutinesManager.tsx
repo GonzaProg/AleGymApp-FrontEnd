@@ -40,7 +40,7 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
                             <Card key={rutina.id} className={`${AppStyles.glassCard} hover:border-blue-500/50 transition-all flex flex-col relative group`}>
                                 
                                 <div className="flex justify-between items-start mb-3">
-                                    <h3 className="text-xl font-bold text-white line-clamp-1" title={rutina.nombreRutina}>
+                                    <h3 className="text-xl font-bold text-white break-words leading-tight" title={rutina.nombreRutina}>
                                         {rutina.nombreRutina}
                                     </h3>
                                     <div className="flex gap-2">

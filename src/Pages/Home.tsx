@@ -44,11 +44,11 @@ const MetricasFinancieras = lazy(() => import("./Pagos/MetricasFinancieras").the
 const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager").then(module => ({ default: module.ProductosManager })));
 
 const Icons = {
-  dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈", crearRutina: "📝",
+  dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈",
   ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥",
   enviarPDF: "📤", renovar: "🔄", salir: "🚪", perfil: "👤", preferencias: "⚙️", 
   nuevoGym: "🏢", gestionGyms: "⚙️", reciboManual: "🧾", crearRutinaGeneral: "📚",
-  tienda: "🛍️", rutinasUsuarios: "📄📄",
+  tienda: "🛍️", rutinasUsuarios: "📝",
 };
 
 const TabLoading = () => (
@@ -183,7 +183,6 @@ export const Home = () => {
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
                 <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
                 <SidebarItem icon={Icons.rutinasUsuarios} label="Rutinas Usuarios" active={activeTab === "Rutinas Usuarios"} onClick={() => handleSidebarClick("Rutinas Usuarios")} />
-                <SidebarItem icon={Icons.crearRutina} label="Rutina Personalizada" active={activeTab === "Crear Rutina"} onClick={() => handleSidebarClick("Crear Rutina")} />
                 <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Tienda</p>

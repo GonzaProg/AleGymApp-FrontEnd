@@ -74,7 +74,7 @@ export const MyRoutines = () => {
                   )}
 
                   <div className={MyRoutinesStyles.cardHeader}>
-                      <h3 className={MyRoutinesStyles.cardTitle}>{rutina.nombreRutina}</h3>
+                      <h3 className={`${MyRoutinesStyles.cardTitle} whitespace-normal break-words leading-tight`}>{rutina.nombreRutina}</h3>
                       <p className={MyRoutinesStyles.profeTag}>
                         Profe: <span className="text-gray-300">{rutina.entrenador}</span>
                       </p>

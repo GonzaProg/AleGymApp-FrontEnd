@@ -1,8 +1,7 @@
 import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
-import { Input, Button, ExerciseSearch } from "../../Components/UI";
+import { Input, Button } from "../../Components/UI";
 import { AppStyles } from "../../Styles/AppStyles";
 
-// Define tipos para las props
 interface CreateRoutineProps {
     isGeneral?: boolean;
     routineIdToEdit?: number | null;
@@ -10,27 +9,34 @@ interface CreateRoutineProps {
 
 export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: CreateRoutineProps) => {
   const {
-    ejercicios, busqueda, sugerencias, mostrarSugerencias, nombreRutina, detalles,
-    ejercicioId, series, reps, peso,
-    setNombreRutina, setEjercicioId, setMostrarSugerencias,
-    handleSearchChange, handleSelectAlumno, handleSeriesChange, handleRepsChange, handlePesoChange, handleAddExercise, handleSubmit,
-    // Nuevos del hook
-    editIndex, handleEditRow, cancelEditRow, handleDeleteRow
+    // Datos Generales
+    nombreRutina, setNombreRutina,
+    // Buscador Alumnos
+    busqueda, sugerencias, mostrarSugerencias, setMostrarSugerencias, handleSearchChange, handleSelectAlumno, 
+    // Datos Display Edición
+    alumnoNombreDisplay,
+    // Buscador Ejercicios
+    ejercicioBusqueda, ejerciciosFiltrados, mostrarSugerenciasEjercicios, 
+    handleEjercicioSearchChange, handleSelectEjercicio, setMostrarSugerenciasEjercicios,
+    // Formulario Detalle
+    series, reps, peso,
+    handleSeriesChange, handleRepsChange, handlePesoChange, handleAddExercise, 
+    detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, handleSubmit
   } = useCreateRoutine(isGeneral, routineIdToEdit); 
 
   return (
-    <div className={AppStyles.principalContainer}>
+    <div className={`${AppStyles.principalContainer} principalContainer`}>
       <div className="w-full max-w-5xl mx-auto space-y-6">
               
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* COLUMNA 1 */}
+          {/* COLUMNA 1: DATOS GENERALES */}
           <div className={`${AppStyles.glassCard} overflow-visible z-50`}>
              <div className={"absolute top-[1px] left-[6px] w-[calc(100%-2px)] h-1 bg-gradient-to-r from-green-500/50 to-transparent rounded-t-3xl"}></div>
              
              <h3 className={`${AppStyles.sectionTitle} left-[100px]`}>
                 <span className={AppStyles.numberBadge}>1</span> 
-                {routineIdToEdit ? "Editar Datos" : "Datos Generales"}
+                {routineIdToEdit ? "Editar Rutina" : "Nueva Rutina"}
              </h3>
 
             <Input 
@@ -42,71 +48,106 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
               labelClassName={AppStyles.label}
             />
             
-            {!isGeneral ? (
+            {/* LÓGICA CORREGIDA CON ESTILO SIMPLE */}
+            {(!isGeneral && !routineIdToEdit) ? (
+                /* CASO: CREANDO PERSONALIZADA (Buscador) */
                 <div className="relative mt-4">
-                  <Input 
-                    label="Buscar Alumno" value={busqueda} 
-                    onChange={e => handleSearchChange(e.target.value)} 
-                    onFocus={() => busqueda && setMostrarSugerencias(true)}
-                    placeholder="Nombre..." className={AppStyles.inputDark} labelClassName={AppStyles.label}
-                  />
-                  {mostrarSugerencias && sugerencias.length > 0 && (
-                    <ul className={AppStyles.suggestionsList}>
-                      {sugerencias.map((a) => (
-                        <li key={a.id} onClick={() => handleSelectAlumno(a)} className={AppStyles.suggestionItem}>
-                          <div className={AppStyles.avatarSmall}>{a.nombre.charAt(0)}</div>
-                          <span className="text-gray-200">{a.nombre} {a.apellido}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                    <Input 
+                        label="Asignar a Alumno" value={busqueda} 
+                        onChange={e => handleSearchChange(e.target.value)} 
+                        onFocus={() => busqueda && setMostrarSugerencias(true)}
+                        placeholder="Buscar por nombre..." className={AppStyles.inputDark} labelClassName={AppStyles.label}
+                    />
+                    {mostrarSugerencias && sugerencias.length > 0 && (
+                        <ul className={AppStyles.suggestionsList}>
+                        {sugerencias.map((a) => (
+                            <li key={a.id} onClick={() => handleSelectAlumno(a)} className={AppStyles.suggestionItem}>
+                            <div className={AppStyles.avatarSmall}>{a.nombre.charAt(0)}</div>
+                            <span className="text-gray-200">{a.nombre} {a.apellido}</span>
+                            </li>
+                        ))}
+                        </ul>
+                    )}
                 </div>
             ) : (
+                /* CASO: GENERAL O EDICIÓN (Cartel Simple) */
                 <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                    <p className="text-blue-300 text-sm font-bold">ℹ️ {routineIdToEdit ? "Modo Edición" : "Modo Plantilla"}</p>
+                    <p className="text-blue-300 text-sm font-bold">
+                        ℹ️ {routineIdToEdit ? "Modo Edición" : "Modo Plantilla"}
+                    </p>
+                    {/* Opcional: Mostrar nombre del alumno en pequeñito si estamos editando una personal */}
+                    {routineIdToEdit && !isGeneral && alumnoNombreDisplay && (
+                        <p className="text-gray-400 text-xs mt-1 pl-6">
+                           Alumno: {alumnoNombreDisplay}
+                        </p>
+                    )}
                 </div>
             )}
+
           </div>
 
-          {/* COLUMNA 2 */}
+          {/* COLUMNA 2: EJERCICIOS (Buscador corregido incluido) */}
           <div className={`${AppStyles.glassCard} overflow-visible z-50`}>
-            <div className={AppStyles.gradientDivider}></div>
-            <h3 className={AppStyles.sectionTitle}><span className={AppStyles.numberBadge}>2</span> Ejercicios</h3>
-            
-            <div className="mt-4">
-              <label className={AppStyles.label}>Ejercicio</label>
-              <ExerciseSearch
-                exercises={ejercicios}
-                value={ejercicioId}
-                onChange={setEjercicioId}
-                placeholder="Seleccionar ejercicio..."
-                className={AppStyles.inputDark}
-                labelClassName={AppStyles.label}
-              />
+             <div className={"absolute top-[1px] left-[6px] w-[calc(100%-2px)] h-1 bg-gradient-to-r from-green-500/50 to-transparent rounded-t-3xl"}></div>
+             <h3 className={`${AppStyles.sectionTitle} left-[100px]`}>
+              <span className={AppStyles.numberBadge}>2</span>
+              Ejercicios
+             </h3>
+             
+             <div className="mt-4 relative">
+                <Input 
+                    label="Buscar Ejercicio"
+                    value={ejercicioBusqueda}
+                    onChange={(e) => handleEjercicioSearchChange(e.target.value)}
+                    onFocus={() => setMostrarSugerenciasEjercicios(true)}
+                    placeholder="Escribe para buscar..."
+                    className={AppStyles.inputDark}
+                    labelClassName={AppStyles.label}
+                />
+                
+                {mostrarSugerenciasEjercicios && (
+                    <ul className={`${AppStyles.suggestionsList} max-h-60 overflow-y-auto`}>
+                        {ejerciciosFiltrados.length > 0 ? (
+                            ejerciciosFiltrados.map((ej) => (
+                                <li 
+                                    key={ej.id} 
+                                    onClick={() => handleSelectEjercicio(ej)} 
+                                    className={AppStyles.suggestionItem}
+                                >
+                                    <span className="text-gray-200">{ej.nombre}</span>
+                                </li>
+                            ))
+                        ) : (
+                            ejercicioBusqueda !== "" && (
+                                <li className="p-3 text-gray-500 text-sm text-center">No encontrado</li>
+                            )
+                        )}
+                    </ul>
+                )}
             </div>
 
             <div className="grid grid-cols-3 gap-4 mt-4">
-              <Input label="Series" type="number" value={series} onChange={handleSeriesChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
-              <Input label="Reps" type="number" value={reps} onChange={handleRepsChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
-              <Input label="Peso (kg)" type="text" value={peso} onChange={handlePesoChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} placeholder="A elección" />
+                <Input label="Series" type="number" value={series} onChange={handleSeriesChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
+                <Input label="Reps" type="number" value={reps} onChange={handleRepsChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
+                <Input label="Peso" type="text" value={peso} onChange={handlePesoChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} placeholder="A elección" />
             </div>
 
             <div className="pt-4 flex gap-2">
-              {editIndex !== null && (
-                  <Button variant="danger" onClick={cancelEditRow} className="flex-1 bg-gray-700">CANCELAR</Button>
-              )}
-              <Button variant="info" fullWidth onClick={handleAddExercise} className={editIndex !== null ? "flex-[2] bg-yellow-500/20 text-yellow-400" : AppStyles.btnPrimary}>
-                {editIndex !== null ? "🔄 ACTUALIZAR" : "+ AGREGAR"}
-              </Button>
+                {editIndex !== null && (
+                    <Button variant="danger" onClick={cancelEditRow} className="flex-1 bg-gray-700">CANCELAR</Button>
+                )}
+                <Button variant="info" fullWidth onClick={handleAddExercise} className={editIndex !== null ? "flex-[2] bg-yellow-500/20 text-yellow-400" : AppStyles.btnPrimary}>
+                    {editIndex !== null ? "🔄 ACTUALIZAR" : "+ AGREGAR"}
+                </Button>
             </div>
           </div>
         </div>
 
         {/* RESUMEN */}
         <div className={AppStyles.glassCard}>
-           <div className={AppStyles.sectionTitle}><h3>Resumen</h3></div>
-           
-           {detalles.length === 0 ? <div className="text-center py-10 text-gray-500">Sin ejercicios</div> : (
+            <div className={AppStyles.sectionTitle}><h3>Resumen</h3></div>
+            
+            {detalles.length === 0 ? <div className="text-center py-10 text-gray-500">Sin ejercicios</div> : (
             <div className="overflow-x-auto rounded-xl border border-white/10">
               <table className="min-w-full text-sm text-left">
                 <thead className={AppStyles.tableHeader}>
