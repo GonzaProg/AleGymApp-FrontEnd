@@ -131,7 +131,7 @@ export const MyRoutines = () => {
                       <button onClick={closeModal} className="text-gray-400 hover:text-white text-3xl leading-none transition-colors">&times;</button>
                   </div>
                   
-                  <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                  <div className={`p-6 space-y-4 max-h-[70vh] ${AppStyles.customScrollbar}`}>
                       {selectedRoutine.detalles.map((d:any, i:number) => {
                         const thumbnail = CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
                         const videoSource = d.ejercicio.localVideoPath || d.ejercicio.urlVideo;

@@ -13,10 +13,10 @@ import { useOptimizedHome } from "../Hooks/Home/useOptimizedHome";
 import { MobileNavbar } from "../Components/Mobile/MobileNavbar"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
-import { StatsGrid } from "../Components/Dashboard/StatsGrid";
-import { HomeStyles } from "../Styles/HomeStyles";
+import { AppStyles } from "../Styles/AppStyles";
 import { BackgroundLayout } from "../Components/BackgroundLayout"; 
 import { Navbar } from "../Components/Navbar";
+import { StatsGrid } from "../Components/Dashboard/StatsGrid";
 
 // --- IMPORTACIONES PEREZOSAS ---
 // Usamos .then(module => ({ default: module.Nombre }))
@@ -173,7 +173,7 @@ export const Home = () => {
               <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => handleSidebarClick("Inicio")}>
                 <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">GYMMate</span>
               </div>
-              <nav className={`p-4 space-y-2 mt-4 overflow-y-auto ${HomeStyles.customScrollbar}`}>
+              <nav className={`p-4 space-y-2 mt-4 ${AppStyles.customScrollbar}`}>
                 <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
                 <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
@@ -218,7 +218,7 @@ export const Home = () => {
             </div>
           </aside>
           <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-            <div className={`flex-1 p-8 relative z-10 ${HomeStyles.customScrollbar}`}>
+            <div className={`flex-1 p-8 relative z-10 ${AppStyles.customScrollbar}`}>
               {renderAdminContent()}
             </div>
           </main>

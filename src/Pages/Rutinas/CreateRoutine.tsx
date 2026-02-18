@@ -106,7 +106,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                 />
                 
                 {mostrarSugerenciasEjercicios && (
-                    <ul className={`${AppStyles.suggestionsList} max-h-60 overflow-y-auto`}>
+                    <ul className={`${AppStyles.suggestionsList} max-h-60 ${AppStyles.customScrollbar}`}>
                         {ejerciciosFiltrados.length > 0 ? (
                             ejerciciosFiltrados.map((ej) => (
                                 <li 
