@@ -1,3 +1,5 @@
+import { AppStyles } from "./AppStyles";
+
 export const MyRoutinesStyles = {
     // Grid Principal
     grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
@@ -18,7 +20,7 @@ export const MyRoutinesStyles = {
 
     // --- Modal Detalle Específico ---
     modalHeader: "bg-gray-800/50 p-6 border-b border-white/10 flex justify-between items-start relative",
-    modalBody: "p-6 overflow-y-auto flex-1 space-y-4 bg-gray-900 custom-scrollbar",
+    modalBody: `p-6 flex-1 space-y-4 bg-gray-900 ${AppStyles.customScrollbar}`,
     exerciseRow: "bg-white/5 p-4 rounded-xl border border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 hover:bg-white/10 transition-colors",
     
     // Métricas (Cajitas de peso/reps)

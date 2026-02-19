@@ -45,7 +45,6 @@ export const ProductosManager = () => {
     const modalTitle = editingProduct ? "Editar Producto" : "Nuevo Producto";
     const submitButtonText = editingProduct ? "Guardar Cambios" : "Crear Producto";
     const iconModal = editingProduct ? "✏️" : "✨";
-    const darkScrollbarClass = "[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-gray-600";
 
     return (
         <div className={AppStyles.principalContainer}>
@@ -273,7 +272,7 @@ export const ProductosManager = () => {
                                 </h2>
                                 <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white text-3xl leading-none transition-colors">&times;</button>
                             </div>
-                            <div className={`p-8 space-y-6 overflow-y-auto ${darkScrollbarClass}`}>
+                            <div className={`p-8 space-y-6 ${AppStyles.customScrollbar}`}>
                                 <div className="flex justify-center">
                                     <label className="relative w-40 h-40 rounded-2xl bg-black/40 border-2 border-dashed border-gray-600 hover:border-green-500 hover:bg-white/5 flex flex-col items-center justify-center cursor-pointer overflow-hidden group transition-all shadow-inner">
                                         {imagePreview ? (
@@ -325,7 +324,7 @@ export const ProductosManager = () => {
                             <div className="p-6 bg-gray-900/50">
                                 <p className="text-sm text-gray-400 mb-2">Aquí están los productos eliminados. Puedes restaurarlos para volver a venderlos.</p>
                             </div>
-                            <div className={`flex-1 overflow-y-auto p-6 space-y-3 min-h-[300px] ${darkScrollbarClass}`}>
+                            <div className={`flex-1 p-6 space-y-3 min-h-[300px] ${AppStyles.customScrollbar}`}>
                                 {archivedProductos.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-gray-500 py-10 opacity-50">
                                         <span className="text-5xl mb-2">🍃</span>

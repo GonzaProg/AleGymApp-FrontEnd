@@ -89,7 +89,7 @@ export const Navbar = () => {
                     </div>
 
                     {/* Lista de Notificaciones */}
-                    <div className="max-h-80 overflow-y-auto thin-scrollbar">
+                    <div className={`max-h-80 ${AppStyles.customScrollbar}`}>
                         {notificaciones.length === 0 ? (
                             <div className="p-8 text-center text-gray-500 text-sm">
                                 <p>🔕 No tienes notificaciones nuevas</p>

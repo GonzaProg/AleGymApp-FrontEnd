@@ -90,7 +90,7 @@ export const MetricasFinancieras = () => {
                                 
                                 {/* Sugerencias Dropdown CORREGIDO */}
                                 {mostrarSugerencias && sugerencias.length > 0 && (
-                                    <ul className={`${AppStyles.suggestionsList} absolute w-full left-0 top-full mt-1 z-50 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto`}>
+                                    <ul className={`${AppStyles.suggestionsList} absolute w-full left-0 top-full mt-1 z-50 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl max-h-60 ${AppStyles.customScrollbar}`}>
                                         {sugerencias.map((alumno: any) => (
                                             <li key={alumno.id} onClick={() => handleSelectAlumno(alumno)} className={AppStyles.suggestionItem}>
                                                 <div className={AppStyles.avatarSmall}>{alumno.nombre.charAt(0)}</div>

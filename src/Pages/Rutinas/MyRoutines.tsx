@@ -1,4 +1,4 @@
-import { useMyRoutines } from "../../Hooks/MyRoutines/useMyRoutines";
+import { useMyRoutines } from "../../Hooks/Rutinas/useMyRoutines";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
@@ -74,7 +74,7 @@ export const MyRoutines = () => {
                   )}
 
                   <div className={MyRoutinesStyles.cardHeader}>
-                      <h3 className={MyRoutinesStyles.cardTitle}>{rutina.nombreRutina}</h3>
+                      <h3 className={`${MyRoutinesStyles.cardTitle} whitespace-normal break-words leading-tight`}>{rutina.nombreRutina}</h3>
                       <p className={MyRoutinesStyles.profeTag}>
                         Profe: <span className="text-gray-300">{rutina.entrenador}</span>
                       </p>
@@ -131,7 +131,7 @@ export const MyRoutines = () => {
                       <button onClick={closeModal} className="text-gray-400 hover:text-white text-3xl leading-none transition-colors">&times;</button>
                   </div>
                   
-                  <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                  <div className={`p-6 space-y-4 max-h-[70vh] ${AppStyles.customScrollbar}`}>
                       {selectedRoutine.detalles.map((d:any, i:number) => {
                         const thumbnail = CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
                         const videoSource = d.ejercicio.localVideoPath || d.ejercicio.urlVideo;
