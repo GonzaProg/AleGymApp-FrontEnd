@@ -232,9 +232,8 @@ export const Home = () => {
   // =================================================================
   return (
     <BackgroundLayout>
-      <div className="absolute top-0 left-0 w-full z-50">
+      
         <Navbar />
-      </div>
       
       <div className="h-screen w-screen overflow-hidden relative">
         {/* Swiper optimizado para móviles */}

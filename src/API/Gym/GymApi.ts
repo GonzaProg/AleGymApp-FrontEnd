@@ -29,6 +29,11 @@ export const GymApi = {
         return response.data;
     },
 
+    getByCode: async (code: string) => {
+        const response = await api.get(`/gyms/by-code/${code}`);
+        return response.data; 
+    },
+
     // 3. Bloquear / Desbloquear
     toggleStatus: async (id: number, activo: boolean) => {
         const response = await api.patch(`/gyms/${id}/status`, { activo });

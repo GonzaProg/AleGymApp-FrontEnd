@@ -7,8 +7,6 @@ const API_URL_BASE = `${VITE_API_URL_CLOUDINARY}${CLOUD_NAME}`;
 const PRESETS = {
     usuarios: import.meta.env.VITE_PRESET_USUARIOS,
     ejercicios: import.meta.env.VITE_PRESET_EJERCICIOS,
-    // Puedes crear un VITE_PRESET_PRODUCTOS en tu .env o reutilizar el de usuarios
-    // Si no lo creas, usará el de usuarios por defecto en la lógica de abajo
     productos: import.meta.env.VITE_PRESET_PRODUCTOS || import.meta.env.VITE_PRESET_USUARIOS 
 };
 
@@ -69,6 +67,17 @@ export const CloudinaryApi = {
             console.error(`Error CloudinaryService (${resourceType}):`, error);
             throw error;
         }
+    },
+
+    // OBTENER IMÁGENES / LOGOS 
+    getUrl: (pathOrUrl?: string): string | null => {
+        if (!pathOrUrl || pathOrUrl.trim() === "") return null;
+        
+        // 1. Si ya es una URL completa (ej: https://res.cloudinary...), la devolvemos tal cual
+        if (pathOrUrl.startsWith("http")) return pathOrUrl;
+
+        // 2. Si es solo un Public ID (ej: "Logos/mi-gym"), construimos la URL
+        return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${pathOrUrl}`;
     },
 
     getThumbnail: (imagenUrl?: string, videoUrl?: string): string | null => {
