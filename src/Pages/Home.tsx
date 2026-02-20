@@ -42,6 +42,7 @@ const GymManagement = lazy(() => import("../Pages/Gym/GymManagement").then(modul
 const ManualReceipt = lazy(() => import("../Pages/Planes/ReciboManual").then(module => ({ default: module.ManualReceipt })));
 const MetricasFinancieras = lazy(() => import("./Pagos/MetricasFinancieras").then(module => ({ default: module.MetricasFinancieras })));
 const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager").then(module => ({ default: module.ProductosManager })));
+const MyPersonalRecords = lazy(() => import("./PersonalRecords/MyPersonalRecords").then(module => ({ default: module.MyPersonalRecords })));
 
 const Icons = {
   dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈",
@@ -257,19 +258,28 @@ export const Home = () => {
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 1: MI PLAN */}
+            {/* SLIDE 1: RECORDS */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
                     <LazySlideContent index={1} activeIndex={activeSlide} visited={visitedSlides.has(1)}>
+                        <MyPersonalRecords />
+                    </LazySlideContent>
+                </div>
+            </SwiperSlide>
+
+            {/* SLIDE 2: MI PLAN */}
+            <SwiperSlide className="overflow-y-auto h-full">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                    <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
                         <UserPlan />
                     </LazySlideContent>
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 2: PERFIL */}
+            {/* SLIDE 3: PERFIL */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-                    <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
+                    <LazySlideContent index={3} activeIndex={activeSlide} visited={visitedSlides.has(3)}>
                         <Profile isMobile={true} />
                     </LazySlideContent>
                 </div>
