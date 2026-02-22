@@ -1,58 +1,32 @@
-import { useState, useEffect } from "react";
-import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
+import { useState } from "react";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import api from "../../API/axios";
 import { showSuccess, showError, showConfirmSuccess } from "../../Helpers/Alerts";
+import { useAlumnoSearch } from "../useAlumnoSearch";
 
 export const useSendRoutinePDF = () => {
   // --- ESTADOS ---
-  const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
   const [rutinas, setRutinas] = useState<any[]>([]);
   const [loading, setLoading] = useState(false); 
   
   // Estado específico para saber qué rutina se está enviando (spinner individual)
   const [sendingId, setSendingId] = useState<number | null>(null);
 
-  // Buscador
-  const [busqueda, setBusqueda] = useState("");
-  const [sugerencias, setSugerencias] = useState<any[]>([]);
-  const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
-  const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any>(null);
-
-  // 1. Cargar lista de alumnos
-  useEffect(() => {
-    const fetchAlumnos = async () => {
-      try {
-        const data = await UsuarioApi.getAlumnos();
-        setTodosLosAlumnos(data);
-      } catch (error) {
-        console.error("Error cargando alumnos", error);
-      }
-    };
-    fetchAlumnos();
-  }, []);
-
-  // 2. Lógica del Buscador (Filtrado local)
-  const handleSearchChange = (text: string) => {
-    setBusqueda(text);
-    if (text.length > 0) {
-      const filtrados = todosLosAlumnos.filter((alumno) => {
-        const nombreCompleto = `${alumno.nombre} ${alumno.apellido}`.toLowerCase();
-        // Filtramos por nombre completo
-        return nombreCompleto.includes(text.toLowerCase());
-      });
-      setSugerencias(filtrados);
-      setMostrarSugerencias(true);
-    } else {
-      clearSelection();
-    }
-  };
+  // Usamos el hook centralizado para la búsqueda de alumnos
+  const {
+    busqueda,
+    sugerencias,
+    mostrarSugerencias,
+    alumnoSeleccionado,
+    handleSearchChange,
+    handleSelectAlumno,
+    setMostrarSugerencias,
+    clearSelection
+  } = useAlumnoSearch({ initialLoad: true });
 
   // 3. Seleccionar Alumno
-  const handleSelectAlumno = async (alumno: any) => {
-    setBusqueda(`${alumno.nombre} ${alumno.apellido}`);
-    setAlumnoSeleccionado(alumno);
-    setMostrarSugerencias(false);
+  const handleSelectAlumnoWithRutinas = async (alumno: any) => {
+    handleSelectAlumno(alumno);
     setLoading(true);
 
     try {
@@ -80,8 +54,11 @@ export const useSendRoutinePDF = () => {
     setSendingId(rutinaId); // Activamos spinner solo en este botón
 
     try {
-      // Llamamos al endpoint específico
-      await api.post(`/rutinas/${rutinaId}/enviar-whatsapp`);
+      // Enviamos el ID del alumno seleccionado para rutinas generales
+      const payload = alumnoSeleccionado ? { alumnoId: alumnoSeleccionado.id } : {};
+      
+      // Llamamos al endpoint específico con el payload
+      await api.post(`/rutinas/${rutinaId}/enviar-whatsapp`, payload);
       
       showSuccess("PDF enviado correctamente 📤");
     } catch (error: any) {
@@ -91,15 +68,6 @@ export const useSendRoutinePDF = () => {
     } finally {
       setSendingId(null); // Apagamos spinner
     }
-  };
-
-  // Helper para limpiar
-  const clearSelection = () => {
-    setSugerencias([]);
-    setMostrarSugerencias(false);
-    setAlumnoSeleccionado(null);
-    setRutinas([]);
-    setBusqueda("");
   };
 
   return {
@@ -112,7 +80,7 @@ export const useSendRoutinePDF = () => {
     sendingId,
     setMostrarSugerencias,
     handleSearchChange,
-    handleSelectAlumno,
+    handleSelectAlumno: handleSelectAlumnoWithRutinas,
     handleSendPDF,
     clearSelection
   };

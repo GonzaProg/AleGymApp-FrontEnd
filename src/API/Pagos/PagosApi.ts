@@ -24,6 +24,18 @@ export interface FinancialMetricsDTO {
     cantidadVentasPlan: number;
     metodoPreferido: string;
     metodoPorcentaje: number;
+    chartAnual: number[];
+    chartMensual: number[];
+}
+
+export interface BreakdownItem {
+    categoria: string;
+    total: number;
+}
+
+export interface MetricsByTypeDTO {
+    desgloseMensual: BreakdownItem[];
+    desgloseAnual: BreakdownItem[];
 }
 
 export const PagosApi = {
@@ -34,6 +46,28 @@ export const PagosApi = {
 
     getMetrics: async (): Promise<FinancialMetricsDTO> => {
         const response = await api.get('/pagos/metrics');
+        return response.data;
+    },
+
+    getMetricsByType: async (): Promise<MetricsByTypeDTO> => {
+        const response = await api.get('/pagos/metrics/types');
+        return response.data;
+    },
+
+    getHistorialPorUsuario: async (userId: number): Promise<PagoDTO[]> => {
+        const response = await api.get(`/pagos/historial/${userId}`);
+        return response.data;
+    },
+
+    // NUEVO: Revertir pago
+    revertirPago: async (pagoId: number) => {
+        const response = await api.post('/pagos/revertir', { pagoId });
+        return response.data;
+    },
+    
+venderCarrito: async (data: { usuarioId: number, metodoPago: string, items: { productoId: number, cantidad: number }[] }) => {
+        // Usamos la misma ruta, pero el body ahora lleva 'items'
+        const response = await api.post('/pagos/venta-producto', data);
         return response.data;
     }
 };

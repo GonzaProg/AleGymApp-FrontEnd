@@ -7,13 +7,10 @@ import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 export const useEjerciciosCrear = () => {
     const { isAdmin, isEntrenador } = useAuthUser();
 
-    // Estado inicial constante para poder resetear fácil
     const initialState: EjercicioDTO = { nombre: '', urlVideo: '', imagenUrl: '' };
     const [form, setForm] = useState<EjercicioDTO>(initialState);
-    
     const [loading, setLoading] = useState(false);
     
-    // Archivos
     const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
@@ -32,7 +29,6 @@ export const useEjerciciosCrear = () => {
     const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
         e.preventDefault();
         
-        // Validación temprana
         if (!isAdmin && !isEntrenador) {
             showError("No tienes permisos para realizar esta acción.");
             return false;
@@ -45,43 +41,44 @@ export const useEjerciciosCrear = () => {
         setLoading(true);
 
         try {
-            let finalVideoUrl = "";
-            let finalImageUrl = "";
+            // CORRECCIÓN AQUÍ: Priorizamos la lógica de Admin
+            if (isAdmin) {
+                // Lógica Admin: Sube archivos y crea completo
+                let finalVideoUrl = "";
+                let finalImageUrl = "";
 
-            // Array de promesas para subida paralela (Optimización de tiempo)
-            const uploadPromises: Promise<void>[] = [];
+                if (selectedVideo) {
+                    finalVideoUrl = await CloudinaryApi.upload(selectedVideo, 'ejercicios', 'Ejercicios', 'video');
+                }
+                
+                if (selectedImage) {
+                    finalImageUrl = await CloudinaryApi.upload(selectedImage, 'ejercicios', 'Ejercicios', 'image');
+                }
 
-            if (selectedVideo) {
-                uploadPromises.push(CloudinaryApi.upload(selectedVideo, 'video').then(url => { finalVideoUrl = url; }));
+                const ejercicioData: EjercicioDTO = {
+                    nombre: form.nombre,
+                    urlVideo: finalVideoUrl || undefined,
+                    imagenUrl: finalImageUrl || undefined
+                };
+
+                await EjerciciosApi.create(ejercicioData);
+            } else {
+                // Lógica Entrenador: Solo crea el nombre, ignora archivos si hubiese
+                await EjerciciosApi.createBasic(form.nombre);
             }
-            if (selectedImage) {
-                uploadPromises.push(CloudinaryApi.upload(selectedImage, 'image').then(url => { finalImageUrl = url; }));
-            }
-
-            // Esperamos a que todo se suba
-            await Promise.all(uploadPromises);
-
-            const ejercicioData: EjercicioDTO = {
-                nombre: form.nombre,
-                urlVideo: finalVideoUrl,
-                imagenUrl: finalImageUrl
-            };
-
-            await EjerciciosApi.create(ejercicioData);
             
             await showSuccess("Ejercicio creado correctamente.");
             
-            // Limpieza de formulario
             setForm(initialState);
             setSelectedVideo(null);
             setSelectedImage(null);
             
-            return true; // Retornamos true para indicar éxito al componente
+            return true;
 
         } catch (err: any) {
             const errorMsg = err.response?.data?.error || err.message || "Error al crear el ejercicio";
             showError(errorMsg);
-            return false; // Retornamos false en caso de error
+            return false;
         } finally {
             setLoading(false);
         }
@@ -93,7 +90,6 @@ export const useEjerciciosCrear = () => {
         selectedVideo, 
         selectedImage,
         handleInputChange,
-        // Unificamos handlers o exponemos wrappers simples
         handleVideoChange: (e: React.ChangeEvent<HTMLInputElement>) => handleFileChange(e, 'video'),
         handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => handleFileChange(e, 'image'),
         handleSubmit

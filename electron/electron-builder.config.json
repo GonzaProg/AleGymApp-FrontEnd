@@ -1,5 +1,5 @@
 {
-  "appId": "com.yourdoamnin.yourapp",
+  "appId": "com.GymMate.app",
   "directories": {
     "buildResources": "resources"
   },
@@ -10,9 +10,11 @@
     "app/**/*"
   ],
   "publish": {
-    "provider": "github"
-  },
+    "provider": "github",
+    "owner": "GonzaProg",
+    "repo": "AleGymApp-FrontEnd"
 
+  },
   "nsis": {
     "allowElevation": true,
     "oneClick": false,

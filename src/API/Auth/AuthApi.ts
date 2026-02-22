@@ -5,7 +5,6 @@ export interface CreateUserDTO {
     dni: string;          
     nombre: string;
     apellido: string;
-    nombreUsuario: string;
     contraseña: string;
     telefono?: string;    
     fechaNacimiento?: string;
@@ -46,20 +45,9 @@ export interface ResetPasswordDTO {
 }
 
 export const AuthApi = {
-    // La API decide la URL basada en el rol
+    // Unificado: tanto Alumnos como Entrenadores usan el mismo endpoint
     createUser: async (data: CreateUserDTO) => {
-        let url = "";
-        
-        // Lógica de ruteo según el Rol
-        if (data.rol === "Entrenador") {
-            // endpoint: /api/auth/crear-entrenador
-            url = "/auth/crear-entrenador"; 
-        } else {
-            // endpoint: /api/auth/register
-            url = "/auth/register"; 
-        }
-
-        const response = await api.post(url, data);
+        const response = await api.post('/auth/register', data);
         return response.data;
     },
 

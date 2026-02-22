@@ -1,25 +1,58 @@
+import api from '../../API/axios';
+
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 const VITE_API_URL_CLOUDINARY = import.meta.env.VITE_API_URL_CLOUDINARY;
 const API_URL_BASE = `${VITE_API_URL_CLOUDINARY}${CLOUD_NAME}`;
 
+const PRESETS = {
+    usuarios: import.meta.env.VITE_PRESET_USUARIOS,
+    ejercicios: import.meta.env.VITE_PRESET_EJERCICIOS,
+};
+
+// 1. AÑADIMOS 'productos' AL TIPO
+type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs';
+
+// Uso el preset de ejercicios para los PRs y el de usuarios para los productos. 
+
 export const CloudinaryApi = {
     
-    // Sube un archivo a Cloudinary
-    upload: async (file: File, resourceType: 'image' | 'video' = 'image'): Promise<string> => {
+    upload: async (file: File, type: UploadType, customPath?: string, resourceType: 'image' | 'video' = 'image'): Promise<string> => {
         
-        // Validaciones básicas de entorno
-        if (!CLOUD_NAME || !UPLOAD_PRESET) {
-            throw new Error("Faltan configurar las variables de entorno de Cloudinary (VITE_CLOUDINARY_...)");
+        // 2. LÓGICA DE PRESETS
+        let presetKey = type;
+        
+        // Mapeos especiales si reutilizamos presets
+        if (type === 'logos') presetKey = 'usuarios';
+        if (type === 'productos') presetKey = 'usuarios';
+        if (type === 'prs') presetKey = 'ejercicios';
+
+        // @ts-ignore (Para que TS confíe en el acceso dinámico)
+        const selectedPreset = PRESETS[presetKey] || PRESETS[type];
+
+        if (!CLOUD_NAME || !selectedPreset) {
+            throw new Error(`Falta configuración de Cloudinary para el tipo: ${type}`);
         }
 
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', UPLOAD_PRESET);
+        formData.append('upload_preset', selectedPreset);
+
+        // 3. LÓGICA DE CARPETAS (Default folders)
+        if (customPath) {
+            formData.append('folder', customPath);
+        } else {
+            let defaultFolder = '';
+            switch (type) {
+                case 'usuarios': defaultFolder = 'Usuarios/General'; break;
+                case 'ejercicios': defaultFolder = 'Ejercicios'; break;
+                case 'logos': defaultFolder = 'Logos'; break;
+                case 'productos': defaultFolder = 'Productos/General'; break;
+                case 'prs': defaultFolder = 'PRs/Videos'; break;
+            }
+            formData.append('folder', defaultFolder);
+        }
 
         try {
-            // Usamos fetch nativo para no enviar los Headers de Autorización de tu Backend (Axios interceptor)
-            // ya que Cloudinary rechazaría el token de tu backend.
             const response = await fetch(`${API_URL_BASE}/${resourceType}/upload`, {
                 method: 'POST',
                 body: formData
@@ -27,33 +60,44 @@ export const CloudinaryApi = {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error?.message || "Error desconocido al subir a Cloudinary");
+                throw new Error(errorData.error?.message || "Error al subir a Cloudinary");
             }
 
             const data = await response.json();
-            return data.secure_url; // Retornamos la URL HTTPS
+            return data.secure_url;
 
         } catch (error) {
             console.error(`Error CloudinaryService (${resourceType}):`, error);
-            throw error; // Re-lanzamos para que el componente maneje la alerta
+            throw error;
         }
     },
 
-    // Obtiene la miniatura a partir de la URL del video o imagen
-    getThumbnail: (imagenUrl?: string, videoUrl?: string): string | null => {
-        // 1. Prioridad: Imagen manual subida
-        if (imagenUrl && imagenUrl.trim() !== "") {
-            return imagenUrl;
-        }
+    // OBTENER IMÁGENES / LOGOS 
+    getUrl: (pathOrUrl?: string): string | null => {
+        if (!pathOrUrl || pathOrUrl.trim() === "") return null;
+        
+        // 1. Si ya es una URL completa (ej: https://res.cloudinary...), la devolvemos tal cual
+        if (pathOrUrl.startsWith("http")) return pathOrUrl;
 
-        // 2. Si no hay imagen, pero hay video de Cloudinary, generamos la miniatura.
+        // 2. Si es solo un Public ID (ej: "Logos/mi-gym"), construimos la URL
+        return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${pathOrUrl}`;
+    },
+
+    getThumbnail: (imagenUrl?: string, videoUrl?: string): string | null => {
+        if (imagenUrl && imagenUrl.trim() !== "") return imagenUrl;
         if (videoUrl && videoUrl.includes("cloudinary.com")) {
-            // Reemplazamos la extensión del video (.mp4, .mov, etc) por .jpg
-            // Esta Regex busca el último punto y reemplaza lo que sigue por .jpg
             return videoUrl.replace(/\.[^/.]+$/, ".jpg");
         }
-
-        // 3. Si no hay nada
         return null;
-    }
+    },
+
+    delete: async (url: string, resourceType: 'image' | 'video' = 'image') => {
+        if (!url || !url.includes("cloudinary.com")) return;
+
+        try {
+            await api.post('/cloudinary/delete', { url, type: resourceType });
+        } catch (error) {
+            console.error("Error eliminando archivo antiguo:", error);
+        }
+    },
 };

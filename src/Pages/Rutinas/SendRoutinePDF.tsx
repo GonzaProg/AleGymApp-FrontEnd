@@ -57,7 +57,7 @@ export const SendRoutinePDF = () => {
 
             {/* LISTA DE SUGERENCIAS */}
             {mostrarSugerencias && sugerencias.length > 0 && (
-              <ul className="absolute w-full mt-2 bg-[#1a1f2e]/95 backdrop-blur-xl border border-green-500/20 rounded-xl shadow-2xl max-h-60 overflow-y-auto z-50 custom-scrollbar">
+              <ul className={`absolute w-full mt-2 bg-[#1a1f2e]/95 backdrop-blur-xl border border-green-500/20 rounded-xl shadow-2xl max-h-60 z-50 ${AppStyles.customScrollbar}`}>
                 {sugerencias.map((alumno) => (
                   <li
                     key={alumno.id}

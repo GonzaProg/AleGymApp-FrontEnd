@@ -12,7 +12,6 @@ export const useRegister = (onSuccess: () => void) => {
         dni: "",
         nombre: "",
         apellido: "",
-        nombreUsuario: "",
         contraseña: "",
         confirmarContrasena: "",
         telefono: "",
@@ -31,7 +30,13 @@ export const useRegister = (onSuccess: () => void) => {
         if (!gymCode) return showError("Error de configuración: Sin código de gimnasio.");
         if (formData.contraseña !== formData.confirmarContrasena) return showError("Las contraseñas no coinciden.");
         if (formData.contraseña.length < 6) return showError("La contraseña debe tener al menos 6 caracteres.");
-
+        if (!formData.fechaNacimiento) {
+            return showError("⚠️ Falta completar la fecha de nacimiento.");
+        }
+        if (!formData.telefono) {
+            return showError("⚠️ Falta completar el número de teléfono.");
+        }
+        
         setLoading(true);
         try {
             // Preparamos el DTO

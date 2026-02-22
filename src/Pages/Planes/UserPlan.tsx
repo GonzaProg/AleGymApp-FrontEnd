@@ -1,102 +1,96 @@
 import { UserPlanStyles } from "../../Styles/UserPlanStyles";
 import { Card } from "../../Components/UI/Card";
 import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
-import { PageLayout } from "../../Components/UI/PageLayout";
-import fondoGym from "../../assets/Fondo-MiPlan.jpg";
+import { type UserPlanDTO } from "../../API/Planes/PlansApi";
 
 export const UserPlan = () => {
-  const { myPlan, loading, error } = useUserPlan();
+  const { activePlans, loading, error } = useUserPlan();
 
-  if (loading) return <div className="p-8 text-center text-gray-400 animate-pulse">Cargando tu plan...</div>;
-  if (error) return <div className="p-8 text-center text-red-400">{error}</div>;
-
-  // --- LÓGICA SIMPLIFICADA ---
-  const dias = myPlan?.diasRestantes || 0;
-  const venceHoy = dias === 0;
-
-  // --- CLASES DINÁMICAS ---
-  const statusColor = venceHoy ? "text-orange-500" : "text-green-500";
-  const borderColor = venceHoy ? "border-orange-500" : "border-green-500";
-  const bgTint = venceHoy ? "bg-orange-500/10" : "bg-green-500/10";
-  const iconoEstado = venceHoy ? '⚠️' : '✅';
-  const textoEstado = venceHoy ? 'Vence Hoy' : 'Activo';
-
-  // Formateo de fecha seguro
-  const fechaVencimientoStr = myPlan?.fechaVencimiento 
-    ? new Date(myPlan.fechaVencimiento).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    : '-';
+  if (loading) return <div className="p-8 text-center text-gray-400 animate-pulse mt-20">Cargando tus suscripciones...</div>;
+  if (error) return <div className="p-8 text-center text-red-400 mt-20">{error}</div>;
 
   return (
-    <PageLayout backgroundImage={fondoGym}>
-        <div className="w-full max-w-4xl mx-auto space-y-6 mt-40">
-
-          {myPlan ? (
-            <div className="mb-10 animate-fade-in w-full">
-              <Card className={`${UserPlanStyles.glassCardUserPlan} border-l-4 ${borderColor} ${bgTint} w-full transition-colors duration-300`}>
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6 p-2">
-                    
-                    {/* IZQUIERDA: Nombre y Estado */}
-                    <div className="text-left">
-                      <h3 className="text-3xl font-bold text-white mb-2">{myPlan.plan.nombre}</h3>
-                      <p className={`${statusColor} font-bold text-lg flex items-center gap-2`}>
-                        {iconoEstado} Estado: {textoEstado}
-                      </p>
-                    </div>
-                    
-                    {/* DERECHA: Contador e Info */}
-                    <div className="text-right w-full md:w-auto mt-4 md:mt-0">
-                      <div className="text-gray-300 text-sm mb-1 tracking-wide font-semibold justify-end flex items-center">
-                        <span>Vence el:</span>
-                        <span className="text-white ml-2 text-base font-bold">{fechaVencimientoStr}</span>
-                      </div>
-                      
-                      <div className="flex items-baseline justify-end gap-2 mt-2">
-                         {/* Lógica visual del contador */}
-                         {venceHoy ? (
-                             <span className="text-xl font-bold text-orange-400 animate-pulse">
-                                 ⚠️ ÚLTIMO DÍA
-                             </span>
-                         ) : (
-                             <>
-                                <span className="text-3xl font-black text-white">
-                                    {dias}
-                                </span>
-                                <span className="text-sm font-medium text-gray-400 tracking-wider">
-                                    {dias === 1 ? 'Día Restante' : 'Días Restantes'}
-                                </span>
-                             </>
-                         )}
-                      </div>
-                    </div>
-                </div>
-                
-                {/* FOOTER CARD */}
-                <div className="mt-6 pt-4 border-t border-white/10 text-gray-400 text-sm italic text-left flex flex-col md:flex-row justify-between items-center gap-2">
-                    <span>"{myPlan.plan.descripcion}"</span>
-                    
-                    {/* Solo mostramos botón/aviso si vence hoy */}
-                    {venceHoy ? (
-                        <span className="text-orange-400 text-xs font-bold uppercase tracking-widest border border-orange-500/50 px-3 py-1 rounded-full bg-orange-500/10 animate-pulse">
-                            Renovar Ahora
-                        </span>
-                    ) : (
-                        <span className="text-green-400 text-xs font-bold uppercase tracking-widest border border-green-500/20 px-3 py-1 rounded-full bg-green-500/5">
-                            Plan al día
-                        </span>
-                    )}
-                </div>
-              </Card>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm w-full">
-                <span className="text-5xl mb-4 opacity-50">📭</span>
-                <h3 className="text-xl text-white font-bold">No tienes un plan activo</h3>
-                <p className="text-gray-400 mt-2 text-center max-w-md">
-                  Acércate a recepción o habla con tu entrenador para suscribirte a un nuevo plan.
-                </p>
-            </div>
-          )}
+    <div className="w-full max-w-4xl mx-auto space-y-6 pt-32 px-4 pb-20 relative z-10">
+      
+      {activePlans.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+          {activePlans.map((plan) => (
+            <PlanCard key={plan.userPlanId} plan={plan} />
+          ))}
         </div>
-    </PageLayout>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm w-full animate-fade-in">
+            <span className="text-5xl mb-4 opacity-50">📭</span>
+            <h3 className="text-xl text-white font-bold">No tienes planes activos</h3>
+            <p className="text-gray-400 mt-2 text-center max-w-md px-4">
+              Acércate a recepción para asignarte una suscripción.
+            </p>
+        </div>
+      )}
+    </div>
   );
+};
+
+// Subcomponente Tarjeta Individual (Para renderizar N planes)
+const PlanCard = ({ plan }: { plan: UserPlanDTO }) => {
+    const dias = plan.diasRestantes;
+    const venceHoy = dias === 0;
+
+    // Variables de estilo dinámicas
+    const statusColor = venceHoy ? "text-orange-400" : "text-green-400";
+    const borderColor = venceHoy ? "border-orange-500" : "border-green-500";
+    const bgTint = venceHoy ? "bg-orange-500/10" : "bg-green-500/5"; 
+    const badgeBg = venceHoy ? "bg-orange-500/20 animate-pulse" : "bg-green-500/20";
+    
+    const iconoEstado = venceHoy ? '⚠️' : '✅';
+    const textoEstado = venceHoy ? 'VENCE HOY' : 'AL DÍA';
+
+    const fechaVencimientoStr = new Date(plan.fechaVencimiento).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    // Icono según tipo de plan
+    const getIconoPlan = (tipo: string) => {
+        if (tipo === 'Natacion') return '🏊';
+        return '🏋️'; // Gym default
+    };
+
+    return (
+        <Card className={`${UserPlanStyles.glassCardUserPlan} border-l-4 ${borderColor} ${bgTint} w-full transition-transform duration-300 hover:scale-[1.02]`}>
+            <div className="flex flex-col justify-between h-full p-2">
+                
+                {/* Header Card */}
+                <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-2xl">{getIconoPlan(plan.tipo)}</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 border border-white/10 px-2 py-0.5 rounded-full">
+                                {plan.tipo}
+                            </span>
+                        </div>
+                        <h3 className="text-2xl font-bold text-white leading-tight">{plan.nombre}</h3>
+                    </div>
+                    
+                    <div className="text-right">
+                         <div className={`${statusColor} ${badgeBg} font-bold text-xs px-2 py-1 rounded inline-flex items-center gap-1`}>
+                            <span>{iconoEstado}</span>
+                            <span>{textoEstado}</span>
+                         </div>
+                    </div>
+                </div>
+
+                {/* Body Card */}
+                <div className="flex items-end justify-between mt-auto">
+                    <div>
+                        <p className="text-gray-400 text-xs uppercase font-semibold mb-1">Vencimiento</p>
+                        <p className="text-white font-mono text-lg">{fechaVencimientoStr}</p>
+                    </div>
+                    <div className="text-right">
+                        <span className={`text-4xl font-black ${venceHoy ? 'text-orange-500' : 'text-white'}`}>
+                            {dias}
+                        </span>
+                        <p className="text-xs text-gray-400 font-medium">Días Restantes</p>
+                    </div>
+                </div>
+            </div>
+        </Card>
+    );
 };

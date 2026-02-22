@@ -9,8 +9,10 @@ import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
 
 export const PlansManager = () => {
   const { 
-    planes, 
+    planesFiltrados,
     loading, 
+    filtroTipo,
+    setFiltroTipo,
     isModalOpen, 
     isSubscribeModalOpen, 
     editingPlan, 
@@ -38,9 +40,26 @@ export const PlansManager = () => {
         <div className="w-full max-w-7xl mx-auto">
           {/* Encabezado Admin */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 w-full gap-4">
-            <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
-              <p className={AppStyles.subtitle}>Gestiona las suscripciones del gimnasio</p>
+            <div className="flex flex-col gap-4 flex-1">
+              <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
+                <p className={AppStyles.subtitle}>Gestiona las suscripciones del gimnasio</p>
+              </div>
+              
+              {/* Buscador por tipo */}
+              <div className="flex items-center gap-2">
+                <label className="text-white text-sm font-medium">Filtrar por:</label>
+                <select 
+                  value={filtroTipo}
+                  onChange={(e) => setFiltroTipo(e.target.value as 'Gym' | 'Natacion' | 'Todos')}
+                  className={`${AppStyles.inputDark} appearance-none cursor-pointer max-w-36 min-w-32 text-center`}
+                >
+                  <option value="Gym" className={AppStyles.darkBackgroundSelect}>Gimnasio</option>
+                  <option value="Natacion" className={AppStyles.darkBackgroundSelect}>Natación</option>
+                  <option value="Todos" className={AppStyles.darkBackgroundSelect}>Todos</option>
+                </select>
+              </div>
             </div>
+            
             <Button onClick={openCreateModal} className={AppStyles.btnPrimary}>
               + NUEVO PLAN
             </Button>
@@ -49,7 +68,7 @@ export const PlansManager = () => {
           {/* Catálogo de Planes */}
           {loading ? <p className="text-white text-center py-10">Cargando catálogo...</p> : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-20 w-full">
-              {planes.map((plan) => (
+              {planesFiltrados.map((plan) => (
                 <Card key={plan.id} className={`${AppStyles.glassCard} hover:border-green-500/50 transition-all relative group flex flex-col`}>
                   
                   <div className="flex justify-between items-start mb-2">
@@ -147,6 +166,7 @@ export const PlansManager = () => {
 const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
     const [form, setForm] = useState({
         nombre: initialData?.nombre || "",
+        tipo: initialData?.tipo || "Gym", // <--- NUEVO DEFAULT
         precio: initialData?.precio || "",
         duracionDias: initialData?.duracionDias || "",
         diasPorSemana: initialData?.diasPorSemana || "",
@@ -164,10 +184,25 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <label className={AppStyles.label}>Nombre del Plan</label>
-                <Input name="nombre" value={form.nombre} onChange={handleChange} required className={AppStyles.inputDark} placeholder="Ej: Mensual / Semanal" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className={AppStyles.label}>Nombre del Plan</label>
+                    <Input name="nombre" value={form.nombre} onChange={handleChange} required className={AppStyles.inputDark} placeholder="Ej: Full Pass" />
+                </div>
+                <div>
+                    <label className={AppStyles.label}>Categoría</label>
+                    <select 
+                        name="tipo" 
+                        value={form.tipo} 
+                        onChange={handleChange} 
+                        className={AppStyles.inputDark + " appearance-none cursor-pointer"}
+                    >
+                        <option value="Gym" className={AppStyles.darkBackgroundSelect}>Gimnasio / Musculación</option>
+                        <option value="Natacion" className={AppStyles.darkBackgroundSelect}>Natación</option>
+                    </select>
+                </div>
             </div>
+
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className={AppStyles.label}>Precio ($)</label>
@@ -178,7 +213,8 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
                     <Input type="number" name="duracionDias" min="0" value={form.duracionDias} onChange={handleChange} required className={AppStyles.inputDark} />
                 </div>
             </div>
-            <div>
+            
+             <div>
                 <label className={AppStyles.label}>Días por Semana (1-7)</label>
                 <Input type="number" min="1" max="7" name="diasPorSemana" value={form.diasPorSemana} onChange={handleChange} required className={AppStyles.inputDark} />
             </div>

@@ -64,6 +64,9 @@ export const AppStyles = {
     btnBack: "text-gray-400 hover:text-white flex items-center gap-2 transition-colors text-sm font-bold uppercase tracking-widest cursor-pointer",
     
     btnIconBase: "p-2 rounded-lg transition-all border",
-    btnEdit: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black border-yellow-500/20",
-    btnDelete: "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border-red-500/20",
+    btnEdit: "p-2 rounded-lg transition-all border bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black border-yellow-500/20",
+    btnDelete: "p-2 rounded-lg transition-all border bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border-red-500/20",
+
+    // SCROLLBAR PERSONALIZADO OSCURO (reutilizable)
+    customScrollbar: "overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20",
 };

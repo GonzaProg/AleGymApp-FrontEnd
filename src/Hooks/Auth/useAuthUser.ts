@@ -5,13 +5,18 @@ export interface User {
     dni: string;
     nombre?: string;
     apellido?: string;
-    nombreUsuario?: string;
     telefono?: string;
     fechaNacimiento?: string;
     email?: string;
     fotoPerfil?: string;
     rol: string; 
     token?: string;
+    gym?: {
+        id: number;
+        nombre: string;
+        logoUrl?: string;
+        codigoAcceso?: string;
+    };
 }
 
 export const useAuthUser = () => {

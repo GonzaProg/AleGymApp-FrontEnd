@@ -82,8 +82,6 @@ export const Login = () => {
                     <Input name="telefono" placeholder="Teléfono" type="tel" value={formData.telefono} onChange={handleChange} className={LoginStyles.inputDark} />
                 </div>
 
-                <Input name="nombreUsuario" placeholder="Nombre de Usuario" value={formData.nombreUsuario} onChange={handleChange} required className={LoginStyles.inputDark} />
-                
                 <Input name="fechaNacimiento" type="date" value={formData.fechaNacimiento} onChange={handleChange} className={`${LoginStyles.inputDark} text-gray-400`} labelClassName={LoginStyles.label}
                     />
 

@@ -1,78 +1,82 @@
-import { useState, useEffect, useMemo } from "react";
-import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
+import { useState, useEffect } from "react";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
 import { showConfirmSuccess, showError, showSuccess } from "../../Helpers/Alerts";
+// Asegúrate de que la ruta de importación sea correcta según tu estructura
+import { useAlumnoSearch } from "../useAlumnoSearch"; 
 
 export const useRenewPlan = () => {
+
     // --- ESTADOS DE DATOS ---
-    const [todosLosAlumnos, setTodosLosAlumnos] = useState<any[]>([]);
     const [planesDisponibles, setPlanesDisponibles] = useState<PlanDTO[]>([]);
     
-    // --- ESTADOS DE UI Y SELECCIÓN ---
-    const [busqueda, setBusqueda] = useState("");
-    const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<any | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [loadingAction, setLoadingAction] = useState(false); // Para spinners en botones
+    // --- ESTADOS DE UI ---
+    const [loadingPlans, setLoadingPlans] = useState(false);
+    const [loadingAction, setLoadingAction] = useState(false); 
     const [metodoPago, setMetodoPago] = useState("Transferencia");
 
-    // 1. Carga inicial de datos
+    // --- BÚSQUEDA CENTRALIZADA ---
+    // includePlan: true porque necesitamos saber si está activo o vencido
+    const {
+        busqueda,
+        sugerencias,
+        alumnoSeleccionado,
+        loading: loadingSearch,
+        handleSearchChange,
+        handleSelectAlumno,
+        clearSelection,
+        setBusqueda
+    } = useAlumnoSearch({ includePlan: true });
+
+    // 1. Carga inicial de PLANES (No alumnos, eso lo maneja el buscador)
     useEffect(() => {
-        cargarDatosIniciales();
+        const cargarPlanes = async () => {
+            setLoadingPlans(true);
+            try {
+                const planes = await PlansApi.getAll();
+                setPlanesDisponibles(planes);
+            } catch (error) {
+                console.error("Error cargando planes:", error);
+            } finally {
+                setLoadingPlans(false);
+            }
+        };
+        cargarPlanes();
     }, []);
 
-    const cargarDatosIniciales = async () => {
-        setLoading(true);
-        try {
-            // Promise.all para cargar en paralelo (Más optimizado)
-            const [alumnos, planes] = await Promise.all([
-                UsuarioApi.getAlumnos(true), // Traemos planes relacionados
-                PlansApi.getAll()
-            ]);
-            setTodosLosAlumnos(alumnos);
-            setPlanesDisponibles(planes);
-        } catch (error) {
-            console.error("Error cargando datos:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 2. Lógica de Filtrado (Memoizado para rendimiento)
-    const sugerencias = useMemo(() => {
-        if (busqueda.length === 0) return [];
-        return todosLosAlumnos.filter(u => 
-            `${u.nombre} ${u.apellido}`.toLowerCase().includes(busqueda.toLowerCase())
-        );
-    }, [busqueda, todosLosAlumnos]);
-
-    // 3. Handlers
+    // Wrappers para la UI (Mantenemos compatibilidad con tu componente visual)
     const seleccionarAlumno = (alumno: any) => {
-        setAlumnoSeleccionado(alumno);
-        setBusqueda(""); // Limpiamos búsqueda para estética
+        handleSelectAlumno(alumno);
         setMetodoPago("Transferencia");
     };
 
     const limpiarSeleccion = () => {
-        setAlumnoSeleccionado(null);
-        setBusqueda("");
+        clearSelection();
     };
 
-    // --- ACCIONES CON LA API ---
-    const renovarPlan = async () => {
+    // --- ACCIONES ---
+
+    const renovarPlan = async (userPlanId?: number) => {
         if (!alumnoSeleccionado) return;
+        
+        // Buscamos un plan para renovar si no viene el ID específico
+        const idRenovar = userPlanId || alumnoSeleccionado.userPlans?.find((p:any) => p.activo)?.id;
+        
+        // Si no tiene plan activo, quizás queremos renovar el último vencido? 
+        // Por seguridad, pedimos que seleccione explícitamente si hay ambigüedad, 
+        // pero aquí asumimos el flujo simple.
+        if (!idRenovar) return showError("No se encontró una suscripción activa para renovar.");
+
         setLoadingAction(true);
         try {
-            const response: any = await PlansApi.renewPlan(alumnoSeleccionado.id, metodoPago);
-            
+            const response: any = await PlansApi.renewPlan(idRenovar, metodoPago);
+
             switch (response.estadoRecibo) {
                 case 'ENVIADO': showSuccess(`✅ Renovado. Recibo enviado 📱`); break;
-                case 'DESACTIVADO': showSuccess(`✅ Renovado correctamente.\n(Recibo desactivado 🔕)`); break;
+                case 'DESACTIVADO': showSuccess(`✅ Renovado correctamente.`); break;
                 case 'ERROR': showSuccess(`⚠️ Renovado, pero FALLÓ el envío del recibo.`); break;
                 default: showSuccess(`✅ Renovado correctamente.`);
             }
 
-            await cargarDatosIniciales(); 
-            setAlumnoSeleccionado((prev: any) => ({...prev, estadoMembresia: 'Activo'})); 
             limpiarSeleccion(); 
         } catch (error: any) {
             showError(error.response?.data?.message || "Error al renovar");
@@ -81,21 +85,24 @@ export const useRenewPlan = () => {
         }
     };
 
-    const cancelarPlan = async () => {
+    const cancelarPlan = async (userPlanId?: number) => {
         if (!alumnoSeleccionado) return;
 
+        const idCancelar = userPlanId || alumnoSeleccionado.userPlans?.find((p:any) => p.activo)?.id;
+        if (!idCancelar) return showError("No hay plan activo para cancelar");
+
         const result = await showConfirmSuccess( 
-                        `¿Cancelar plan?`,
-                        `¿Deseas cancelar la membresía de ${alumnoSeleccionado.nombre}?`);
+            `¿Cancelar plan?`,
+            `¿Deseas cancelar la membresía de ${alumnoSeleccionado.nombre}?`
+        );
                         
         if (!result.isConfirmed) return;
 
         setLoadingAction(true);
         try {
-            await PlansApi.cancelPlan(alumnoSeleccionado.id);
-            // Actualización optimista local
-            setAlumnoSeleccionado({ ...alumnoSeleccionado, planActual: null });
-            await cargarDatosIniciales(); // Sincronización real de fondo
+            await PlansApi.cancelPlan(idCancelar);
+            showSuccess("Plan cancelado correctamente");
+            limpiarSeleccion();
         } catch (error: any) {
             showError("Error al cancelar");
         } finally {
@@ -107,8 +114,9 @@ export const useRenewPlan = () => {
         if (!alumnoSeleccionado) return;
 
         const result = await showConfirmSuccess( 
-                        `Asignar ${plan.nombre}`,
-                        `¿Deseas asignar el plan "${plan.nombre}" a ${alumnoSeleccionado.nombre}?`);
+            `Asignar ${plan.nombre}`,
+            `¿Deseas asignar el plan "${plan.nombre}" a ${alumnoSeleccionado.nombre}?`
+        );
                         
         if (!result.isConfirmed) return;
 
@@ -118,12 +126,11 @@ export const useRenewPlan = () => {
             
             switch (response.estadoRecibo) {
                 case 'ENVIADO': showSuccess(`✅ Asignado. Recibo enviado 📱`); break;
-                case 'DESACTIVADO': showSuccess(`✅ Asignado correctamente.\n(Recibo desactivado 🔕)`); break;
+                case 'DESACTIVADO': showSuccess(`✅ Asignado correctamente.`); break;
                 case 'ERROR': showSuccess(`⚠️ Asignado, pero FALLÓ el envío del recibo.`); break;
                 default: showSuccess(`✅ Asignado correctamente.`);
             }
             
-            await cargarDatosIniciales();
             limpiarSeleccion();
         } catch (error: any) {
             showError("Error al asignar plan");
@@ -138,12 +145,13 @@ export const useRenewPlan = () => {
         alumnoSeleccionado,
         sugerencias,
         busqueda,
-        loading,
+        loading: loadingPlans || loadingSearch, // Loading combinado
         loadingAction,
         metodoPago,
         
         // Acciones
-        setBusqueda,
+        setBusqueda, // Para el input
+        handleSearchChange, // Para el onChange
         seleccionarAlumno,
         limpiarSeleccion,
         renovarPlan,

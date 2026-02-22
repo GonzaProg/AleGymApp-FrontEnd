@@ -81,7 +81,7 @@ export const CreateGym = () => {
                 {/* --- MODAL PASO 2: CREAR DUEÑO (Overlay) --- */}
                 {showOwnerModal && (
                     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
-                        <Card className="bg-gray-900 border border-green-500/30 max-w-2xl w-full p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                        <Card className={`bg-gray-900 border border-green-500/30 max-w-2xl w-full p-8 shadow-2xl relative max-h-[90vh] ${AppStyles.customScrollbar}`}>
                             <div className="text-center mb-6">
                                 <h2 className="text-2xl font-bold text-white">
                                     ¡Gimnasio <span className="text-green-400">{createdGymName}</span> Creado!
@@ -106,8 +106,8 @@ export const CreateGym = () => {
                                     <Input name="dni" value={ownerForm.dni} onChange={handleOwnerChange} className={AppStyles.inputDark} required />
                                 </div>
                                 <div className="col-span-1">
-                                    <label className={AppStyles.label}>Usuario (Nick)</label>
-                                    <Input name="nombreUsuario" value={ownerForm.nombreUsuario} onChange={handleOwnerChange} className={AppStyles.inputDark} required />
+                                    <label className={AppStyles.label}>Teléfono (WhatsApp)</label>
+                                    <Input name="telefono" value={ownerForm.telefono} onChange={handleOwnerChange} className={AppStyles.inputDark} />
                                 </div>
                                 
                                 {/* Datos Cuenta */}
@@ -125,11 +125,6 @@ export const CreateGym = () => {
                                         onChange={handleOwnerChange} 
                                         className={AppStyles.inputDark} 
                                     />
-                                </div>
-
-                                <div className="col-span-1">
-                                    <label className={AppStyles.label}>Teléfono (WhatsApp)</label>
-                                    <Input name="telefono" value={ownerForm.telefono} onChange={handleOwnerChange} className={AppStyles.inputDark} />
                                 </div>
 
                                 <div className="col-span-2 mt-4 flex gap-4">

@@ -14,7 +14,6 @@ export const useCreateUser = () => {
     dni: "",              
     nombre: "",
     apellido: "",
-    nombreUsuario: "",
     contraseña: "",
     telefono: "",         
     fechaNacimiento: "",  
@@ -32,7 +31,7 @@ export const useCreateUser = () => {
 
   const handleSubmit = async () => {
     // Validar campos vacíos
-    if (!formData.dni || !formData.contraseña || !formData.nombreUsuario || !formData.nombre) {
+    if (!formData.dni || !formData.contraseña || !formData.nombre) {
       return showError("Por favor completa los campos obligatorios (*)");
     }
 
@@ -67,7 +66,7 @@ export const useCreateUser = () => {
 
       await AuthApi.createUser(dataToSend);
 
-      await showSuccess(`Usuario ${formData.nombreUsuario} creado con éxito!`);
+      await showSuccess(`Usuario ${formData.nombre} creado con éxito!`);
       window.location.reload();
 
     } catch (error: any) {

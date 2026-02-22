@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuthUser } from "../Auth/useAuthUser"; 
 import { UsuarioApi, type UpdateProfileDTO } from "../../API/Usuarios/UsuarioApi"; 
 import { showSuccess, showError } from "../../Helpers/Alerts";
-
-const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-const API_URL_CLOUDINARY = import.meta.env.VITE_API_URL_CLOUDINARY;
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary"; 
 
 export const useProfile = () => {
   const { currentUser } = useAuthUser();
@@ -21,12 +18,10 @@ export const useProfile = () => {
   const [uploadingImage, setUploadingImage] = useState(false); 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
-  // FORMULARIO DE EDICIÓN (Actualizado con nuevos campos)
   const [editForm, setEditForm] = useState<UpdateProfileDTO>({
     nombre: "",
     dni: "",
     apellido: "",
-    nombreUsuario: "",
     fotoPerfil: "",
     telefono: "",         
     fechaNacimiento: ""   
@@ -42,10 +37,8 @@ export const useProfile = () => {
     confirmPassword: ""
   });
 
-  // CARGAR DATOS
   useEffect(() => {
     if (displayUser) {
-      // Formatear fecha para el input type="date" (YYYY-MM-DD)
       let fechaFormateada = "";
       if (displayUser.fechaNacimiento) {
           fechaFormateada = new Date(displayUser.fechaNacimiento).toISOString().split('T')[0];
@@ -55,7 +48,6 @@ export const useProfile = () => {
         nombre: displayUser.nombre || "",
         dni: displayUser.dni || "", 
         apellido: displayUser.apellido || "", 
-        nombreUsuario: displayUser.nombreUsuario || "", 
         fotoPerfil: displayUser.fotoPerfil || "",
         telefono: displayUser.telefono || "",           
         fechaNacimiento: fechaFormateada            
@@ -79,25 +71,6 @@ export const useProfile = () => {
     }
   };
 
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', UPLOAD_PRESET); 
-
-    try {
-        const response = await fetch(
-            `${API_URL_CLOUDINARY}/${CLOUD_NAME}/image/upload`,
-            { method: 'POST', body: formData }
-        );
-        const data = await response.json();
-        if (!response.ok) throw new Error("Error al subir imagen");
-        return data.secure_url; 
-    } catch (error) {
-        console.error("Error cloudinary:", error);
-        throw error;
-    }
-  };
-
   const handleSaveProfile = async () => {
     if (!localId) return;
 
@@ -108,9 +81,26 @@ export const useProfile = () => {
 
       if (selectedFile) {
           setUploadingImage(true);
-          finalImageUrl = await uploadToCloudinary(selectedFile);
-          setUploadingImage(false);
-      }
+
+          // 1. BORRAR FOTO ANTERIOR
+          if (editForm.fotoPerfil && editForm.fotoPerfil.includes("cloudinary")) {
+              await CloudinaryApi.delete(editForm.fotoPerfil, 'image');
+          }
+          
+          // 1. OBTENEMOS DATOS DEL GYM
+          // Usamos el codigo de acceso del gym para que sea único. 
+          // Si no tiene gym (ej: Admin global), va a 'Usuarios/Admin'
+          const gymFolder = currentUser?.gym?.codigoAcceso 
+              ? `Usuarios/Gym_${currentUser.gym.codigoAcceso}` // Ej: Usuarios/Gym_15
+              : `Usuarios/Admin`;
+
+          // 2. LLAMAMOS AL UPLOAD CON LA CARPETA DINÁMICA
+          // Param 1: Archivo
+          // Param 2: Tipo de preset ('usuarios')
+          // Param 3: Ruta carpeta (gymFolder)
+          finalImageUrl = await CloudinaryApi.upload(selectedFile, 'usuarios', gymFolder);
+          
+          setUploadingImage(false);      }
 
       const updatedDTO: UpdateProfileDTO = {
         ...editForm,
@@ -119,7 +109,6 @@ export const useProfile = () => {
 
       const data = await UsuarioApi.update(localId, updatedDTO);
       
-      // Actualizamos todo
       const updatedUser = { ...displayUser, ...data };
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setDisplayUser(updatedUser);

@@ -20,7 +20,7 @@ export const useEjerciciosGestion = () => {
 
     // Modals
     const [videoUrl, setVideoUrl] = useState<string | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null); // Nuevo Modal Imagen
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const fetchEjercicios = useCallback(async () => {
         setLoading(true);
@@ -44,7 +44,15 @@ export const useEjerciciosGestion = () => {
         return;}
 
         try {
-            await EjerciciosApi.delete(id);
+            // Ahora se elimina tanto de la BD como de Cloudinary
+            const ejercicio = ejercicios.find(e => e.id === id);
+            
+            await EjerciciosApi.delete(id); // Borrar de BD
+            
+            // BORRAR DE CLOUDINARY (Fire & Forget)
+            if (ejercicio?.urlVideo) CloudinaryApi.delete(ejercicio.urlVideo, 'video');
+            if (ejercicio?.imagenUrl) CloudinaryApi.delete(ejercicio.imagenUrl, 'image');
+
             setEjercicios(prev => prev.filter(e => e.id !== id));
         } catch (err: any) { 
             const mensajeBackend = err.response?.data?.message || err.response?.data?.error;
@@ -70,12 +78,26 @@ export const useEjerciciosGestion = () => {
     const saveEdit = async (id: number) => {
         setUploading(true);
         try {
+            // Buscamos datos originales para saber qué borrar
+            const original = ejercicios.find(e => e.id === id);
+
             let finalVideo = editForm.urlVideo;
             let finalImage = editForm.imagenUrl;
 
             const uploads = [];
-            if (selectedVideo) uploads.push(CloudinaryApi.upload(selectedVideo, 'video').then(u => finalVideo = u));
-            if (selectedImage) uploads.push(CloudinaryApi.upload(selectedImage, 'image').then(u => finalImage = u));
+            if (selectedVideo) {
+                // BORRAR VIDEO VIEJO SI EXISTE
+                if (original?.urlVideo) await CloudinaryApi.delete(original.urlVideo, 'video');
+                
+                uploads.push(CloudinaryApi.upload(selectedVideo, 'ejercicios', 'Ejercicios', 'video').then(u => finalVideo = u));
+            }
+            
+            if (selectedImage) {
+                // BORRAR IMAGEN VIEJA SI EXISTE
+                if (original?.imagenUrl) await CloudinaryApi.delete(original.imagenUrl, 'image');
+
+                uploads.push(CloudinaryApi.upload(selectedImage, 'ejercicios', 'Ejercicios', 'image').then(u => finalImage = u));
+            }
             
             await Promise.all(uploads);
 

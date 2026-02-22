@@ -1,17 +1,19 @@
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from "react-dom";
 import { useEjerciciosGestion } from '../../Hooks/Ejercicios/useEjerciciosGestion';
 import { AppStyles } from '../../Styles/AppStyles';
 import { EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
 import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
+import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
 
-// Definimos la interfaz para recibir la función de navegación
 interface Props {
     onNavigate?: (tab: string) => void;
 }
 
 export const EjerciciosGestion = ({ onNavigate }: Props) => {
     const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState('');
     
     const { 
         ejercicios, loading, uploading, editingId, editForm, 
@@ -22,13 +24,21 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
         setVideoUrl, setImageUrl
     } = useEjerciciosGestion();
 
-    // Función que decide cómo navegar
+    const { isAdmin } = useAuthUser();
+
+    const filteredEjercicios = useMemo(() => {
+        const q = searchTerm.trim().toLowerCase();
+        if (!q) return ejercicios;
+        return ejercicios.filter((e) => {
+            if (editingId != null && e.id === editingId) return true;
+            return e.nombre.toLowerCase().includes(q);
+        });
+    }, [ejercicios, searchTerm, editingId]);
+
     const handleNewExercise = () => {
         if (onNavigate) {
-            // Si estamos en el Dashboard, cambiamos el tab internamente
             onNavigate('Crear Ejercicio');
         } else {
-            // Si accedimos por URL directa, usamos router
             navigate('/ejercicios/crear');
         }
     };
@@ -38,9 +48,15 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
             <div className="w-full max-w-7xl mx-auto space-y-6"> 
                 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:justify-end gap-4 mt-10">
-                    
-                    {/* BOTÓN CON LÓGICA SPA */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-10">
+                    <div className="w-full md:max-w-xs">
+                        <input
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Buscar ejercicio..."
+                            className={`${AppStyles.inputDark} h-10 text-sm bg-gray-900/60`}
+                        />
+                    </div>
                     <button 
                         onClick={handleNewExercise} 
                         className={`${AppStyles.btnPrimary} flex items-center gap-2 px-6 flex-none w-auto`}
@@ -49,7 +65,6 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                     </button>
                 </div>
 
-                {/* ... (El resto de la tabla y modales sigue IDÉNTICO a lo que te pasé antes) ... */}
                 <div className={TableStyles.tableContainer}>
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/50 to-green-500/50"></div>
                     <div className="overflow-x-auto">
@@ -65,39 +80,65 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr><td colSpan={4} className="p-8 text-center text-gray-400 italic">Cargando...</td></tr>
-                                ) : ejercicios.map((ej) => {
+                                ) : filteredEjercicios.map((ej) => {
                                     const isEditing = editingId === ej.id;
                                     return (
                                         <tr key={ej.id} className={TableStyles.tr}>
+                                            {/* COLUMNA NOMBRE: Editable para todos */}
                                             <td className={TableStyles.td + " font-medium text-white"}>
                                                 {isEditing ? (
-                                                    <input className={TableStyles.editInput} value={editForm.nombre} onChange={(e) => handleEditInputChange('nombre', e.target.value)} autoFocus />
+                                                    <input 
+                                                        className={TableStyles.editInput} 
+                                                        value={editForm.nombre} 
+                                                        onChange={(e) => handleEditInputChange('nombre', e.target.value)} 
+                                                        autoFocus 
+                                                    />
                                                 ) : <span className="text-lg">{ej.nombre}</span>}
                                             </td>
+
+                                            {/* COLUMNA IMAGEN */}
                                             <td className={TableStyles.td}>
                                                 {isEditing ? (
-                                                    <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white text-xs py-1 px-2 rounded flex items-center gap-2 w-max">
-                                                        <span>{selectedImage ? '🖼️ Listo' : '🖼️ Cambiar'}</span>
-                                                        <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
-                                                    </label>
+                                                    // MODO EDICIÓN
+                                                    isAdmin ? (
+                                                        <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white text-xs py-1 px-2 rounded flex items-center gap-2 w-max">
+                                                            <span>{selectedImage ? '🖼️ Listo' : '🖼️ Cambiar'}</span>
+                                                            <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                                                        </label>
+                                                    ) : (
+                                                        // Entrenador editando: No puede cambiar imagen
+                                                        <span className="text-gray-500 text-xs italic bg-white/5 px-2 py-1 rounded">Solo lectura</span>
+                                                    )
                                                 ) : (
+                                                    // MODO VISUALIZACIÓN: Todos pueden ver
                                                     ej.imagenUrl ? (
                                                         <button onClick={() => setImageUrl(ej.imagenUrl!)} className="text-purple-400 hover:text-purple-300 underline text-sm flex items-center gap-1">🖼️ Ver</button>
                                                     ) : <span className="text-gray-600 text-sm italic">-</span>
                                                 )}
                                             </td>
+
+                                            {/* COLUMNA VIDEO */}
                                             <td className={TableStyles.td}>
                                                 {isEditing ? (
-                                                    <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white text-xs py-1 px-2 rounded flex items-center gap-2 w-max">
-                                                        <span>{selectedVideo ? '📹 Listo' : '📹 Cambiar'}</span>
-                                                        <input type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
-                                                    </label>
+                                                    // MODO EDICIÓN
+                                                    isAdmin ? (
+                                                        <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white text-xs py-1 px-2 rounded flex items-center gap-2 w-max">
+                                                            <span>{selectedVideo ? '📹 Listo' : '📹 Cambiar'}</span>
+                                                            <input type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
+                                                        </label>
+                                                    ) : (
+                                                        // Entrenador editando: No puede cambiar video
+                                                        <span className="text-gray-500 text-xs italic bg-white/5 px-2 py-1 rounded">Solo lectura</span>
+                                                    )
                                                 ) : (
+                                                    // MODO VISUALIZACIÓN: Todos pueden ver
                                                     ej.urlVideo ? (
                                                         <button onClick={() => setVideoUrl(ej.urlVideo!)} className={TableStyles.videoLink}>📺 Ver</button>
                                                     ) : <span className="text-gray-600 text-sm italic">-</span>
                                                 )}
                                             </td>
+
+                                            {/* COLUMNA ACCIONES */}
                                             <td className={`${TableStyles.td} text-right space-x-2`}>
                                                 {isEditing ? (
                                                     <div className="flex justify-end gap-2">
@@ -107,7 +148,11 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                                 ) : (
                                                     <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                                         <button onClick={() => startEdit(ej)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar">✏️</button>
-                                                        <button onClick={() => handleDelete(ej.id)} className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} title="Eliminar">🗑️</button>
+                                                        
+                                                        {/* Solo Admin puede eliminar */}
+                                                        {isAdmin && (
+                                                            <button onClick={() => handleDelete(ej.id)} className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} title="Eliminar">🗑️</button>
+                                                        )}
                                                     </div>
                                                 )}
                                             </td>
