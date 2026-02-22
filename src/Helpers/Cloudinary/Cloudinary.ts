@@ -7,11 +7,12 @@ const API_URL_BASE = `${VITE_API_URL_CLOUDINARY}${CLOUD_NAME}`;
 const PRESETS = {
     usuarios: import.meta.env.VITE_PRESET_USUARIOS,
     ejercicios: import.meta.env.VITE_PRESET_EJERCICIOS,
-    productos: import.meta.env.VITE_PRESET_PRODUCTOS || import.meta.env.VITE_PRESET_USUARIOS 
 };
 
 // 1. AÑADIMOS 'productos' AL TIPO
-type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos';
+type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs';
+
+// Uso el preset de ejercicios para los PRs y el de usuarios para los productos. 
 
 export const CloudinaryApi = {
     
@@ -22,7 +23,8 @@ export const CloudinaryApi = {
         
         // Mapeos especiales si reutilizamos presets
         if (type === 'logos') presetKey = 'usuarios';
-        if (type === 'productos' && !PRESETS.productos) presetKey = 'usuarios'; // Fallback
+        if (type === 'productos') presetKey = 'usuarios';
+        if (type === 'prs') presetKey = 'ejercicios';
 
         // @ts-ignore (Para que TS confíe en el acceso dinámico)
         const selectedPreset = PRESETS[presetKey] || PRESETS[type];
@@ -45,6 +47,7 @@ export const CloudinaryApi = {
                 case 'ejercicios': defaultFolder = 'Ejercicios'; break;
                 case 'logos': defaultFolder = 'Logos'; break;
                 case 'productos': defaultFolder = 'Productos/General'; break;
+                case 'prs': defaultFolder = 'PRs/Videos'; break;
             }
             formData.append('folder', defaultFolder);
         }

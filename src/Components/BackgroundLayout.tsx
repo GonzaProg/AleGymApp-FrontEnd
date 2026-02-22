@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // <-- Agregamos useState y useEffect
 
 interface BackgroundLayoutProps {
   children: React.ReactNode;
@@ -38,6 +38,31 @@ const DumbbellIcon = ({ style }: { style: React.CSSProperties }) => (
 );
 
 export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, className = "" }) => {
+  // --- NUEVO ESTADO PARA CANTIDAD DE MANCUERNAS ---
+  // Inicializamos en 4 (mobile first) por si acaso
+  const [dumbbellCount, setDumbbellCount] = useState(4);
+
+  useEffect(() => {
+    // Función para chequear el ancho
+    const checkScreenSize = () => {
+      // 768px es el breakpoint estándar entre celular y tablet/escritorio
+      if (window.innerWidth < 768) {
+        setDumbbellCount(4); // Celulares: 4 mancuernas para no dar lag
+      } else {
+        setDumbbellCount(8); // Escritorio: 8 mancuernas
+      }
+    };
+
+    // Ejecutamos una vez al cargar
+    checkScreenSize();
+
+    // Escuchamos si el usuario cambia el tamaño de la ventana (para PC)
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Limpiamos el evento al desmontar el componente
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   return (
     <div style={styles.container} className={className}>
       {/* --- CAPA 0: NEON AURORA ANIMADA --- */}
@@ -49,9 +74,10 @@ export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, cl
         <div style={styles.auroraEast}></div>
         <div style={styles.auroraWest}></div>
         
-        {/* 2. MANCUERNAS PARPADEANTES */}
+        {/* 2. MANCUERNAS PARPADEANTES DINÁMICAS */}
         <div style={styles.starsContainer}>
-          {[...Array(8)].map((_, i) => { 
+          {/* USAMOS LA VARIABLE dumbbellCount EN LUGAR DE UN NÚMERO FIJO */}
+          {[...Array(dumbbellCount)].map((_, i) => { 
             const randomSize = 20 + Math.random() * 25; 
             const randomRotation = Math.random() * 360;
             
@@ -90,7 +116,6 @@ export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, cl
           50% { transform: translateY(10px) rotate(-1deg) scale(0.9); opacity: 0.4; }
           75% { transform: translateY(-10px) rotate(2deg) scale(1.05); opacity: 0.6; }
         }
-        /* Ajusté la animación twinkle para que el brillo en el trazo se vea mejor */
         @keyframes twinkle {
           0%, 100% { opacity: 0; transform: scale(0.5); }
           50% { opacity: 0.7; transform: scale(1); filter: drop-shadow(0 0 3px rgba(255,255,255,0.8)); }

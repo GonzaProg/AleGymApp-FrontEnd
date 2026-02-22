@@ -42,6 +42,8 @@ const GymManagement = lazy(() => import("../Pages/Gym/GymManagement").then(modul
 const ManualReceipt = lazy(() => import("../Pages/Planes/ReciboManual").then(module => ({ default: module.ManualReceipt })));
 const MetricasFinancieras = lazy(() => import("./Pagos/MetricasFinancieras").then(module => ({ default: module.MetricasFinancieras })));
 const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager").then(module => ({ default: module.ProductosManager })));
+const MyPersonalRecords = lazy(() => import("./PersonalRecords/MyPersonalRecords").then(module => ({ default: module.MyPersonalRecords })));
+const StudentHome = lazy(() => import("./StudentsHome/StudentHome").then(module => ({ default: module.StudentHome })));
 
 const Icons = {
   dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈",
@@ -236,7 +238,6 @@ export const Home = () => {
         <Navbar />
       
       <div className="h-screen w-screen overflow-hidden relative">
-        {/* Swiper optimizado para móviles */}
         <Swiper
             ref={swiperRef}
             modules={[Pagination]}
@@ -244,32 +245,49 @@ export const Home = () => {
             slidesPerView={1}
             onSlideChange={handleSlideChange}
             className="h-full w-full pb-24"
-            // CSS touch-action ayuda al navegador a saber que es un swipe horizontal
             style={{ touchAction: 'pan-y' }} 
-            speed={300} // Velocidad de transición rápida pero suave
+            speed={300} 
         >
-            {/* SLIDE 0: RUTINAS */}
+            {/* SLIDE 0: INICIO (NUEVO DASHBOARD) */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
                     <LazySlideContent index={0} activeIndex={activeSlide} visited={visitedSlides.has(0)}>
+                        <StudentHome currentUser={currentUser} />
+                    </LazySlideContent>
+                </div>
+            </SwiperSlide>
+
+            {/* SLIDE 1: RUTINAS */}
+            <SwiperSlide className="overflow-y-auto h-full">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                    <LazySlideContent index={1} activeIndex={activeSlide} visited={visitedSlides.has(1)}>
                         <MyRoutines /> 
                     </LazySlideContent>
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 1: MI PLAN */}
+            {/* SLIDE 2: RECORDS (PRs) */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-                    <LazySlideContent index={1} activeIndex={activeSlide} visited={visitedSlides.has(1)}>
+                    <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
+                        <MyPersonalRecords />
+                    </LazySlideContent>
+                </div>
+            </SwiperSlide>
+
+            {/* SLIDE 3: MI PLAN */}
+            <SwiperSlide className="overflow-y-auto h-full">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                    <LazySlideContent index={3} activeIndex={activeSlide} visited={visitedSlides.has(3)}>
                         <UserPlan />
                     </LazySlideContent>
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 2: PERFIL */}
+            {/* SLIDE 4: PERFIL */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
-                    <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
+                    <LazySlideContent index={4} activeIndex={activeSlide} visited={visitedSlides.has(4)}>
                         <Profile isMobile={true} />
                     </LazySlideContent>
                 </div>
