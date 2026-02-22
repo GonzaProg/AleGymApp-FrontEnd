@@ -19,16 +19,7 @@ export const MyRoutines = () => {
   return (
     <>
       <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-24 pt-32">
-          
-          {/* Header */}
-          <div className="mb-10 text-center md:text-left pt-6">
-              <h2 className="text-3xl font-bold mb-1 text-white drop-shadow-lg flex items-center justify-center md:justify-start gap-2">
-                  <span className={AppStyles.title}>Mis Rutinas</span>
-                  <span>💪</span>
-              </h2>
-              <p className="text-gray-400 text-sm mt-1 animate-pulse">Desliza para ver tu Plan 👉</p>
-          </div>
-      
+                
           {loading ? (
              <div className="text-center py-20">
                 <p className="text-xl text-green-500 font-bold animate-pulse">Cargando entrenamientos...</p>

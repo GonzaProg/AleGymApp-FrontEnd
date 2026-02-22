@@ -22,6 +22,9 @@ export const usePersonalRecords = () => {
     const [videoSeleccionado, setVideoSeleccionado] = useState<string | null>(null);
     const [isFormOpen, setIsFormOpen] = useState(false);
 
+    const [ejercicioSearch, setEjercicioSearch] = useState("");
+    const [showDropdown, setShowDropdown] = useState(false);
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { currentUser } = useAuthUser();
 
@@ -34,19 +37,16 @@ export const usePersonalRecords = () => {
         }
     };
 
-    // Carga inicial
     useEffect(() => {
         PersonalRecordApi.getNombresEjercicios().then(setEjercicios).catch(console.error);
         cargarDatos();
     }, []);
 
-    // Buscador con debounce
     useEffect(() => {
         const delay = setTimeout(() => cargarDatos(busqueda), 500);
         return () => clearTimeout(delay);
     }, [busqueda]);
 
-    // Manejadores (Handlers)
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -67,6 +67,8 @@ export const usePersonalRecords = () => {
         setVideoPreview(null);
         setOldVideoUrl(null);
         setIsFormOpen(false);
+        setEjercicioSearch(""); 
+        setShowDropdown(false);
     };
 
     const handleSave = async () => {
@@ -76,14 +78,11 @@ export const usePersonalRecords = () => {
         try {
             let finalVideoUrl = oldVideoUrl;
 
-            // ARMAMOS LA CARPETA DINÁMICA
             if (videoFile) {
-                // Genera una ruta tipo: "PRs/Gym_1"
                 const customFolder = currentUser?.gym?.codigoAcceso 
                     ? `PRs/Gym_${currentUser.gym.codigoAcceso}` 
                     : 'PRs/General';
 
-                // Le pasamos el customFolder a Cloudinary
                 finalVideoUrl = await CloudinaryApi.upload(videoFile, 'prs', customFolder, 'video');
             }
 
@@ -98,9 +97,11 @@ export const usePersonalRecords = () => {
             resetForm();
             cargarDatos();
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Detalle del error:", error);
-            showError("Error al guardar el PR");
+            // Capturamos el error exacto que mande el backend (por si es el de duplicado)
+            const errorMsg = error.response?.data?.error || "Error al guardar el PR";
+            showError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -109,6 +110,7 @@ export const usePersonalRecords = () => {
     const handleEdit = (pr: any) => {
         setEditandoId(pr.id);
         setEjercicioId(pr.ejercicio.id.toString());
+        setEjercicioSearch(pr.ejercicio.nombre); 
         setPeso(pr.peso.toString());
         setOldVideoUrl(pr.videoUrl);
         setVideoPreview(pr.videoUrl);
@@ -129,15 +131,34 @@ export const usePersonalRecords = () => {
         }
     };
 
+    // --- LÓGICA DE VALIDACIÓN Y DUPLICIDAD ---
+    const prExistente = !editandoId ? prs.find(p => p.ejercicio.id.toString() === ejercicioId) : null;
+    const esDuplicado = !!prExistente;
+
+    let isSaveDisabled = false;
+    if (loading || !ejercicioId || !peso || esDuplicado) {
+        isSaveDisabled = true;
+    } else if (editandoId) {
+        const originalPR = prs.find(p => p.id === editandoId);
+        if (originalPR) {
+            const sinCambioEjercicio = ejercicioId === originalPR.ejercicio.id.toString();
+            const sinCambioPeso = peso === originalPR.peso.toString();
+            const sinCambioVideo = videoFile === null; 
+
+            if (sinCambioEjercicio && sinCambioPeso && sinCambioVideo) {
+                isSaveDisabled = true; 
+            }
+        }
+    }
+
     return {
-        // Estado exportado
         prs, ejercicios, busqueda, loading,
         ejercicioId, peso, videoPreview, editandoId, fileInputRef, videoSeleccionado, isFormOpen,
+        ejercicioSearch, showDropdown, isSaveDisabled, esDuplicado, prExistente, // <-- Añadimos los de duplicidad
         
-        // Mutadores de estado directo
         setBusqueda, setEjercicioId, setPeso, setVideoSeleccionado,
+        setEjercicioSearch, setShowDropdown,
         
-        // Funciones / Handlers
         handleFileChange, handleSave, handleEdit, handleDelete, resetForm, setIsFormOpen
     };
 };
