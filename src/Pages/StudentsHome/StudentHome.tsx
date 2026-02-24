@@ -10,9 +10,9 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
     // Lógica simple para cambiar el texto y color según la cantidad de gente
     const getMensajeConcurrencia = (cantidad: number) => {
-        if (cantidad <= 5) return { texto: "Está súper tranquilo. ¡Es el momento perfecto para entrenar!", color: "text-green-400" };
-        if (cantidad > 5 && cantidad <= 10) return { texto: "Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!", color: "text-yellow-400" };
-        return { texto: "Está bastante lleno, ¡esquiva a la multitud!", color: "text-orange-400" };
+        if (cantidad <= 6) return { texto: "Está súper tranquilo. ¡Es el momento perfecto para entrenar!", color: "text-green-400" };
+        if (cantidad > 6 && cantidad <= 12) return { texto: "Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!", color: "text-yellow-400" };
+        return { texto: "Está bastante lleno, ¿Entrenamos más tarde?", color: "text-orange-400" };
     };
 
     return (
