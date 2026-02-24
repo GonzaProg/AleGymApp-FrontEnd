@@ -90,18 +90,27 @@ export const MyPersonalRecords = () => {
                         
                         {!editandoId && (
                             <div className="relative">
+                                {/* OVERLAY INVISIBLE PARA MÓVILES (Permite scrollear la lista y cierra al tocar afuera) */}
+                                {showDropdown && (
+                                    <div 
+                                        className="fixed inset-0 z-[90]" 
+                                        onClick={() => setShowDropdown(false)}
+                                    />
+                                )}
+
                                 <input 
                                     type="text" 
                                     placeholder="🔍 Buscar y seleccionar ejercicio..." 
                                     value={ejercicioSearch}
                                     onFocus={() => setShowDropdown(true)}
-                                    onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                                    // ⚠️ ELIMINAMOS EL onBlur QUE ROMPÍA EL SCROLL EN CELULARES
                                     onChange={(e) => {
                                         setEjercicioSearch(e.target.value);
                                         setShowDropdown(true);
                                         setEjercicioId(""); 
                                     }}
-                                    className={AppStyles.inputDark}
+                                    // Le damos z-index mayor al input para que quede por encima del overlay invisible
+                                    className={AppStyles.inputDark + " relative z-[100]"}
                                 />
                                 
                                 {showDropdown && (
@@ -128,7 +137,7 @@ export const MyPersonalRecords = () => {
 
                                 {/* ALERTA DE DUPLICIDAD */}
                                 {esDuplicado && prExistente && (
-                                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl flex flex-col items-center gap-3 animate-fade-in mt-4 shadow-lg">
+                                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl flex flex-col items-center gap-3 animate-fade-in mt-4 shadow-lg relative z-[100]">
                                         <p className="text-yellow-400 text-sm text-center leading-relaxed">
                                             Ya tienes un record de <span className="font-bold text-yellow-300 text-base">{prExistente.peso} KG</span> para este ejercicio.
                                         </p>
