@@ -1,12 +1,17 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
+import { Scanner } from '@yudiel/react-qr-scanner'; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { useStudentHome } from "../../Hooks/StudentsHome/useStudentHome";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const [isInfoOpen, setIsInfoOpen] = useState(false);
     
-    // Conectamos con nuestro nuevo Hook
-    const { concurrencia, loadingConcurrencia, isCheckingIn, handleCheckIn } = useStudentHome(currentUser);
+    // Conectamos con nuestro nuevo Hook (ahora trae los estados del escáner)
+    const { 
+        concurrencia, loadingConcurrencia, isCheckingIn, handleCheckIn,
+        isScannerOpen, setIsScannerOpen 
+    } = useStudentHome(currentUser);
 
     // Lógica simple para cambiar el texto y color según la cantidad de gente
     const getMensajeConcurrencia = (cantidad: number) => {
@@ -26,20 +31,20 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 <p className="text-gray-400 text-lg font-medium">¿Qué vamos a entrenar hoy?</p>
             </div>
 
-            {/* BOTÓN GIGANTE DE CHECK-IN */}
+            {/* BOTÓN GIGANTE DE ESCANEO */}
             <button 
-                onClick={handleCheckIn}
+                onClick={() => setIsScannerOpen(true)}
                 disabled={isCheckingIn}
                 className={`w-full ${AppStyles.btnPrimary} flex flex-col items-center justify-center gap-2 py-6 relative overflow-hidden group`}
             >
                 {/* Brillo de fondo animado */}
                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                 
-                <span className="text-4xl">{isCheckingIn ? "⏳" : "📍"}</span>
+                <span className="text-4xl">📷</span>
                 <span className="text-lg font-black tracking-wider">
-                    {isCheckingIn ? "Registrando..." : "Registrar Entrada"}
+                    Escanear QR de Entrada
                 </span>
-                <span className="text-xs font-normal text-white/80">Toca aquí al llegar al gimnasio</span>
+                <span className="text-xs font-normal text-white/80">Apunta al código de la recepción</span>
             </button>
 
             {/* ACORDEÓN DE INFORMACIÓN */}
@@ -60,7 +65,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                     <div className="pt-4 border-t border-white/10 text-gray-300 text-sm leading-relaxed">
                         <p>
                             ¡Ayúdanos a mantener la información actualizada! 🤝<br/><br/>
-                            Toca el botón <strong>"Registrar Entrada"</strong> cada vez que llegues al gimnasio.<br/><br/>
+                            Toca el botón <strong>"Escanear QR"</strong> cada vez que llegues al gimnasio.<br/><br/>
                             Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios. (Tu salida se calcula sola después de 90 mins).
                         </p>
                     </div>
@@ -103,6 +108,44 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                     </div>
                 </div>
             </div>
+
+            {/* MODAL DEL ESCÁNER DE CÁMARA */}
+            {isScannerOpen && createPortal(
+                <div className={AppStyles.modalOverlay}>
+                    <div className={`${AppStyles.modalContent} p-6 items-center bg-gray-950`}>
+                        <h3 className="text-xl font-bold text-white mb-2">Escanea el Código</h3>
+                        <p className="text-gray-400 text-sm text-center mb-6">Coloca el código QR de tu gimnasio dentro del recuadro para registrar tu asistencia.</p>
+                        
+                        {/* Contenedor redondeado para la cámara */}
+                        <div className="w-full max-w-sm rounded-3xl overflow-hidden border-4 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.3)] bg-black aspect-square flex items-center justify-center relative">
+                            <Scanner
+                                onScan={(result) => {
+                                    // Verificamos que haya detectado algo
+                                    if (result && result.length > 0) {
+                                        setIsScannerOpen(false); // Cerramos la cámara
+                                        handleCheckIn(result[0].rawValue); // Extraemos el texto del QR
+                                    }
+                                }}
+                                onError={(error: unknown) => {
+                                    if (error instanceof Error) {
+                                        console.log(error.message);
+                                    } else {
+                                        console.log(error);
+                                    }
+                                }}
+                            />
+                        </div>
+
+                        <button 
+                            onClick={() => setIsScannerOpen(false)} 
+                            className={`mt-8 ${AppStyles.btnSecondary} w-full max-w-sm`}
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>,
+                document.body
+            )}
             
         </div>
     );

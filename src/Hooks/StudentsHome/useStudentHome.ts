@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import { AsistenciaApi } from "../../API/Asistencias/AsistenciaApi";
-import { showSuccess, showError } from "../../Helpers/Alerts"; // Ajusta a tus alertas
+import { showSuccess, showError } from "../../Helpers/Alerts";
 
 export const useStudentHome = (currentUser: any) => {
     const [concurrencia, setConcurrencia] = useState<number | null>(null);
     const [loadingConcurrencia, setLoadingConcurrencia] = useState(true);
     const [isCheckingIn, setIsCheckingIn] = useState(false);
+    
+    // Estado para abrir/cerrar la cámara
+    const [isScannerOpen, setIsScannerOpen] = useState(false); 
 
     const gymId = currentUser?.gym?.id;
 
@@ -21,26 +24,32 @@ export const useStudentHome = (currentUser: any) => {
         }
     };
 
-    // Cargar los datos cuando el componente se monta
+    // Sin setInterval: solo carga al entrar a la vista
     useEffect(() => {
         cargarConcurrencia();
-        
-        // Opcional: Refrescar la concurrencia cada 5 minutos
-        const interval = setInterval(cargarConcurrencia, 5 * 60 * 1000);
-        return () => clearInterval(interval);
     }, [gymId]);
 
-    // Función para el botón de "Registrar Entrada"
-    const handleCheckIn = async () => {
+    const handleCheckIn = async (scannedText: string) => {
         if (!gymId) return;
+        
+        // Limpiamos espacios y convertimos directamente a número
+        const scannedGymId = Number(scannedText.trim());
+        
+        // Validamos únicamente contra el ID numérico del gimnasio
+        if (scannedGymId !== gymId) {
+            showError("Este código QR no pertenece a tu gimnasio.");
+            console.log("Leído por el QR:", scannedText); // Te sirve para debuggear por si acaso
+            return;
+        }
+
         setIsCheckingIn(true);
         try {
             await AsistenciaApi.registrarEntrada(gymId);
             showSuccess("¡Entrada registrada! A entrenar duro 💪");
-            // Recargamos el contador para que sume al usuario actual
+            
+            // Actualizamos la métrica de concurrencia al momento
             cargarConcurrencia();
         } catch (error: any) {
-            // Si es el error de "ya registraste tu entrada", mostramos alerta
             const errorMsg = error.response?.data?.error || "Error al registrar entrada";
             showError(errorMsg);
         } finally {
@@ -52,6 +61,8 @@ export const useStudentHome = (currentUser: any) => {
         concurrencia,
         loadingConcurrencia,
         isCheckingIn,
-        handleCheckIn
+        handleCheckIn,
+        isScannerOpen,
+        setIsScannerOpen
     };
 };

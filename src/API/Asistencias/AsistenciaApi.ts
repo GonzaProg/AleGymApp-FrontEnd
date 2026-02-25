@@ -10,5 +10,9 @@ export const AsistenciaApi = {
     obtenerConcurrencia: async (gymId: number): Promise<number> => {
         const response = await api.get(`/asistencias/concurrencia/${gymId}`);
         return response.data.estimacion;
+    },
+
+    registrarEntradaManual: async (dni: string): Promise<void> => {
+        await api.post('/asistencias/manual', { dni });
     }
 };
