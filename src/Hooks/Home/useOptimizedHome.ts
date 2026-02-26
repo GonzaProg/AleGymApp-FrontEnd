@@ -13,6 +13,12 @@ export interface User {
     fotoPerfil?: string;
     rol: string; 
     token?: string;
+    gym?: {
+        id: number;
+        nombre?: string;
+        codigoAcceso?: string;
+        moduloAsistencia?: boolean;
+    };
 }
 
 export const useOptimizedHome = () => {

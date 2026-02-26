@@ -6,6 +6,7 @@ export const useStudentHome = (currentUser: any) => {
     const [concurrencia, setConcurrencia] = useState<number | null>(null);
     const [loadingConcurrencia, setLoadingConcurrencia] = useState(true);
     const [isCheckingIn, setIsCheckingIn] = useState(false);
+    const isAsistenciaHabilitada = currentUser?.gym?.moduloAsistencia !== false; // true por defecto
     
     // Estado para abrir/cerrar la cámara
     const [isScannerOpen, setIsScannerOpen] = useState(false); 
@@ -24,30 +25,35 @@ export const useStudentHome = (currentUser: any) => {
         }
     };
 
-    // Sin setInterval: solo carga al entrar a la vista
     useEffect(() => {
-        cargarConcurrencia();
-    }, [gymId]);
+        if (isAsistenciaHabilitada) {
+            cargarConcurrencia();
+        }
+    }, [gymId, isAsistenciaHabilitada]);
 
     const handleCheckIn = async (scannedText: string) => {
         if (!gymId) return;
         
-        // Limpiamos espacios y convertimos directamente a número
         const scannedGymId = Number(scannedText.trim());
         
-        // Validamos únicamente contra el ID numérico del gimnasio
         if (scannedGymId !== gymId) {
             showError("Este código QR no pertenece a tu gimnasio.");
-            console.log("Leído por el QR:", scannedText); // Te sirve para debuggear por si acaso
             return;
         }
 
         setIsCheckingIn(true);
         try {
-            await AsistenciaApi.registrarEntrada(gymId);
-            showSuccess("¡Entrada registrada! A entrenar duro 💪");
+            // Guardamos la respuesta completa
+            const response = await AsistenciaApi.registrarEntrada(gymId);
             
-            // Actualizamos la métrica de concurrencia al momento
+            // Verificamos si se pasó de los días de su plan
+            if (response.excedido) {
+                // Puedes usar showError o crear un showWarning en tus alertas
+                showError("⚠️ Has excedido los días de tu plan. Tu asistencia fue registrada, pero debes regularizar tu situación en recepción.");
+            } else {
+                showSuccess("¡Entrada registrada! A entrenar duro 💪");
+            }
+            
             cargarConcurrencia();
         } catch (error: any) {
             const errorMsg = error.response?.data?.error || "Error al registrar entrada";
@@ -63,6 +69,7 @@ export const useStudentHome = (currentUser: any) => {
         isCheckingIn,
         handleCheckIn,
         isScannerOpen,
-        setIsScannerOpen
+        setIsScannerOpen,
+        isAsistenciaHabilitada
     };
 };

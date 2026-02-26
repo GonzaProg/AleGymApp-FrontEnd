@@ -10,6 +10,7 @@ import "swiper/css/pagination";
 
 // Hooks y Componentes
 import { useOptimizedHome } from "../Hooks/Home/useOptimizedHome";
+import { useAlertasRecepcion } from "../Hooks/Asistencias/useAlertasRecepcion";
 import { MobileNavbar } from "../Components/Mobile/MobileNavbar"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
@@ -18,7 +19,7 @@ import { BackgroundLayout } from "../Components/BackgroundLayout";
 import { Navbar } from "../Components/Navbar";
 import { StatsGrid } from "../Components/Dashboard/StatsGrid";
 
-// --- IMPORTACIONES PEREZOSAS ---
+// IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
 const UserPlan = lazy(() => import("./Planes/UserPlan").then(module => ({ default: module.UserPlan })));
 const Profile = lazy(() => import("./Usuarios/Profile").then(module => ({ default: module.Profile })));
@@ -79,6 +80,16 @@ export const Home = () => {
   
   const [visitedSlides, setVisitedSlides] = useState<Set<number>>(new Set([0]));
 
+  // VALIDACIÓN: ¿El módulo de asistencia está habilitado para este gym?
+  const isAsistenciaHabilitada = currentUser?.gym?.moduloAsistencia !== false;
+
+  // NUEVO: Hook para controlar la lucecita de alertas
+  const { hasAlert, clearAlert } = useAlertasRecepcion(
+      isEntrenador || isAdmin, 
+      currentUser?.gym?.id,
+      isAsistenciaHabilitada
+  );
+
   const handleEditRoutine = (id: number) => {
       setRoutineIdToEdit(id);
       setActiveTab("Crear Rutina General");
@@ -87,6 +98,11 @@ export const Home = () => {
   const handleSidebarClick = (tabName: string) => {
       setRoutineIdToEdit(null);
       setActiveTab(tabName);
+      
+      // Si entra a ver las asistencias, apagamos la luz roja
+      if (tabName === "Asistencia Manual") {
+          clearAlert();
+      }
   };
 
   const handleSlideChange = (swiper: any) => {
@@ -170,8 +186,19 @@ export const Home = () => {
               <nav className={`p-4 space-y-2 mt-4 ${AppStyles.customScrollbar}`}>
                 <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
                 
-                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Recepción</p>
-                <SidebarItem icon={Icons.asistencia} label="Asistencia Manual" active={activeTab === "Asistencia Manual"} onClick={() => handleSidebarClick("Asistencia Manual")} />
+                {/* CONDICIONAL: Solo mostrar si el módulo está habilitado */}
+                {isAsistenciaHabilitada && (
+                    <>
+                        <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Recepción</p>
+                        <SidebarItem 
+                            icon={Icons.asistencia} 
+                            label="Asistencia Manual" 
+                            active={activeTab === "Asistencia Manual"} 
+                            onClick={() => handleSidebarClick("Asistencia Manual")} 
+                            hasAlert={hasAlert} // <-- PASAMOS LA ALERTA AQUÍ
+                        />
+                    </>
+                )}
 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Planes</p>
                 <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
@@ -288,11 +315,20 @@ export const Home = () => {
   );
 };
 
-const SidebarItem = ({ icon, label, active, onClick }: { icon: string, label: string, active: boolean, onClick: () => void }) => {
+// SidebarItem ahora recibe hasAlert para mostrar la luz roja
+const SidebarItem = ({ icon, label, active, onClick, hasAlert }: { icon: string, label: string, active: boolean, onClick: () => void, hasAlert?: boolean }) => {
   return (
-    <div onClick={onClick} className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+    <div onClick={onClick} className={`relative flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
       <span className={`text-xl group-hover:scale-110 transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
       <span className="font-medium text-sm">{label}</span>
+      
+      {/* LA LUCECITA ROJA PARPADEANTE */}
+      {hasAlert && (
+        <span className="absolute right-4 flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+        </span>
+      )}
     </div>
   )
 }

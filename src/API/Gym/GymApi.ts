@@ -50,10 +50,12 @@ export const GymApi = {
         const response = await api.get('/gyms/preferences');
         return response.data;
     },
+    
     updatePreferences: async (data: { 
         envioAutomaticoCumpleanos?: boolean; 
         envioAutomaticoRecibos?: boolean;
         mensajeCumpleanos?: string;
+        moduloAsistencia?: boolean;
      }) => {
         const response = await api.put('/gyms/preferences', data);
         return response.data;
