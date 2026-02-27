@@ -24,13 +24,8 @@ export const MyPersonalRecords = () => {
     );
 
     return (
-        <div className="mt-24 p-4 animate-fade-in pb-24 space-y-6 max-w-lg mx-auto relative">
+        <div className="mt-6 p-2 animate-fade-in pb-24 space-y-6 max-w-lg mx-auto relative">
             
-            <div className="flex items-center justify-center">
-                <h2 className={AppStyles.title + " text-center"}>Mis Records</h2>
-                <p className="text-2xl ml-2">🏆</p>
-            </div>
-
             {/* ACORDEÓN DE INFORMACIÓN */}
             <div className={AppStyles.glassCard.replace("p-8", "p-2")}>
                 <button 
