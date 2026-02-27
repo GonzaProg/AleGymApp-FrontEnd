@@ -7,6 +7,7 @@ export const usePreferences = () => {
     const [autoBirthday, setAutoBirthday] = useState(true);
     const [autoReceipts, setAutoReceipts] = useState(true);
     const [birthdayMessage, setBirthdayMessage] = useState("");
+    const [moduloAsistencia, setModuloAsistencia] = useState(true);
     
     // LocalStorage Settings (Métricas)
     // Inicializamos leyendo de localStorage
@@ -26,6 +27,7 @@ export const usePreferences = () => {
                 setAutoBirthday(data.envioAutomaticoCumpleanos);
                 setAutoReceipts(data.envioAutomaticoRecibos);
                 setBirthdayMessage(data.mensajeCumpleanos || "");
+                setModuloAsistencia(data.moduloAsistencia ?? true);
             } catch (err) {
                 console.error("Error cargando preferencias", err);
             } finally {
@@ -53,6 +55,36 @@ export const usePreferences = () => {
         } catch (e) {
             setAutoReceipts(!val);
             showError("No se pudo actualizar");
+        }
+    };
+
+    const toggleAsistencia = async (val: boolean) => {
+        setModuloAsistencia(val); 
+        try {
+            await GymApi.updatePreferences({ moduloAsistencia: val });
+            
+            // --- EL TRUCO ESTÁ AQUÍ: Actualizamos la "memoria" del navegador ---
+            const storage = localStorage.getItem("user") ? localStorage : sessionStorage;
+            const userStr = storage.getItem("user");
+
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                if (user.gym) {
+                    user.gym.moduloAsistencia = val; // Sobreescribimos con el nuevo valor
+                    storage.setItem("user", JSON.stringify(user)); // Lo guardamos de nuevo
+                }
+            }
+
+            showSuccess(`Módulo de asistencia ${val ? 'activado' : 'desactivado'}. Actualizando vista...`);
+
+            // Recargamos la pestaña automáticamente después de 1 segundo para que el menú lateral desaparezca/aparezca
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+
+        } catch (e) {
+            setModuloAsistencia(!val); 
+            showError("No se pudo actualizar el módulo");
         }
     };
 
@@ -88,6 +120,7 @@ export const usePreferences = () => {
         toggleBirthday,
         toggleReceipts,
         showFinancialMetrics,
-        setShowFinancialMetrics
+        setShowFinancialMetrics,
+        moduloAsistencia, toggleAsistencia
     };
 };
