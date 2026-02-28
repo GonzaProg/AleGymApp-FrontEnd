@@ -42,7 +42,7 @@ const GymManagement = lazy(() => import("../Pages/Gym/GymManagement").then(modul
 const ManualReceipt = lazy(() => import("../Pages/Planes/ReciboManual").then(module => ({ default: module.ManualReceipt })));
 const MetricasFinancieras = lazy(() => import("./Pagos/MetricasFinancieras").then(module => ({ default: module.MetricasFinancieras })));
 const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager").then(module => ({ default: module.ProductosManager })));
-const MyPersonalRecords = lazy(() => import("./PersonalRecords/MyPersonalRecords").then(module => ({ default: module.MyPersonalRecords })));
+const ProgresoView = lazy(() => import("./Progreso/ProgresoView").then(module => ({ default: module.ProgresoView })));
 const StudentHome = lazy(() => import("./StudentsHome/StudentHome").then(module => ({ default: module.StudentHome })));
 const AsistenciaManual = lazy(() => import("../Pages/Asistencias/AsistenciaManual").then(module => ({ default: module.AsistenciaManual })));
 
@@ -284,10 +284,11 @@ export const Home = () => {
                 </div>
             </SwiperSlide>
 
-            <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+            <SwiperSlide className="h-full">
+                <div className="h-full">
                     <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
-                        <MyPersonalRecords />
+                        {/* Le pasamos currentUser para poder guardar en el gym correcto */}
+                        <ProgresoView currentUser={currentUser} /> 
                     </LazySlideContent>
                 </div>
             </SwiperSlide>

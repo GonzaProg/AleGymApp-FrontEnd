@@ -10,7 +10,7 @@ const PRESETS = {
 };
 
 // 1. AÑADIMOS 'productos' AL TIPO
-type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs';
+type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs' | 'evolucion';
 
 // Uso el preset de ejercicios para los PRs y el de usuarios para los productos. 
 
@@ -24,7 +24,7 @@ export const CloudinaryApi = {
         // Mapeos especiales si reutilizamos presets
         if (type === 'logos') presetKey = 'usuarios';
         if (type === 'productos') presetKey = 'usuarios';
-        if (type === 'prs') presetKey = 'ejercicios';
+        if (type === 'prs' || type === 'evolucion') presetKey = 'ejercicios';
 
         // @ts-ignore (Para que TS confíe en el acceso dinámico)
         const selectedPreset = PRESETS[presetKey] || PRESETS[type];
@@ -47,7 +47,8 @@ export const CloudinaryApi = {
                 case 'ejercicios': defaultFolder = 'Ejercicios'; break;
                 case 'logos': defaultFolder = 'Logos'; break;
                 case 'productos': defaultFolder = 'Productos/General'; break;
-                case 'prs': defaultFolder = 'PRs/Videos'; break;
+                case 'prs': defaultFolder = 'PRs/General'; break;
+                case 'evolucion': defaultFolder = 'EvolucionCorporal/General'; break;
             }
             formData.append('folder', defaultFolder);
         }

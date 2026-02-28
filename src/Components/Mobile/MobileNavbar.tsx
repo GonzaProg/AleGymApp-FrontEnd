@@ -7,7 +7,7 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
   const navItems = [
     { id: "inicio", label: "Inicio", index: 0, Icon: HomeIcon },
     { id: "rutinas", label: "Rutinas", index: 1, Icon: DumbbellIcon },
-    { id: "pr", label: "PR", index: 2, Icon: MedalIcon },
+    { id: "progreso", label: "Progreso", index: 2, Icon: MedalIcon },
     { id: "plan", label: "Mi Plan", index: 3, Icon: PlanIcon },
     { id: "perfil", label: "Perfil", index: 4, Icon: UserIcon },
   ];
