@@ -5,8 +5,9 @@ export const EvolucionApi = {
         const response = await api.post('/evolucion', { peso, fotoUrl });
         return response.data;
     },
-    obtenerHistorial: async () => {
-        const response = await api.get('/evolucion');
+    obtenerHistorial: async (limit?: number) => {
+        const url = limit ? `/evolucion?limit=${limit}` : '/evolucion';
+        const response = await api.get(url);
         return response.data;
     },
     eliminar: async (id: number) => {

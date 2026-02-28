@@ -82,7 +82,7 @@ export const Login = () => {
                     <Input name="telefono" placeholder="Teléfono" type="tel" value={formData.telefono} onChange={handleChange} className={LoginStyles.inputDark} />
                 </div>
 
-                <Input name="fechaNacimiento" type="date" value={formData.fechaNacimiento} onChange={handleChange} className={`${LoginStyles.inputDark} text-gray-400`} labelClassName={LoginStyles.label}
+                <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento" type="date" value={formData.fechaNacimiento} onChange={handleChange} className={`${LoginStyles.inputDark} text-gray-400`} labelClassName={LoginStyles.label}
                     />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
