@@ -211,7 +211,7 @@ export const Home = () => {
                 <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Tienda</p>
-                <SidebarItem icon={Icons.tienda} label="Productos / Tienda" active={activeTab === "Productos"} onClick={() => handleSidebarClick("Productos")} />
+                <SidebarItem icon={Icons.tienda} label="Productos" active={activeTab === "Productos"} onClick={() => handleSidebarClick("Productos")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Social</p>
                 <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />

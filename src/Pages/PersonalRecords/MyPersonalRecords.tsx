@@ -242,7 +242,27 @@ export const MyPersonalRecords = () => {
 
                             <div className="flex-1">
                                 <h4 className="text-white font-bold">{pr.ejercicio.nombre}</h4>
-                                <p className="text-green-400 font-black text-xl">{pr.peso} KG</p>
+                                
+                                {/* NUEVO: CONTENEDOR DEL PESO CON COMPARACIÓN */}
+                                <div className="flex items-center gap-3 mt-1 mb-1">
+                                    <p className="text-green-400 font-black text-xl leading-none">{pr.peso} KG</p>
+                                    
+                                    {/* Lógica de Flechas y Peso Anterior */}
+                                    {pr.pesoAnterior && Number(pr.peso) !== Number(pr.pesoAnterior) && (
+                                        <div className="flex items-center text-xs font-bold bg-black/30 px-2 py-1 rounded-lg border border-white/5">
+                                            {Number(pr.peso) > Number(pr.pesoAnterior) ? (
+                                                <span className="text-green-500 flex items-center gap-1.5" title="¡Aumentaste tu PR!">
+                                                    ↑ <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
+                                                </span>
+                                            ) : (
+                                                <span className="text-red-400 flex items-center gap-1.5" title="El PR anterior era mayor">
+                                                    ↓ <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                
                                 <p className="text-xs text-gray-500">{new Date(pr.fechaActualizacion).toLocaleDateString()}</p>
                             </div>
 
