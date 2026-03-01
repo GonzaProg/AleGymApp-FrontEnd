@@ -34,6 +34,7 @@ export interface LoginResponse {
             id: number;
             nombre: string;
             logoUrl?: string;
+            moduloAsistencia?: boolean;
         }
     };
 }

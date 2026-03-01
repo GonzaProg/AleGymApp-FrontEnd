@@ -24,13 +24,8 @@ export const MyPersonalRecords = () => {
     );
 
     return (
-        <div className="mt-24 p-4 animate-fade-in pb-24 space-y-6 max-w-lg mx-auto relative">
+        <div className="mt-6 p-2 animate-fade-in pb-24 space-y-6 max-w-lg mx-auto relative">
             
-            <div className="flex items-center justify-center">
-                <h2 className={AppStyles.title + " text-center"}>Mis Records</h2>
-                <p className="text-2xl ml-2">🏆</p>
-            </div>
-
             {/* ACORDEÓN DE INFORMACIÓN */}
             <div className={AppStyles.glassCard.replace("p-8", "p-2")}>
                 <button 
@@ -90,18 +85,27 @@ export const MyPersonalRecords = () => {
                         
                         {!editandoId && (
                             <div className="relative">
+                                {/* OVERLAY INVISIBLE PARA MÓVILES (Permite scrollear la lista y cierra al tocar afuera) */}
+                                {showDropdown && (
+                                    <div 
+                                        className="fixed inset-0 z-[90]" 
+                                        onClick={() => setShowDropdown(false)}
+                                    />
+                                )}
+
                                 <input 
                                     type="text" 
                                     placeholder="🔍 Buscar y seleccionar ejercicio..." 
                                     value={ejercicioSearch}
                                     onFocus={() => setShowDropdown(true)}
-                                    onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                                    // ⚠️ ELIMINAMOS EL onBlur QUE ROMPÍA EL SCROLL EN CELULARES
                                     onChange={(e) => {
                                         setEjercicioSearch(e.target.value);
                                         setShowDropdown(true);
                                         setEjercicioId(""); 
                                     }}
-                                    className={AppStyles.inputDark}
+                                    // Le damos z-index mayor al input para que quede por encima del overlay invisible
+                                    className={AppStyles.inputDark + " relative z-[100]"}
                                 />
                                 
                                 {showDropdown && (
@@ -128,7 +132,7 @@ export const MyPersonalRecords = () => {
 
                                 {/* ALERTA DE DUPLICIDAD */}
                                 {esDuplicado && prExistente && (
-                                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl flex flex-col items-center gap-3 animate-fade-in mt-4 shadow-lg">
+                                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-xl flex flex-col items-center gap-3 animate-fade-in mt-4 shadow-lg relative z-[100]">
                                         <p className="text-yellow-400 text-sm text-center leading-relaxed">
                                             Ya tienes un record de <span className="font-bold text-yellow-300 text-base">{prExistente.peso} KG</span> para este ejercicio.
                                         </p>
@@ -238,7 +242,27 @@ export const MyPersonalRecords = () => {
 
                             <div className="flex-1">
                                 <h4 className="text-white font-bold">{pr.ejercicio.nombre}</h4>
-                                <p className="text-green-400 font-black text-xl">{pr.peso} KG</p>
+                                
+                                {/* NUEVO: CONTENEDOR DEL PESO CON COMPARACIÓN */}
+                                <div className="flex items-center gap-3 mt-1 mb-1">
+                                    <p className="text-green-400 font-black text-xl leading-none">{pr.peso} KG</p>
+                                    
+                                    {/* Lógica de Flechas y Peso Anterior */}
+                                    {pr.pesoAnterior && Number(pr.peso) !== Number(pr.pesoAnterior) && (
+                                        <div className="flex items-center text-xs font-bold bg-black/30 px-2 py-1 rounded-lg border border-white/5">
+                                            {Number(pr.peso) > Number(pr.pesoAnterior) ? (
+                                                <span className="text-green-500 flex items-center gap-1.5" title="¡Aumentaste tu PR!">
+                                                    ↑ <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
+                                                </span>
+                                            ) : (
+                                                <span className="text-red-400 flex items-center gap-1.5" title="El PR anterior era mayor">
+                                                    ↓ <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                
                                 <p className="text-xs text-gray-500">{new Date(pr.fechaActualizacion).toLocaleDateString()}</p>
                             </div>
 

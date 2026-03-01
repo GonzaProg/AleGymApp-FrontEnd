@@ -16,6 +16,7 @@ export interface User {
         nombre: string;
         logoUrl?: string;
         codigoAcceso?: string;
+        moduloAsistencia?: boolean;
     };
 }
 

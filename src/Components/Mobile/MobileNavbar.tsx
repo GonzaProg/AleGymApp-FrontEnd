@@ -7,13 +7,13 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
   const navItems = [
     { id: "inicio", label: "Inicio", index: 0, Icon: HomeIcon },
     { id: "rutinas", label: "Rutinas", index: 1, Icon: DumbbellIcon },
-    { id: "pr", label: "PR", index: 2, Icon: MedalIcon },
+    { id: "progreso", label: "Progreso", index: 2, Icon: MedalIcon },
     { id: "plan", label: "Mi Plan", index: 3, Icon: PlanIcon },
     { id: "perfil", label: "Perfil", index: 4, Icon: UserIcon },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-gray-900/95 backdrop-blur-md border-t border-white/10 pb-safe pt-2 px-6 z-50 flex justify-around items-center h-20 shadow-2xl">
+    <div className="fixed bottom-0 left-0 w-full bg-gray-900/95 backdrop-blur-md border-t border-white/10 px-6 z-50 flex justify-around items-center pb-safe pt-2 min-h-[5rem] shadow-2xl">
       {navItems.map((item) => {
         const isActive = activeTab === item.index;
         const IconComponent = item.Icon;
@@ -22,7 +22,7 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
           <button
             key={item.index}
             onClick={() => setActiveTab(item.index)}
-            className={`flex flex-col items-center gap-1 transition-all duration-300 relative ${
+            className={`flex flex-col items-center gap-1 transition-all duration-300 relative pb-2 ${
               isActive ? "text-white scale-110" : "text-gray-500 hover:text-gray-300"
             }`}
           >
@@ -37,7 +37,7 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
 
             {/* Puntito indicador verde */}
             {isActive && (
-              <span className="absolute -bottom-3 w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_8px_#22c55e] transition-all duration-300" />
+              <span className="absolute -bottom-1 w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_8px_#22c55e] transition-all duration-300" />
             )}
           </button>
         );

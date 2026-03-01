@@ -10,6 +10,7 @@ import "swiper/css/pagination";
 
 // Hooks y Componentes
 import { useOptimizedHome } from "../Hooks/Home/useOptimizedHome";
+import { useAlertasRecepcion } from "../Hooks/Asistencias/useAlertasRecepcion";
 import { MobileNavbar } from "../Components/Mobile/MobileNavbar"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
@@ -18,8 +19,7 @@ import { BackgroundLayout } from "../Components/BackgroundLayout";
 import { Navbar } from "../Components/Navbar";
 import { StatsGrid } from "../Components/Dashboard/StatsGrid";
 
-// --- IMPORTACIONES PEREZOSAS ---
-// Usamos .then(module => ({ default: module.Nombre }))
+// IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
 const UserPlan = lazy(() => import("./Planes/UserPlan").then(module => ({ default: module.UserPlan })));
 const Profile = lazy(() => import("./Usuarios/Profile").then(module => ({ default: module.Profile })));
@@ -42,15 +42,16 @@ const GymManagement = lazy(() => import("../Pages/Gym/GymManagement").then(modul
 const ManualReceipt = lazy(() => import("../Pages/Planes/ReciboManual").then(module => ({ default: module.ManualReceipt })));
 const MetricasFinancieras = lazy(() => import("./Pagos/MetricasFinancieras").then(module => ({ default: module.MetricasFinancieras })));
 const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager").then(module => ({ default: module.ProductosManager })));
-const MyPersonalRecords = lazy(() => import("./PersonalRecords/MyPersonalRecords").then(module => ({ default: module.MyPersonalRecords })));
+const ProgresoView = lazy(() => import("./Progreso/ProgresoView").then(module => ({ default: module.ProgresoView })));
 const StudentHome = lazy(() => import("./StudentsHome/StudentHome").then(module => ({ default: module.StudentHome })));
+const AsistenciaManual = lazy(() => import("../Pages/Asistencias/AsistenciaManual").then(module => ({ default: module.AsistenciaManual })));
 
 const Icons = {
   dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈",
   ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥",
   enviarPDF: "📤", renovar: "🔄", salir: "🚪", perfil: "👤", preferencias: "⚙️", 
   nuevoGym: "🏢", gestionGyms: "⚙️", reciboManual: "🧾", crearRutinaGeneral: "📚",
-  tienda: "🛍️", rutinasUsuarios: "📝",
+  tienda: "🛍️", rutinasUsuarios: "📝", asistencia: "✅",
 };
 
 const TabLoading = () => (
@@ -59,15 +60,11 @@ const TabLoading = () => (
     </div>
 );
 
-// Componente Wrapper para renderizar solo si se ha visitado
-// Esto reduce drasticamente el peso inicial del DOM
 const LazySlideContent = ({ children, index, activeIndex, visited }: { children: any, index: number, activeIndex: number, visited: boolean }) => {
-    // Si ya lo visitamos O es el actual, lo mostramos. Si no, mostramos un placeholder vacío.
-    // El placeholder mantiene la altura mínima para que el Swiper no colapse.
     if (visited || index === activeIndex) {
         return <Suspense fallback={<TabLoading />}>{children}</Suspense>;
     }
-    return <div className="h-full w-full" />; // Placeholder invisible
+    return <div className="h-full w-full" />;
 };
 
 export const Home = () => {
@@ -81,8 +78,17 @@ export const Home = () => {
   const [activeSlide, setActiveSlide] = useState(0); 
   const swiperRef = useRef<any>(null);
   
-  // Optimización: Guardamos qué slides ya visitó el usuario
   const [visitedSlides, setVisitedSlides] = useState<Set<number>>(new Set([0]));
+
+  // VALIDACIÓN: ¿El módulo de asistencia está habilitado para este gym?
+  const isAsistenciaHabilitada = currentUser?.gym?.moduloAsistencia !== false;
+
+  // NUEVO: Hook para controlar la lucecita de alertas
+  const { hasAlert, clearAlert } = useAlertasRecepcion(
+      isEntrenador || isAdmin, 
+      currentUser?.gym?.id,
+      isAsistenciaHabilitada
+  );
 
   const handleEditRoutine = (id: number) => {
       setRoutineIdToEdit(id);
@@ -92,12 +98,16 @@ export const Home = () => {
   const handleSidebarClick = (tabName: string) => {
       setRoutineIdToEdit(null);
       setActiveTab(tabName);
+      
+      // Si entra a ver las asistencias, apagamos la luz roja
+      if (tabName === "Asistencia Manual") {
+          clearAlert();
+      }
   };
 
   const handleSlideChange = (swiper: any) => {
     const newIndex = swiper.activeIndex;
     setActiveSlide(newIndex);
-    // Agregamos el nuevo índice a los visitados
     setVisitedSlides(prev => {
         const newSet = new Set(prev);
         newSet.add(newIndex);
@@ -115,9 +125,6 @@ export const Home = () => {
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
   if (!currentUser) return null; 
 
-  // =================================================================
-  // VISTA ENTRENADOR / ADMIN
-  // =================================================================
   if (isEntrenador || isAdmin) {
     const AdminDashboardWelcome = () => (
         <div className="animate-fade-in-up space-y-6 mt-20">
@@ -159,6 +166,7 @@ export const Home = () => {
                         case "Gestión Gimnasios": return <GymManagement />; 
                         case "Enviar Recibo Manualmente": return <ManualReceipt />;
                         case "Productos": return <ProductosManager />;
+                        case "Asistencia Manual": return <AsistenciaManual />;
                         default: return <AdminDashboardWelcome />;
                     }
                 })()}
@@ -177,7 +185,22 @@ export const Home = () => {
               </div>
               <nav className={`p-4 space-y-2 mt-4 ${AppStyles.customScrollbar}`}>
                 <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
-                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Planes</p>
+                
+                {/* CONDICIONAL: Solo mostrar si el módulo está habilitado */}
+                {isAsistenciaHabilitada && (
+                    <>
+                        <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Recepción</p>
+                        <SidebarItem 
+                            icon={Icons.asistencia} 
+                            label="Asistencia Manual" 
+                            active={activeTab === "Asistencia Manual"} 
+                            onClick={() => handleSidebarClick("Asistencia Manual")} 
+                            hasAlert={hasAlert} // <-- PASAMOS LA ALERTA AQUÍ
+                        />
+                    </>
+                )}
+
+                <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Planes</p>
                 <SidebarItem icon={Icons.planes} label="Planes" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
                 <SidebarItem icon={Icons.renovar} label="Renovar" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
                 <SidebarItem icon={Icons.finanzas} label="Finanzas" active={activeTab === "Finanzas"} onClick={() => handleSidebarClick("Finanzas")} />
@@ -188,7 +211,7 @@ export const Home = () => {
                 <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Tienda</p>
-                <SidebarItem icon={Icons.tienda} label="Productos / Tienda" active={activeTab === "Productos"} onClick={() => handleSidebarClick("Productos")} />
+                <SidebarItem icon={Icons.tienda} label="Productos" active={activeTab === "Productos"} onClick={() => handleSidebarClick("Productos")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Social</p>
                 <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
@@ -229,9 +252,6 @@ export const Home = () => {
     );
   }
 
-  // =================================================================
-  // VISTA ALUMNOS (OPTIMIZADA)
-  // =================================================================
   return (
     <BackgroundLayout>
       
@@ -248,7 +268,6 @@ export const Home = () => {
             style={{ touchAction: 'pan-y' }} 
             speed={300} 
         >
-            {/* SLIDE 0: INICIO (NUEVO DASHBOARD) */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
                     <LazySlideContent index={0} activeIndex={activeSlide} visited={visitedSlides.has(0)}>
@@ -257,7 +276,6 @@ export const Home = () => {
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 1: RUTINAS */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
                     <LazySlideContent index={1} activeIndex={activeSlide} visited={visitedSlides.has(1)}>
@@ -266,16 +284,15 @@ export const Home = () => {
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 2: RECORDS (PRs) */}
-            <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+            <SwiperSlide className="h-full">
+                <div className="h-full">
                     <LazySlideContent index={2} activeIndex={activeSlide} visited={visitedSlides.has(2)}>
-                        <MyPersonalRecords />
+                        {/* Le pasamos currentUser para poder guardar en el gym correcto */}
+                        <ProgresoView currentUser={currentUser} /> 
                     </LazySlideContent>
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 3: MI PLAN */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
                     <LazySlideContent index={3} activeIndex={activeSlide} visited={visitedSlides.has(3)}>
@@ -284,7 +301,6 @@ export const Home = () => {
                 </div>
             </SwiperSlide>
 
-            {/* SLIDE 4: PERFIL */}
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-24">
                     <LazySlideContent index={4} activeIndex={activeSlide} visited={visitedSlides.has(4)}>
@@ -300,11 +316,20 @@ export const Home = () => {
   );
 };
 
-const SidebarItem = ({ icon, label, active, onClick }: { icon: string, label: string, active: boolean, onClick: () => void }) => {
+// SidebarItem ahora recibe hasAlert para mostrar la luz roja
+const SidebarItem = ({ icon, label, active, onClick, hasAlert }: { icon: string, label: string, active: boolean, onClick: () => void, hasAlert?: boolean }) => {
   return (
-    <div onClick={onClick} className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+    <div onClick={onClick} className={`relative flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
       <span className={`text-xl group-hover:scale-110 transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
       <span className="font-medium text-sm">{label}</span>
+      
+      {/* LA LUCECITA ROJA PARPADEANTE */}
+      {hasAlert && (
+        <span className="absolute right-4 flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+        </span>
+      )}
     </div>
   )
 }

@@ -8,7 +8,8 @@ export const Preferences = () => {
         autoBirthday, toggleBirthday,
         autoReceipts, toggleReceipts,
         birthdayMessage, setBirthdayMessage, saveBirthdayMessage, savingMessage,
-        showFinancialMetrics, setShowFinancialMetrics
+        showFinancialMetrics, setShowFinancialMetrics,
+        moduloAsistencia, toggleAsistencia
     } = usePreferences();
 
     if (loading) return <div className="text-white text-center pt-20">Cargando preferencias...</div>;
@@ -18,7 +19,10 @@ export const Preferences = () => {
             <div className="w-full max-w-4xl mx-auto">
                 
                 <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
-                    <h1 className={AppStyles.title}>Configuración ⚙️</h1>
+                    <div className="flex items-center gap-3">
+                        <p className="text-2xl">⚙️</p>
+                        <h1 className={AppStyles.title}>Configuración</h1>
+                    </div>
                     <p className={AppStyles.subtitle}>Personaliza el comportamiento de tu sistema.</p>
                 </div>
 
@@ -92,6 +96,21 @@ export const Preferences = () => {
                                 <p className="text-gray-400 text-sm">Mostrar gráficas de ingresos y métricas en el historial de pagos.</p>
                             </div>
                             <ToggleSwitch checked={showFinancialMetrics} onChange={setShowFinancialMetrics} />
+                        </div>
+                    </div>
+
+                    {/* SECCIÓN 3: MÓDULOS DEL SISTEMA */}
+                    <div className={AppStyles.glassCard}>
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">
+                            📦 Módulos del Sistema
+                        </h3>
+
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-white font-bold text-lg">Control de Asistencia</p>
+                                <p className="text-gray-400 text-sm">Habilita el escaneo de códigos QR, concurrencia en vivo y control de accesos.</p>
+                            </div>
+                            <ToggleSwitch checked={moduloAsistencia} onChange={toggleAsistencia} />
                         </div>
                     </div>
 
