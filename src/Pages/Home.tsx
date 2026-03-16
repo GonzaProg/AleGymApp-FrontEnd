@@ -136,6 +136,9 @@ export const Home = () => {
             <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
               Aquí tienes un resumen de la actividad del gimnasio.
             </p>
+            <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
+              Todo parece estar en orden 😎
+            </p>
           </div>
           {metrics && <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />}
         </div>

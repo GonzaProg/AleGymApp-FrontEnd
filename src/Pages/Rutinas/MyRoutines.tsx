@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useMyRoutines } from "../../Hooks/Rutinas/useMyRoutines";
 import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
@@ -13,6 +14,39 @@ export const MyRoutines = () => {
       videoUrl, closeModal, closeVideo, handleOpenVideo,
       handleDownload, downloadingId, downloadProgress, downloadedIds
   } = useMyRoutines();
+
+  const [checkedExercises, setCheckedExercises] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('gymmate_checked_exercises');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const today = new Date().toDateString();
+        if (parsed.date === today) {
+          setCheckedExercises(parsed.data || {});
+        } else {
+          localStorage.removeItem('gymmate_checked_exercises');
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      localStorage.removeItem('gymmate_checked_exercises');
+    }
+  }, []);
+
+  const toggleExerciseCheck = (routineId: string | number, exerciseId: string | number | undefined, index: number) => {
+    const key = `${routineId}-${exerciseId || index}`;
+    setCheckedExercises(prev => {
+      const newState = { ...prev, [key]: !prev[key] };
+      const today = new Date().toDateString();
+      localStorage.setItem('gymmate_checked_exercises', JSON.stringify({
+        date: today,
+        data: newState
+      }));
+      return newState;
+    });
+  };
 
   const isNative = Capacitor.isNativePlatform();
 
@@ -126,9 +160,12 @@ export const MyRoutines = () => {
                       {selectedRoutine.detalles.map((d:any, i:number) => {
                         const thumbnail = CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
                         const videoSource = d.ejercicio.localVideoPath || d.ejercicio.urlVideo;
+                        
+                        const exerciseKey = `${selectedRoutine.id}-${d.ejercicio.id || i}`;
+                        const isChecked = !!checkedExercises[exerciseKey];
 
                         return (
-                            <div key={i} className="bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row gap-6 items-center md:items-stretch transition-all hover:bg-gray-800/80 group">
+                            <div key={i} className={`bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row gap-6 items-center md:items-stretch transition-all group ${isChecked ? 'opacity-70 grayscale-[0.3]' : 'hover:bg-gray-800/80'}`}>
                                 <div className="w-full md:w-48 h-32 flex-shrink-0 bg-black/40 rounded-lg border border-white/5 overflow-hidden relative">
                                     {thumbnail ? (
                                         <img src={thumbnail} alt={d.ejercicio.nombre} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -149,8 +186,18 @@ export const MyRoutines = () => {
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-3">
                                             <span className="bg-green-900/50 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">#{i + 1}</span>
-                                            <h4 className="font-bold text-white text-xl">{d.ejercicio.nombre}</h4>
+                                            <h4 className={`font-bold text-xl transition-colors ${isChecked ? 'text-gray-500 line-through' : 'text-white'}`}>{d.ejercicio.nombre}</h4>
                                         </div>
+                                        <button 
+                                            onClick={() => toggleExerciseCheck(selectedRoutine.id, d.ejercicio.id, i)}
+                                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ml-4 ${
+                                                isChecked 
+                                                ? 'bg-green-500 border-green-400 text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]' 
+                                                : 'bg-black/40 border-white/20 text-transparent hover:border-green-500/50 hover:bg-white/5 backdrop-blur-sm'
+                                            }`}
+                                        >
+                                            <span className="text-xl leading-none font-bold select-none">{isChecked ? '✓' : ''}</span>
+                                        </button>
                                     </div>
                                     <div className="grid grid-cols-3 gap-2 md:gap-4">
                                         <div className="bg-black/40 rounded-lg p-2 text-center border border-white/5">

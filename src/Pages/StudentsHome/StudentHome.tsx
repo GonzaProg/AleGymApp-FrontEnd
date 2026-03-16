@@ -69,7 +69,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                 <p>
                                     ¡Ayúdanos a mantener la información actualizada! 🤝<br/><br/>
                                     Toca el botón <strong>"Escanear QR"</strong> cada vez que llegues al gimnasio.<br/><br/>
-                                    Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios. (Tu salida se calcula sola después de 90 mins).
+                                    Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios.
                                 </p>
                             </div>
                         </div>
