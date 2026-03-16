@@ -21,7 +21,8 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     // Formulario Detalle
     series, reps, peso,
     handleSeriesChange, handleRepsChange, handlePesoChange, handleAddExercise, 
-    detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, handleSubmit
+    detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, 
+    moveRowUp, moveRowDown, handleSubmit
   } = useCreateRoutine(isGeneral, routineIdToEdit); 
 
   return (
@@ -161,8 +162,10 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                       <td className="p-4 text-center text-gray-300">{d.repeticiones}</td>
                       <td className="p-4 text-center text-green-400">{d.peso}</td>
                       <td className="p-4 text-right flex justify-end gap-2">
-                        <button onClick={() => handleEditRow(index)} className="text-yellow-500 bg-yellow-500/10 p-2 rounded">✏️</button>
-                        <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 p-2 rounded">🗑️</button>
+                        <button onClick={() => moveRowUp(index)} disabled={index === 0} className={`p-2 rounded transition-opacity ${index === 0 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬆️</button>
+                        <button onClick={() => moveRowDown(index)} disabled={index === detalles.length - 1} className={`p-2 rounded transition-opacity ${index === detalles.length - 1 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬇️</button>
+                        <button onClick={() => handleEditRow(index)} className="text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 p-2 rounded transition-colors">✏️</button>
+                        <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 hover:bg-red-500/20 p-2 rounded transition-colors">🗑️</button>
                       </td>
                     </tr>
                   ))}
