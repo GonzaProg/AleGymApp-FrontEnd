@@ -1,3 +1,5 @@
+import { Dumbbell, Medal, User } from "lucide-react";
+
 interface MobileNavbarProps {
   activeTab: number;
   setActiveTab: (index: number) => void;
@@ -46,73 +48,39 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
   );
 };
 
-// ICONOS SVG DE GEOMETRÍA UNIFICADA
 // Propiedades comunes para garantizar que la transición sea solo de color/relleno
 const getIconProps = (isActive: boolean) => ({
     fill: isActive ? "currentColor" : "none", // Relleno si está activo
     stroke: "currentColor", // El color del trazo es el actual (gris o blanco)
-    strokeWidth: isActive ? "0" : "1.5", // Si está relleno, quitamos el trazo. Si está vacío, trazo fino.
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
+    strokeWidth: isActive ? 0 : 1.5, // Si está relleno, quitamos el trazo. Si está vacío, trazo fino. Note that Lucide expects a number.
+    className: "w-6 h-6 transition-all duration-300"
 });
 
 const HomeIcon = ({ isActive }: { isActive: boolean }) => (
-  <svg viewBox="0 0 24 24" className="w-6 h-6" {...getIconProps(isActive)}>
+  <svg viewBox="0 0 24 24" {...getIconProps(isActive)} strokeLinecap="round" strokeLinejoin="round">
     {/* Una sola forma cerrada que representa la casa con la puerta */}
     <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
   </svg>
 );
 
 const DumbbellIcon = ({ isActive }: { isActive: boolean }) => (
-  <svg viewBox="0 0 24 24" className="w-6 h-6" {...getIconProps(isActive)}>
-    {/* Forma unificada de la mancuerna */}
-    <path d="M6.5 6h-2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1h8v1a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v1h-8v-1a2 2 0 0 0-2-2z" />
-  </svg>
+  <Dumbbell {...getIconProps(isActive)} />
 );
 
-// NUEVO ICONO DE MEDALLA
+// NUEVO ICONO DE MEDALLA - Hacemos un mapping similar
 const MedalIcon = ({ isActive }: { isActive: boolean }) => (
-  <svg viewBox="0 0 24 24" className="w-6 h-6">
-    {/* 1. Silueta principal (Cinta y Círculo) */}
-    <g 
-      fill={isActive ? "currentColor" : "none"} 
-      stroke="currentColor" 
-      strokeWidth={isActive ? "0" : "1.5"} 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15" />
-      <circle cx="12" cy="17" r="5" />
-    </g>
-
-    {/* 2. Detalles internos (Líneas y el número 1) */}
-    <g 
-      fill="none" 
-      // TRUCO: Cuando está activo, pintamos los detalles internos del color del navbar (#111827)
-      stroke={isActive ? "#111827" : "currentColor"} 
-      strokeWidth="1.5" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <path d="M11 12 5.12 2.2" />
-      <path d="m13 12 5.88-9.8" />
-      <path d="M8 7h8" />
-      <path d="M12 18v-2h-.5" />
-    </g>
-  </svg>
+  <Medal {...getIconProps(isActive)} />
 );
+
 const PlanIcon = ({ isActive }: { isActive: boolean }) => (
-  <svg viewBox="0 0 24 24" className="w-6 h-6" {...getIconProps(isActive)}>
+  <svg viewBox="0 0 24 24" {...getIconProps(isActive)} strokeLinecap="round" strokeLinejoin="round">
     {/* Forma de documento con check */}
     <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-    <polyline points="14 2 14 8 20 8" fill="none" stroke={isActive ? "gray" : "currentColor"} strokeWidth="1.5" /> {/* El pliegue siempre es línea */}
-    <path d="M9 13l2 2 4-4" fill="none" stroke={isActive ? "gray" : "currentColor"} strokeWidth="2" /> {/* El check siempre es línea */}
+    <polyline points="14 2 14 8 20 8" fill="none" stroke={isActive ? "gray" : "currentColor"} strokeWidth={1.5} /> {/* El pliegue siempre es línea */}
+    <path d="M9 13l2 2 4-4" fill="none" stroke={isActive ? "#111827" : "currentColor"} strokeWidth={2} /> {/* El check: verde oscuro si está activo, sino currentColor */}
   </svg>
 );
 
 const UserIcon = ({ isActive }: { isActive: boolean }) => (
-  <svg viewBox="0 0 24 24" className="w-6 h-6" {...getIconProps(isActive)}>
-    {/* Forma unificada de persona (círculo + cuerpo) */}
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-  </svg>
+  <User {...getIconProps(isActive)} />
 );
