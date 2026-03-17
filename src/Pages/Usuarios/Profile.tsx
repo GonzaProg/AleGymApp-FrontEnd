@@ -5,6 +5,7 @@ import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles"; 
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
 import { formatearFechaUTC } from "../../Helpers/DateUtils";
+import { Camera, Edit2, Lock, LogOut } from "lucide-react";
 
 interface ProfileProps {
   isMobile?: boolean; // Prop para diferenciar el contexto
@@ -80,7 +81,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
 
                   {isEditingProfile && !uploadingImage && (
                     <label className={ProfileStyles.uploadOverlay}>
-                      <span className="text-4xl cursor-pointer hover:scale-110 transition-transform">📷</span>
+                      <Camera className="w-10 h-10 cursor-pointer hover:scale-110 transition-transform text-white opacity-80 backdrop-blur-sm" />
                       <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
                     </label>
                   )}
@@ -174,7 +175,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
                         onClick={() => setIsEditingProfile(true)} 
                         className={ProfileStyles.editProfileBtn}
                       >
-                        ✏️ Editar Perfil
+                        <Edit2 className="w-5 h-5 inline-block mr-2" /> Editar Perfil
                       </Button>
                     </div>
                   </div>
@@ -188,7 +189,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
             {!showPasswordSection ? (
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                   <div className="flex flex-col md:flex-row items-center gap-4">
-                    <span className="text-3xl bg-gray-800 p-2 rounded-lg">🔒</span>
+                    <div className="bg-gray-800 p-2 rounded-lg text-white"><Lock className="w-7 h-7" /></div>
                     <div>
                         <span className="font-bold text-gray-100 text-xl block">Seguridad</span>
                         <span className="text-gray-500 text-sm">Gestiona tu contraseña</span>
@@ -200,7 +201,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
               </div>
             ) : (
               <div className="animate-fade-in-up space-y-6">
-                <h3 className={AppStyles.sectionTitle.replace('text-xl', 'text-lg text-gray-300 border-white/5')}>🔒 ACTUALIZAR CONTRASEÑA</h3>
+                <h3 className={AppStyles.sectionTitle.replace('text-xl', 'text-lg text-gray-300 border-white/5')}><Lock className="w-5 h-5 inline-block mr-2" /> ACTUALIZAR CONTRASEÑA</h3>
                 
                 <div className="bg-black/20 p-6 rounded-xl border border-white/5 space-y-4">
                     <Input label="Contraseña Actual" type="password" value={passForm.currentPassword} onChange={e => handlePassChange('currentPassword', e.target.value)} className={AppStyles.inputDark} labelClassName={AppStyles.label}/>
@@ -223,7 +224,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
             <div className={AppStyles.glassCard + " p-8 bg-gray-900/60"}>                
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
-                      <span className="text-3xl bg-red-900/30 p-2 rounded-lg">🚪</span>
+                      <div className="bg-red-900/30 p-2 rounded-lg"><LogOut className="w-7 h-7 text-red-500" /></div>
                       <span className="font-bold text-gray-100 text-base block">Cerrar Sesión</span>
                     </div>
                     <button 

@@ -46,12 +46,18 @@ const ProgresoView = lazy(() => import("./Progreso/ProgresoView").then(module =>
 const StudentHome = lazy(() => import("./StudentsHome/StudentHome").then(module => ({ default: module.StudentHome })));
 const AsistenciaManual = lazy(() => import("../Pages/Asistencias/AsistenciaManual").then(module => ({ default: module.AsistenciaManual })));
 
+import {
+  Home as HomeIcon, Dumbbell, Gem, TrendingUp, Users, RefreshCw, Send,
+  LogOut, User, Settings, Building2, Receipt, BookOpen, ShoppingBag,
+  FileText, CheckSquare, Bell, UserPlus
+} from "lucide-react";
+
 const Icons = {
-  dashboard: "🏠", rutinas: "💪", planes: "💎", finanzas: "📈",
-  ejercicios: "🏋️", notificaciones: "📢", usuarios: "👥",
-  enviarPDF: "📤", renovar: "🔄", salir: "🚪", perfil: "👤", preferencias: "⚙️", 
-  nuevoGym: "🏢", gestionGyms: "⚙️", reciboManual: "🧾", crearRutinaGeneral: "📚",
-  tienda: "🛍️", rutinasUsuarios: "📝", asistencia: "✅",
+  dashboard: <HomeIcon size={20} />, rutinas: <Dumbbell size={20} />, planes: <Gem size={20} />, finanzas: <TrendingUp size={20} />,
+  ejercicios: <Dumbbell size={20} />, notificaciones: <Bell size={20} />, usuarios: <Users size={20} />, nuevoUsuario: <UserPlus size={20} />,
+  enviarPDF: <Send size={20} />, renovar: <RefreshCw size={20} />, salir: <LogOut size={20} />, perfil: <User size={20} />, preferencias: <Settings size={20} />, 
+  nuevoGym: <Building2 size={20} />, gestionGyms: <Settings size={20} />, reciboManual: <Receipt size={20} />, crearRutinaGeneral: <BookOpen size={20} />,
+  tienda: <ShoppingBag size={20} />, rutinasUsuarios: <FileText size={20} />, asistencia: <CheckSquare size={20} />,
 };
 
 const TabLoading = () => (
@@ -136,6 +142,9 @@ export const Home = () => {
             <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
               Aquí tienes un resumen de la actividad del gimnasio.
             </p>
+            <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
+              Todo parece estar en orden 😎
+            </p>
           </div>
           {metrics && <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />}
         </div>
@@ -217,7 +226,7 @@ export const Home = () => {
                 <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
                 <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
                 <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
-                <SidebarItem icon={Icons.usuarios} label="Nuevo Usuario" active={activeTab === "Nuevo Usuario"} onClick={() => handleSidebarClick("Nuevo Usuario")} />
+                <SidebarItem icon={Icons.nuevoUsuario} label="Nuevo Usuario" active={activeTab === "Nuevo Usuario"} onClick={() => handleSidebarClick("Nuevo Usuario")} />
                 <SidebarItem icon={Icons.usuarios} label="Gestionar Usuarios" active={activeTab === "Gestionar Usuarios"} onClick={() => handleSidebarClick("Gestionar Usuarios")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
@@ -317,7 +326,7 @@ export const Home = () => {
 };
 
 // SidebarItem ahora recibe hasAlert para mostrar la luz roja
-const SidebarItem = ({ icon, label, active, onClick, hasAlert }: { icon: string, label: string, active: boolean, onClick: () => void, hasAlert?: boolean }) => {
+const SidebarItem = ({ icon, label, active, onClick, hasAlert }: { icon: React.ReactNode, label: string, active: boolean, onClick: () => void, hasAlert?: boolean }) => {
   return (
     <div onClick={onClick} className={`relative flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
       <span className={`text-xl group-hover:scale-110 transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>

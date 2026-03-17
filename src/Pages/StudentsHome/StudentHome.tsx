@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Scanner } from '@yudiel/react-qr-scanner'; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { useStudentHome } from "../../Hooks/StudentsHome/useStudentHome";
+import { Camera, Info, Flame, Dumbbell } from "lucide-react";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -43,7 +44,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                         {/* Brillo de fondo animado */}
                         <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                         
-                        <span className="text-4xl">📷</span>
+                        <Camera className="w-10 h-10 text-white" />
                         <span className="text-lg font-black tracking-wider">
                             Escanear QR de Entrada
                         </span>
@@ -57,7 +58,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                             className="w-full p-2 flex items-center justify-between hover:bg-white/5 transition-colors rounded-2xl"
                         >
                             <h3 className="text-blue-400 font-bold flex items-center gap-2 text-sm">
-                                <span>ℹ️</span> ¿Cómo funciona esto?
+                                <span><Info className="w-4 h-4" /></span> ¿Cómo funciona esto?
                             </h3>
                             <span className={`text-gray-400 transition-transform duration-300 ${isInfoOpen ? 'rotate-180' : ''}`}>
                                 ▼
@@ -69,7 +70,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                 <p>
                                     ¡Ayúdanos a mantener la información actualizada! 🤝<br/><br/>
                                     Toca el botón <strong>"Escanear QR"</strong> cada vez que llegues al gimnasio.<br/><br/>
-                                    Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios. (Tu salida se calcula sola después de 90 mins).
+                                    Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios.
                                 </p>
                             </div>
                         </div>
@@ -81,7 +82,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                         
                         <div className="relative z-10 flex items-start gap-4">
                             <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/10 p-4 rounded-2xl flex-shrink-0 border border-green-500/30 shadow-inner">
-                                <span className="text-3xl">🔥</span>
+                                <Flame className="w-8 h-8 text-orange-500" />
                             </div>
                             
                             <div className="flex-1">
@@ -114,8 +115,8 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 </>
             ) : (
                 // SI EL MÓDULO ESTÁ DESACTIVADO, MOSTRAMOS UN MENSAJE DE MOTIVACIÓN
-                <div className={`${AppStyles.glassCard} text-center py-12 border-white/5`}>
-                    <span className="text-6xl block mb-6 animate-pulse">💪</span>
+                <div className={`${AppStyles.glassCard} text-center py-12 border-white/5 flex flex-col items-center`}>
+                    <Dumbbell className="w-16 h-16 text-white mb-6 animate-pulse" />
                     <h3 className="text-2xl font-black text-white mb-2 tracking-wide">¡A darle con todo!</h3>
                     <p className="text-gray-400 text-sm max-w-xs mx-auto">
                         Desliza hacia los costados para ver tus rutinas, revisar tu plan actual o superar tus récords personales.

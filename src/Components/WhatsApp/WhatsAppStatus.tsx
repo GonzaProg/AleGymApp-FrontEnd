@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import api from "../../API/axios";
 import { useWhatsAppModal } from "../../Context/WhatsAppModalContext";
 import { showConfirmDelete, showSuccess, showError } from "../../Helpers/Alerts";
+import { LogOut } from "lucide-react";
 
 export const WhatsAppStatus = () => {
   const [status, setStatus] = useState<"connected" | "disconnected" | "loading" | "offline">("loading");
@@ -123,9 +124,7 @@ export const WhatsAppStatus = () => {
             <span className="text-sm font-bold text-green-400">WhatsApp Activo</span>
           </div>
           <button onClick={handleLogout} className="p-1.5 rounded-md text-red-400/70 hover:text-red-400 hover:bg-red-500/20 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-            </svg>
+            <LogOut className="w-5 h-5" />
           </button>
         </div>
       ) : (

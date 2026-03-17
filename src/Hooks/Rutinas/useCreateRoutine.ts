@@ -190,6 +190,28 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       if (editIndex === index) cancelEditRow();
   };
 
+  const moveRowUp = (index: number) => {
+      if (index === 0) return;
+      setDetalles(prev => {
+          const copia = [...prev];
+          const temp = copia[index];
+          copia[index] = copia[index - 1];
+          copia[index - 1] = temp;
+          return copia;
+      });
+  };
+
+  const moveRowDown = (index: number) => {
+      if (index === detalles.length - 1) return;
+      setDetalles(prev => {
+          const copia = [...prev];
+          const temp = copia[index];
+          copia[index] = copia[index + 1];
+          copia[index + 1] = temp;
+          return copia;
+      });
+  };
+
   // --- GUARDAR ---
   const handleSubmit = async () => {
     if (!nombreRutina.trim()) return showError("Falta el nombre de la rutina");
@@ -249,6 +271,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     peso, handlePesoChange,
     handleAddExercise, 
     editIndex, handleEditRow, cancelEditRow, handleDeleteRow,
+    moveRowUp, moveRowDown,
     handleSubmit
   };
 };
