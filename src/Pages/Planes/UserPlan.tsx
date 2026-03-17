@@ -2,6 +2,7 @@ import { UserPlanStyles } from "../../Styles/UserPlanStyles";
 import { Card } from "../../Components/UI/Card";
 import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
 import { type UserPlanDTO } from "../../API/Planes/PlansApi";
+import { Inbox, AlertTriangle, CheckCircle, Waves, Dumbbell } from "lucide-react";
 
 export const UserPlan = () => {
   const { activePlans, loading, error } = useUserPlan();
@@ -20,7 +21,7 @@ export const UserPlan = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm w-full animate-fade-in">
-            <span className="text-5xl mb-4 opacity-50">📭</span>
+            <Inbox className="w-16 h-16 mb-4 opacity-50 text-white" />
             <h3 className="text-xl text-white font-bold">No tienes planes activos</h3>
             <p className="text-gray-400 mt-2 text-center max-w-md px-4">
               Acércate a recepción para asignarte una suscripción.
@@ -42,16 +43,12 @@ const PlanCard = ({ plan }: { plan: UserPlanDTO }) => {
     const bgTint = venceHoy ? "bg-orange-500/10" : "bg-green-500/5"; 
     const badgeBg = venceHoy ? "bg-orange-500/20 animate-pulse" : "bg-green-500/20";
     
-    const iconoEstado = venceHoy ? '⚠️' : '✅';
+    const IconoEstado = venceHoy ? AlertTriangle : CheckCircle;
     const textoEstado = venceHoy ? 'VENCE HOY' : 'AL DÍA';
 
     const fechaVencimientoStr = new Date(plan.fechaVencimiento).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-    // Icono según tipo de plan
-    const getIconoPlan = (tipo: string) => {
-        if (tipo === 'Natacion') return '🏊';
-        return '🏋️'; // Gym default
-    };
+    const IconoPlan = plan.tipo === 'Natacion' ? Waves : Dumbbell;
 
     return (
         <Card className={`${UserPlanStyles.glassCardUserPlan} border-l-4 ${borderColor} ${bgTint} w-full transition-transform duration-300 hover:scale-[1.02]`}>
@@ -61,7 +58,7 @@ const PlanCard = ({ plan }: { plan: UserPlanDTO }) => {
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="text-2xl">{getIconoPlan(plan.tipo)}</span>
+                            <span className="text-2xl text-white"><IconoPlan className="w-7 h-7" /></span>
                             <span className="text-xs font-bold uppercase tracking-wider text-gray-400 border border-white/10 px-2 py-0.5 rounded-full">
                                 {plan.tipo}
                             </span>
@@ -71,7 +68,7 @@ const PlanCard = ({ plan }: { plan: UserPlanDTO }) => {
                     
                     <div className="text-right">
                          <div className={`${statusColor} ${badgeBg} font-bold text-xs px-2 py-1 rounded inline-flex items-center gap-1`}>
-                            <span>{iconoEstado}</span>
+                            <span><IconoEstado className="w-4 h-4" /></span>
                             <span>{textoEstado}</span>
                          </div>
                     </div>

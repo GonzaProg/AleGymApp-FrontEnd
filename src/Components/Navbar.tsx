@@ -4,13 +4,7 @@ import api from "../API/axios";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
 import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary"; 
-
-// Icono Campanita código SVG
-const BellIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-    <path fillRule="evenodd" d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" clipRule="evenodd" />
-  </svg>
-);
+import { Bell } from "lucide-react";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -98,7 +92,7 @@ export const Navbar = () => {
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="relative p-2 text-gray-300 hover:text-white transition-colors hover:bg-white/10 rounded-full focus:outline-none"
             >
-                <BellIcon />
+                <Bell className="w-6 h-6" />
                 {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-pulse shadow-red-500/50 shadow-lg">
                         {unreadCount}

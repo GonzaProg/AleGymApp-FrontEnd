@@ -1,4 +1,5 @@
 import { type DashboardMetrics } from "../../API/Dashboard/DashboardApi";
+import { Users, FileText, Dumbbell, TrendingUp } from "lucide-react";
 
 interface Props {
     metrics: DashboardMetrics;
@@ -17,7 +18,7 @@ export const StatsGrid = ({ metrics, userRole }: Props) => {
                     title="Alumnos Activos" 
                     value={metrics.alumnosActivos} 
                     total={metrics.alumnosTotales}
-                    icon="👥" 
+                    icon={<Users className="w-6 h-6 text-white" />} 
                     color="from-green-500 to-emerald-600" 
                 />
             )}
@@ -27,7 +28,7 @@ export const StatsGrid = ({ metrics, userRole }: Props) => {
                 <StatCard 
                     title="Rutinas Totales" 
                     value={metrics.rutinasTotales} 
-                    icon="📝" 
+                    icon={<FileText className="w-6 h-6 text-white" />} 
                     color="from-blue-500 to-cyan-600" 
                 />
             )}
@@ -36,7 +37,7 @@ export const StatsGrid = ({ metrics, userRole }: Props) => {
             <StatCard 
                 title="Ejercicios" 
                 value={metrics.ejerciciosTotales} 
-                icon="🏋️" 
+                icon={<Dumbbell className="w-6 h-6 text-white" />} 
                 color="from-purple-500 to-violet-600" 
             />
 
@@ -45,7 +46,7 @@ export const StatsGrid = ({ metrics, userRole }: Props) => {
                 <StatCard 
                     title="Ratio Activos" 
                     value={`${Math.round((metrics.alumnosActivos! / (metrics.alumnosTotales! || 1)) * 100)}%`} 
-                    icon="📈" 
+                    icon={<TrendingUp className="w-6 h-6 text-white" />} 
                     color="from-orange-500 to-amber-600" 
                 />
             )}

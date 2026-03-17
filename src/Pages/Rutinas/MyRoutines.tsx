@@ -6,6 +6,7 @@ import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { Capacitor } from "@capacitor/core"; 
 import { createPortal } from "react-dom";
+import { Inbox, CloudDownload, CheckCircle, Download, Search, Dumbbell } from "lucide-react";
 
 export const MyRoutines = () => {
   
@@ -61,7 +62,7 @@ export const MyRoutines = () => {
           ) : rutinas.length === 0 ? (
             <div className={`${AppStyles.glassCard} p-10 text-center`}>
                 <div className={AppStyles.gradientDivider}></div>
-                <span className="text-5xl opacity-50 mb-4 block">📭</span>
+                <Inbox className="w-16 h-16 opacity-50 mb-4 mx-auto text-white" />
                 <p className="text-gray-300 text-lg">No tienes rutinas asignadas todavía.</p>
             </div>
           ) : (
@@ -81,11 +82,11 @@ export const MyRoutines = () => {
                         className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all active:scale-95 shadow-lg"
                       >
                         {downloadingId === rutina.id ? (
-                            <span className="text-xs text-green-400 font-bold animate-pulse">⏬</span>
+                            <CloudDownload className="w-5 h-5 text-green-400 animate-pulse" />
                         ) : downloadedIds.includes(rutina.id) ? (
-                            <span className="text-xl" title="Descargado">✅</span>
+                            <span title="Descargado"><CheckCircle className="w-6 h-6 text-green-400" /></span>
                         ) : (
-                            <span className="text-xl opacity-70" title="Descargar">⬇️</span>
+                            <span title="Descargar"><Download className="w-6 h-6 opacity-70 text-white" /></span>
                         )}
                       </button>
                   )}
@@ -128,7 +129,7 @@ export const MyRoutines = () => {
 
                   <div className="text-center pt-2 mt-auto">
                       <span className={MyRoutinesStyles.viewDetailBtn}>
-                        VER DETALLE <span className="text-lg">🔍</span>
+                        VER DETALLE <Search className="w-5 h-5 inline-block ml-1" />
                       </span>
                   </div>
                 </div>
@@ -171,7 +172,7 @@ export const MyRoutines = () => {
                                         <img src={thumbnail} alt={d.ejercicio.nombre} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                     ) : (
                                         <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
-                                            <span className="text-3xl opacity-50">🏋️‍♂️</span>
+                                            <Dumbbell className="w-10 h-10 opacity-50 text-white" />
                                         </div>
                                     )}
                                     
