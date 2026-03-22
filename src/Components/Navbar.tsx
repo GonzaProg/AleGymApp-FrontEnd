@@ -73,8 +73,6 @@ export const Navbar = () => {
                     <img 
                         src={gymLogo} 
                         alt="Logo Gym"
-                        // CAMBIO: Aumentado a h-12 (aprox 48px) y w-auto. 
-                        // Puedes probar h-14 si lo quieres aún más grande.
                         className="h-14 w-auto object-contain transition-transform group-hover:scale-105"
                         onError={(e) => {
                             e.currentTarget.style.display = 'none';

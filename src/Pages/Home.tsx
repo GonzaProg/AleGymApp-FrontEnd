@@ -18,6 +18,7 @@ import { AppStyles } from "../Styles/AppStyles";
 import { BackgroundLayout } from "../Components/BackgroundLayout"; 
 import { Navbar } from "../Components/Navbar";
 import { StatsGrid } from "../Components/Dashboard/StatsGrid";
+import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary";
 
 // IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
@@ -189,8 +190,20 @@ export const Home = () => {
           <WhatsAppModal />
           <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
             <div className="flex-1 overflow-hidden flex flex-col">
-              <div className="h-20 flex items-center px-8 border-b border-white/5 cursor-pointer shrink-0" onClick={() => handleSidebarClick("Inicio")}>
+              <div className="h-20 flex items-center px-6 border-b border-white/5 cursor-pointer shrink-0 group" onClick={() => handleSidebarClick("Inicio")}>
                 <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">GYMMate</span>
+                {(currentUser?.gym as any)?.logoUrl && (
+                  <div className="flex items-center ml-3 pl-3 border-l border-white/20 h-10 animate-fade-in">
+                    <img 
+                      src={CloudinaryApi.getUrl((currentUser?.gym as any)?.logoUrl) || undefined} 
+                      alt="Logo Gym"
+                      className="h-14 w-auto object-contain transition-transform group-hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
               <nav className={`p-4 space-y-2 mt-4 ${AppStyles.customScrollbar}`}>
                 <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />

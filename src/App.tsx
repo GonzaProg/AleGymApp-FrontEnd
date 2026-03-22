@@ -6,6 +6,7 @@ import { useAuthUser } from "./Hooks/Auth/useAuthUser";
 import type { JSX } from "react/jsx-dev-runtime";
 import { GymLockedScreen } from "./Components/GymLocked/GymLockedScreen";
 import { useUpdateListener } from "./Hooks/System/useUpdateListener";
+import { useLocalNotifications } from "./Hooks/System/useLocalNotifications";
 import { SetupScreen } from "./Pages/Setup/SetupScreen";
 
 // 2. IMPORTACIONES PEREZOSAS (Lazy Imports)
@@ -24,6 +25,7 @@ const LoadingScreen = () => (
 const AppContent = () => {
   const { isConfigured } = useGymConfig();
   useUpdateListener();
+  useLocalNotifications();
   
   if (!isConfigured) return <SetupScreen />;
 
