@@ -4,7 +4,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { MyRoutinesStyles } from "../../Styles/MyRoutinesStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
-import { Capacitor } from "@capacitor/core"; 
+
 import { createPortal } from "react-dom";
 import { Inbox, CloudDownload, CheckCircle, Download, Search, Dumbbell } from "lucide-react";
 
@@ -49,8 +49,6 @@ export const MyRoutines = () => {
     });
   };
 
-  const isNative = Capacitor.isNativePlatform();
-
   return (
     <>
       <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-24 pt-32">
@@ -75,21 +73,19 @@ export const MyRoutines = () => {
                 >
                   <div className={AppStyles.gradientDivider}></div>
 
-                  {/* BOTÓN DE DESCARGA (Nativo) */}
-                  {isNative && (
-                      <button 
-                        onClick={(e) => handleDownload(e, rutina)}
-                        className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all active:scale-95 shadow-lg"
-                      >
-                        {downloadingId === rutina.id ? (
-                            <CloudDownload className="w-5 h-5 text-green-400 animate-pulse" />
-                        ) : downloadedIds.includes(rutina.id) ? (
-                            <span title="Descargado"><CheckCircle className="w-6 h-6 text-green-400" /></span>
-                        ) : (
-                            <span title="Descargar"><Download className="w-6 h-6 opacity-70 text-white" /></span>
-                        )}
-                      </button>
-                  )}
+                  {/* BOTÓN DE DESCARGA */}
+                  <button 
+                    onClick={(e) => handleDownload(e, rutina)}
+                    className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all active:scale-95 shadow-lg"
+                  >
+                    {downloadingId === rutina.id ? (
+                        <CloudDownload className="w-5 h-5 text-green-400 animate-pulse" />
+                    ) : downloadedIds.includes(rutina.id) ? (
+                        <span title="Descargado"><CheckCircle className="w-6 h-6 text-green-400" /></span>
+                    ) : (
+                        <span title="Descargar"><Download className="w-6 h-6 opacity-70 text-white" /></span>
+                    )}
+                  </button>
 
                   {/* OVERLAY PROGRESO */}
                   {downloadingId === rutina.id && (
