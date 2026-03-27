@@ -6,7 +6,7 @@ import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
 import { createPortal } from "react-dom";
-import { Inbox, CloudDownload, CheckCircle, Download, Search, Dumbbell } from "lucide-react";
+import { Inbox, CloudDownload, CheckCircle, Download, Search, Dumbbell, ArrowLeft } from "lucide-react";
 
 export const MyRoutines = () => {
   
@@ -49,9 +49,115 @@ export const MyRoutines = () => {
     });
   };
 
+  if (selectedRoutine) {
+    return (
+      <div className="mt-20 w-full min-h-full bg-[#1a1225] flex flex-col pt-safe animate-fade-in-up">
+        {/* ENCABEZADO FIJO */}
+        <div className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur-xl border-b border-white/10 px-4 py-4 shrink-0 shadow-lg mt-0">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-green-900"></div>
+            <div className="flex items-center gap-4 mt-2 mb-2">
+                <button 
+                  onClick={closeModal} 
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-sm"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div className="flex-1 min-w-0">
+                    <h2 className="text-xl md:text-2xl font-black text-white flex items-center gap-2 truncate">
+                        {selectedRoutine.nombreRutina}
+                        {selectedRoutine.detalles?.[0]?.ejercicio?.localVideoPath && (
+                            <span className="text-[10px] md:text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 whitespace-nowrap">Offline</span>
+                        )}
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        {/* LISTA DE EJERCICIOS */}
+        <div className="p-4 md:p-6 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
+            {selectedRoutine.detalles.map((d:any, i:number) => {
+              const thumbnail = CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
+              const videoSource = d.ejercicio.localVideoPath || d.ejercicio.urlVideo;
+              
+              const exerciseKey = `${selectedRoutine.id}-${d.ejercicio.id || i}`;
+              const isChecked = !!checkedExercises[exerciseKey];
+
+              return (
+                  <div key={i} className={`bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row gap-4 md:gap-6 items-center md:items-stretch transition-all group ${isChecked ? 'opacity-70 grayscale-[0.3]' : 'hover:bg-gray-800/80'}`}>
+                      <div className="w-full md:w-48 h-40 md:h-32 flex-shrink-0 bg-black/40 rounded-lg border border-white/5 overflow-hidden relative">
+                          {thumbnail ? (
+                              <img src={thumbnail} alt={d.ejercicio.nombre} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                          ) : (
+                              <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
+                                  <Dumbbell className="w-10 h-10 opacity-50 text-white" />
+                              </div>
+                          )}
+                          
+                          {videoSource && (
+                              <div onClick={() => handleOpenVideo(videoSource)} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-100 transition-opacity cursor-pointer backdrop-blur-[1px]">
+                                  <span className="bg-green-500/80 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.4)] transform hover:scale-110 transition-transform text-xl pl-1 backdrop-blur-md border border-white/20">▶</span>
+                              </div>
+                          )}
+                      </div>
+
+                      <div className="flex-1 flex flex-col justify-between w-full">
+                          <div className="flex justify-between items-start mb-4">
+                              <div className="flex items-center gap-3">
+                                  <span className="bg-green-900/50 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">#{i + 1}</span>
+                                  <h4 className={`font-bold text-lg md:text-xl transition-colors ${isChecked ? 'text-gray-500 line-through' : 'text-white'}`}>{d.ejercicio.nombre}</h4>
+                              </div>
+                              <button 
+                                  onClick={() => toggleExerciseCheck(selectedRoutine.id, d.ejercicio.id, i)}
+                                  className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ml-2 ${
+                                      isChecked 
+                                      ? 'bg-green-500 border-green-400 text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]' 
+                                      : 'bg-black/40 border-white/20 text-transparent hover:border-green-500/50 hover:bg-white/5 backdrop-blur-sm'
+                                  }`}
+                              >
+                                  <span className="text-xl leading-none font-bold select-none">{isChecked ? '✓' : ''}</span>
+                              </button>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                              <div className="bg-black/40 rounded-lg p-2 text-center border border-white/5 flex flex-col justify-center">
+                                  <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-wider block mb-0.5">Series</span>
+                                  <span className="text-lg md:text-xl font-bold text-white leading-tight">{d.series}</span>
+                              </div>
+                              <div className="bg-black/40 rounded-lg p-2 text-center border border-white/5 flex flex-col justify-center">
+                                  <span className="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-wider block mb-0.5">Reps</span>
+                                  <span className="text-lg md:text-xl font-bold text-white leading-tight">{d.repeticiones}</span>
+                              </div>
+                              <div className="bg-green-900/10 rounded-lg p-2 text-center border border-green-500/20 flex flex-col justify-center">
+                                  <span className="text-[10px] md:text-xs text-green-500/70 uppercase font-bold tracking-wider block mb-0.5">Peso</span>
+                                  <span className="text-lg md:text-xl font-bold text-green-400 leading-tight">{d.peso > 0 ? `${d.peso} kg` : '-'}</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              );
+            })}
+        </div>
+        
+        {/* VIDEO MODAL (Aún necesario para mostrar el video por encima de todo) */}
+        {videoUrl && (
+            typeof document !== "undefined" ? createPortal(
+              <div className={MyRoutinesStyles.videoContainer} onClick={closeVideo}>
+                  <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
+                    <span className="text-2xl font-bold">&times;</span>
+                  </button>
+                  <div className="w-full max-w-4xl aspect-video px-4" onClick={(e) => e.stopPropagation()}>
+                    <VideoEjercicio url={videoUrl} />
+                  </div>
+              </div>,
+              document.body
+            ) : null
+        )}
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-24 pt-32">
+      <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-24 pt-32 animate-fade-in">
                 
           {loading ? (
              <div className="text-center py-20">
@@ -134,97 +240,6 @@ export const MyRoutines = () => {
           )}
       </div>
 
-      {/* MODAL DETALLE */}
-      {selectedRoutine && (
-          typeof document !== "undefined" ? createPortal(
-            <div className={AppStyles.modalOverlay} onClick={closeModal}>
-                <div className={`${AppStyles.modalContent} max-w-4xl`} onClick={(e) => e.stopPropagation()}>
-                  <div className={MyRoutinesStyles.modalHeader}>
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-green-900"></div>
-                      <div>
-                        <h2 className="text-2xl font-black text-white flex items-center gap-2">
-                            {selectedRoutine.nombreRutina}
-                            {selectedRoutine.detalles?.[0]?.ejercicio?.localVideoPath && (
-                                <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">Offline</span>
-                            )}
-                        </h2>
-                        <p className="text-gray-400 text-sm mt-1">Planificado por: <b className="text-green-400">{selectedRoutine.entrenador}</b></p>
-                      </div>
-                      <button onClick={closeModal} className="text-gray-400 hover:text-white text-3xl leading-none transition-colors">&times;</button>
-                  </div>
-                  
-                  <div className={`p-6 space-y-4 max-h-[70vh] ${AppStyles.customScrollbar}`}>
-                      {selectedRoutine.detalles.map((d:any, i:number) => {
-                        const thumbnail = CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
-                        const videoSource = d.ejercicio.localVideoPath || d.ejercicio.urlVideo;
-                        
-                        const exerciseKey = `${selectedRoutine.id}-${d.ejercicio.id || i}`;
-                        const isChecked = !!checkedExercises[exerciseKey];
-
-                        return (
-                            <div key={i} className={`bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row gap-6 items-center md:items-stretch transition-all group ${isChecked ? 'opacity-70 grayscale-[0.3]' : 'hover:bg-gray-800/80'}`}>
-                                <div className="w-full md:w-48 h-32 flex-shrink-0 bg-black/40 rounded-lg border border-white/5 overflow-hidden relative">
-                                    {thumbnail ? (
-                                        <img src={thumbnail} alt={d.ejercicio.nombre} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                    ) : (
-                                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-600">
-                                            <Dumbbell className="w-10 h-10 opacity-50 text-white" />
-                                        </div>
-                                    )}
-                                    
-                                    {videoSource && (
-                                        <div onClick={() => handleOpenVideo(videoSource)} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-[1px]">
-                                            <span className="bg-gray-300/50 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform text-xl pl-0.5">▶</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="flex-1 flex flex-col justify-between w-full">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div className="flex items-center gap-3">
-                                            <span className="bg-green-900/50 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">#{i + 1}</span>
-                                            <h4 className={`font-bold text-xl transition-colors ${isChecked ? 'text-gray-500 line-through' : 'text-white'}`}>{d.ejercicio.nombre}</h4>
-                                        </div>
-                                        <button 
-                                            onClick={() => toggleExerciseCheck(selectedRoutine.id, d.ejercicio.id, i)}
-                                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 ml-4 ${
-                                                isChecked 
-                                                ? 'bg-green-500 border-green-400 text-black shadow-[0_0_15px_rgba(34,197,94,0.4)]' 
-                                                : 'bg-black/40 border-white/20 text-transparent hover:border-green-500/50 hover:bg-white/5 backdrop-blur-sm'
-                                            }`}
-                                        >
-                                            <span className="text-xl leading-none font-bold select-none">{isChecked ? '✓' : ''}</span>
-                                        </button>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-2 md:gap-4">
-                                        <div className="bg-black/40 rounded-lg p-2 text-center border border-white/5">
-                                            <span className="text-xs text-gray-500 uppercase font-bold tracking-wider block mb-1">Series</span>
-                                            <span className="text-xl font-bold text-white">{d.series}</span>
-                                        </div>
-                                        <div className="bg-black/40 rounded-lg p-2 text-center border border-white/5">
-                                            <span className="text-xs text-gray-500 uppercase font-bold tracking-wider block mb-1">Reps</span>
-                                            <span className="text-xl font-bold text-white">{d.repeticiones}</span>
-                                        </div>
-                                        <div className="bg-green-900/10 rounded-lg p-2 text-center border border-green-500/20">
-                                            <span className="text-xs text-green-500/70 uppercase font-bold tracking-wider block mb-1">Peso</span>
-                                            <span className="text-xl font-bold text-green-400">{d.peso > 0 ? `${d.peso} kg` : '-'}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                      })}
-                  </div>
-                  
-                  <div className="p-4 border-t border-white/10 bg-gray-800/50 flex justify-end">
-                    <button onClick={closeModal} className="text-red-400 border border-red-500/30 hover:bg-red-500/10 font-bold py-2 px-6 rounded-xl transition-all">Cerrar</button>
-                  </div>
-                </div>
-            </div>,
-            document.body
-          ) : null
-      )}
-      
       {/* VIDEO MODAL */}
       {videoUrl && (
           typeof document !== "undefined" ? createPortal(
