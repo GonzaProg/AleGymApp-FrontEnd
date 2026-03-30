@@ -14,6 +14,15 @@ export const UsersManager = () => {
         return <UserDetailView user={selectedUser} onBack={() => setSelectedUser(null)} />;
     }
 
+    const getEstadoActual = (planResumen?: { estado: 'Activo' | 'Vencido' | 'Sin Plan', vencimiento?: string }) => {
+        if (!planResumen) return 'Sin Plan';
+        if (planResumen.estado === 'Activo' && planResumen.vencimiento) {
+            const isNotExpired = new Date(planResumen.vencimiento).setHours(23, 59, 59, 999) >= new Date().getTime();
+            return isNotExpired ? 'Activo' : 'Inactivo';
+        }
+        return planResumen.estado === 'Vencido' ? 'Inactivo' : planResumen.estado;
+    };
+
     return (
         <div className="w-full max-w-7xl mx-auto space-y-8 animate-fade-in">
             {/* CONTROLES SUPERIORES */}
@@ -54,7 +63,9 @@ export const UsersManager = () => {
                 {loading && usuarios.length === 0 ? (
                     Array(8).fill(0).map((_, i) => <div key={i} className="h-24 bg-gray-800/50 rounded-2xl animate-pulse" />)
                 ) : (
-                    usuarios.map(user => (
+                    usuarios.map(user => {
+                        const estadoReal = getEstadoActual(user.planResumen);
+                        return (
                         <div 
                             key={user.id} 
                             onClick={() => setSelectedUser(user)}
@@ -68,11 +79,11 @@ export const UsersManager = () => {
                                 <p className="text-gray-500 text-xs font-mono">DNI: {user.dni}</p>
                             </div>
                             {/* Badge de Plan Resumen */}
-                            <div className={`absolute top-2 right-2 text-[8px] px-1.5 py-0.5 rounded border ${user.planResumen?.estado === 'Activo' ? 'text-green-400 border-green-500/30 bg-green-500/10' : 'text-red-400 border-red-500/30 bg-red-500/10'}`}>
-                                {user.planResumen?.estado}
+                            <div className={`absolute top-2 right-2 text-[8px] px-1.5 py-0.5 rounded border ${estadoReal === 'Activo' ? 'text-green-400 border-green-500/30 bg-green-500/10' : 'text-red-400 border-red-500/30 bg-red-500/10'}`}>
+                                {estadoReal}
                             </div>
                         </div>
-                    ))
+                    )})
                 )}
             </div>
         </div>

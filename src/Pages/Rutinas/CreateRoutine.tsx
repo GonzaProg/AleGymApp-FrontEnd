@@ -1,6 +1,10 @@
+import { useState, useRef, useEffect } from "react";
+import { Play } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
 import { AppStyles } from "../../Styles/AppStyles";
+import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio";
 
 interface CreateRoutineProps {
     isGeneral?: boolean;
@@ -22,8 +26,24 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     series, reps, peso,
     handleSeriesChange, handleRepsChange, handlePesoChange, handleAddExercise, 
     detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, 
-    moveRowUp, moveRowDown, handleSubmit
+    moveRowUp, moveRowDown, handleSubmit,
+    ejercicios // <-- Extraemos los ejercicios para buscar detalles rápidos
   } = useCreateRoutine(isGeneral, routineIdToEdit); 
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Si el modal de video NO está abierto, y el click fue fuera del contenedor del buscador
+      if (!previewUrl && searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setMostrarSugerenciasEjercicios(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [previewUrl, setMostrarSugerenciasEjercicios]);
 
   return (
     <div className={`${AppStyles.principalContainer} principalContainer`}>
@@ -95,7 +115,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
               Ejercicios
              </h3>
              
-             <div className="mt-4 relative">
+             <div className="mt-4 relative" ref={searchContainerRef}>
                 <Input 
                     label="Buscar Ejercicio"
                     value={ejercicioBusqueda}
@@ -112,10 +132,23 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                             ejerciciosFiltrados.map((ej) => (
                                 <li 
                                     key={ej.id} 
-                                    onClick={() => handleSelectEjercicio(ej)} 
-                                    className={AppStyles.suggestionItem}
+                                    className={`${AppStyles.suggestionItem} flex justify-between items-center group`}
                                 >
-                                    <span className="text-gray-200">{ej.nombre}</span>
+                                    <span 
+                                        className="text-gray-200 flex-1" 
+                                        onClick={() => handleSelectEjercicio(ej)}
+                                    >
+                                        {ej.nombre}
+                                    </span>
+                                    {ej.urlVideo && (
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); setPreviewUrl(ej.urlVideo); }}
+                                            className="text-blue-400 hover:text-blue-300 bg-blue-500/10 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                            title="Ver demostración"
+                                        >
+                                            <Play size={14} className="fill-current" />
+                                        </button>
+                                    )}
                                 </li>
                             ))
                         ) : (
@@ -155,20 +188,33 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                   <tr><th className="p-4">Ejercicio</th><th className="p-4 text-center">Series</th><th className="p-4 text-center">Reps</th><th className="p-4 text-center">Peso</th><th className="p-4 text-right">Acción</th></tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {detalles.map((d: any, index: number) => (
-                    <tr key={index} className={`${AppStyles.tableRow} ${editIndex === index ? 'bg-yellow-500/10' : ''}`}>
-                      <td className="p-4 font-medium text-white">{d.nombreEjercicio}</td>
-                      <td className="p-4 text-center text-gray-300">{d.series}</td>
-                      <td className="p-4 text-center text-gray-300">{d.repeticiones}</td>
-                      <td className="p-4 text-center text-green-400">{d.peso}</td>
-                      <td className="p-4 text-right flex justify-end gap-2">
-                        <button onClick={() => moveRowUp(index)} disabled={index === 0} className={`p-2 rounded transition-opacity ${index === 0 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬆️</button>
-                        <button onClick={() => moveRowDown(index)} disabled={index === detalles.length - 1} className={`p-2 rounded transition-opacity ${index === detalles.length - 1 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬇️</button>
-                        <button onClick={() => handleEditRow(index)} className="text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 p-2 rounded transition-colors">✏️</button>
-                        <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 hover:bg-red-500/20 p-2 rounded transition-colors">🗑️</button>
-                      </td>
-                    </tr>
-                  ))}
+                  {detalles.map((d: any, index: number) => {
+                      const ejOriginal = ejercicios.find((e: any) => e.id === d.ejercicioId);
+                      return (
+                      <tr key={index} className={`${AppStyles.tableRow} ${editIndex === index ? 'bg-yellow-500/10' : ''}`}>
+                        <td className="p-4 font-medium text-white flex items-center gap-2">
+                          {d.nombreEjercicio}
+                          {ejOriginal?.urlVideo && (
+                              <button 
+                                  onClick={() => setPreviewUrl(ejOriginal.urlVideo)}
+                                  className="text-blue-400 hover:text-blue-300 bg-blue-500/10 p-1.5 rounded-full transition-colors ml-2"
+                                  title="Ver video"
+                              >
+                                  <Play size={12} className="fill-current" />
+                              </button>
+                          )}
+                        </td>
+                        <td className="p-4 text-center text-gray-300">{d.series}</td>
+                        <td className="p-4 text-center text-gray-300">{d.repeticiones}</td>
+                        <td className="p-4 text-center text-green-400">{d.peso}</td>
+                        <td className="p-4 text-right flex justify-end gap-2">
+                          <button onClick={() => moveRowUp(index)} disabled={index === 0} className={`p-2 rounded transition-opacity ${index === 0 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬆️</button>
+                          <button onClick={() => moveRowDown(index)} disabled={index === detalles.length - 1} className={`p-2 rounded transition-opacity ${index === detalles.length - 1 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬇️</button>
+                          <button onClick={() => handleEditRow(index)} className="text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 p-2 rounded transition-colors">✏️</button>
+                          <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 hover:bg-red-500/20 p-2 rounded transition-colors">🗑️</button>
+                        </td>
+                      </tr>
+                    )})}
                 </tbody>
               </table>
             </div>
@@ -182,6 +228,16 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
         </div>
 
       </div>
+
+      {previewUrl && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 animate-fade-in" onClick={() => setPreviewUrl(null)}>
+              <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden border border-white/20">
+                  <VideoEjercicio url={previewUrl} />
+              </div>
+          </div>,
+          document.body
+      )}
+
     </div>
   );
 };
