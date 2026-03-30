@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play } from "lucide-react";
+import { Play, ChevronDown } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
@@ -23,8 +23,13 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     ejercicioBusqueda, ejerciciosFiltrados, mostrarSugerenciasEjercicios, 
     handleEjercicioSearchChange, handleSelectEjercicio, setMostrarSugerenciasEjercicios,
     // Formulario Detalle
-    series, reps, peso,
-    handleSeriesChange, handleRepsChange, handlePesoChange, handleAddExercise, 
+    series, handleSeriesChange,
+    tipoSerie, setTipoSerie,
+    repsInicial, handleRepsInicialChange,
+    reps, handleRepsChange,
+    peso, handlePesoChange,
+    pesosArray, handlePesoArrayChange, repsArrayCalculado,
+    handleAddExercise, 
     detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, 
     moveRowUp, moveRowDown, handleSubmit,
     ejercicios // <-- Extraemos los ejercicios para buscar detalles rápidos
@@ -160,11 +165,67 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                 )}
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mt-4">
+            <div className={`grid grid-cols-2 ${tipoSerie === 'Estandar' ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 mt-4`}>
                 <Input label="Series" type="number" value={series} onChange={handleSeriesChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
-                <Input label="Reps" type="number" value={reps} onChange={handleRepsChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} />
-                <Input label="Peso" type="text" value={peso} onChange={handlePesoChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} placeholder="A elección" />
+                {tipoSerie === 'Estandar' ? (
+                    <>
+                        <Input label="Reps" type="text" value={reps} onChange={handleRepsChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} placeholder="Ej: 15/12" />
+                        <Input label="Peso" type="text" value={peso} onChange={handlePesoChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} placeholder="A elección" />
+                    </>
+                ) : (
+                    <Input label="Reps Iniciales" type="text" value={repsInicial} onChange={handleRepsInicialChange} className={`${AppStyles.inputDark} text-center font-bold`} labelClassName={AppStyles.label} placeholder="Ej: 15" />
+                )}
             </div>
+
+            <div className="mt-4 flex flex-col gap-2">
+                <label className={AppStyles.label}>Tipo de Serie</label>
+                <div className="relative group">
+                    <select 
+                        value={tipoSerie} 
+                        onChange={(e) => setTipoSerie(e.target.value as any)} 
+                        className={`${AppStyles.inputDark} text-center font-bold px-4 py-[10px] appearance-none rounded-lg border border-white/10 cursor-pointer pr-10 w-full`}
+                    >
+                        <option value="Estandar" className={AppStyles.darkBackgroundSelect}>Estándar</option>
+                        <option value="Ascendente" className={AppStyles.darkBackgroundSelect}>Ascendente</option>
+                        <option value="Descendente" className={AppStyles.darkBackgroundSelect}>Descendente</option>
+                    </select>
+                    
+                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500 group-hover:text-green-400 transition-colors">
+                        <ChevronDown className="w-4 h-4 fill-current" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Listado dinámico de pesos por repetición */}
+            {tipoSerie !== 'Estandar' && (
+                <div className="mt-6 p-4 rounded-xl border border-white/5 bg-black/20 space-y-3">
+                <div className="flex items-center justify-between mb-2 px-2">
+                    <h4 className="text-gray-400 text-sm font-bold uppercase tracking-wider">Detalle por Serie</h4>
+                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wider w-[150px] text-center">Peso</span>
+                </div>
+                {Array(Number(series) || 1).fill("").map((_, i) => {
+                    const computedReps = repsArrayCalculado[i] || "-";
+
+                    return (
+                        <div key={i} className="flex items-center gap-4 bg-white/5 p-2 px-4 rounded-lg">
+                            <span className="text-blue-400 font-bold min-w-[30px]">#{i + 1}</span>
+                            <span className="text-gray-300 font-medium flex-1">
+                                {computedReps} reps
+                            </span>
+                            <div className="w-[150px]">
+                                <Input 
+                                    type="text" 
+                                    value={pesosArray[i] || ""} 
+                                    onChange={(e) => handlePesoArrayChange(i, e.target.value)} 
+                                    className={`${AppStyles.inputDark} text-center font-bold`} 
+                                    placeholder="A elección" 
+                                />
+                            </div>
+                        </div>
+                    );
+                })}
+                </div>
+            )}
 
             <div className="pt-4 flex gap-2">
                 {editIndex !== null && (

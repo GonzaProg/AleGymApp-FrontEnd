@@ -26,7 +26,11 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   // Inputs Detalle
   const [peso, setPeso] = useState(""); 
   const [series, setSeries] = useState<number | string>(4);
-  const [reps, setReps] = useState<number | string>(10);
+  const [reps, setReps] = useState<string>("10");
+  const [tipoSerie, setTipoSerie] = useState<'Estandar' | 'Ascendente' | 'Descendente'>('Estandar');
+  const [repsInicial, setRepsInicial] = useState<string>("10");
+  const [pesosArray, setPesosArray] = useState<string[]>(Array(4).fill(""));
+  const [repsArrayCalculado, setRepsArrayCalculado] = useState<string[]>([]);
 
   // Tabla
   const [detalles, setDetalles] = useState<any[]>([]);
@@ -41,6 +45,47 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     handleSelectAlumno,
     setMostrarSugerencias,
   } = useAlumnoSearch();
+
+  // EFECTO PARA CALCULAR REPETICIONES Y AJUSTAR ARRAY DE PESOS
+  useEffect(() => {
+     let result: string[] = [];
+     const cSeries = Number(series) || 1;
+     
+     if (tipoSerie === 'Estandar') {
+         const parts = reps.split('/');
+         for(let i=0; i<cSeries; i++) {
+             result.push(parts[i] || parts[parts.length - 1] || "10");
+         }
+     } else {
+         let current = Number(repsInicial) || 10;
+         for (let i = 0; i < cSeries; i++) {
+             result.push(String(current));
+             
+             if (tipoSerie === 'Ascendente') {
+                 if (current < 12) current += 2;
+                 else if (current % 5 === 2) current += 3;
+                 else if (current % 5 === 0) current += 2;
+                 else current += 2;
+             } else {
+                 if (current <= 12) current = Math.max(current - 2, 1);
+                 else if (current % 5 === 0) current -= 3;
+                 else if (current % 5 === 2) current -= 2;
+                 else current = Math.max(current - 2, 1);
+             }
+         }
+     }
+     setRepsArrayCalculado(result);
+     
+     setPesosArray(prev => {
+         const newArr = [...prev];
+         if (newArr.length < cSeries) {
+             return [...newArr, ...Array(cSeries - newArr.length).fill("")];
+         } else if (newArr.length > cSeries) {
+             return newArr.slice(0, cSeries);
+         }
+         return newArr;
+     });
+  }, [series, reps, tipoSerie, repsInicial]);
 
   // 1. CARGA INICIAL (Ejercicios y Datos de Rutina si es edición)
   useEffect(() => {
@@ -124,14 +169,37 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
 
   // --- HANDLERS INPUTS ---
   const handleSeriesChange = (e: any) => setSeries(e.target.value);
-  const handleRepsChange = (e: any) => setReps(e.target.value);
+  const handleRepsChange = (e: any) => {
+      const value = e.target.value;
+      if (/^[\d/-]*$/.test(value)) {
+          setReps(value);
+      }
+  };
+  const handleRepsInicialChange = (e: any) => {
+      const value = e.target.value;
+      if (/^[\d]*$/.test(value)) {
+          setRepsInicial(value);
+      }
+  };
   const handlePesoChange = (e: any) => setPeso(e.target.value);
+  const handlePesoArrayChange = (index: number, value: string) => {
+      setPesosArray(prev => {
+          const newArr = [...prev];
+          newArr[index] = value;
+          return newArr;
+      });
+  };
 
   // --- LÓGICA TABLA ---
   const handleAddExercise = () => {
     if (!ejercicioId) return showError("Selecciona un ejercicio válido de la lista");
     
-    const pesoFinal = peso.trim() === "" ? "A elección" : peso;
+    // Si viene vacio algún peso, se pone 'A elección'
+    const pesoFinal = tipoSerie === 'Estandar' 
+        ? (peso.trim() === "" ? "A elección" : peso.trim())
+        : pesosArray.map(p => p.trim() === "" || p.trim() === "A elección" ? "A elección" : p.trim()).join('/');
+    const repsFinal = tipoSerie === 'Estandar' ? reps : repsArrayCalculado.join('/');
+
     const ejercicioEncontrado = ejercicios.find((e) => e.id === Number(ejercicioId));
     
     // Si por alguna razón no se encuentra por ID (raro), usamos el texto de búsqueda como fallback visual
@@ -141,7 +209,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       ejercicioId: Number(ejercicioId),
       nombreEjercicio: nombreFinal,
       series: Number(series),
-      repeticiones: Number(reps),
+      repeticiones: repsFinal,
       peso: pesoFinal,
     };
 
@@ -158,8 +226,11 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
 
     // RESET COMPLETO DEL FORMULARIO DE EJERCICIO
     setSeries(4); 
-    setReps(10); 
-    setPeso(""); 
+    setReps("10");
+    setTipoSerie('Estandar');
+    setRepsInicial("10");
+    setPeso("");
+    setPesosArray(Array(4).fill(""));
     setEjercicioId(""); 
     setEjercicioBusqueda(""); // Limpiamos el input visual
   };
@@ -170,8 +241,22 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       setEjercicioId(item.ejercicioId.toString());
       setEjercicioBusqueda(item.nombreEjercicio); 
       setSeries(item.series);
+      setTipoSerie('Estandar');
       setReps(item.repeticiones);
-      setPeso(item.peso === "A elección" ? "" : item.peso);
+      setRepsInicial("10");
+      
+      const pesosParseados = item.peso.split('/');
+      // Si es estandar y parseado es único, va a 'peso' general
+      if (pesosParseados.length === 1) {
+          setPeso(pesosParseados[0] === "A elección" ? "" : pesosParseados[0]);
+      } else {
+          setPeso("");
+      }
+      
+      // Rellenamos o cortamos según las series puestas (por las dudas)
+      const nuevosPesos = Array(item.series).fill("").map((_, i) => pesosParseados[i] === "A elección" ? "" : (pesosParseados[i] || ""));
+      setPesosArray(nuevosPesos);
+      
       setEditIndex(index);
       
       // Scroll al inicio
@@ -181,7 +266,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
 
   const cancelEditRow = () => {
       setEditIndex(null);
-      setSeries(4); setReps(10); setPeso(""); 
+      setSeries(4); setReps("10"); setTipoSerie('Estandar'); setRepsInicial("10"); setPeso(""); setPesosArray(Array(4).fill(""));
       setEjercicioId(""); setEjercicioBusqueda("");
   };
 
@@ -264,11 +349,14 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     handleEjercicioSearchChange,
     handleSelectEjercicio,
     setMostrarSugerenciasEjercicios,
-    // Formulario Detalle (Viejos)
+    // Formulario Detalle (Viejos y Nuevos)
     ejercicioId, setEjercicioId,
     series, handleSeriesChange,
+    tipoSerie, setTipoSerie,
+    repsInicial, handleRepsInicialChange,
     reps, handleRepsChange,
     peso, handlePesoChange,
+    pesosArray, handlePesoArrayChange, repsArrayCalculado,
     handleAddExercise, 
     editIndex, handleEditRow, cancelEditRow, handleDeleteRow,
     moveRowUp, moveRowDown,
