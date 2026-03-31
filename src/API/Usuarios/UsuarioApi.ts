@@ -80,5 +80,10 @@ export const UsuarioApi = {
     changePassword: async (id: number, data: ChangePasswordDTO) => {
         const response = await api.patch(`/users/${id}/password`, data);
         return response.data;
+    },
+
+    saveFcmToken: async (fcmToken: string) => {
+        const response = await api.put(`/users/fcm-token`, { fcmToken });
+        return response.data;
     }
 };

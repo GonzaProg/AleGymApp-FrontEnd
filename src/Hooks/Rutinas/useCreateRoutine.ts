@@ -190,6 +190,13 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       });
   };
 
+  const handleAutoFillWeights = () => {
+      const firstWeight = pesosArray[0];
+      if (firstWeight && firstWeight.trim() !== "") {
+          setPesosArray(prev => prev.map(() => firstWeight));
+      }
+  };
+
   // --- LÓGICA TABLA ---
   const handleAddExercise = () => {
     if (!ejercicioId) return showError("Selecciona un ejercicio válido de la lista");
@@ -356,7 +363,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     repsInicial, handleRepsInicialChange,
     reps, handleRepsChange,
     peso, handlePesoChange,
-    pesosArray, handlePesoArrayChange, repsArrayCalculado,
+    pesosArray, handlePesoArrayChange, repsArrayCalculado, handleAutoFillWeights,
     handleAddExercise, 
     editIndex, handleEditRow, cancelEditRow, handleDeleteRow,
     moveRowUp, moveRowDown,

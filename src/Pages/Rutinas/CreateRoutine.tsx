@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, ChevronDown } from "lucide-react";
+import { Play, ChevronDown, Copy } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
@@ -28,7 +28,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     repsInicial, handleRepsInicialChange,
     reps, handleRepsChange,
     peso, handlePesoChange,
-    pesosArray, handlePesoArrayChange, repsArrayCalculado,
+    pesosArray, handlePesoArrayChange, repsArrayCalculado, handleAutoFillWeights,
     handleAddExercise, 
     detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, 
     moveRowUp, moveRowDown, handleSubmit,
@@ -196,12 +196,22 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                 </div>
             </div>
 
-            {/* Listado dinámico de pesos por repetición */}
             {tipoSerie !== 'Estandar' && (
                 <div className="mt-6 p-4 rounded-xl border border-white/5 bg-black/20 space-y-3">
                 <div className="flex items-center justify-between mb-2 px-2">
                     <h4 className="text-gray-400 text-sm font-bold uppercase tracking-wider">Detalle por Serie</h4>
-                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wider w-[150px] text-center">Peso</span>
+                    <div className="flex items-center gap-2 w-[150px] justify-center relative">
+                        {pesosArray[0]?.trim() !== "" && Number(series) > 1 && (
+                            <button 
+                                onClick={handleAutoFillWeights}
+                                className="absolute -left-6 text-gray-400 hover:text-green-400 bg-white/5 hover:bg-green-500/10 p-1 cursor-pointer rounded transition-all"
+                                title="Copiar primer peso a todos"
+                            >
+                                <Copy size={14} />
+                            </button>
+                        )}
+                        <span className="text-gray-400 text-xs font-bold uppercase tracking-wider text-center">Peso</span>
+                    </div>
                 </div>
                 {Array(Number(series) || 1).fill("").map((_, i) => {
                     const computedReps = repsArrayCalculado[i] || "-";
