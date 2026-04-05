@@ -3,7 +3,8 @@ import { createPortal } from "react-dom";
 import { Scanner } from '@yudiel/react-qr-scanner'; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { useStudentHome } from "../../Hooks/StudentsHome/useStudentHome";
-import { Camera, Info, Flame, Dumbbell } from "lucide-react";
+import { Camera, Info, Flame, Dumbbell, Quote } from "lucide-react";
+import { useFraseMotivacional } from "../../Hooks/StudentsHome/useFraseMotivacional";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -18,8 +19,10 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const getMensajeConcurrencia = (cantidad: number) => {
         if (cantidad <= 6) return { texto: "Está súper tranquilo. ¡Es el momento perfecto para entrenar!", color: "text-green-400" };
         if (cantidad > 6 && cantidad <= 12) return { texto: "Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!", color: "text-yellow-400" };
-        return { texto: "Está bastante lleno, ¿Entrenamos más tarde?", color: "text-orange-400" };
+        return { texto: "Está bastante lleno. ¡Queda a tu elección!", color: "text-orange-400" };
     };
+
+    const { frase, loading: loadingFrase } = useFraseMotivacional();
 
     return (
         <div className="pt-safe mt-24 p-4 animate-fade-in pb-24 space-y-6 max-w-lg mx-auto relative">
@@ -123,6 +126,42 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                     </p>
                 </div>
             )}
+
+            {/* FRASE MOTIVADORA DEL DÍA */}
+            <div className={`${AppStyles.glassCard} relative overflow-hidden border-blue-500/20 shadow-lg shadow-blue-900/10 bg-gradient-to-r from-gray-900/80 to-blue-900/20 p-5`}>
+                <div className="flex flex-col gap-4 relative z-10">
+                    <div className="flex items-start gap-3">
+                        <Quote className="w-5 h-5 text-blue-400 flex-shrink-0 opacity-80 mt-0.5" />
+                        <div className="flex-1 w-full">
+                            <h4 className="text-blue-400 font-bold text-[10px] uppercase tracking-widest mb-1 opacity-90">Frase del Día</h4>
+                            
+                            {loadingFrase ? (
+                                <div className="animate-pulse space-y-2 mt-2">
+                                    <div className="h-4 bg-white/10 rounded w-full"></div>
+                                    <div className="h-4 bg-white/10 rounded w-3/4"></div>
+                                </div>
+                            ) : frase ? (
+                                <p className="text-gray-300 font-medium text-sm leading-relaxed italic">
+                                    "{frase.texto}"
+                                </p>
+                            ) : null}
+                        </div>
+                    </div>
+
+                    {/* Imagen opcional en caché */}
+                    {(!loadingFrase && frase?.localImageUrl) && (
+                        <div className="w-full mt-2 rounded-xl overflow-hidden shadow-lg border border-white/5 relative bg-black/40 flex justify-center items-center p-2">
+                            <img 
+                                src={frase.localImageUrl} 
+                                alt="Motivación Diaria" 
+                                className="max-w-full max-h-64 object-contain rounded-lg opacity-90 transition-opacity duration-700 ease-in"
+                                onLoad={(e) => (e.currentTarget.style.opacity = '1')}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            </div>
 
             {/* MODAL DEL ESCÁNER DE CÁMARA */}
             {isScannerOpen && createPortal(
