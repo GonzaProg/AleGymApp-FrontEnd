@@ -289,12 +289,12 @@ export const Home = () => {
             spaceBetween={0}
             slidesPerView={1}
             onSlideChange={handleSlideChange}
-            className="h-full w-full pb-24"
+            className="h-full w-full pb-32"
             style={{ touchAction: 'pan-y' }} 
             speed={300} 
         >
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={0} activeIndex={activeSlide} visited={visitedSlides.has(0)}>
                         <StudentHome currentUser={currentUser} />
                     </LazySlideContent>
@@ -302,7 +302,7 @@ export const Home = () => {
             </SwiperSlide>
 
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={1} activeIndex={activeSlide} visited={visitedSlides.has(1)}>
                         <MyRoutines /> 
                     </LazySlideContent>
@@ -319,7 +319,7 @@ export const Home = () => {
             </SwiperSlide>
 
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={3} activeIndex={activeSlide} visited={visitedSlides.has(3)}>
                         <UserPlan />
                     </LazySlideContent>
@@ -327,7 +327,7 @@ export const Home = () => {
             </SwiperSlide>
 
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={4} activeIndex={activeSlide} visited={visitedSlides.has(4)}>
                         <Profile isMobile={true} />
                     </LazySlideContent>

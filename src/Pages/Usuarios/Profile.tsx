@@ -40,7 +40,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
   
   // Estilos condicionales según el entorno
   const containerClasses = isMobile 
-    ? `${AppStyles.contentContainer} pt-32 pb-24` // Estilo Mobile (Swiper)
+    ? `${AppStyles.contentContainer} mt-32 pt-safe pb-32` // Estilo Mobile (Swiper)
     : AppStyles.customScrollbar;
 
   const cardWidthClass = isMobile ? "w-full max-w-3xl space-y-8 mx-auto" : "w-full max-w-3xl mx-auto space-y-8";

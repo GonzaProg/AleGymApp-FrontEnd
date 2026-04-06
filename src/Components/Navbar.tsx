@@ -54,7 +54,7 @@ export const Navbar = () => {
 
   return (
     <>
-    <nav className="fixed w-full z-50 top-0 start-0 bg-gradient-to-b from-gray-900 via-gray-900/90 to-transparent pb-8 transition-all">
+    <nav className="fixed w-full z-50 top-0 start-0 bg-gradient-to-b from-gray-900 via-gray-900/90 to-transparent pt-safe pb-8 transition-all">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
         
         {/* --- IZQUIERDA: LOGO MIXTO (TEXTO + IMAGEN) --- */}

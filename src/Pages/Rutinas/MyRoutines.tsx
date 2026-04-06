@@ -159,7 +159,7 @@ export const MyRoutines = () => {
 
   return (
     <>
-      <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-24 pt-32 animate-fade-in">
+      <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-32 mt-32 pt-safe animate-fade-in">
                 
           {loading ? (
              <div className="text-center py-20">
