@@ -25,7 +25,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const { frase, loading: loadingFrase } = useFraseMotivacional();
 
     return (
-        <div className="pt-safe mt-24 p-4 animate-fade-in pb-24 space-y-6 max-w-lg mx-auto relative">
+        <div className="pt-safe mt-24 p-4 animate-fade-in pb-32 space-y-6 max-w-lg mx-auto relative">
             
             {/* SALUDO INICIAL */}
             <div className="mb-8 px-2">
