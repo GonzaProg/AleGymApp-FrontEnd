@@ -6,7 +6,7 @@ export const ProgresoView = ({ currentUser }: { currentUser: any }) => {
     const [tab, setTab] = useState<'prs' | 'cuerpo'>('prs');
 
     return (
-        <div className="mt-24 px-4 pb-24 max-w-2xl mx-auto h-full flex flex-col">
+        <div className="pt-safe mt-24 px-4 pb-32 max-w-2xl mx-auto h-full flex flex-col">
             
             {/* CABECERA Y TOGGLE FACHERO */}
             <div className="mb-6 shrink-0">

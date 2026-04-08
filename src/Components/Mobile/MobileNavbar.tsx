@@ -15,7 +15,7 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-gray-900/95 backdrop-blur-md border-t border-white/10 px-6 z-50 flex justify-around items-center pb-safe pt-2 min-h-[5rem] shadow-2xl">
+    <div className="fixed bottom-0 left-0 w-full bg-gray-900/95 backdrop-blur-md border-t border-white/10 px-6 z-50 flex justify-around items-center pt-2 pb-safe min-h-[5rem] shadow-2xl">
       {navItems.map((item) => {
         const isActive = activeTab === item.index;
         const IconComponent = item.Icon;

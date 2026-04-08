@@ -6,7 +6,7 @@ import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
 import { createPortal } from "react-dom";
-import { Inbox, CloudDownload, CheckCircle, Download, Search, Dumbbell, ArrowLeft } from "lucide-react";
+import { Inbox, CloudDownload, CheckCircle, Download, Search, Dumbbell, ArrowLeft, Play } from "lucide-react";
 
 export const MyRoutines = () => {
   
@@ -95,7 +95,9 @@ export const MyRoutines = () => {
                           
                           {videoSource && (
                               <div onClick={() => handleOpenVideo(videoSource)} className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-100 transition-opacity cursor-pointer backdrop-blur-[1px]">
-                                  <span className="bg-green-500/80 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.4)] transform hover:scale-110 transition-transform text-xl pl-1 backdrop-blur-md border border-white/20">▶</span>
+                                  <span className="bg-green-500/80 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-[0_0_15px_rgba(34,197,94,0.4)] transform hover:scale-110 transition-transform backdrop-blur-md border border-white/20">
+                                      <Play className="w-5 h-5 ml-1 fill-white text-white" />
+                                  </span>
                               </div>
                           )}
                       </div>
@@ -157,7 +159,7 @@ export const MyRoutines = () => {
 
   return (
     <>
-      <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-24 pt-32 animate-fade-in">
+      <div className="w-full max-w-6xl space-y-6 mx-auto relative z-10 px-4 pb-32 mt-32 pt-safe animate-fade-in">
                 
           {loading ? (
              <div className="text-center py-20">

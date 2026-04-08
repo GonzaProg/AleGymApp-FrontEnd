@@ -3,6 +3,9 @@ import { Card } from "../../Components/UI/Card";
 import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
 
 export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () => void }) => {
+    const isPlanActuallyActive = (fecha: string, activo: boolean) => activo && new Date(fecha).setHours(23, 59, 59, 999) >= new Date().getTime();
+    const hasActivePlan = user.userPlans?.some(up => isPlanActuallyActive(up.fechaVencimiento, up.activo));
+
     return (
         <div className="w-full max-w-5xl mx-auto mt-14 animate-fade-in-up">
             <button onClick={onBack} className={`${AppStyles.btnBack} mb-8`}>← Volver a la lista</button>
@@ -16,11 +19,11 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                         </div>
                         <h2 className="text-2xl font-bold text-white text-center">{user.nombre} {user.apellido}</h2>
                         <span className={`text-xs font-black tracking-tighter uppercase mb-6 mt-2 px-3 py-1 rounded-full ${
-                            user.userPlans?.some(up => up.activo) 
+                            hasActivePlan 
                                 ? 'text-green-400 bg-green-500/10' 
                                 : 'text-red-400 bg-red-500/10'
                         }`}>
-                            Alumno {user.userPlans?.some(up => up.activo) ? 'Activo' : 'Inactivo'}
+                            Alumno {hasActivePlan ? 'Activo' : 'Inactivo'}
                         </span>
                         
                         <div className="w-full space-y-4 border-t border-white/5 pt-6">
@@ -39,21 +42,24 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                         {user.userPlans
                             ?.sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime())
                             .slice(-5)
-                            .map(up => (
-                            <div key={up.id} className={`p-6 rounded-2xl border flex justify-between items-center bg-gray-900/60 backdrop-blur-md relative overflow-hidden ${up.activo ? 'border-green-500/30' : 'border-red-500/20 opacity-60'}`}>
-                                {up.activo && <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>}
-                                <div>
-                                    <h4 className="text-lg font-bold text-white">{up.plan.nombre}</h4>
-                                    <p className="text-xs text-gray-500 uppercase font-bold">{up.plan.tipo}</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-[10px] text-gray-500 font-bold">VENCIMIENTO</p>
-                                    <p className={`font-mono ${up.activo ? 'text-green-400' : 'text-red-400'}`}>
-                                        {new Date(up.fechaVencimiento).toLocaleDateString()}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                            .map(up => {
+                                const isActivoDate = isPlanActuallyActive(up.fechaVencimiento, up.activo);
+                                return (
+                                    <div key={up.id} className={`p-6 rounded-2xl border flex justify-between items-center bg-gray-900/60 backdrop-blur-md relative overflow-hidden ${isActivoDate ? 'border-green-500/30' : 'border-red-500/20 opacity-60'}`}>
+                                        {isActivoDate && <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>}
+                                        <div>
+                                            <h4 className="text-lg font-bold text-white">{up.plan.nombre}</h4>
+                                            <p className="text-xs text-gray-500 uppercase font-bold">{up.plan.tipo}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[10px] text-gray-500 font-bold">VENCIMIENTO</p>
+                                            <p className={`font-mono ${isActivoDate ? 'text-green-400' : 'text-red-400'}`}>
+                                                {new Date(up.fechaVencimiento).toLocaleDateString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         {(!user.userPlans || user.userPlans.length === 0) && (
                             <div className="p-10 border border-dashed border-white/10 rounded-2xl text-center text-gray-500 italic">No registra planes en la base de datos</div>
                         )}

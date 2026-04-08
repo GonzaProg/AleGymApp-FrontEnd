@@ -46,11 +46,12 @@ const ProductosManager = lazy(() => import("../Pages/Productos/ProductosManager"
 const ProgresoView = lazy(() => import("./Progreso/ProgresoView").then(module => ({ default: module.ProgresoView })));
 const StudentHome = lazy(() => import("./StudentsHome/StudentHome").then(module => ({ default: module.StudentHome })));
 const AsistenciaManual = lazy(() => import("../Pages/Asistencias/AsistenciaManual").then(module => ({ default: module.AsistenciaManual })));
+const FrasesManager = lazy(() => import("../Pages/Config/FrasesManager").then(module => ({ default: module.FrasesManager })));
 
 import {
   Home as HomeIcon, Dumbbell, Gem, TrendingUp, Users, RefreshCw, Send,
   LogOut, User, Settings, Building2, Receipt, BookOpen, ShoppingBag,
-  FileText, CheckSquare, Bell, UserPlus
+  FileText, CheckSquare, Bell, UserPlus, MessageSquare
 } from "lucide-react";
 
 const Icons = {
@@ -58,7 +59,7 @@ const Icons = {
   ejercicios: <Dumbbell size={20} />, notificaciones: <Bell size={20} />, usuarios: <Users size={20} />, nuevoUsuario: <UserPlus size={20} />,
   enviarPDF: <Send size={20} />, renovar: <RefreshCw size={20} />, salir: <LogOut size={20} />, perfil: <User size={20} />, preferencias: <Settings size={20} />, 
   nuevoGym: <Building2 size={20} />, gestionGyms: <Settings size={20} />, reciboManual: <Receipt size={20} />, crearRutinaGeneral: <BookOpen size={20} />,
-  tienda: <ShoppingBag size={20} />, rutinasUsuarios: <FileText size={20} />, asistencia: <CheckSquare size={20} />,
+  tienda: <ShoppingBag size={20} />, rutinasUsuarios: <FileText size={20} />, asistencia: <CheckSquare size={20} />, frases: <MessageSquare size={20} />
 };
 
 const TabLoading = () => (
@@ -177,6 +178,7 @@ export const Home = () => {
                         case "Enviar Recibo Manualmente": return <ManualReceipt />;
                         case "Productos": return <ProductosManager />;
                         case "Asistencia Manual": return <AsistenciaManual />;
+                        case "Frases": return <FrasesManager />;
                         default: return <AdminDashboardWelcome />;
                     }
                 })()}
@@ -249,6 +251,7 @@ export const Home = () => {
                 {isAdmin && (
                   <>
                     <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6">Administración</p>
+                    <SidebarItem icon={Icons.frases} label="Frases" active={activeTab === "Frases"} onClick={() => handleSidebarClick("Frases")} />
                     <SidebarItem icon={Icons.nuevoGym} label="Nuevo Gimnasio" active={activeTab === "Nuevo Gimnasio"} onClick={() => handleSidebarClick("Nuevo Gimnasio")} />
                     <SidebarItem icon={Icons.gestionGyms} label="Gestión Gimnasios" active={activeTab === "Gestión Gimnasios"} onClick={() => handleSidebarClick("Gestión Gimnasios")} />
                   </>
@@ -286,12 +289,12 @@ export const Home = () => {
             spaceBetween={0}
             slidesPerView={1}
             onSlideChange={handleSlideChange}
-            className="h-full w-full pb-24"
+            className="h-full w-full pb-32"
             style={{ touchAction: 'pan-y' }} 
             speed={300} 
         >
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={0} activeIndex={activeSlide} visited={visitedSlides.has(0)}>
                         <StudentHome currentUser={currentUser} />
                     </LazySlideContent>
@@ -299,7 +302,7 @@ export const Home = () => {
             </SwiperSlide>
 
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={1} activeIndex={activeSlide} visited={visitedSlides.has(1)}>
                         <MyRoutines /> 
                     </LazySlideContent>
@@ -316,7 +319,7 @@ export const Home = () => {
             </SwiperSlide>
 
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={3} activeIndex={activeSlide} visited={visitedSlides.has(3)}>
                         <UserPlan />
                     </LazySlideContent>
@@ -324,7 +327,7 @@ export const Home = () => {
             </SwiperSlide>
 
             <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-24">
+                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={4} activeIndex={activeSlide} visited={visitedSlides.has(4)}>
                         <Profile isMobile={true} />
                     </LazySlideContent>

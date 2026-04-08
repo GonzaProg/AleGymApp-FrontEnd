@@ -11,7 +11,7 @@ export const UserPlan = () => {
   if (error) return <div className="p-8 text-center text-red-400 mt-20">{error}</div>;
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 pt-32 px-4 pb-20 relative z-10">
+    <div className="w-full max-w-4xl mx-auto space-y-6 mt-32 pt-safe px-4 pb-32 relative z-10">
       
       {activePlans.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
