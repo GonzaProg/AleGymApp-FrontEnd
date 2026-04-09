@@ -31,7 +31,9 @@ export const PlansManager = () => {
     handleSavePlan,
     handleSubscribeUser,
     handleSearchChange,
-    handleSelectAlumno
+    handleSelectAlumno,
+    fechaInicio,
+    setFechaInicio
   } = usePlans();
 
   return (
@@ -151,6 +153,8 @@ export const PlansManager = () => {
                         // Pasamos props de pago
                         metodoPago={metodoPago}
                         setMetodoPago={setMetodoPago}
+                        fechaInicio={fechaInicio}
+                        setFechaInicio={setFechaInicio}
                     />
                 </div>
             </div>,
@@ -234,7 +238,8 @@ const SubscribeForm = ({
     busqueda, sugerencias, mostrarSugerencias, 
     handleSearchChange, handleSelectAlumno, setMostrarSugerencias, 
     onConfirm, onCancel,
-    metodoPago, setMetodoPago // Recibimos props
+    metodoPago, setMetodoPago, // Recibimos props
+    fechaInicio, setFechaInicio
 }: any) => {
     return (
         <div className="space-y-6">
@@ -268,6 +273,17 @@ const SubscribeForm = ({
                 value={metodoPago} 
                 onChange={setMetodoPago} 
             />
+
+            <div>
+                <Input 
+                    type="date"
+                    label="Fecha de Inicio"
+                    value={fechaInicio}
+                    onChange={(e: any) => setFechaInicio(e.target.value)}
+                    className={AppStyles.inputDark}
+                    labelClassName={AppStyles.label}
+                />
+            </div>
 
             <div className="flex gap-4 pt-2">
                 <button type="button" onClick={onCancel} className={AppStyles.btnSecondary + " w-full"}>CANCELAR</button>
