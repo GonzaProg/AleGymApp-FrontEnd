@@ -7,6 +7,7 @@ import { FrasesApi } from '../../API/Frases/FrasesApi';
 // Constantes para caché
 const STORE_KEY_DATE = 'frase_daily_date';
 const STORE_KEY_TEXT = 'frase_daily_text';
+const STORE_KEY_FALLBACK_URL = 'frase_daily_fallback_image';
 const IMAGE_FILENAME = 'daily_quote.jpg';
 
 export const useFraseMotivacional = () => {
@@ -30,17 +31,26 @@ export const useFraseMotivacional = () => {
                     let localImageUrl: string | null = null;
                     if (Capacitor.isNativePlatform()) {
                         try {
+                            // Validar físicamente si el archivo fue creado y existe
+                            await Filesystem.stat({
+                                directory: Directory.Data,
+                                path: IMAGE_FILENAME
+                            });
+                            
                             const file = await Filesystem.getUri({
                                 directory: Directory.Data,
                                 path: IMAGE_FILENAME
                             });
-                            localImageUrl = Capacitor.convertFileSrc(file.uri);
+                            localImageUrl = Capacitor.convertFileSrc(file.uri) + '?v=' + currentDateSeed;
                         } catch (e) {
-                            // File not found, might have been cleared
+                            // El archivo nunca se guardó (error de blob/escritura) o se borró. 
+                            // Usamos directamente la URL original que guardamos de respaldo.
+                            const { value: fallbackUrl } = await Preferences.get({ key: STORE_KEY_FALLBACK_URL });
+                            localImageUrl = fallbackUrl;
                         }
                     } else {
                         // Web fallback
-                        const { value: webUrl } = await Preferences.get({ key: 'frase_daily_web_url' });
+                        const { value: webUrl } = await Preferences.get({ key: STORE_KEY_FALLBACK_URL });
                         localImageUrl = webUrl;
                     }
 
@@ -58,47 +68,52 @@ export const useFraseMotivacional = () => {
 
                 // 4. Descargar la imagen si existe
                 if (backendQuote.imagenUrl) {
+                    
+                    // SIEMPRE guardamos la URL online como respaldo vital
+                    await Preferences.set({ key: STORE_KEY_FALLBACK_URL, value: backendQuote.imagenUrl });
+                    
                     if (Capacitor.isNativePlatform()) {
                         try {
-                            // Descargar imagen como Base64 (muy simple en React Native/Capacitor para imágenes livianas)
-                            const response = await fetch(backendQuote.imagenUrl);
-                            const blob = await response.blob();
-                            
-                            // Convertir Blob a Base64 manualmente para Capacitor
-                            const base64Data = await new Promise<string>((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.readAsDataURL(blob);
-                                reader.onloadend = () => {
-                                    const base64data = reader.result as string;
-                                    resolve(base64data.split(',')[1]); // Quitar "data:image/jpeg;base64,"
-                                };
-                                reader.onerror = reject;
-                            });
+                            // Borrar rastro anterior
+                            try {
+                                await Filesystem.deleteFile({
+                                    path: IMAGE_FILENAME,
+                                    directory: Directory.Data
+                                });
+                            } catch (e) {}
 
-                            // Guardar en Filesystem (esto sobreescribe la anterior si ya existía el mismo path)
-                            await Filesystem.writeFile({
+                            // Descargar y guardar nativamente de a un solo paso (Evita cortes por RAM en Blob a Base64)
+                            await Filesystem.downloadFile({
+                                url: backendQuote.imagenUrl,
                                 path: IMAGE_FILENAME,
-                                data: base64Data,
-                                directory: Directory.Data
+                                directory: Directory.Data,
                             });
 
                             const file = await Filesystem.getUri({
                                 directory: Directory.Data,
                                 path: IMAGE_FILENAME
                             });
-                            localImageUrl = Capacitor.convertFileSrc(file.uri);
+                            localImageUrl = Capacitor.convertFileSrc(file.uri) + '?v=' + currentDateSeed;
 
                         } catch (error) {
-                            console.error("Error guardando imagen offline", error);
-                            localImageUrl = backendQuote.imagenUrl; // Fallback
+                            console.error("Error guardando imagen local, usando nativa en su lugar.", error);
+                            localImageUrl = backendQuote.imagenUrl;
                         }
                     } else {
-                        // Web Fallback (El navegador la cachea automáticamente)
+                        // Web
                         localImageUrl = backendQuote.imagenUrl;
-                        await Preferences.set({ key: 'frase_daily_web_url', value: localImageUrl });
                     }
-                } else if (!Capacitor.isNativePlatform()) {
-                     await Preferences.remove({ key: 'frase_daily_web_url' });
+                } else {
+                     // Si hoy no hay imagen en ninguna
+                     if (Capacitor.isNativePlatform()) {
+                        try {
+                            await Filesystem.deleteFile({
+                                path: IMAGE_FILENAME,
+                                directory: Directory.Data
+                            });
+                        } catch (e) {}
+                     }
+                     await Preferences.remove({ key: STORE_KEY_FALLBACK_URL });
                 }
 
                 // 5. Guardar el nuevo estado para de hoy en adelante

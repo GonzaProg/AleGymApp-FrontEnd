@@ -1,8 +1,8 @@
 {
   "name": "gym-mate",
   "productName": "GymMate",
-  "version": "1.0.7",
-  "description": "Tu compañero de Gimnasio",
+  "version": "1.0.8",
+  "description": "Tu Compañero de Gimnasio",
   "author": "GV",
   "license": "MIT",
   "main": "build/src/index.js",
