@@ -13,6 +13,7 @@ export const usePlans = () => {
     const [editingPlan, setEditingPlan] = useState<PlanDTO | null>(null);
     const [selectedPlanToSubscribe, setSelectedPlanToSubscribe] = useState<PlanDTO | null>(null);
     const [metodoPago, setMetodoPago] = useState("Transferencia");
+    const [fechaInicio, setFechaInicio] = useState(new Date().toISOString().split('T')[0]);
 
     // Usamos el hook centralizado para la búsqueda de alumnos
     const {
@@ -60,6 +61,7 @@ export const usePlans = () => {
         clearSelection();
         setAlumnoSeleccionadoId(null);
         setMetodoPago("Transferencia");
+        setFechaInicio(new Date().toISOString().split('T')[0]);
         setIsSubscribeModalOpen(true);
     };
 
@@ -109,7 +111,8 @@ export const usePlans = () => {
             const response: any = await PlansApi.subscribeUser(
                 alumnoSeleccionadoId, 
                 selectedPlanToSubscribe.id!, 
-                metodoPago
+                metodoPago,
+                fechaInicio
             );
             
             switch (response.estadoRecibo) {
@@ -150,6 +153,7 @@ export const usePlans = () => {
         setIsModalOpen, setIsSubscribeModalOpen, setMostrarSugerencias,
         openCreateModal, openEditModal, openSubscribeModal,
         handleSavePlan, handleSubscribeUser, handleSearchChange,
-        handleSelectAlumno: handleSelectAlumnoWithId, setMetodoPago
+        handleSelectAlumno: handleSelectAlumnoWithId, setMetodoPago,
+        fechaInicio, setFechaInicio
     };
 };

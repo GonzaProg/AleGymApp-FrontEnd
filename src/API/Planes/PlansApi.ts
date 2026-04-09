@@ -49,8 +49,8 @@ export const PlansApi = {
     },
 
     // 5. Suscribir Usuario
-    subscribeUser: async (userId: number, planId: number, metodoPago: string = "Transferencia") => {
-        const response = await api.post('/planes/suscribir', { userId, planId, metodoPago });
+    subscribeUser: async (userId: number, planId: number, metodoPago: string = "Transferencia", fechaInicio?: string) => {
+        const response = await api.post('/planes/suscribir', { userId, planId, metodoPago, fechaInicio });
         return response.data;
     },
 
