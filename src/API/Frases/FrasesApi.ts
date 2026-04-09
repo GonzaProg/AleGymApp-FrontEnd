@@ -16,7 +16,9 @@ export const FrasesApi = {
     },
 
     getDaily: async (): Promise<FraseMotivacion> => {
-        const response = await api.get('/frases/daily');
+        const response = await api.get('/frases/daily', {
+            params: { t: Date.now() }
+        });
         return response.data;
     },
 
