@@ -5,6 +5,10 @@ export interface Ejercicio {
     nombre: string;
     urlVideo?: string;
     imagenUrl?: string;
+    musculoTrabajado?: string;
+    elementosGym?: string;
+    tipoAgarre?: string;
+    detalles?: string;
     fechaActualizacion?: Date;
 }
 
@@ -12,7 +16,13 @@ export interface EjercicioDTO {
     nombre: string;
     urlVideo?: string;
     imagenUrl?: string;
+    musculoTrabajado?: string;
+    elementosGym?: string;
+    tipoAgarre?: string;
+    detalles?: string;
 }
+
+export const TIPOS_AGARRE = ["Prono", "Supino", "Neutro", "Mixto"];
 
 export const EjerciciosApi = {
     // 1. Obtener todos
@@ -27,9 +37,9 @@ export const EjerciciosApi = {
         return response.data;
     },
 
-    // 2b. Crear básico (solo nombre - admin y entrenador)
-    createBasic: async (nombre: string): Promise<Ejercicio> => {
-        const response = await api.post('/ejercicios/basico', { nombre });
+    // 2b. Crear básico (solo nombre y detalles - admin y entrenador)
+    createBasic: async (data: Partial<EjercicioDTO>): Promise<Ejercicio> => {
+        const response = await api.post('/ejercicios/basico', data);
         return response.data;
     },
 

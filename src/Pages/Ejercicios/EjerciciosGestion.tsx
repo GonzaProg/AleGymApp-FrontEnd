@@ -6,6 +6,7 @@ import { AppStyles } from '../../Styles/AppStyles';
 import { EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
 import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
+import { TIPOS_AGARRE } from '../../API/Ejercicios/EjerciciosApi';
 
 interface Props {
     onNavigate?: (tab: string) => void;
@@ -72,6 +73,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                             <thead className={TableStyles.tableHeaderRow}>
                                 <tr>
                                     <th className={TableStyles.th}>Nombre</th>
+                                    <th className={`${TableStyles.th} hidden md:table-cell`}>Músculo</th>
                                     <th className={TableStyles.th}>Imagen</th>
                                     <th className={TableStyles.th}>Video</th>
                                     <th className={`${TableStyles.th} text-right`}>Acciones</th>
@@ -87,13 +89,67 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                             {/* COLUMNA NOMBRE: Editable para todos */}
                                             <td className={TableStyles.td + " font-medium text-white"}>
                                                 {isEditing ? (
-                                                    <input 
-                                                        className={TableStyles.editInput} 
-                                                        value={editForm.nombre} 
-                                                        onChange={(e) => handleEditInputChange('nombre', e.target.value)} 
-                                                        autoFocus 
-                                                    />
-                                                ) : <span className="text-lg">{ej.nombre}</span>}
+                                                    <div className="space-y-4 py-2 pr-4 min-w-[200px] md:min-w-[400px] w-full">
+                                                        <div>
+                                                            <label className="text-xs text-gray-400 mb-1 block">Nombre</label>
+                                                            <input 
+                                                                className={TableStyles.editInput} 
+                                                                value={editForm.nombre} 
+                                                                onChange={(e) => handleEditInputChange('nombre', e.target.value)} 
+                                                                autoFocus 
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                            <div>
+                                                                <label className="text-xs text-gray-400 mb-1 block">Músculo Trabajado</label>
+                                                                <input 
+                                                                    className={TableStyles.editInput} 
+                                                                    value={editForm.musculoTrabajado} 
+                                                                    onChange={(e) => handleEditInputChange('musculoTrabajado', e.target.value)} 
+                                                                    placeholder="Ej: Pectoral"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-xs text-gray-400 mb-1 block">Elementos</label>
+                                                                <input 
+                                                                    className={TableStyles.editInput} 
+                                                                    value={editForm.elementosGym} 
+                                                                    onChange={(e) => handleEditInputChange('elementosGym', e.target.value)} 
+                                                                    placeholder="Ej: Barra, Banco"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="text-xs text-gray-400 mb-1 block">Tipo de Agarre</label>
+                                                                <select 
+                                                                    className={TableStyles.editInput} 
+                                                                    value={editForm.tipoAgarre} 
+                                                                    onChange={(e) => handleEditInputChange('tipoAgarre', e.target.value)}
+                                                                >
+                                                                    <option value="">Ninguno</option>
+                                                                    {TIPOS_AGARRE.map(agarre => (
+                                                                        <option key={agarre} value={agarre}>{agarre}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="text-xs text-gray-400 mb-1 block">Detalles</label>
+                                                            <textarea 
+                                                                className={`${TableStyles.editInput} min-h-[60px] resize-y`} 
+                                                                value={editForm.detalles} 
+                                                                onChange={(e) => handleEditInputChange('detalles', e.target.value)} 
+                                                                placeholder="Anotaciones extra..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ) : <span className="text-lg block break-words">{ej.nombre}</span>}
+                                            </td>
+
+                                            {/* COLUMNA MÚSCULO TRABAJADO */}
+                                            <td className={`${TableStyles.td} hidden md:table-cell`}>
+                                                {!isEditing ? (
+                                                    <span className="text-sm text-gray-300 bg-gray-800/80 px-2.5 py-1 rounded-md border border-white/5 whitespace-nowrap">{ej.musculoTrabajado || '-'}</span>
+                                                ) : <span className="text-xs text-gray-600 block opacity-50 italic">→ Modo edición</span>}
                                             </td>
 
                                             {/* COLUMNA IMAGEN */}
@@ -139,10 +195,10 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                             </td>
 
                                             {/* COLUMNA ACCIONES */}
-                                            <td className={`${TableStyles.td} text-right space-x-2`}>
+                                            <td className={`${TableStyles.td} text-right space-x-2 align-top pt-4 md:align-middle`}>
                                                 {isEditing ? (
-                                                    <div className="flex justify-end gap-2">
-                                                        <button onClick={() => saveEdit(ej.id)} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave}`}>{uploading ? '...' : '💾'}</button>
+                                                    <div className="flex justify-end gap-2 flex-col md:flex-row mt-2 md:mt-0">
+                                                        <button onClick={() => saveEdit(ej.id)} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave} mb-2 md:mb-0`}>{uploading ? '...' : '💾'}</button>
                                                         <button onClick={cancelEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel}`}>❌</button>
                                                     </div>
                                                 ) : (

@@ -104,9 +104,27 @@ export const MyRoutines = () => {
 
                       <div className="flex-1 flex flex-col justify-between w-full">
                           <div className="flex justify-between items-start mb-4">
-                              <div className="flex items-center gap-3">
-                                  <span className="bg-green-900/50 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">#{i + 1}</span>
-                                  <h4 className={`font-bold text-lg md:text-xl transition-colors ${isChecked ? 'text-gray-500 line-through' : 'text-white'}`}>{d.ejercicio.nombre}</h4>
+                              <div className="flex flex-col gap-1 w-full mr-2">
+                                  <div className="flex items-center gap-3">
+                                      <span className="bg-green-900/50 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">#{i + 1}</span>
+                                      <h4 className={`font-bold text-lg md:text-xl transition-colors ${isChecked ? 'text-gray-500 line-through' : 'text-white'}`}>{d.ejercicio.nombre}</h4>
+                                  </div>
+                                  
+                                  {/* INFO EXTRA DEL EJERCICIO */}
+                                  {(d.ejercicio.musculoTrabajado || d.ejercicio.tipoAgarre || d.ejercicio.elementosGym) && !isChecked && (
+                                      <div className="flex flex-wrap gap-2 mt-1 md:ml-10">
+                                          {d.ejercicio.musculoTrabajado && <span className="text-[10px] md:text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">💪 {d.ejercicio.musculoTrabajado}</span>}
+                                          {d.ejercicio.elementosGym && <span className="text-[10px] md:text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">🏋️ {d.ejercicio.elementosGym}</span>}
+                                          {d.ejercicio.tipoAgarre && <span className="text-[10px] md:text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded border border-orange-500/30">🤏 Agarre {d.ejercicio.tipoAgarre}</span>}
+                                      </div>
+                                  )}
+                                  
+                                  {/* DETALLES DE TEXTO */}
+                                  {d.ejercicio.detalles && !isChecked && (
+                                      <div className="mt-1 md:ml-10 text-[11px] md:text-xs text-gray-400 bg-black/20 p-2 rounded border border-white/5 leading-relaxed">
+                                          <span className="text-gray-500 font-bold block mb-0.5">ℹ️ Notas:</span> {d.ejercicio.detalles}
+                                      </div>
+                                  )}
                               </div>
                               <button 
                                   onClick={() => toggleExerciseCheck(selectedRoutine.id, d.ejercicio.id, i)}

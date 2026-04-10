@@ -7,14 +7,22 @@ import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 export const useEjerciciosCrear = () => {
     const { isAdmin, isEntrenador } = useAuthUser();
 
-    const initialState: EjercicioDTO = { nombre: '', urlVideo: '', imagenUrl: '' };
+    const initialState: EjercicioDTO = { 
+        nombre: '', 
+        urlVideo: '', 
+        imagenUrl: '',
+        musculoTrabajado: '',
+        elementosGym: '',
+        tipoAgarre: '',
+        detalles: ''
+    };
     const [form, setForm] = useState<EjercicioDTO>(initialState);
     const [loading, setLoading] = useState(false);
     
     const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
     };
@@ -41,6 +49,15 @@ export const useEjerciciosCrear = () => {
         setLoading(true);
 
         try {
+            // Construimos los datos que se van a mandar independientemente del rol para los campos nuevos.
+            const ejercicioData: EjercicioDTO = {
+                nombre: form.nombre,
+                musculoTrabajado: form.musculoTrabajado || undefined,
+                elementosGym: form.elementosGym || undefined,
+                tipoAgarre: form.tipoAgarre || undefined,
+                detalles: form.detalles || undefined
+            };
+
             // CORRECCIÓN AQUÍ: Priorizamos la lógica de Admin
             if (isAdmin) {
                 // Lógica Admin: Sube archivos y crea completo
@@ -55,16 +72,13 @@ export const useEjerciciosCrear = () => {
                     finalImageUrl = await CloudinaryApi.upload(selectedImage, 'ejercicios', 'Ejercicios', 'image');
                 }
 
-                const ejercicioData: EjercicioDTO = {
-                    nombre: form.nombre,
-                    urlVideo: finalVideoUrl || undefined,
-                    imagenUrl: finalImageUrl || undefined
-                };
+                ejercicioData.urlVideo = finalVideoUrl || undefined;
+                ejercicioData.imagenUrl = finalImageUrl || undefined;
 
                 await EjerciciosApi.create(ejercicioData);
             } else {
-                // Lógica Entrenador: Solo crea el nombre, ignora archivos si hubiese
-                await EjerciciosApi.createBasic(form.nombre);
+                // Lógica Entrenador: Solo crea el nombre y nuevos detalles, ignora archivos si hubiese
+                await EjerciciosApi.createBasic(ejercicioData);
             }
             
             await showSuccess("Ejercicio creado correctamente.");

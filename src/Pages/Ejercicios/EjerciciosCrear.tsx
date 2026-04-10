@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEjerciciosCrear } from '../../Hooks/Ejercicios/useEjerciciosCrear'; 
 import { AppStyles } from '../../Styles/AppStyles';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
+import { TIPOS_AGARRE } from '../../API/Ejercicios/EjerciciosApi';
 
 interface Props {
     onNavigate?: (tab: string) => void;
@@ -66,6 +67,52 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                                 className={AppStyles.inputDark}
                                 placeholder="Ej: Press de Banca Plano"
                                 value={form.nombre} onChange={handleInputChange} required autoFocus
+                            />
+                        </div>
+
+                        {/* DETALLES EXTRA (Músculo, Elementos, Agarre) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className={AppStyles.label}>Músculo Trabajado <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                                <input 
+                                    type="text" name="musculoTrabajado" 
+                                    className={AppStyles.inputDark}
+                                    placeholder="Ej: Pectoral Mayor"
+                                    value={form.musculoTrabajado} onChange={handleInputChange}
+                                />
+                            </div>
+                            <div>
+                                <label className={AppStyles.label}>Elementos del Gym <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                                <input 
+                                    type="text" name="elementosGym" 
+                                    className={AppStyles.inputDark}
+                                    placeholder="Ej: Banco plano, Barra, Discos"
+                                    value={form.elementosGym} onChange={handleInputChange}
+                                />
+                            </div>
+                            <div>
+                                <label className={AppStyles.label}>Tipo de Agarre <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                                <select 
+                                    name="tipoAgarre" 
+                                    className={`${AppStyles.inputDark}`}
+                                    value={form.tipoAgarre} onChange={handleInputChange}
+                                >
+                                    <option value="">Ninguno</option>
+                                    {TIPOS_AGARRE.map(agarre => (
+                                        <option key={agarre} value={agarre}>{agarre}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* DETALLES TEXTAREA */}
+                        <div>
+                            <label className={AppStyles.label}>Detalles a tener en cuenta <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                            <textarea 
+                                name="detalles" 
+                                className={AppStyles.inputDark + " min-h-[100px] resize-y"}
+                                placeholder="Anotaciones extra sobre la técnica o cuidados especiales..."
+                                value={form.detalles} onChange={handleInputChange}
                             />
                         </div>
 

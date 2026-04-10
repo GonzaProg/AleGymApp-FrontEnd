@@ -11,7 +11,15 @@ export const useEjerciciosGestion = () => {
     
     // Edición
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [editForm, setEditForm] = useState<EjercicioDTO>({ nombre: '', urlVideo: '', imagenUrl: '' });
+    const [editForm, setEditForm] = useState<EjercicioDTO>({ 
+        nombre: '', 
+        urlVideo: '', 
+        imagenUrl: '',
+        musculoTrabajado: '',
+        elementosGym: '',
+        tipoAgarre: '',
+        detalles: ''
+    });
 
     // Archivos seleccionados en edición
     const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
@@ -63,14 +71,30 @@ export const useEjerciciosGestion = () => {
     const startEdit = (ej: Ejercicio) => {
         if (!isAdmin && !isEntrenador) return;
         setEditingId(ej.id);
-        setEditForm({ nombre: ej.nombre, urlVideo: ej.urlVideo || '', imagenUrl: ej.imagenUrl || '' });
+        setEditForm({ 
+            nombre: ej.nombre, 
+            urlVideo: ej.urlVideo || '', 
+            imagenUrl: ej.imagenUrl || '',
+            musculoTrabajado: ej.musculoTrabajado || '',
+            elementosGym: ej.elementosGym || '',
+            tipoAgarre: ej.tipoAgarre || '',
+            detalles: ej.detalles || ''
+        });
         setSelectedVideo(null);
         setSelectedImage(null);
     };
 
     const cancelEdit = () => {
         setEditingId(null);
-        setEditForm({ nombre: '', urlVideo: '', imagenUrl: '' });
+        setEditForm({ 
+            nombre: '', 
+            urlVideo: '', 
+            imagenUrl: '',
+            musculoTrabajado: '',
+            elementosGym: '',
+            tipoAgarre: '',
+            detalles: ''
+        });
         setSelectedVideo(null);
         setSelectedImage(null);
     };
