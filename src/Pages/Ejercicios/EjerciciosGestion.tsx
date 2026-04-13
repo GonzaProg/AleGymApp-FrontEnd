@@ -7,6 +7,7 @@ import { EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosG
 import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
 import { TIPOS_AGARRE } from '../../API/Ejercicios/EjerciciosApi';
+import { ChevronDown } from 'lucide-react';
 
 interface Props {
     onNavigate?: (tab: string) => void;
@@ -115,21 +116,26 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                                                     className={TableStyles.editInput} 
                                                                     value={editForm.elementosGym} 
                                                                     onChange={(e) => handleEditInputChange('elementosGym', e.target.value)} 
-                                                                    placeholder="Ej: Barra, Banco"
+                                                                    placeholder="Ej: Barra/Mancuernas/Máquina/etc."
                                                                 />
                                                             </div>
                                                             <div>
                                                                 <label className="text-xs text-gray-400 mb-1 block">Tipo de Agarre</label>
-                                                                <select 
-                                                                    className={TableStyles.editInput} 
-                                                                    value={editForm.tipoAgarre} 
-                                                                    onChange={(e) => handleEditInputChange('tipoAgarre', e.target.value)}
-                                                                >
-                                                                    <option value="">Ninguno</option>
-                                                                    {TIPOS_AGARRE.map(agarre => (
-                                                                        <option key={agarre} value={agarre}>{agarre}</option>
-                                                                    ))}
-                                                                </select>
+                                                                <div className="relative group">
+                                                                    <select 
+                                                                        className={`${TableStyles.editInput} appearance-none cursor-pointer pr-10`} 
+                                                                        value={editForm.tipoAgarre} 
+                                                                        onChange={(e) => handleEditInputChange('tipoAgarre', e.target.value)}
+                                                                    >
+                                                                        <option value="" className={AppStyles.darkBackgroundSelect}>Ninguno</option>
+                                                                        {TIPOS_AGARRE.map(agarre => (
+                                                                            <option key={agarre} value={agarre} className={AppStyles.darkBackgroundSelect}>{agarre}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500 group-hover:text-purple-400 transition-colors">
+                                                                        <ChevronDown className="w-4 h-4 fill-current" />
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div>
@@ -149,7 +155,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                             <td className={`${TableStyles.td} hidden md:table-cell`}>
                                                 {!isEditing ? (
                                                     <span className="text-sm text-gray-300 bg-gray-800/80 px-2.5 py-1 rounded-md border border-white/5 whitespace-nowrap">{ej.musculoTrabajado || '-'}</span>
-                                                ) : <span className="text-xs text-gray-600 block opacity-50 italic">→ Modo edición</span>}
+                                                ) : <span></span>}
                                             </td>
 
                                             {/* COLUMNA IMAGEN */}
@@ -195,11 +201,15 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                             </td>
 
                                             {/* COLUMNA ACCIONES */}
-                                            <td className={`${TableStyles.td} text-right space-x-2 align-top pt-4 md:align-middle`}>
+                                            <td className={`${TableStyles.td} text-right align-middle`}>
                                                 {isEditing ? (
-                                                    <div className="flex justify-end gap-2 flex-col md:flex-row mt-2 md:mt-0">
-                                                        <button onClick={() => saveEdit(ej.id)} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave} mb-2 md:mb-0`}>{uploading ? '...' : '💾'}</button>
-                                                        <button onClick={cancelEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel}`}>❌</button>
+                                                    <div className="flex flex-col items-end gap-3 mt-2 md:mt-0">
+                                                        <button onClick={() => saveEdit(ej.id)} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave} px-2 py-2 text-base md:text-lg w-full md:w-32 flex justify-center items-center gap-2`}>
+                                                            {uploading ? '⏳...' : '💾 Guardar'}
+                                                        </button>
+                                                        <button onClick={cancelEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel} px-2 py-2 text-base md:text-lg w-full md:w-32 flex justify-center items-center gap-2`}>
+                                                            ❌ Cancelar
+                                                        </button>
                                                     </div>
                                                 ) : (
                                                     <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">

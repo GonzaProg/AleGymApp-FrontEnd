@@ -3,6 +3,7 @@ import { useEjerciciosCrear } from '../../Hooks/Ejercicios/useEjerciciosCrear';
 import { AppStyles } from '../../Styles/AppStyles';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
 import { TIPOS_AGARRE } from '../../API/Ejercicios/EjerciciosApi';
+import { ChevronDown } from 'lucide-react';
 
 interface Props {
     onNavigate?: (tab: string) => void;
@@ -65,7 +66,7 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                             <input 
                                 type="text" name="nombre" 
                                 className={AppStyles.inputDark}
-                                placeholder="Ej: Press de Banca Plano"
+                                placeholder="Ej: Press Inclinado"
                                 value={form.nombre} onChange={handleInputChange} required autoFocus
                             />
                         </div>
@@ -77,7 +78,7 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                                 <input 
                                     type="text" name="musculoTrabajado" 
                                     className={AppStyles.inputDark}
-                                    placeholder="Ej: Pectoral Mayor"
+                                    placeholder="Ej: Pectoral"
                                     value={form.musculoTrabajado} onChange={handleInputChange}
                                 />
                             </div>
@@ -86,22 +87,27 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                                 <input 
                                     type="text" name="elementosGym" 
                                     className={AppStyles.inputDark}
-                                    placeholder="Ej: Banco plano, Barra, Discos"
+                                    placeholder="Ej: Barra/Mancuernas/Máquina/etc."
                                     value={form.elementosGym} onChange={handleInputChange}
                                 />
                             </div>
                             <div>
                                 <label className={AppStyles.label}>Tipo de Agarre <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
-                                <select 
-                                    name="tipoAgarre" 
-                                    className={`${AppStyles.inputDark}`}
-                                    value={form.tipoAgarre} onChange={handleInputChange}
-                                >
-                                    <option value="">Ninguno</option>
-                                    {TIPOS_AGARRE.map(agarre => (
-                                        <option key={agarre} value={agarre}>{agarre}</option>
-                                    ))}
-                                </select>
+                                <div className="relative group">
+                                    <select 
+                                        name="tipoAgarre" 
+                                        className={`${AppStyles.inputDark} appearance-none cursor-pointer pr-10`}
+                                        value={form.tipoAgarre} onChange={handleInputChange}
+                                    >
+                                        <option value="" className={AppStyles.darkBackgroundSelect}>Ninguno</option>
+                                        {TIPOS_AGARRE.map(agarre => (
+                                            <option key={agarre} value={agarre} className={AppStyles.darkBackgroundSelect}>{agarre}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500 group-hover:text-purple-400 transition-colors">
+                                        <ChevronDown className="w-4 h-4 fill-current" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
