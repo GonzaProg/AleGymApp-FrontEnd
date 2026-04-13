@@ -24,6 +24,12 @@ export interface EjercicioDTO {
 
 export const TIPOS_AGARRE = ["Prono", "Supino", "Neutro", "Mixto"];
 
+export const MUSCULOS_PERMITIDOS = [
+    "Abdomen", "Antebrazos", "Bíceps", "Cuádriceps", 
+    "Cuello", "Espalda", "Glúteos", "Hombros", 
+    "Isquiotibiales", "Pantorrillas", "Pectoral", "Tríceps"
+];
+
 export const EjerciciosApi = {
     // 1. Obtener todos
     getAll: async (): Promise<Ejercicio[]> => {

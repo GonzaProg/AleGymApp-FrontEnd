@@ -22,6 +22,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   // Sugerencias filtradas localmente
   const [ejerciciosFiltrados, setEjerciciosFiltrados] = useState<any[]>([]);
   const [mostrarSugerenciasEjercicios, setMostrarSugerenciasEjercicios] = useState(false);
+  const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
 
   // Inputs Detalle
   const [peso, setPeso] = useState(""); 
@@ -140,24 +141,29 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     setAlumnoId(alumno.id);     // Guarda el ID para el submit
   };
 
-  // --- HANDLERS BUSQUEDA EJERCICIOS ---
-  
+  // --- EFECTO PARA FILTRAR EJERCICIOS ---
+  useEffect(() => {
+      let filtrados = ejercicios;
+      if (selectedMuscle) {
+          filtrados = filtrados.filter(e => e.musculoTrabajado === selectedMuscle);
+      }
+      if (ejercicioBusqueda) {
+          filtrados = filtrados.filter(e => 
+              e.nombre.toLowerCase().includes(ejercicioBusqueda.toLowerCase())
+          );
+      }
+      setEjerciciosFiltrados(filtrados);
+  }, [ejercicios, selectedMuscle, ejercicioBusqueda]);
+
   const handleEjercicioSearchChange = (text: string) => {
       setEjercicioBusqueda(text);
       setMostrarSugerenciasEjercicios(true);
-      
-      // Si borra el texto, reseteamos el ID seleccionado y mostramos todos
-      if (text === "") {
-          setEjercicioId("");
-          setEjerciciosFiltrados(ejercicios); 
-          return;
-      }
+      if (text === "") setEjercicioId("");
+  };
 
-      // Filtrar localmente
-      const filtrados = ejercicios.filter(e => 
-          e.nombre.toLowerCase().includes(text.toLowerCase())
-      );
-      setEjerciciosFiltrados(filtrados);
+  const handleSelectMuscle = (muscle: string | null) => {
+      setSelectedMuscle(muscle);
+      setMostrarSugerenciasEjercicios(true);
   };
 
   const handleSelectEjercicio = (ejercicio: any) => {
@@ -349,6 +355,8 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     handleEjercicioSearchChange,
     handleSelectEjercicio,
     setMostrarSugerenciasEjercicios,
+    selectedMuscle,
+    handleSelectMuscle,
     // Formulario Detalle (Viejos y Nuevos)
     ejercicioId, setEjercicioId,
     series, handleSeriesChange,

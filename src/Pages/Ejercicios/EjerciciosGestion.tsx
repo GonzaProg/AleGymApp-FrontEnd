@@ -6,8 +6,9 @@ import { AppStyles } from '../../Styles/AppStyles';
 import { EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
 import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
-import { TIPOS_AGARRE } from '../../API/Ejercicios/EjerciciosApi';
+import { TIPOS_AGARRE, MUSCULOS_PERMITIDOS } from '../../API/Ejercicios/EjerciciosApi';
 import { ChevronDown } from 'lucide-react';
+import { MuscleFilter } from '../../Components/MuscleFilter/MuscleFilter';
 
 interface Props {
     onNavigate?: (tab: string) => void;
@@ -16,6 +17,7 @@ interface Props {
 export const EjerciciosGestion = ({ onNavigate }: Props) => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
     
     const { 
         ejercicios, loading, uploading, editingId, editForm, 
@@ -29,13 +31,19 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
     const { isAdmin } = useAuthUser();
 
     const filteredEjercicios = useMemo(() => {
+        let result = ejercicios;
+        if (selectedMuscle) {
+            result = result.filter(e => e.musculoTrabajado === selectedMuscle);
+        }
         const q = searchTerm.trim().toLowerCase();
-        if (!q) return ejercicios;
-        return ejercicios.filter((e) => {
-            if (editingId != null && e.id === editingId) return true;
-            return e.nombre.toLowerCase().includes(q);
-        });
-    }, [ejercicios, searchTerm, editingId]);
+        if (q) {
+            result = result.filter((e) => {
+                if (editingId != null && e.id === editingId) return true;
+                return e.nombre.toLowerCase().includes(q);
+            });
+        }
+        return result;
+    }, [ejercicios, searchTerm, editingId, selectedMuscle]);
 
     const handleNewExercise = () => {
         if (onNavigate) {
@@ -65,6 +73,10 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                     >
                         <span>+</span> Nuevo Ejercicio
                     </button>
+                </div>
+
+                <div className="bg-gray-900/40 rounded-xl border border-white/5 mb-4 px-2">
+                    <MuscleFilter selectedMuscle={selectedMuscle} onSelectMuscle={setSelectedMuscle} />
                 </div>
 
                 <div className={TableStyles.tableContainer}>
@@ -103,12 +115,21 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                             <div>
                                                                 <label className="text-xs text-gray-400 mb-1 block">Músculo Trabajado</label>
-                                                                <input 
-                                                                    className={TableStyles.editInput} 
-                                                                    value={editForm.musculoTrabajado} 
-                                                                    onChange={(e) => handleEditInputChange('musculoTrabajado', e.target.value)} 
-                                                                    placeholder="Ej: Pectoral"
-                                                                />
+                                                                <div className="relative group">
+                                                                    <select 
+                                                                        className={`${TableStyles.editInput} appearance-none cursor-pointer pr-10`} 
+                                                                        value={editForm.musculoTrabajado} 
+                                                                        onChange={(e) => handleEditInputChange('musculoTrabajado', e.target.value)}
+                                                                    >
+                                                                        <option value="" className={AppStyles.darkBackgroundSelect}>Ninguno</option>
+                                                                        {MUSCULOS_PERMITIDOS.map(m => (
+                                                                            <option key={m} value={m} className={AppStyles.darkBackgroundSelect}>{m}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500 group-hover:text-purple-400 transition-colors">
+                                                                        <ChevronDown className="w-4 h-4 fill-current" />
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                             <div>
                                                                 <label className="text-xs text-gray-400 mb-1 block">Elementos</label>

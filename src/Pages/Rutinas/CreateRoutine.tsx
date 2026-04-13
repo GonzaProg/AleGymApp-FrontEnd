@@ -5,6 +5,7 @@ import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
 import { AppStyles } from "../../Styles/AppStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio";
+import { MuscleFilter } from "../../Components/MuscleFilter/MuscleFilter";
 
 interface CreateRoutineProps {
     isGeneral?: boolean;
@@ -22,6 +23,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     // Buscador Ejercicios
     ejercicioBusqueda, ejerciciosFiltrados, mostrarSugerenciasEjercicios, 
     handleEjercicioSearchChange, handleSelectEjercicio, setMostrarSugerenciasEjercicios,
+    selectedMuscle, handleSelectMuscle,
     // Formulario Detalle
     series, handleSeriesChange,
     tipoSerie, setTipoSerie,
@@ -54,9 +56,9 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     <div className={`${AppStyles.principalContainer} principalContainer`}>
       <div className="w-full max-w-5xl mx-auto space-y-6">
               
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
           
-          {/* COLUMNA 1: DATOS GENERALES */}
+          {/* SECCIÓN 1: DATOS GENERALES */}
           <div className={`${AppStyles.glassCard} overflow-visible z-50`}>
              <div className={"absolute top-[1px] left-[6px] w-[calc(100%-2px)] h-1 bg-gradient-to-r from-green-500/50 to-transparent rounded-t-3xl"}></div>
              
@@ -120,7 +122,11 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
               Ejercicios
              </h3>
              
-             <div className="mt-4 relative" ref={searchContainerRef}>
+             <div className="mt-4 bg-black/20 rounded-xl border border-white/5 mb-4">
+                 <MuscleFilter selectedMuscle={selectedMuscle} onSelectMuscle={handleSelectMuscle} />
+             </div>
+
+             <div className="mt-2 relative" ref={searchContainerRef}>
                 <Input 
                     label="Buscar Ejercicio"
                     value={ejercicioBusqueda}
