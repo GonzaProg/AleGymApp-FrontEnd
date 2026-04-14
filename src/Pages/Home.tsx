@@ -22,7 +22,6 @@ import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary";
 
 // IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
-const UserPlan = lazy(() => import("./Planes/UserPlan").then(module => ({ default: module.UserPlan })));
 const Profile = lazy(() => import("./Usuarios/Profile").then(module => ({ default: module.Profile })));
 
 // Vistas de Admin (Lazy Loading)
@@ -321,14 +320,6 @@ export const Home = () => {
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={3} activeIndex={activeSlide} visited={visitedSlides.has(3)}>
-                        <UserPlan />
-                    </LazySlideContent>
-                </div>
-            </SwiperSlide>
-
-            <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
-                    <LazySlideContent index={4} activeIndex={activeSlide} visited={visitedSlides.has(4)}>
                         <Profile isMobile={true} />
                     </LazySlideContent>
                 </div>

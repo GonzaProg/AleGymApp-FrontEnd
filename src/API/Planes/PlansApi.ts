@@ -21,6 +21,7 @@ export interface UserPlanDTO {
     fechaInicio: string;
     fechaVencimiento: string;
     diasRestantes: number;
+    descripcion?: string;
 }
 
 export const PlansApi = {
