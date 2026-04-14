@@ -57,12 +57,10 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                         <span className={AppStyles.numberBadge}>1</span> Datos del Ejercicio
                     </h3>
 
-                    {/* El mensaje de error visual se eliminó porque ahora usamos SweetAlert en el Hook */}
-
                     <form onSubmit={onSubmitWrapper} className="space-y-6">
                         {/* NOMBRE */}
                         <div>
-                            <label className={AppStyles.label}>Nombre del Ejercicio</label>
+                            <label className={AppStyles.label}>Nombre del Ejercicio <span className="text-red-500">*</span></label>
                             <input 
                                 type="text" name="nombre" 
                                 className={AppStyles.inputDark}
@@ -74,14 +72,14 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                         {/* DETALLES EXTRA (Músculo, Elementos, Agarre) */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className={AppStyles.label}>Músculo Trabajado <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                                <label className={AppStyles.label}>Músculo Trabajado <span className="text-red-500">*</span></label>
                                 <div className="relative group">
                                     <select 
                                         name="musculoTrabajado" 
                                         className={`${AppStyles.inputDark} appearance-none cursor-pointer pr-10`}
                                         value={form.musculoTrabajado} onChange={handleInputChange}
                                     >
-                                        <option value="" className={AppStyles.darkBackgroundSelect}>Ninguno</option>
+                                        <option value="" className={AppStyles.darkBackgroundSelect} disabled>Seleccione un músculo</option>
                                         {MUSCULOS_PERMITIDOS.map(m => (
                                             <option key={m} value={m} className={AppStyles.darkBackgroundSelect}>{m}</option>
                                         ))}
@@ -190,8 +188,7 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                         {!isAdmin && (
                             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                                 <p className="text-blue-300 text-sm">
-                                    <strong>Nota:</strong> Como entrenador, solo puedes poner el nombre. 
-                                    Los campos imagen y video los cargo yo más tarde.
+                                    <strong>Nota:</strong> El video demostrativo del ejercicio será cargado más adelante por el administrador.
                                 </p>
                             </div>
                         )}

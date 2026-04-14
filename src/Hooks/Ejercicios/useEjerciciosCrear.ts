@@ -45,6 +45,10 @@ export const useEjerciciosCrear = () => {
             showError("El nombre del ejercicio es obligatorio.");
             return false;
         }
+        if (!form.musculoTrabajado) {
+            showError("Debes seleccionar un músculo trabajado.");
+            return false;
+        }
 
         setLoading(true);
 

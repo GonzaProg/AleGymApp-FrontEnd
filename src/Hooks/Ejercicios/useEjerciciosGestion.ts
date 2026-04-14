@@ -100,6 +100,15 @@ export const useEjerciciosGestion = () => {
     };
 
     const saveEdit = async (id: number) => {
+        if (!editForm.nombre.trim()) {
+            showError("El nombre del ejercicio es obligatorio.");
+            return;
+        }
+        if (!editForm.musculoTrabajado) {
+            showError("Debes seleccionar un músculo trabajado.");
+            return;
+        }
+
         setUploading(true);
         try {
             // Buscamos datos originales para saber qué borrar
