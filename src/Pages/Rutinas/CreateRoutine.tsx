@@ -5,6 +5,8 @@ import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
 import { AppStyles } from "../../Styles/AppStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio";
+import { MuscleFilter } from "../../Components/MuscleFilter/MuscleFilter";
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 
 interface CreateRoutineProps {
     isGeneral?: boolean;
@@ -22,6 +24,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     // Buscador Ejercicios
     ejercicioBusqueda, ejerciciosFiltrados, mostrarSugerenciasEjercicios, 
     handleEjercicioSearchChange, handleSelectEjercicio, setMostrarSugerenciasEjercicios,
+    selectedMuscle, handleSelectMuscle,
     // Formulario Detalle
     series, handleSeriesChange,
     tipoSerie, setTipoSerie,
@@ -52,11 +55,11 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
 
   return (
     <div className={`${AppStyles.principalContainer} principalContainer`}>
-      <div className="w-full max-w-5xl mx-auto space-y-6">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
               
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
           
-          {/* COLUMNA 1: DATOS GENERALES */}
+          {/* SECCIÓN 1: DATOS GENERALES */}
           <div className={`${AppStyles.glassCard} overflow-visible z-50`}>
              <div className={"absolute top-[1px] left-[6px] w-[calc(100%-2px)] h-1 bg-gradient-to-r from-green-500/50 to-transparent rounded-t-3xl"}></div>
              
@@ -113,14 +116,18 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
           </div>
 
           {/* COLUMNA 2: EJERCICIOS (Buscador corregido incluido) */}
-          <div className={`${AppStyles.glassCard} overflow-visible z-50`}>
+          <div className={`${AppStyles.glassCard} overflow-visible z-40`}>
              <div className={"absolute top-[1px] left-[6px] w-[calc(100%-2px)] h-1 bg-gradient-to-r from-green-500/50 to-transparent rounded-t-3xl"}></div>
              <h3 className={`${AppStyles.sectionTitle} left-[100px]`}>
               <span className={AppStyles.numberBadge}>2</span>
               Ejercicios
              </h3>
              
-             <div className="mt-4 relative" ref={searchContainerRef}>
+             <div className="mt-4 bg-black/20 rounded-xl border border-white/5 mb-4">
+                 <MuscleFilter selectedMuscle={selectedMuscle} onSelectMuscle={handleSelectMuscle} />
+             </div>
+
+             <div className="mt-2 relative" ref={searchContainerRef}>
                 <Input 
                     label="Buscar Ejercicio"
                     value={ejercicioBusqueda}
@@ -131,38 +138,45 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                     labelClassName={AppStyles.label}
                 />
                 
-                {mostrarSugerenciasEjercicios && (
-                    <ul className={`${AppStyles.suggestionsList} max-h-60 ${AppStyles.customScrollbar}`}>
-                        {ejerciciosFiltrados.length > 0 ? (
-                            ejerciciosFiltrados.map((ej) => (
-                                <li 
+                {mostrarSugerenciasEjercicios && (ejercicioBusqueda.trim() !== "" || selectedMuscle) ? (
+                    <div className="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[400px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: '#374151 transparent' }}>
+                        {ejerciciosFiltrados.length > 0 ? ejerciciosFiltrados.map((ej) => {
+                            const thumbUrl = CloudinaryApi.getThumbnail(ej.imagenUrl, ej.urlVideo);
+                            return (
+                                <div 
                                     key={ej.id} 
-                                    className={`${AppStyles.suggestionItem} flex justify-between items-center group`}
+                                    className="relative group rounded-xl overflow-hidden cursor-pointer border border-white/10 hover:border-green-500/60 transition-all aspect-square bg-gray-900 shadow-md flex-shrink-0" 
+                                    onClick={() => handleSelectEjercicio(ej)}
                                 >
-                                    <span 
-                                        className="text-gray-200 flex-1" 
-                                        onClick={() => handleSelectEjercicio(ej)}
-                                    >
-                                        {ej.nombre}
-                                    </span>
+                                    {thumbUrl ? (
+                                        <img src={thumbUrl} alt={ej.nombre} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center text-gray-500 bg-gray-800/50">
+                                            <span className="text-2xl mb-1 opacity-50">🏋️</span>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Gradient Overlay superior para el texto */}
+                                    <div className="absolute top-0 inset-x-0 p-2 bg-gradient-to-b from-black/90 via-black/50 to-transparent">
+                                        <p className="text-white text-xs font-bold leading-tight drop-shadow-md text-center">{ej.nombre}</p>
+                                    </div>
+
+                                    {/* Botón de play (para ver video) */}
                                     {ej.urlVideo && (
                                         <button 
-                                            onClick={(e) => { e.stopPropagation(); setPreviewUrl(ej.urlVideo); }}
-                                            className="text-blue-400 hover:text-blue-300 bg-blue-500/10 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                            title="Ver demostración"
+                                            onClick={(e) => { e.stopPropagation(); setPreviewUrl(ej.urlVideo); }} 
+                                            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-green-500/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:bg-green-400 shadow-lg"
                                         >
-                                            <Play size={14} className="fill-current" />
+                                            <Play size={18} className="fill-white text-white ml-1" />
                                         </button>
                                     )}
-                                </li>
-                            ))
-                        ) : (
-                            ejercicioBusqueda !== "" && (
-                                <li className="p-3 text-gray-500 text-sm text-center">No encontrado</li>
-                            )
+                                </div>
+                            );
+                        }) : (
+                            <p className="col-span-full py-6 text-center text-gray-500 italic">No hay ejercicios encontrados</p>
                         )}
-                    </ul>
-                )}
+                    </div>
+                ) : null}
             </div>
 
             <div className={`grid grid-cols-2 ${tipoSerie === 'Estandar' ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-4 mt-4`}>
