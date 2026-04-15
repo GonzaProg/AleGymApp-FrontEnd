@@ -27,7 +27,7 @@ export const ProgresoView = ({ currentUser }: { currentUser: any }) => {
                         onClick={() => setTab('cuerpo')}
                         className={`flex-1 py-2.5 text-sm font-bold z-10 transition-colors duration-300 ${tab === 'cuerpo' ? 'text-gray-950' : 'text-gray-400'}`}
                     >
-                        Peso Corporal
+                        Mis Avances
                     </button>
                 </div>
             </div>

@@ -1,9 +1,10 @@
-import { useState } from "react"; // <-- Importamos useState aquí
+import { useState } from "react"; 
 import { createPortal } from "react-dom";
 import { AppStyles } from "../../Styles/AppStyles";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { usePersonalRecords } from "../../Hooks/PersonalRecords/usePersonalRecords";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
+import { Info, ChevronDown, Trophy, Pencil, Plus, Search, Video, Play, Dumbbell, ArrowUp, ArrowDown, Trash2, X } from "lucide-react";
 
 export const MyPersonalRecords = () => {
     const {
@@ -33,17 +34,15 @@ export const MyPersonalRecords = () => {
                     className="w-full p-2 flex items-center justify-between hover:bg-white/5 transition-colors rounded-2xl"
                 >
                     <h3 className="text-blue-400 font-bold flex items-center gap-2">
-                        <span>ℹ️</span> Información
+                        <Info className="w-5 h-5" /> Información
                     </h3>
-                    <span className={`text-gray-400 transition-transform duration-300 ${isInfoOpen ? 'rotate-180' : ''}`}>
-                        ▼
-                    </span>
+                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${isInfoOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 <div className={`transition-all duration-500 ease-in-out px-4 ${isInfoOpen ? 'max-h-[500px] opacity-100 pb-5' : 'max-h-0 opacity-0'}`}>
                     <div className="pt-4 border-t border-white/10 text-gray-300 text-sm leading-relaxed">
                         <p>
-                            <strong className="text-green-400 text-base">¡Prepárate para competir!</strong> 🥇<br/><br/>
+                            <strong className="text-green-400 text-base">¡Prepárate para competir!</strong> <Trophy className="w-5 h-5 inline text-yellow-400 align-text-bottom ml-1" /><br/><br/>
                             Al finalizar cada mes, generaremos un <strong>Ranking Automático</strong> con los alumnos que levanten los mayores pesos en ejercicios seleccionados.<br/><br/>
                             Asegúrate de grabar tus mejores levantamientos, mantener una buena técnica y subir tus PRs para asegurar tu lugar en el podio de tu gimnasio.
                         </p>
@@ -51,10 +50,9 @@ export const MyPersonalRecords = () => {
                 </div>
 
                 <div className={`transition-all duration-500 ease-in-out px-5 ${isInfoOpen ? 'max-h-[500px] opacity-100 pb-5' : 'max-h-0 opacity-0'}`}>
-                    <div className="pt-4 border-t border-white/10 text-yellow-400 text-sm leading-relaxed">
-                        <p>
-                            Solo los PRs que tengan video se van a tomar en cuenta para el Ranking.
-                        </p>
+                    <div className="pt-4 border-t border-white/10 text-yellow-400 text-sm leading-relaxed flex items-start gap-2">
+                         <Info className="w-4 h-4 shrink-0 mt-0.5" /> 
+                         <p>Solo los PRs que tengan video se van a tomar en cuenta para el Ranking.</p>
                     </div>
                 </div>
             </div>
@@ -73,14 +71,12 @@ export const MyPersonalRecords = () => {
                     className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors rounded-2xl"
                 >
                     <h3 className="text-white font-bold flex items-center gap-2">
-                        {editandoId ? "✏️ Editando Record" : "➕ Añadir Nuevo Record"}
+                        {editandoId ? <><Pencil className="w-5 h-5"/> Editando Record</> : <><Plus className="w-5 h-5"/> Añadir Nuevo Record</>}
                     </h3>
-                    <span className={`text-gray-400 transition-transform duration-300 ${isFormOpen ? 'rotate-180' : ''}`}>
-                        ▼
-                    </span>
+                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${isFormOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                <div className={`transition-all duration-500 ease-in-out px-5 ${isFormOpen ? 'max-h-[1200px] opacity-100 pb-5 overflow-visible' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+                <div className={`transition-all duration-500 ease-in-out px-1 ${isFormOpen ? 'max-h-[1200px] opacity-100 pb-5 overflow-visible' : 'max-h-0 opacity-0 overflow-hidden'}`}>
                     <div className="space-y-4 pt-4 border-t border-white/10">
                         
                         {!editandoId && (
@@ -93,20 +89,23 @@ export const MyPersonalRecords = () => {
                                     />
                                 )}
 
-                                <input 
-                                    type="text" 
-                                    placeholder="🔍 Buscar y seleccionar ejercicio..." 
-                                    value={ejercicioSearch}
-                                    onFocus={() => setShowDropdown(true)}
-                                    // ⚠️ ELIMINAMOS EL onBlur QUE ROMPÍA EL SCROLL EN CELULARES
-                                    onChange={(e) => {
-                                        setEjercicioSearch(e.target.value);
-                                        setShowDropdown(true);
-                                        setEjercicioId(""); 
-                                    }}
-                                    // Le damos z-index mayor al input para que quede por encima del overlay invisible
-                                    className={AppStyles.inputDark + " relative z-[100]"}
-                                />
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-[101]" />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Buscar y seleccionar ejercicio..." 
+                                        value={ejercicioSearch}
+                                        onFocus={() => setShowDropdown(true)}
+                                        // ⚠️ ELIMINAMOS EL onBlur QUE ROMPÍA EL SCROLL EN CELULARES
+                                        onChange={(e) => {
+                                            setEjercicioSearch(e.target.value);
+                                            setShowDropdown(true);
+                                            setEjercicioId(""); 
+                                        }}
+                                        // Le damos z-index mayor al input para que quede por encima del overlay invisible
+                                        className={AppStyles.inputDark + " pl-10 relative z-[100]"}
+                                    />
+                                </div>
                                 
                                 {showDropdown && (
                                     <div className="absolute z-[100] w-full mt-2 max-h-52 overflow-y-auto bg-gray-950 border border-white/20 rounded-xl shadow-2xl touch-pan-y">
@@ -119,7 +118,7 @@ export const MyPersonalRecords = () => {
                                                         setEjercicioSearch(ej.nombre);
                                                         setShowDropdown(false);
                                                     }}
-                                                    className="p-4 active:bg-green-500/40 hover:bg-green-500/20 text-white border-b border-white/5 last:border-0"
+                                                    className="p-4 active:bg-green-500/40 hover:bg-green-500/20 text-white border-b border-white/5 last:border-0 cursor-pointer"
                                                 >
                                                     {ej.nombre}
                                                 </div>
@@ -140,7 +139,7 @@ export const MyPersonalRecords = () => {
                                             onClick={() => handleEdit(prExistente)}
                                             className="text-yellow-400 text-xs font-bold uppercase tracking-widest bg-yellow-500/20 px-5 py-2.5 rounded-lg hover:bg-yellow-500/30 transition-all active:scale-95 border border-yellow-500/20 flex items-center gap-2"
                                         >
-                                            <span>✏️</span> Modificar Existente
+                                            <Pencil className="w-4 h-4" /> Modificar Existente
                                         </button>
                                     </div>
                                 )}
@@ -165,8 +164,8 @@ export const MyPersonalRecords = () => {
                             {videoPreview ? (
                                 <video src={videoPreview} className="w-full h-full object-cover" controls={false} muted loop autoPlay />
                             ) : (
-                                <div className="text-center p-3">
-                                    <span className="text-3xl block mb-2 group-hover:scale-110 transition-transform">📹</span>
+                                <div className="text-center p-3 flex flex-col items-center">
+                                    <Video className="w-10 h-10 mb-2 text-gray-500 group-hover:scale-110 group-hover:text-gray-400 transition-all" />
                                     <span className="text-gray-400 text-xs font-medium">Subir video</span>
                                 </div>
                             )}
@@ -206,9 +205,10 @@ export const MyPersonalRecords = () => {
             </div>
 
             <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input 
                     type="text" 
-                    placeholder="🔍 Buscar por ejercicio..." 
+                    placeholder="Buscar por ejercicio..." 
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     className={AppStyles.inputDark + " pl-10"}
@@ -221,10 +221,13 @@ export const MyPersonalRecords = () => {
                 </h3>
                 
                 {prs.length === 0 ? (
-                    <p className="text-center text-gray-500 py-4">No se encontraron records.</p>
+                    <p className="text-center text-gray-500 py-4 flex flex-col items-center">
+                        <Dumbbell className="w-8 h-8 text-gray-600 mb-2 opacity-50" />    
+                        No se encontraron records.
+                    </p>
                 ) : (
                     prs.map(pr => (
-                        <div key={pr.id} className="bg-gray-800/50 border border-white/5 rounded-2xl p-4 flex gap-4 items-center">
+                        <div key={pr.id} className="bg-gray-800/50 border border-white/5 rounded-2xl p-4 flex gap-4 items-center group">
                             
                             <div 
                                 onClick={() => pr.videoUrl ? setVideoSeleccionado(pr.videoUrl) : null}
@@ -233,10 +236,10 @@ export const MyPersonalRecords = () => {
                                 {pr.videoUrl ? (
                                     <>
                                         <img src={CloudinaryApi.getThumbnail(undefined, pr.videoUrl)!} className="w-full h-full object-cover opacity-70" alt="thumbnail" />
-                                        <span className="absolute text-white text-2xl drop-shadow-md">▶</span>
+                                        <Play fill="currentColor" className="absolute w-8 h-8 text-white drop-shadow-md" />
                                     </>
                                 ) : (
-                                    <span className="text-3xl text-gray-600">💪</span>
+                                    <Dumbbell className="w-8 h-8 text-gray-600" />
                                 )}
                             </div>
 
@@ -252,11 +255,11 @@ export const MyPersonalRecords = () => {
                                         <div className="flex items-center text-xs font-bold bg-black/30 px-2 py-1 rounded-lg border border-white/5">
                                             {Number(pr.peso) > Number(pr.pesoAnterior) ? (
                                                 <span className="text-green-500 flex items-center gap-1.5" title="¡Aumentaste tu PR!">
-                                                    ↑ <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
+                                                    <ArrowUp className="w-3.5 h-3.5" /> <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
                                                 </span>
                                             ) : (
                                                 <span className="text-red-400 flex items-center gap-1.5" title="El PR anterior era mayor">
-                                                    ↓ <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
+                                                    <ArrowDown className="w-3.5 h-3.5" /> <span className="text-gray-500 line-through font-medium">{pr.pesoAnterior}</span>
                                                 </span>
                                             )}
                                         </div>
@@ -266,9 +269,9 @@ export const MyPersonalRecords = () => {
                                 <p className="text-xs text-gray-500">{new Date(pr.fechaActualizacion).toLocaleDateString()}</p>
                             </div>
 
-                            <div className="flex flex-col gap-2 shrink-0">
-                                <button onClick={() => handleEdit(pr)} className={AppStyles.btnEdit}>✏️</button>
-                                <button onClick={() => handleDelete(pr.id, pr.videoUrl)} className={AppStyles.btnDelete}>🗑️</button>
+                            <div className="flex flex-col gap-2 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                <button onClick={() => handleEdit(pr)} className={`${AppStyles.btnEdit} flex items-center justify-center`}><Pencil className="w-4 h-4"/></button>
+                                <button onClick={() => handleDelete(pr.id, pr.videoUrl)} className={`${AppStyles.btnDelete} flex items-center justify-center`}><Trash2 className="w-4 h-4"/></button>
                             </div>
                         </div>
                     ))
@@ -280,9 +283,9 @@ export const MyPersonalRecords = () => {
                     <div className="flex justify-end pb-4 pt-8">
                         <button 
                             onClick={() => setVideoSeleccionado(null)}
-                            className="text-white bg-white/10 hover:bg-white/20 p-2 rounded-full px-6 font-bold transition-colors"
+                            className="text-white flex items-center gap-2 bg-white/10 hover:bg-white/20 p-2 rounded-full px-5 font-bold transition-colors"
                         >
-                            Cerrar ✕
+                            Cerrar <X className="w-4 h-4"/>
                         </button>
                     </div>
                     

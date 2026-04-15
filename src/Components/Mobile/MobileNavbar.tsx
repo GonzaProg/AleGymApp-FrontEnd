@@ -10,8 +10,7 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
     { id: "inicio", label: "Inicio", index: 0, Icon: HomeIcon },
     { id: "rutinas", label: "Rutinas", index: 1, Icon: DumbbellIcon },
     { id: "progreso", label: "Progreso", index: 2, Icon: MedalIcon },
-    { id: "plan", label: "Mi Plan", index: 3, Icon: PlanIcon },
-    { id: "perfil", label: "Perfil", index: 4, Icon: UserIcon },
+    { id: "perfil", label: "Perfil", index: 3, Icon: UserIcon },
   ];
 
   return (
@@ -70,15 +69,6 @@ const DumbbellIcon = ({ isActive }: { isActive: boolean }) => (
 // NUEVO ICONO DE MEDALLA - Hacemos un mapping similar
 const MedalIcon = ({ isActive }: { isActive: boolean }) => (
   <Medal {...getIconProps(isActive)} />
-);
-
-const PlanIcon = ({ isActive }: { isActive: boolean }) => (
-  <svg viewBox="0 0 24 24" {...getIconProps(isActive)} strokeLinecap="round" strokeLinejoin="round">
-    {/* Forma de documento con check */}
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-    <polyline points="14 2 14 8 20 8" fill="none" stroke={isActive ? "gray" : "currentColor"} strokeWidth={1.5} /> {/* El pliegue siempre es línea */}
-    <path d="M9 13l2 2 4-4" fill="none" stroke={isActive ? "#111827" : "currentColor"} strokeWidth={2} /> {/* El check: verde oscuro si está activo, sino currentColor */}
-  </svg>
 );
 
 const UserIcon = ({ isActive }: { isActive: boolean }) => (
