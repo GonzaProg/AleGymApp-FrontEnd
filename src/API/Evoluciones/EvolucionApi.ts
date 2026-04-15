@@ -1,8 +1,8 @@
 import api from '../axios';
 
 export const EvolucionApi = {
-    registrar: async (peso: number, fotoUrl?: string) => {
-        const response = await api.post('/evolucion', { peso, fotoUrl });
+    registrar: async (datos: any) => {
+        const response = await api.post('/evolucion', datos);
         return response.data;
     },
     obtenerHistorial: async (limit?: number) => {
@@ -12,6 +12,10 @@ export const EvolucionApi = {
     },
     eliminar: async (id: number) => {
         const response = await api.delete(`/evolucion/${id}`);
+        return response.data;
+    },
+    actualizar: async (id: number, datos: any) => {
+        const response = await api.patch(`/evolucion/${id}`, datos);
         return response.data;
     }
 };

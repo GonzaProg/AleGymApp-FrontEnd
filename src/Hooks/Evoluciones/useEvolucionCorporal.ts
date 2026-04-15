@@ -3,32 +3,49 @@ import { EvolucionApi } from "../../API/Evoluciones/EvolucionApi";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { showError, showSuccess, showConfirmDelete } from "../../Helpers/Alerts"; 
 
+export type PosicionFoto = 'fotoPerfilIzquierdo' | 'fotoPerfilDerecho' | 'fotoFrontal' | 'fotoEspaldas';
+
 export const useEvolucionCorporal = (currentUser: any) => {
     const [historial, setHistorial] = useState<any[]>([]);
     
     // Estados de Carga
     const [loading, setLoading] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false); // Spinner para el botón "Ver todos"
+    const [loadingMore, setLoadingMore] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [updatingFoto, setUpdatingFoto] = useState<number | null>(null);
     
     // Estados para la UI
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [fotoSeleccionada, setFotoSeleccionada] = useState<string | null>(null);
     const [mostrarTodos, setMostrarTodos] = useState(false); 
-    const [todosCargados, setTodosCargados] = useState(false); // <-- Bandera para no repetir peticiones
+    const [todosCargados, setTodosCargados] = useState(false);
 
-    // Formulario
+    // Formulario Medidas
     const [peso, setPeso] = useState("");
-    const [file, setFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [cuello, setCuello] = useState("");
+    const [hombros, setHombros] = useState("");
+    const [pecho, setPecho] = useState("");
+    const [bicep, setBicep] = useState("");
+    const [antebrazo, setAntebrazo] = useState("");
+    const [cintura, setCintura] = useState("");
+    const [cadera, setCadera] = useState("");
+    const [muslo, setMuslo] = useState("");
+    const [pantorrilla, setPantorrilla] = useState("");
 
-    // 1. CARGA INICIAL (Solo 5)
+    // Formulario Fotos
+    const [fotos, setFotos] = useState({
+        fotoPerfilIzquierdo: { file: null as File | null, preview: null as string | null },
+        fotoPerfilDerecho: { file: null as File | null, preview: null as string | null },
+        fotoFrontal: { file: null as File | null, preview: null as string | null },
+        fotoEspaldas: { file: null as File | null, preview: null as string | null },
+    });
+
     const cargarHistorialInicial = async () => {
         setLoading(true);
         try {
-            const data = await EvolucionApi.obtenerHistorial(5); // Trae solo 5
+            const data = await EvolucionApi.obtenerHistorial(5);
             setHistorial(data);
-            if (data.length < 5) setTodosCargados(true); // Si hay menos de 5, ya no hay más para traer
+            if (data.length < 5) setTodosCargados(true);
         } catch (error) {
             console.error("Error cargando historial de evolución");
         } finally { 
@@ -40,72 +57,104 @@ export const useEvolucionCorporal = (currentUser: any) => {
         cargarHistorialInicial(); 
     }, []);
 
-    // 2. CARGA DE TODOS (Cuando aprieta el botón)
     const handleVerTodos = async () => {
         if (mostrarTodos) {
-            // Si ya los está viendo, el botón funciona como "Ver menos"
             setMostrarTodos(false);
             return;
         }
-
         if (todosCargados) {
-            // Si ya fue a la BD por todos, pero estaba en "Ver menos", solo expande visualmente
             setMostrarTodos(true);
             return;
         }
-
-        // Si nunca trajo todos, va a la BD a buscarlos
         setLoadingMore(true);
         try {
-            const data = await EvolucionApi.obtenerHistorial(); // Trae todos
+            const data = await EvolucionApi.obtenerHistorial();
             setHistorial(data);
             setTodosCargados(true);
             setMostrarTodos(true);
         } catch (error) {
-            console.error("Error trayendo todos los registros");
             showError("No se pudieron cargar los registros antiguos.");
         } finally {
             setLoadingMore(false);
         }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, position: PosicionFoto) => {
         if (e.target.files && e.target.files[0]) {
             const selected = e.target.files[0];
-            setFile(selected);
-            setPreview(URL.createObjectURL(selected));
+            setFotos(prev => ({
+                ...prev,
+                [position]: {
+                    file: selected,
+                    preview: URL.createObjectURL(selected)
+                }
+            }));
         }
     };
 
-    const clearFile = () => {
-        setFile(null);
-        setPreview(null);
+    const clearFile = (position: PosicionFoto) => {
+        setFotos(prev => ({
+            ...prev,
+            [position]: { file: null, preview: null }
+        }));
     };
 
     const resetForm = () => {
-        setPeso("");
-        clearFile();
+        setPeso(""); setCuello(""); setHombros(""); setPecho(""); 
+        setBicep(""); setAntebrazo(""); setCintura(""); setCadera(""); 
+        setMuslo(""); setPantorrilla("");
+        setFotos({
+            fotoPerfilIzquierdo: { file: null, preview: null },
+            fotoPerfilDerecho: { file: null, preview: null },
+            fotoFrontal: { file: null, preview: null },
+            fotoEspaldas: { file: null, preview: null },
+        });
         setIsFormOpen(false);
     };
 
     const handleGuardar = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!peso) return showError("Por favor, ingresa tu peso actual.");
+        if (!peso || !pecho || !bicep || !cintura || !cadera || !muslo) {
+            return showError("Por favor, ingresa todas las medidas obligatorias.");
+        }
 
         setSaving(true);
         try {
-            let fotoUrl = "";
-            if (file) {
-                const customFolder = `EvolucionCorporal/Gym-${currentUser?.gym?.codigoAcceso}`;
-                fotoUrl = await CloudinaryApi.upload(file, 'evolucion', customFolder, 'image');
-            }
+            const customFolder = `EvolucionCorporal/Gym-${currentUser?.gym?.codigoAcceso}`;
+            
+            // Subir imágenes concurrentemente
+            const uploadPromises = Object.entries(fotos).map(async ([key, data]) => {
+                let url = null;
+                if (data.file) {
+                    url = await CloudinaryApi.upload(data.file, 'evolucion', customFolder, 'image');
+                }
+                return { [key]: url };
+            });
 
-            await EvolucionApi.registrar(Number(peso), fotoUrl);
+            const uploadedUrls = await Promise.all(uploadPromises);
+            const urlsObj = Object.assign({}, ...uploadedUrls);
+
+            // Preparar payload limpiando los valores vacíos de las strings
+            const parseNumber = (val: string) => val ? Number(val) : undefined;
+            const payload = {
+                peso: parseNumber(peso),
+                cuello: parseNumber(cuello),
+                hombros: parseNumber(hombros),
+                pecho: parseNumber(pecho),
+                bicep: parseNumber(bicep),
+                antebrazo: parseNumber(antebrazo),
+                cintura: parseNumber(cintura),
+                cadera: parseNumber(cadera),
+                muslo: parseNumber(muslo),
+                pantorrilla: parseNumber(pantorrilla),
+                ...urlsObj
+            };
+
+            await EvolucionApi.registrar(payload);
             
             showSuccess("¡Progreso guardado con éxito!");
             resetForm(); 
             
-            // Si ya había cargado todos, traemos todos de nuevo. Si no, traemos los 5.
             if (todosCargados) {
                 const data = await EvolucionApi.obtenerHistorial();
                 setHistorial(data);
@@ -125,9 +174,16 @@ export const useEvolucionCorporal = (currentUser: any) => {
         if (!confirmacion.isConfirmed) return;
         
         try {
-            const registroAEliminar = historial.find(item => item.id === id);
+            const registro = historial.find(item => item.id === id);
             await EvolucionApi.eliminar(id);
-            if (registroAEliminar?.fotoUrl) CloudinaryApi.delete(registroAEliminar.fotoUrl, 'image');
+
+            // Borrar fotos de cloudinary si existen
+            const posiblesFotos = ['fotoPerfilIzquierdo', 'fotoPerfilDerecho', 'fotoFrontal', 'fotoEspaldas'];
+            posiblesFotos.forEach(p => {
+                if (registro && registro[p]) {
+                    CloudinaryApi.delete(registro[p], 'image');
+                }
+            });
 
             setHistorial(prev => prev.filter(item => item.id !== id));
             showSuccess("Registro eliminado.");
@@ -136,13 +192,46 @@ export const useEvolucionCorporal = (currentUser: any) => {
         }
     };
 
+    const handleChangeFotoExistente = async (registroId: number, file: File, posicion: PosicionFoto) => {
+        setUpdatingFoto(registroId);
+        try {
+            const registro = historial.find(item => item.id === registroId);
+            if (!registro) throw new Error("Registro no encontrado");
+
+            // Si habia foto anterior, la borramos
+            if (registro[posicion]) {
+                await CloudinaryApi.delete(registro[posicion], 'image');
+            }
+
+            // Subimos la nueva
+            const customFolder = `EvolucionCorporal/Gym-${currentUser?.gym?.codigoAcceso}`;
+            const nuevaUrl = await CloudinaryApi.upload(file, 'evolucion', customFolder, 'image');
+
+            // Actualizamos en BD
+            const payload = { [posicion]: nuevaUrl };
+            const response = await EvolucionApi.actualizar(registroId, payload);
+
+            // Actualizamos estado local
+            setHistorial(prev => prev.map(item => item.id === registroId ? { ...item, ...response.avance } : item));
+            
+            showSuccess("Foto actualizada correctamente.");
+        } catch (error) {
+            showError("Error al actualizar la foto.");
+        } finally {
+            setUpdatingFoto(null);
+        }
+    };
+
     return {
-        historial, loading, loadingMore, saving,
-        peso, setPeso,
-        preview, handleFileChange, clearFile,
+        historial, loading, loadingMore, saving, updatingFoto,
+        peso, setPeso, cuello, setCuello, hombros, setHombros,
+        pecho, setPecho, bicep, setBicep, antebrazo, setAntebrazo,
+        cintura, setCintura, cadera, setCadera, muslo, setMuslo,
+        pantorrilla, setPantorrilla,
+        fotos, handleFileChange, clearFile,
         isFormOpen, setIsFormOpen, resetForm,
         fotoSeleccionada, setFotoSeleccionada,
         mostrarTodos, handleVerTodos, todosCargados,
-        handleGuardar, handleEliminar
+        handleGuardar, handleEliminar, handleChangeFotoExistente
     };
 };
