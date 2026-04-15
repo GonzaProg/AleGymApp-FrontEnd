@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
 import { AppStyles } from "../../Styles/AppStyles";
 import { useAsistenciaManual } from "../../Hooks/Asistencias/useAsistenciaManual";
+import { CheckCircle, Flame, AlertTriangle, Sparkles, XCircle, CheckCircle2 } from "lucide-react";
 
 export const AsistenciaManual = () => {
     const { 
@@ -15,12 +16,12 @@ export const AsistenciaManual = () => {
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 animate-fade-in-up mt-10 pt-6 pb-10 relative">
-            <h2 className={AppStyles.title}>✅ Control de Recepción</h2>
+            <h2 className={`${AppStyles.title} flex items-center gap-3`}><CheckCircle className="w-8 h-8 text-green-400" /> Control de Recepción</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className={`${AppStyles.glassCard} flex items-center gap-6`}>
                     <div className="bg-green-500/20 p-4 rounded-2xl border border-green-500/30">
-                        <span className="text-4xl">🔥</span>
+                        <span className="flex items-center justify-center"><Flame className="w-8 h-8 text-orange-500" /></span>
                     </div>
                     <div>
                         <p className="text-gray-400 text-sm font-bold uppercase tracking-wider">Entrenando Ahora</p>
@@ -60,7 +61,7 @@ export const AsistenciaManual = () => {
                 {/* Cabecera con Pestañas */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-white/5 pb-4">
                     <div className="flex items-center gap-3">
-                        <span className="text-2xl">⚠️</span>
+                        <span className="flex items-center justify-center"><AlertTriangle className="w-8 h-8 text-yellow-500" /></span>
                         <div>
                             <h3 className="text-lg font-bold text-red-400">Alertas de Plan Excedido</h3>
                             <p className="text-xs text-gray-400">Toca un alumno para ver su historial del mes.</p>
@@ -88,7 +89,7 @@ export const AsistenciaManual = () => {
                     <p className="text-gray-500 text-center py-4 animate-pulse">Cargando reportes...</p>
                 ) : listaExcedidos.length === 0 ? (
                     <div className="text-center py-8">
-                        <span className="text-4xl opacity-50 mb-2 block">✨</span>
+                        <Sparkles className="w-12 h-12 text-gray-400 opacity-50 mb-2 block mx-auto" />
                         <p className="text-gray-400 font-medium">Todo en orden. Ningún exceso registrado {tabActiva === 'hoy' ? 'hoy' : 'este mes'}.</p>
                     </div>
                 ) : (
@@ -153,7 +154,7 @@ export const AsistenciaManual = () => {
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-xl">{item.excedido ? '❌' : '✅'}</span>
+                                                    <span className="flex items-center justify-center">{item.excedido ? <XCircle className="w-6 h-6 text-red-500" /> : <CheckCircle2 className="w-6 h-6 text-green-500" />}</span>
                                                     <div>
                                                         <p className={`font-bold capitalize ${item.excedido ? 'text-red-300' : 'text-white'}`}>
                                                             {diaSemana}

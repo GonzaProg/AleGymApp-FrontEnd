@@ -1,6 +1,7 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
 import { usePreferences } from "../../Hooks/Config/usePreferences";
+import { Settings, Bot, Save, Monitor, Package } from "lucide-react";
 
 export const Preferences = () => {
     const { 
@@ -20,7 +21,7 @@ export const Preferences = () => {
                 
                 <div className={AppStyles.headerContainer.replace("text-center", "text-left")}>
                     <div className="flex items-center gap-3">
-                        <p className="text-2xl">⚙️</p>
+                        <Settings className="w-7 h-7 text-white" />
                         <h1 className={AppStyles.title}>Configuración</h1>
                     </div>
                     <p className={AppStyles.subtitle}>Personaliza el comportamiento de tu sistema.</p>
@@ -30,8 +31,8 @@ export const Preferences = () => {
                     
                     {/* SECCIÓN 1: AUTOMATIZACIONES (Backend) */}
                     <div className={AppStyles.glassCard}>
-                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">
-                            🤖 Automatizaciones (WhatsApp)
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+                            <Bot className="w-6 h-6 text-blue-400" /> Automatizaciones (WhatsApp)
                         </h3>
                         
                         {/* Cumpleaños */}
@@ -65,7 +66,7 @@ export const Preferences = () => {
                                         disabled={savingMessage}
                                         className="bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
                                     >
-                                        {savingMessage ? 'Guardando...' : '💾 Guardar Mensaje'}
+                                        {savingMessage ? 'Guardando...' : <span className="flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Guardar Mensaje</span>}
                                     </button>
                                 </div>
                             </div>
@@ -85,8 +86,8 @@ export const Preferences = () => {
 
                     {/* SECCIÓN 2: INTERFAZ (Local) */}
                     <div className={AppStyles.glassCard}>
-                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">
-                            🖥️ Interfaz y Métricas
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+                            <Monitor className="w-6 h-6 text-purple-400" /> Interfaz y Métricas
                         </h3>
 
                         {/* Métricas Financieras */}
@@ -101,8 +102,8 @@ export const Preferences = () => {
 
                     {/* SECCIÓN 3: MÓDULOS DEL SISTEMA */}
                     <div className={AppStyles.glassCard}>
-                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">
-                            📦 Módulos del Sistema
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+                            <Package className="w-6 h-6 text-green-400" /> Módulos del Sistema
                         </h3>
 
                         <div className="flex items-center justify-between">

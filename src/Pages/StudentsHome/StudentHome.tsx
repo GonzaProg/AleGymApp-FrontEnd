@@ -5,7 +5,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { useStudentHome } from "../../Hooks/StudentsHome/useStudentHome";
 import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
-import { Camera, Info, Flame, Dumbbell, Quote } from "lucide-react";
+import { Camera, Info, Flame, Dumbbell, Quote, Handshake } from "lucide-react";
 import { useFraseMotivacional } from "../../Hooks/StudentsHome/useFraseMotivacional";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
@@ -139,7 +139,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                         <div className={`transition-all duration-500 ease-in-out px-4 ${isInfoOpen ? 'max-h-[500px] opacity-100 pb-4' : 'max-h-0 opacity-0'}`}>
                             <div className="pt-4 border-t border-white/10 text-gray-300 text-sm leading-relaxed">
                                 <p>
-                                    ¡Ayúdanos a mantener la información actualizada! 🤝<br/><br/>
+                                    ¡Ayúdanos a mantener la información actualizada! <Handshake className="w-4 h-4 inline text-blue-400 mx-1" /><br/><br/>
                                     Toca el botón <strong>"Escanear QR"</strong> cada vez que llegues al gimnasio.<br/><br/>
                                     Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios.
                                 </p>

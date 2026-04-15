@@ -3,7 +3,7 @@ import { useEjerciciosCrear } from '../../Hooks/Ejercicios/useEjerciciosCrear';
 import { AppStyles } from '../../Styles/AppStyles';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
 import { TIPOS_AGARRE, MUSCULOS_PERMITIDOS } from '../../API/Ejercicios/EjerciciosApi';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Image as ImageIcon, Camera, Video, Upload, Save } from 'lucide-react';
 
 interface Props {
     onNavigate?: (tab: string) => void;
@@ -144,12 +144,12 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                                         <div className="flex flex-col items-center gap-2 pointer-events-none">
                                             {selectedImage ? (
                                                 <>
-                                                    <span className="text-3xl">🖼️</span>
+                                                    <ImageIcon className="w-8 h-8 text-purple-400" />
                                                     <p className="text-purple-400 font-bold text-sm truncate max-w-[150px]">{selectedImage.name}</p>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📷</span>
+                                                    <Camera className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
                                                     <p className="text-gray-400 text-xs">Arrastra imagen</p>
                                                 </>
                                             )}
@@ -169,12 +169,12 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                                         <div className="flex flex-col items-center gap-2 pointer-events-none">
                                             {selectedVideo ? (
                                                 <>
-                                                    <span className="text-3xl">📹</span>
+                                                    <Video className="w-8 h-8 text-green-400" />
                                                     <p className="text-green-400 font-bold text-sm truncate max-w-[150px]">{selectedVideo.name}</p>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📤</span>
+                                                    <Upload className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
                                                     <p className="text-gray-400 text-xs">Arrastra video</p>
                                                 </>
                                             )}
@@ -207,9 +207,9 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                             <button 
                                 type="submit" 
                                 disabled={loading} 
-                                className={`${AppStyles.btnPrimary} ${loading ? 'opacity-70 cursor-wait' : ''}`}
+                                className={`${AppStyles.btnPrimary} ${loading ? 'opacity-70 cursor-wait' : ''} flex justify-center items-center gap-2`}
                             >
-                                {loading ? 'Guardando...' : '💾 Guardar'}
+                                {loading ? 'Guardando...' : <><Save className="w-4 h-4" /> Guardar</>}
                             </button>
                         </div>
                     </form>

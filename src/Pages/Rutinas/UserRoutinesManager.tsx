@@ -3,6 +3,7 @@ import { Card } from "../../Components/UI/Card";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { useUserRoutinesManager } from "../../Hooks/Rutinas/useUserRoutinesManager";
+import { Search, Edit2, Trash2, Link as LinkIcon, CheckCircle2, Info } from "lucide-react";
 
 export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: string) => void, onEdit: (id: number) => void }) => {
     const {
@@ -38,8 +39,8 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
                             className={`${AppStyles.inputDark} text-lg`}
                             labelClassName={AppStyles.label}
                         />
-                        <div className="absolute right-4 top-8 text-gray-400">
-                            🔍
+                        <div className="absolute right-4 top-9 text-gray-400">
+                            <Search className="w-5 h-5" />
                         </div>
                         
                         {/* SUGERENCIAS DE ALUMNOS */}
@@ -105,7 +106,7 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
                                                     className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} 
                                                     title="Editar Rutina Personal"
                                                 >
-                                                    ✏️
+                                                    <Edit2 className="w-4 h-4 ml-1" />
                                                 </button>
 
                                                 <button 
@@ -113,7 +114,7 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
                                                     className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} 
                                                     title="Eliminar Rutina Personal"
                                                 >
-                                                    🗑️
+                                                    <Trash2 className="w-4 h-4 ml-1" />
                                                 </button>
                                             </>
                                         )}
@@ -124,7 +125,7 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
                                                     className={`${AppStyles.btnIconBase} bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border-orange-500/20`} 
                                                     title="Desvincular Rutina General del Alumno"
                                                 >
-                                                    🔗
+                                                    <LinkIcon className="w-4 h-4 ml-1" />
                                                 </button>
                                             </>
                                         )}
@@ -170,9 +171,9 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
 
                                 <div className="text-xs text-gray-500 pt-2 border-t border-white/10">
                                     {canEditRoutine(rutina) ? (
-                                        <span className="text-green-400">✓ Editable</span>
+                                        <span className="text-green-400 flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Editable</span>
                                     ) : (
-                                        <span className="text-blue-400">ℹ️ Gestión desde Rutinas Generales</span>
+                                        <span className="text-blue-400 flex items-center gap-1"><Info className="w-4 h-4" /> Gestión desde Rutinas Generales</span>
                                     )}
                                 </div>
                             </Card>

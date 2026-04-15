@@ -2,6 +2,7 @@ import { useCreateUser } from "../../Hooks/CreateUser/useCreateUser";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles"; 
+import { Info } from "lucide-react";
 
 export const CreateUser = () => {
   const { formData, isAdmin, handleChange, handleSubmit, handleCancel } = useCreateUser();
@@ -63,7 +64,7 @@ export const CreateUser = () => {
                     {!isAdmin && (
                         <div className="md:col-span-2">
                             <div className={AppStyles.infoBox}>
-                                <span className="text-lg">ℹ️</span>
+                                <Info className="w-5 h-5 text-blue-400" />
                                 <p>Como Entrenador solo tienes permisos para crear Alumnos.</p>
                             </div>
                         </div>

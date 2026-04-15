@@ -4,6 +4,7 @@ import { Card } from "../../Components/UI/Card";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { useGeneralRoutinesManager } from "../../Hooks/Rutinas/useGeneralRoutinesManager";
+import { Edit2, Trash2, Send } from "lucide-react";
 
 export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: string) => void, onEdit: (id: number) => void }) => {
     const {
@@ -46,18 +47,18 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
                                     <div className="flex gap-2">
                                         <button 
                                             onClick={() => onEdit(rutina.id)}
-                                            className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} 
+                                            className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit} flex justify-center items-center`} 
                                             title="Editar Plantilla"
                                         >
-                                            ✏️
+                                            <Edit2 className="w-4 h-4" />
                                         </button>
 
                                         <button 
                                             onClick={() => handleDelete(rutina)}
-                                            className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} 
+                                            className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete} flex justify-center items-center`} 
                                             title="Eliminar Plantilla"
                                         >
-                                            🗑️
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
@@ -91,9 +92,9 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (ta
 
                                 <Button 
                                     onClick={() => openAssignModal(rutina)} 
-                                    className={`${AppStyles.btnPrimary} w-full mt-auto border-blue-500/30 hover:bg-blue-600 hover:text-white`}
+                                    className={`${AppStyles.btnPrimary} w-full mt-auto border-blue-500/30 hover:bg-blue-600 hover:text-white flex items-center justify-center gap-2`}
                                 >
-                                    📤 ASIGNAR A ALUMNO
+                                    <Send className="w-4 h-4" /> ASIGNAR A ALUMNO
                                 </Button>
                             </Card>
                         ))}

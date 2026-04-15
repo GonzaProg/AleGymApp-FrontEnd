@@ -1,7 +1,7 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { useManualReceipt } from "../../Hooks/Planes/useReciboManual";
 import { Card } from "../../Components/UI/Card";
-
+import { Search, FileText, AlertTriangle, Send } from "lucide-react";
 export const ManualReceipt = () => {
     const {
         alumnoSeleccionado,
@@ -31,12 +31,15 @@ export const ManualReceipt = () => {
                     <div className={AppStyles.searchWrapper}>
                         <div className={`${AppStyles.searchGlow} bg-gradient-to-r from-cyan-500 to-blue-600`}></div>
                         <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                                <Search className="w-5 h-5 text-gray-400" />
+                            </div>
                             <input
                                 type="text"
                                 value={busqueda}
                                 onChange={(e) => handleSearchChange(e.target.value)}
-                                placeholder="🔍 Buscar alumno por nombre..."
-                                className={`${AppStyles.searchInput} focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500`}
+                                placeholder="Buscar alumno por nombre..."
+                                className={`${AppStyles.searchInput} pl-10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500`}
                             />
                             
                             {sugerencias.length > 0 && (
@@ -98,7 +101,7 @@ export const ManualReceipt = () => {
                             {tienePlanesActivos ? (
                                 <div className="bg-blue-900/20 rounded-xl p-6 border border-blue-500/20 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="text-4xl">📄</div>
+                                        <div className="flex items-center justify-center"><FileText className="w-10 h-10 text-blue-400" /></div>
                                         <div>
                                             <p className="text-blue-300 text-xs font-bold uppercase tracking-wider">Documento Disponible</p>
                                             <h3 className="text-xl font-bold text-white">Comprobante de Plan</h3>
@@ -109,8 +112,8 @@ export const ManualReceipt = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="bg-red-900/20 rounded-xl p-4 border border-red-500/20 mb-8 text-center text-red-300">
-                                    ⚠️ Este usuario no posee un plan activo. No se puede generar recibo.
+                                <div className="flex items-center justify-center gap-2 bg-red-900/20 rounded-xl p-4 border border-red-500/20 mb-8 text-center text-red-300">
+                                    <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" /> Este usuario no posee un plan activo. No se puede generar recibo.
                                 </div>
                             )}
 
@@ -132,13 +135,13 @@ export const ManualReceipt = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <span>📤</span> Enviar Recibo por WhatsApp
+                                        <Send className="w-5 h-5" /> Enviar Recibo por WhatsApp
                                     </>
                                 )}
                             </button>
                             
-                            <p className="text-center text-sm text-gray-500 mt-4">
-                                Se enviará al número: {alumnoSeleccionado.telefono || 'No registrado ⚠️'}
+                            <p className="text-center text-sm text-gray-500 mt-4 flex items-center justify-center gap-1">
+                                Se enviará al número: {alumnoSeleccionado.telefono || <span className="inline-flex items-center gap-1 ml-1 text-yellow-500/90 font-medium">No registrado <AlertTriangle className="w-4 h-4" /></span>}
                             </p>
                         </div>
                     </Card>

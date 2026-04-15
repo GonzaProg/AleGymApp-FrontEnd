@@ -4,6 +4,7 @@ import { FinancialDashboardStyles } from "../../Styles/FinancialDashboardStyles"
 import { ToggleSwitch } from "../UI/ToggleSwitch"; 
 import { MetricsByType } from "./MetricsByType"; 
 import { FinancialCharts } from "./FinancialCharts"; 
+import { TrendingUp, Trophy, CreditCard, ArrowUp, ArrowDown } from "lucide-react";
 
 export const FinancialDashboard = () => {
     const { metrics, loadingMetrics } = useFinancialMetrics();
@@ -50,7 +51,7 @@ export const FinancialDashboard = () => {
                 {/* Ingresos Mes Actual */}
                 <div className={FinancialDashboardStyles.cardBaseClass}>
                     <div className={FinancialDashboardStyles.iconBaseClass}>
-                        📈
+                        <TrendingUp className="w-8 h-8 text-white opacity-80" />
                     </div>
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 to-green-600"></div>
 
@@ -62,7 +63,7 @@ export const FinancialDashboard = () => {
                         <span className={`font-bold px-2 py-0.5 rounded flex items-center gap-1 ${
                             isPositive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                         }`}>
-                            {isPositive ? '▲' : '▼'} {Math.abs(metrics.porcentajeCrecimiento)}%
+                            {isPositive ? <ArrowUp className="w-3 h-3"/> : <ArrowDown className="w-3 h-3"/>} {Math.abs(metrics.porcentajeCrecimiento)}%
                         </span>
                         <span className="text-gray-500 text-xs">vs mes pasado</span>
                     </div>
@@ -71,7 +72,7 @@ export const FinancialDashboard = () => {
                 {/* Ingresos Anuales */}
                 <div className={FinancialDashboardStyles.cardBaseClass}>
                     <div className={FinancialDashboardStyles.iconBaseClass}>
-                        🏆
+                        <Trophy className="w-8 h-8 text-white opacity-80" />
                     </div>
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-500 to-pink-600"></div>
                     
@@ -85,7 +86,7 @@ export const FinancialDashboard = () => {
                 {/* Método Preferido (Anual) */}
                 <div className={`${FinancialDashboardStyles.cardBaseClass} md:col-span-2 md:w-[calc(50%-1.25rem)] md:mx-auto`}>
                     <div className={FinancialDashboardStyles.iconBaseClass}>
-                        💳
+                        <CreditCard className="w-8 h-8 text-white opacity-80" />
                     </div>
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-indigo-600"></div>
 
