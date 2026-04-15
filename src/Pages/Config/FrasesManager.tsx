@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useFrasesManager } from '../../Hooks/Frases/useFrasesManager';
 import { AppStyles } from '../../Styles/AppStyles';
 import { EjerciciosGestionStyles as TableStyles } from '../../Styles/EjerciciosGestionStyles';
+import { Hourglass, Save, X, Image, Edit2, Trash2 } from "lucide-react";
 
 export const FrasesManager = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -95,14 +96,14 @@ export const FrasesManager = () => {
                                         </td>
                                         <td className={TableStyles.td}>
                                             <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white text-xs py-1 px-2 rounded flex items-center gap-2 w-max transition-colors">
-                                                <span>{selectedImage ? '🖼️ Seleccionada' : '🖼️ Subir'}</span>
+                                                <span>{selectedImage ? <span className="flex items-center gap-1"><Image className="w-4 h-4" /> Seleccionada</span> : <span className="flex items-center gap-1"><Image className="w-4 h-4" /> Subir</span>}</span>
                                                 <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                                             </label>
                                         </td>
                                         <td className={`${TableStyles.td} text-right space-x-2`}>
                                             <div className="flex justify-end gap-2">
-                                                <button onClick={saveEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave}`}>{uploading ? '⏳' : '💾'}</button>
-                                                <button onClick={cancelEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel}`}>❌</button>
+                                                <button onClick={saveEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave}`}>{uploading ? <Hourglass className="w-4 h-4" /> : <Save className="w-4 h-4" />}</button>
+                                                <button onClick={cancelEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel}`}><X className="w-4 h-4" /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -132,12 +133,12 @@ export const FrasesManager = () => {
                                             <td className={TableStyles.td}>
                                                 {isEditing ? (
                                                     <label className="cursor-pointer bg-gray-700 hover:bg-gray-600 border border-gray-500 text-white text-xs py-1 px-2 rounded flex items-center gap-2 w-max">
-                                                        <span>{selectedImage ? '🖼️ Listo' : '🖼️ Cambiar'}</span>
+                                                        <span>{selectedImage ? <span className="flex items-center gap-1"><Image className="w-4 h-4" /> Listo</span> : <span className="flex items-center gap-1"><Image className="w-4 h-4" /> Cambiar</span>}</span>
                                                         <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                                                     </label>
                                                 ) : (
                                                     f.imagenUrl ? (
-                                                        <button onClick={() => setImageUrl(f.imagenUrl!)} className="text-purple-400 hover:text-purple-300 underline text-sm flex items-center gap-1">🖼️ Ver</button>
+                                                        <button onClick={() => setImageUrl(f.imagenUrl!)} className="text-purple-400 hover:text-purple-300 underline text-sm flex items-center gap-1"><Image className="w-4 h-4" /> Ver</button>
                                                     ) : <span className="text-gray-600 text-sm italic">-</span>
                                                 )}
                                             </td>
@@ -146,13 +147,13 @@ export const FrasesManager = () => {
                                             <td className={`${TableStyles.td} text-right space-x-2`}>
                                                 {isEditing ? (
                                                     <div className="flex justify-end gap-2">
-                                                        <button onClick={saveEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave}`}>{uploading ? '⏳' : '💾'}</button>
-                                                        <button onClick={cancelEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel}`}>❌</button>
+                                                        <button onClick={saveEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnSave}`}>{uploading ? <Hourglass className="w-4 h-4" /> : <Save className="w-4 h-4" />}</button>
+                                                        <button onClick={cancelEdit} disabled={uploading} className={`${AppStyles.actionBtnBase} ${AppStyles.btnCancel}`}><X className="w-4 h-4" /></button>
                                                     </div>
                                                 ) : (
                                                     <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                                                        <button onClick={() => startEdit(f)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar">✏️</button>
-                                                        <button onClick={() => handleDelete(f.id)} className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} title="Eliminar">🗑️</button>
+                                                        <button onClick={() => startEdit(f)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit} flex items-center justify-center`} title="Editar"><Edit2 className="w-4 h-4" /></button>
+                                                        <button onClick={() => handleDelete(f.id)} className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete} flex items-center justify-center`} title="Eliminar"><Trash2 className="w-4 h-4" /></button>
                                                     </div>
                                                 )}
                                             </td>

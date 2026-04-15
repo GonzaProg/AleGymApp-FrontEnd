@@ -6,7 +6,7 @@ import { AppStyles } from '../../Styles/AppStyles';
 import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
 import { TIPOS_AGARRE, MUSCULOS_PERMITIDOS } from '../../API/Ejercicios/EjerciciosApi';
-import { ChevronDown, Play, Dumbbell } from 'lucide-react';
+import { ChevronDown, Play, Dumbbell, Edit2, Trash2, Image as ImageIcon, Video, Hourglass, Save } from 'lucide-react';
 import { MuscleFilter } from '../../Components/MuscleFilter/MuscleFilter';
 import { CloudinaryApi } from '../../Helpers/Cloudinary/Cloudinary';
 
@@ -117,9 +117,9 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
 
                                 {/* Botones de Edición / Eliminar abajo */}
                                 <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-center gap-2 z-20">
-                                    <button onClick={(e) => { e.stopPropagation(); startEdit(ej); }} className="bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500 hover:text-black p-2 rounded-lg transition-colors border border-yellow-500/30" title="Editar">✏️</button>
+                                    <button onClick={(e) => { e.stopPropagation(); startEdit(ej); }} className="bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500 hover:text-black p-2 rounded-lg transition-colors border border-yellow-500/30 flex justify-center items-center" title="Editar"><Edit2 className="w-4 h-4" /></button>
                                     {isAdmin && (
-                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(ej.id); }} className="bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white p-2 rounded-lg transition-colors border border-red-500/30" title="Eliminar">🗑️</button>
+                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(ej.id); }} className="bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white p-2 rounded-lg transition-colors border border-red-500/30 flex justify-center items-center" title="Eliminar"><Trash2 className="w-4 h-4" /></button>
                                     )}
                                 </div>
                             </div>
@@ -135,7 +135,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
              {editingId && createPortal(
                 <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/90 p-4 overflow-y-auto" onClick={cancelEdit}>
                     <div className={`${AppStyles.glassCard} max-w-2xl w-full p-6 animate-fade-in my-8 relative`} onClick={e => e.stopPropagation()}>
-                        <h3 className={AppStyles.sectionTitle}>✏️ Editar Ejercicio</h3>
+                        <h3 className={`${AppStyles.sectionTitle} flex items-center gap-2`}><Edit2 className="w-5 h-5 text-purple-400" /> Editar Ejercicio</h3>
                         
                         <div className="space-y-4">
                             <div>
@@ -213,15 +213,15 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                 <div className="grid grid-cols-2 gap-4 mt-4 p-4 bg-black/40 rounded-xl border border-white/5">
                                     <div>
                                         <label className={AppStyles.label}>Imagen</label>
-                                        <label className="cursor-pointer bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white text-sm py-2 px-4 rounded-lg flex justify-center items-center gap-2 shadow-lg">
-                                            <span>{selectedImage ? '🖼️ Seleccionada' : '🖼️ Subir Imagen'}</span>
+                                        <label className="cursor-pointer bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white text-sm py-2 px-4 rounded-lg flex justify-center items-center gap-2 shadow-lg transition-colors">
+                                            <span>{selectedImage ? <span className="flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Seleccionada</span> : <span className="flex items-center gap-2"><ImageIcon className="w-4 h-4 text-purple-400" /> Subir Imagen</span>}</span>
                                             <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
                                         </label>
                                     </div>
                                     <div>
                                         <label className={AppStyles.label}>Video</label>
-                                        <label className="cursor-pointer bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white text-sm py-2 px-4 rounded-lg flex justify-center items-center gap-2 shadow-lg">
-                                            <span>{selectedVideo ? '📹 Seleccionado' : '📹 Subir Video'}</span>
+                                        <label className="cursor-pointer bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white text-sm py-2 px-4 rounded-lg flex justify-center items-center gap-2 shadow-lg transition-colors">
+                                            <span>{selectedVideo ? <span className="flex items-center gap-2"><Video className="w-4 h-4" /> Seleccionado</span> : <span className="flex items-center gap-2"><Video className="w-4 h-4 text-green-400" /> Subir Video</span>}</span>
                                             <input type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
                                         </label>
                                     </div>
@@ -233,7 +233,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                     Cancelar
                                 </button>
                                 <button onClick={() => saveEdit(editingId)} disabled={uploading} className={`${AppStyles.btnPrimary} flex-[2] flex justify-center items-center gap-2`}>
-                                    {uploading ? '⏳ Guardando...' : '💾 Guardar'}
+                                    {uploading ? <span className="flex items-center gap-2"><Hourglass className="w-4 h-4" /> Guardando...</span> : <span className="flex items-center gap-2"><Save className="w-4 h-4" /> Guardar</span>}
                                 </button>
                             </div>
                         </div>

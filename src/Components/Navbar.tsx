@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
-import { Bell } from "lucide-react";
-
+import { Bell, BellOff } from "lucide-react";
 export const Navbar = () => {
   const navigate = useNavigate();
   const { notificaciones, unreadCount, markAsRead, refresh } = useNotificaciones();
@@ -67,8 +66,9 @@ export const Navbar = () => {
                     </div>
                     <div className={`max-h-80 ${AppStyles.customScrollbar}`}>
                         {notificaciones.length === 0 ? (
-                            <div className="p-8 text-center text-gray-500 text-sm">
-                                <p>🔕 No tienes notificaciones nuevas</p>
+                            <div className="p-8 text-center text-gray-500 text-sm flex flex-col items-center">
+                                <BellOff className="w-8 h-8 mb-2 opacity-50" />
+                                <p>No tienes notificaciones nuevas</p>
                             </div>
                         ) : (
                             <ul className="divide-y divide-white/5">

@@ -6,6 +6,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
+import { Store, Trash2, Plus, ShoppingCart, CheckCircle2, Image as ImageIcon, Edit2, Package, Search, Leaf, RefreshCcw } from "lucide-react";
 
 export const ProductosManager = () => {
     // 1. Hook de Productos (CRUD)
@@ -44,7 +45,7 @@ export const ProductosManager = () => {
     const formatPrice = (price: number) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(price);
     const modalTitle = editingProduct ? "Editar Producto" : "Nuevo Producto";
     const submitButtonText = editingProduct ? "Guardar Cambios" : "Crear Producto";
-    const iconModal = editingProduct ? "✏️" : "✨";
+    const iconModal = editingProduct ? <Edit2 className="w-5 h-5" /> : <Package className="w-5 h-5" />;
 
     return (
         <div className={AppStyles.principalContainer}>
@@ -53,15 +54,15 @@ export const ProductosManager = () => {
                 {/* --- HEADER --- */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gray-900/50 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
                     <div>
-                        <h1 className={AppStyles.title}>Tienda & Stock 🛒</h1>
+                        <h1 className={`${AppStyles.title} flex items-center gap-3`}>Tienda & Stock <Store className="w-8 h-8 text-white" /></h1>
                         <p className={AppStyles.subtitle}>Administra productos y realiza ventas rápidas.</p>
                     </div>
                     <div className="flex flex-wrap gap-3 w-full md:w-auto">
                         <button onClick={handleOpenTrash} className={AppStyles.btnSecondaryNotFlex + " flex items-center gap-2 justify-center flex-1 md:flex-none"}>
-                            <span>🗑️</span> Papelera
+                            <Trash2 className="w-4 h-4" /> Papelera
                         </button>
                         <button onClick={handleOpenCreate} className={AppStyles.btnPrimary + " flex items-center gap-2 justify-center flex-1 md:flex-none py-3 px-6"}>
-                            <span>+</span> Nuevo Producto
+                            <Plus className="w-4 h-4" /> Nuevo Producto
                         </button>
                     </div>
                 </div>
@@ -73,21 +74,26 @@ export const ProductosManager = () => {
                     <div className="lg:col-span-3 space-y-6">
                         <div className={`${AppStyles.glassCard} border-l-4 border-l-green-500`}>
                             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                <span>🏧</span> Punto de Venta
+                                <Store className="w-6 h-6 text-white" /> Punto de Venta
                             </h3>
 
                             {/* 1. BUSCADOR DE ALUMNOS (Estilo Hero) */}
                             <div className="relative z-50 mb-8">
                                 <div className={AppStyles.searchWrapper}>
                                     <div className={`${AppStyles.searchGlow} bg-gradient-to-r from-green-600 to-blue-600`}></div>
-                                    <input
-                                        type="text"
-                                        value={busqueda}
-                                        onChange={(e) => handleSearchChange(e.target.value)}
-                                        onFocus={() => busqueda && setMostrarSugerencias(true)}
-                                        placeholder="🔍 Buscar alumno para vender..."
-                                        className={AppStyles.searchInput}
-                                    />
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                                            <Search className="w-5 h-5 text-gray-400" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={busqueda}
+                                            onChange={(e) => handleSearchChange(e.target.value)}
+                                            onFocus={() => busqueda && setMostrarSugerencias(true)}
+                                            placeholder="Buscar alumno para vender..."
+                                            className={`${AppStyles.searchInput} pl-10`}
+                                        />
+                                    </div>
                                     {/* Botón limpiar */}
                                     {alumnoSeleccionado && (
                                         <button 
@@ -157,7 +163,7 @@ export const ProductosManager = () => {
                                                 onClick={clearCart}
                                                 className="mr-6 text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1 transition-colors"
                                             >
-                                                🗑️ Vaciar
+                                                <Trash2 className="w-4 h-4" /> Vaciar
                                             </button>
                                             {/* Usamos el componente PaymentMethodSelect */}
                                             <div className="flex-1 md:flex-none">
@@ -179,17 +185,17 @@ export const ProductosManager = () => {
                                             <Button 
                                                 onClick={() => handleCheckout(alumnoSeleccionado)} 
                                                 disabled={isCheckingOut}
-                                                className="bg-green-600 hover:bg-green-500 text-white px-8 py-4 rounded-xl shadow-lg shadow-green-900/40 font-bold text-lg transition-all hover:scale-105 disabled:opacity-50 disabled:scale-100"
+                                                className="bg-green-600 hover:bg-green-500 text-white px-8 py-4 rounded-xl shadow-lg shadow-green-900/40 font-bold text-lg transition-all hover:scale-105 disabled:opacity-50 disabled:scale-100 flex items-center gap-2"
                                             >
-                                                {isCheckingOut ? "Procesando..." : "✅ Confirmar Venta"}
+                                                {isCheckingOut ? "Procesando..." : <><CheckCircle2 className="w-5 h-5" /> Confirmar Venta</>}
                                             </Button>
                                         </div>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-700 rounded-xl">
-                                    <span className="text-4xl block mb-2 opacity-50">🛒</span>
-                                    Selecciona productos abajo para agregarlos al carrito
+                                <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-700 rounded-xl flex flex-col justify-center items-center">
+                                    <ShoppingCart className="w-12 h-12 opacity-50 mb-2" />
+                                    <span>Selecciona productos abajo para agregarlos al carrito</span>
                                 </div>
                             )}
                         </div>
@@ -218,7 +224,7 @@ export const ProductosManager = () => {
                                             <img src={prod.imagenUrl} alt={prod.nombre} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         ) : (
                                             <div className="w-full h-full flex flex-col items-center justify-center text-gray-600 bg-gray-900/50">
-                                                <span className="text-4xl opacity-30 mb-2">📷</span>
+                                                <ImageIcon className="w-12 h-12 opacity-30 mb-2" />
                                             </div>
                                         )}
                                         <div className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-black border backdrop-blur-md shadow-lg transition-all ${prod.stock > 5 ? "bg-black/60 text-white border-white/10" : "bg-red-600/90 text-white border-red-400 animate-pulse"}`}>
@@ -240,15 +246,15 @@ export const ProductosManager = () => {
                                                 onClick={() => addToCart(prod)}
                                                 className="w-full bg-green-600/20 hover:bg-green-500 text-green-400 hover:text-white font-bold py-2 rounded-lg border border-green-500/30 transition-all mb-3 flex items-center justify-center gap-2"
                                             >
-                                                <span>🛒</span> Agregar
+                                                <ShoppingCart className="w-4 h-4" /> Agregar
                                             </button>
 
                                             <div className="flex justify-between pt-3 border-t border-white/10">
                                                 <button onClick={() => handleOpenEdit(prod)} className="text-xs font-bold text-yellow-500 hover:text-yellow-400 flex items-center gap-1">
-                                                    ✏️ Editar
+                                                    <Edit2 className="w-3 h-3" /> Editar
                                                 </button>
                                                 <button onClick={() => handleDelete(prod)} className="text-xs font-bold text-red-500 hover:text-red-400 flex items-center gap-1">
-                                                    🗑️ Eliminar
+                                                    <Trash2 className="w-3 h-3" /> Eliminar
                                                 </button>
                                             </div>
                                         </div>
@@ -267,7 +273,7 @@ export const ProductosManager = () => {
                         <div className={`${AppStyles.modalContent} max-w-lg`} onClick={e => e.stopPropagation()}>
                             <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black/20">
                                 <h2 className="text-xl font-bold text-white flex items-center gap-3">
-                                    <span className="text-2xl">{iconModal}</span>
+                                    <span className="flex items-center text-purple-400">{iconModal}</span>
                                     {modalTitle}
                                 </h2>
                                 <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white text-3xl leading-none transition-colors">&times;</button>
@@ -283,8 +289,8 @@ export const ProductosManager = () => {
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="text-center text-gray-500 group-hover:text-green-400 transition-colors">
-                                                <span className="text-4xl block mb-2">📷</span>
+                                            <div className="text-center text-gray-500 group-hover:text-green-400 transition-colors flex flex-col justify-center items-center">
+                                                <ImageIcon className="w-10 h-10 mb-2" />
                                                 <span className="text-xs font-bold uppercase tracking-wider">Subir Foto</span>
                                             </div>
                                         )}
@@ -318,7 +324,7 @@ export const ProductosManager = () => {
                     <div className={AppStyles.modalOverlay}>
                         <div className={`${AppStyles.modalContent} max-w-2xl`} onClick={e => e.stopPropagation()}>
                             <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black/20">
-                                <h2 className="text-2xl font-bold text-white flex items-center gap-3"><span>🗑️</span> Papelera de Reciclaje</h2>
+                                <h2 className="text-2xl font-bold text-white flex items-center gap-3"><Trash2 className="w-6 h-6 text-red-500" /> Papelera de Reciclaje</h2>
                                 <button onClick={() => setIsTrashOpen(false)} className="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
                             </div>
                             <div className="p-6 bg-gray-900/50">
@@ -327,22 +333,22 @@ export const ProductosManager = () => {
                             <div className={`flex-1 p-6 space-y-3 min-h-[300px] ${AppStyles.customScrollbar}`}>
                                 {archivedProductos.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-gray-500 py-10 opacity-50">
-                                        <span className="text-5xl mb-2">🍃</span>
+                                        <Leaf className="w-12 h-12 mb-2" />
                                         <p>La papelera está limpia</p>
                                     </div>
                                 ) : (
                                     archivedProductos.map(prod => (
                                         <div key={prod.id} className="flex items-center justify-between bg-black/30 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors group">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 bg-gray-800 rounded-lg overflow-hidden border border-white/10">
-                                                    {prod.imagenUrl ? <img src={prod.imagenUrl} className="w-full h-full object-cover grayscale opacity-70" alt="" /> : <div className="w-full h-full flex items-center justify-center text-xl">📦</div>}
+                                                <div className="w-14 h-14 bg-gray-800 rounded-lg overflow-hidden border border-white/10 flex justify-center items-center">
+                                                    {prod.imagenUrl ? <img src={prod.imagenUrl} className="w-full h-full object-cover grayscale opacity-70" alt="" /> : <Package className="w-6 h-6 text-gray-500" />}
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-gray-300 text-lg group-hover:text-white transition-colors">{prod.nombre}</p>
                                                     <p className="text-xs text-gray-500 font-mono">Precio histórico: {formatPrice(prod.precio)}</p>
                                                 </div>
                                             </div>
-                                            <button onClick={() => handleRestore(prod)} className="px-4 py-2 bg-green-500/10 text-green-400 text-sm font-bold rounded-lg border border-green-500/20 hover:bg-green-500/20 hover:border-green-500/50 transition-all flex items-center gap-2"><span>♻️</span> Restaurar</button>
+                                            <button onClick={() => handleRestore(prod)} className="px-4 py-2 bg-green-500/10 text-green-400 text-sm font-bold rounded-lg border border-green-500/20 hover:bg-green-500/20 hover:border-green-500/50 transition-all flex items-center gap-2"><RefreshCcw className="w-4 h-4" /> Restaurar</button>
                                         </div>
                                     ))
                                 )}

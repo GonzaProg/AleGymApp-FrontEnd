@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Lock, MessageSquare } from "lucide-react";
 
 export const GymLockedScreen = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,7 +27,7 @@ export const GymLockedScreen = () => {
 
       <div className="relative z-10 max-w-lg bg-gray-800 border border-red-500/50 p-8 rounded-2xl shadow-2xl shadow-red-900/20">
         <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-          <span className="text-4xl">🔒</span>
+          <Lock className="w-10 h-10 text-red-500" />
         </div>
 
         <h1 className="text-3xl font-bold text-white mb-2">Servicio Suspendido</h1>
@@ -45,7 +46,7 @@ export const GymLockedScreen = () => {
             onClick={() => window.open("https://wa.me/549XXXXXXXX", "_blank")}
             className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition flex items-center justify-center gap-2"
           >
-            <span>💬</span> Contactar Soporte / Realizar Pago
+            <MessageSquare className="w-5 h-5" /> Contactar Soporte / Realizar Pago
           </button>
           
         </div>

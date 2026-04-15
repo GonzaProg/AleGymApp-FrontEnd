@@ -6,6 +6,7 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { FinancialDashboard } from "../../Components/Pagos/FinancialDashboard";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
+import { DollarSign, Search, Undo2 } from "lucide-react";
 
 export const MetricasFinancieras = () => {
     
@@ -48,9 +49,9 @@ export const MetricasFinancieras = () => {
                 {/* --- HEADER SUPERIOR --- */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                             <h1 className={AppStyles.title}>Gestión Financiera</h1>
-                            <span className="text-2xl">💰</span>
+                            <DollarSign className="w-8 h-8 text-green-400" />
                         </div>
                         <p className={AppStyles.subtitle}>Control de ingresos, egresos y devoluciones.</p>
                     </div>
@@ -71,7 +72,7 @@ export const MetricasFinancieras = () => {
                 {/* --- SECCIÓN DEVOLUCIONES / BÚSQUEDA --- */}
                 <div className={`${AppStyles.glassCard} border-l-4 border-l-yellow-500 overflow-visible relative z-20`}>
                     <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                        <span>🔍</span> Gestión de Devoluciones
+                        <Search className="w-5 h-5 text-white" /> Gestión de Devoluciones
                     </h3>
                     <p className="text-gray-400 text-sm mb-4">
                         Busca un alumno para filtrar su historial y realizar devoluciones o correcciones de pagos.
@@ -84,7 +85,7 @@ export const MetricasFinancieras = () => {
                                     value={busqueda}
                                     onChange={(e) => handleSearchChange(e.target.value)}
                                     onFocus={() => busqueda && setMostrarSugerencias(true)}
-                                    placeholder="🔎 Buscar alumno por nombre..."
+                                    placeholder="Buscar alumno por nombre..."
                                     className={AppStyles.inputDark}
                                 />
                                 
@@ -174,7 +175,7 @@ export const MetricasFinancieras = () => {
                                                                 className="text-gray-500 hover:text-red-400 transition-colors p-2 rounded hover:bg-red-500/10"
                                                                 title="Realizar Devolución"
                                                             >
-                                                                ↩️ Revertir
+                                                                <Undo2 className="inline w-4 h-4 mr-1" /> Revertir
                                                             </button>
                                                         )}
                                                     </td>

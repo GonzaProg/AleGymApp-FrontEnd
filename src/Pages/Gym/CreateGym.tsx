@@ -3,6 +3,7 @@ import { Card } from "../../Components/UI/Card";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
+import { Building2, Image as ImageIcon, Camera } from "lucide-react";
 
 export const CreateGym = () => {
     const { 
@@ -19,7 +20,7 @@ export const CreateGym = () => {
                 {/* --- FORMULARIO PASO 1: CREAR GIMNASIO --- */}
                 <Card className={`${AppStyles.glassCard} max-w-lg w-full p-8 ${showOwnerModal ? 'blur-sm pointer-events-none' : ''}`}>
                     <div className="text-center mb-6">
-                        <h2 className="text-3xl font-bold text-white drop-shadow-md">Nuevo Gimnasio 🏢</h2>
+                        <h2 className="text-3xl font-bold text-white drop-shadow-md flex items-center justify-center gap-3">Nuevo Gimnasio <Building2 className="w-8 h-8 text-blue-400" /></h2>
                         <p className="text-gray-300 text-sm mt-2">Paso 1: Dar de alta la sucursal.</p>
                     </div>
 
@@ -59,12 +60,12 @@ export const CreateGym = () => {
                                 <div className="flex flex-col items-center gap-2 pointer-events-none">
                                     {selectedLogo ? (
                                         <>
-                                            <span className="text-3xl">🖼️</span>
+                                            <ImageIcon className="w-8 h-8 text-green-400" />
                                             <p className="text-green-400 font-bold text-sm truncate max-w-[200px]">{selectedLogo.name}</p>
                                         </>
                                     ) : (
                                         <>
-                                            <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📷</span>
+                                            <Camera className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
                                             <p className="text-gray-400 text-xs">Arrastra el logo aquí</p>
                                         </>
                                     )}

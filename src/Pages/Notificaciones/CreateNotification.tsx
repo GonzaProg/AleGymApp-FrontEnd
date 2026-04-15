@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNotificaciones } from "../../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../../Styles/AppStyles";
+import { Megaphone, Send } from "lucide-react";
 
 export const CreateNotification = () => {
   const { sendBroadcast, loading } = useNotificaciones();
@@ -19,9 +20,9 @@ export const CreateNotification = () => {
         <div className="w-full max-w-2xl">
           
           <div className={AppStyles.headerContainer + " mb-14"}>
-            <h2 className="text-4xl font-bold mb-4 drop-shadow-lg">
+            <h2 className="text-4xl font-bold mb-4 drop-shadow-lg flex items-center">
                 <span className={AppStyles.subtitle}>Envía una Notificación a todos los Usuarios</span>
-                <span className="ml-3 text-white text-2xl">📢</span>
+                <Megaphone className="w-8 h-8 text-white ml-3" />
             </h2>
           </div>
 
@@ -66,7 +67,7 @@ export const CreateNotification = () => {
                   disabled={loading}
                   className={AppStyles.btnPrimary + " px-8 w-full"}
                 >
-                  {loading ? "Enviando..." : "🚀 Enviar a Todos"}
+                  {loading ? "Enviando..." : <span className="flex items-center justify-center gap-2"><Send className="w-4 h-4" /> Enviar a Todos</span>}
                 </button>
               </div>
             </form>

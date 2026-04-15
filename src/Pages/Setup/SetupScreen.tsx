@@ -6,6 +6,7 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles";
 import fondoSetup from "../../assets/Fondo-Login.jpg";
+import { Settings } from "lucide-react";
 
 export const SetupScreen = () => {
   const { setGymLocal } = useGymConfig();
@@ -38,7 +39,7 @@ export const SetupScreen = () => {
         <Card className={AppStyles.glassCard}>
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 border border-green-500/50 mb-4 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
-                <span className="text-3xl">⚙️</span>
+                <Settings className="w-8 h-8 text-green-500" />
             </div>
             <h1 className="text-3xl font-bold text-white drop-shadow-md">Configuración</h1>
             <p className="text-gray-300 mt-2 text-sm px-4">

@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { PlanExpiredModal } from "../../Components/Planes/PlanExpiredModal"; 
 import { GymCodeModal } from "../../Components/GymCodeModal/GymCodeModal"; 
 import { useGymConfig } from "../../Context/GymConfigContext";
+import { Rocket, AlertTriangle, Dumbbell } from "lucide-react";
 
 export const Login = () => {
   // Estado para alternar vistas
@@ -91,7 +92,9 @@ export const Login = () => {
                 </div>
 
                 <Button type="submit" className={LoginStyles.btnPrimary} fullWidth disabled={registerLoading}>
-                    {registerLoading ? "CREANDO CUENTA..." : "REGISTRARME 🚀"}
+                    <span className="flex items-center justify-center gap-2">
+                        {registerLoading ? "CREANDO CUENTA..." : <>REGISTRARME <Rocket className="w-5 h-5" /></>}
+                    </span>
                 </Button>
 
                 <div className="text-center pt-4 border-t border-white/10">
@@ -149,7 +152,7 @@ export const Login = () => {
 
                 {loginError && (
                     <div className={`${LoginStyles.errorBox} flex items-center gap-2`}>
-                        {loginError.includes("Mantenimiento") && <span className="text-xl">⚠️</span>}
+                        {loginError.includes("Mantenimiento") && <AlertTriangle className="w-5 h-5 text-yellow-500" />}
                         {loginError}
                     </div>
                 )}
@@ -174,9 +177,9 @@ export const Login = () => {
                         <button 
                             type="button"
                             onClick={() => setShowGymCodeModal(true)}
-                            className="text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer"
+                            className="text-xs text-gray-500 hover:text-gray-300 transition-colors cursor-pointer flex items-center justify-center gap-2"
                         >
-                            🏋️ Cambiar código de gimnasio
+                            <Dumbbell className="w-4 h-4" /> Cambiar código de gimnasio
                         </button>
 
                         <Link 

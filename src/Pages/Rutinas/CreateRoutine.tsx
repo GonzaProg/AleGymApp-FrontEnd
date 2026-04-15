@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, ChevronDown } from "lucide-react";
+import { Play, ChevronDown, Info, Dumbbell, ArrowUp, ArrowDown, Edit2, Trash2, RefreshCw, Plus, Save, CheckCircle2 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
@@ -101,8 +101,8 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
             ) : (
                 /* CASO: GENERAL O EDICIÓN (Cartel Simple) */
                 <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl">
-                    <p className="text-blue-300 text-sm font-bold">
-                        ℹ️ {routineIdToEdit ? "Modo Edición" : "Modo Plantilla"}
+                    <p className="text-blue-300 text-sm font-bold flex items-center gap-2">
+                        <Info className="w-4 h-4" /> {routineIdToEdit ? "Modo Edición" : "Modo Plantilla"}
                     </p>
                     {/* Opcional: Mostrar nombre del alumno en pequeñito si estamos editando una personal */}
                     {routineIdToEdit && !isGeneral && alumnoNombreDisplay && (
@@ -152,7 +152,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                                         <img src={thumbUrl} alt={ej.nombre} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
                                     ) : (
                                         <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center text-gray-500 bg-gray-800/50">
-                                            <span className="text-2xl mb-1 opacity-50">🏋️</span>
+                                            <Dumbbell className="w-8 h-8 opacity-50 mb-1" />
                                         </div>
                                     )}
                                     
@@ -245,8 +245,8 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                 {editIndex !== null && (
                     <Button variant="danger" onClick={cancelEditRow} className="flex-1 bg-gray-700">CANCELAR</Button>
                 )}
-                <Button variant="info" fullWidth onClick={handleAddExercise} className={editIndex !== null ? "flex-[2] bg-yellow-500/20 text-yellow-400" : AppStyles.btnPrimary}>
-                    {editIndex !== null ? "🔄 ACTUALIZAR" : "+ AGREGAR"}
+                <Button variant="info" fullWidth onClick={handleAddExercise} className={`${editIndex !== null ? "flex-[2] bg-yellow-500/20 text-yellow-400" : AppStyles.btnPrimary} flex items-center justify-center gap-2`}>
+                    {editIndex !== null ? <><RefreshCw className="w-4 h-4" /> ACTUALIZAR</> : <><Plus className="w-4 h-4" /> AGREGAR</>}
                 </Button>
             </div>
           </div>
@@ -283,10 +283,10 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                         <td className="p-4 text-center text-gray-300">{d.repeticiones}</td>
                         <td className="p-4 text-center text-green-400">{d.peso}</td>
                         <td className="p-4 text-right flex justify-end gap-2">
-                          <button onClick={() => moveRowUp(index)} disabled={index === 0} className={`p-2 rounded transition-opacity ${index === 0 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬆️</button>
-                          <button onClick={() => moveRowDown(index)} disabled={index === detalles.length - 1} className={`p-2 rounded transition-opacity ${index === detalles.length - 1 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}>⬇️</button>
-                          <button onClick={() => handleEditRow(index)} className="text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 p-2 rounded transition-colors">✏️</button>
-                          <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 hover:bg-red-500/20 p-2 rounded transition-colors">🗑️</button>
+                          <button onClick={() => moveRowUp(index)} disabled={index === 0} className={`p-2 rounded flex justify-center items-center transition-opacity ${index === 0 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}><ArrowUp className="w-4 h-4" /></button>
+                          <button onClick={() => moveRowDown(index)} disabled={index === detalles.length - 1} className={`p-2 rounded flex justify-center items-center transition-opacity ${index === detalles.length - 1 ? 'opacity-30 cursor-not-allowed text-gray-500' : 'text-blue-400 hover:bg-blue-500/10'}`}><ArrowDown className="w-4 h-4" /></button>
+                          <button onClick={() => handleEditRow(index)} className="text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 p-2 border border-yellow-500/20 rounded transition-colors flex justify-center items-center"><Edit2 className="w-4 h-4" /></button>
+                          <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 hover:bg-red-500/20 p-2 border border-red-500/20 rounded transition-colors flex justify-center items-center"><Trash2 className="w-4 h-4" /></button>
                         </td>
                       </tr>
                     )})}
@@ -296,8 +296,8 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
            )}
 
           <div className="mt-8 flex justify-end pt-6 border-t border-white/10">
-            <Button variant="info" onClick={handleSubmit} size="lg" className={AppStyles.btnPrimary}>
-                {routineIdToEdit ? '💾 GUARDAR CAMBIOS' : '✅ CONFIRMAR'}
+            <Button variant="info" onClick={handleSubmit} size="lg" className={`${AppStyles.btnPrimary} flex items-center justify-center gap-2`}>
+                {routineIdToEdit ? <><Save className="w-5 h-5" /> GUARDAR CAMBIOS</> : <><CheckCircle2 className="w-5 h-5" /> CONFIRMAR</>}
             </Button>
           </div>
         </div>

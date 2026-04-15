@@ -1,7 +1,7 @@
 import { useSendRoutinePDF } from "../../Hooks/EnviarRutinaPDF/useSendRoutinePDF";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Button } from "../../Components/UI/Button";
-import { Send } from "lucide-react";
+import { Send, Search, FolderOpen, Calendar, Dumbbell, User } from "lucide-react";
 
 
 export const SendRoutinePDF = () => {
@@ -37,14 +37,19 @@ export const SendRoutinePDF = () => {
 
           <div className="relative">
              <div className="flex gap-2">
-                <input
-                    type="text"
-                    value={busqueda}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    onFocus={() => busqueda && setMostrarSugerencias(true)}
-                    placeholder="🔍 Buscar alumno por nombre..."
-                    className={AppStyles.searchInput}
-                />
+                <div className="relative w-full">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                        <Search className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        value={busqueda}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        onFocus={() => busqueda && setMostrarSugerencias(true)}
+                        placeholder="Buscar alumno por nombre..."
+                        className={`${AppStyles.searchInput} pl-10`}
+                    />
+                </div>
                 {alumnoSeleccionado && (
                     <button 
                         onClick={clearSelection}
@@ -92,7 +97,7 @@ export const SendRoutinePDF = () => {
                     </div>
                 ) : rutinas.length === 0 ? (
                     <div className="bg-gray-800/40 backdrop-blur-md border border-white/5 rounded-2xl p-10 text-center flex flex-col items-center">
-                        <span className="text-5xl opacity-20 grayscale mb-4">📂</span>
+                        <FolderOpen className="w-16 h-16 opacity-30 text-gray-400 mb-4" />
                         <p className="text-gray-400">Este alumno no tiene rutinas asignadas.</p>
                     </div>
                 ) : (
@@ -112,13 +117,13 @@ export const SendRoutinePDF = () => {
                                     </h4>
                                     <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-400">
                                         <span className="flex items-center gap-1">
-                                            📅 {new Date(rutina.fechaCreacion).toLocaleDateString()}
+                                            <Calendar className="w-4 h-4 text-gray-500" /> {new Date(rutina.fechaCreacion).toLocaleDateString()}
                                         </span>
                                         <span className="flex items-center gap-1">
-                                            🏋️ {rutina.detalles?.length || 0} Ejercicios
+                                            <Dumbbell className="w-4 h-4 text-purple-400" /> {rutina.detalles?.length || 0} Ejercicios
                                         </span>
                                         <span className="flex items-center gap-1">
-                                            👨‍🏫 {rutina.entrenador || "Profe"}
+                                            <User className="w-4 h-4 text-blue-400" /> {rutina.entrenador || "Profe"}
                                         </span>
                                     </div>
                                 </div>

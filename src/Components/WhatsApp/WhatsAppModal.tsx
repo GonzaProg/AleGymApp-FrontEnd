@@ -4,6 +4,7 @@ import api from "../../API/axios";
 import { useWhatsAppModal } from "../../Context/WhatsAppModalContext";
 import { Card } from "../UI/Card";
 import { Button } from "../UI/Button";
+import { Smartphone, CheckCircle2, X } from "lucide-react";
 
 export const WhatsAppModal = () => {
   const { isOpen, closeModal } = useWhatsAppModal();
@@ -120,9 +121,9 @@ export const WhatsAppModal = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <Card className="max-w-md w-full bg-gray-900 border border-green-500/30 p-6 text-center relative">
         {/* Botón X llama a handleClose (Cancela) */}
-        <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
+        <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-white"><X className="w-5 h-5"/></button>
         
-        <h2 className="text-2xl font-bold text-white mb-2">WhatsApp Web 📱</h2>
+        <h2 className="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-2">WhatsApp Web <Smartphone className="w-6 h-6 text-green-400"/></h2>
         <p className="text-gray-400 text-sm mb-6">
              {isReady ? "¡Vinculación Exitosa!" : "Escanea el código para conectar"}
         </p>
@@ -134,8 +135,8 @@ export const WhatsAppModal = () => {
                 <p className="text-gray-500">Generando QR seguro...</p>
             </div>
           ) : isReady ? (
-            <div className="text-center animate-fade-in-up">
-                <div className="text-6xl mb-4">✅</div>
+            <div className="text-center animate-fade-in-up flex flex-col items-center">
+                <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
                 <p className="text-green-600 font-bold text-lg">¡Conectado!</p>
                 <p className="text-gray-400 text-xs mt-2">Cerrando ventana...</p>
             </div>
