@@ -11,7 +11,7 @@ export const UserRoutinesManager = ({ onNavigate, onEdit, onEditGroup }: { onNav
         rutinasAlumno, loading,
         busqueda, handleSearchChange, sugerencias, mostrarSugerencias, setMostrarSugerencias,
         handleSelectAlumno, alumnoSeleccionado, clearSelection,
-        handleDelete, handleUnlink, canEditRoutine
+        handleDelete, handleUnlink
     } = useUserRoutinesManager();
 
     // Estado para expandir/contraer vista de días en cards de grupo
@@ -113,27 +113,15 @@ export const UserRoutinesManager = ({ onNavigate, onEdit, onEditGroup }: { onNav
                                             {rutina.nombreRutina}
                                         </h3>
                                         <div className="flex gap-2">
-                                            {canEditRoutine(rutina) && (
-                                                <>
-                                                    <button 
-                                                        onClick={() => onEdit(rutina.id)}
-                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} 
-                                                        title="Editar Rutina Personal"
-                                                    >
-                                                        <Edit2 className="w-4 h-4 ml-1" />
-                                                    </button>
-
-                                                    <button 
-                                                        onClick={() => handleDelete(rutina)}
-                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} 
-                                                        title="Eliminar Rutina Personal"
-                                                    >
-                                                        <Trash2 className="w-4 h-4 ml-1" />
-                                                    </button>
-                                                </>
-                                            )}
-                                            {/* Para grupos: editar, eliminar y desvincular */}
-                                            {esGrupo && (
+                                            {rutina.esGeneral ? (
+                                                <button 
+                                                    onClick={() => handleUnlink(rutina)}
+                                                    className={`${AppStyles.btnIconBase} bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border-orange-500/20`} 
+                                                    title="Desvincular Rutina General del Alumno"
+                                                >
+                                                    <LinkIcon className="w-4 h-4 ml-1" />
+                                                </button>
+                                            ) : esGrupo ? (
                                                 <>
                                                     <button 
                                                         onClick={() => onEditGroup(rutina.grupoId)}
@@ -149,25 +137,22 @@ export const UserRoutinesManager = ({ onNavigate, onEdit, onEditGroup }: { onNav
                                                     >
                                                         <Trash2 className="w-4 h-4 ml-1" />
                                                     </button>
-                                                    {rutina.esGeneral && (
-                                                        <button 
-                                                            onClick={() => handleUnlink(rutina)}
-                                                            className={`${AppStyles.btnIconBase} bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border-orange-500/20`} 
-                                                            title="Desvincular todos los días"
-                                                        >
-                                                            <LinkIcon className="w-4 h-4 ml-1" />
-                                                        </button>
-                                                    )}
                                                 </>
-                                            )}
-                                            {!canEditRoutine(rutina) && !esGrupo && (
+                                            ) : (
                                                 <>
                                                     <button 
-                                                        onClick={() => handleUnlink(rutina)}
-                                                        className={`${AppStyles.btnIconBase} bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border-orange-500/20`} 
-                                                        title="Desvincular Rutina General del Alumno"
+                                                        onClick={() => onEdit(rutina.id)}
+                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} 
+                                                        title="Editar Rutina Personal"
                                                     >
-                                                        <LinkIcon className="w-4 h-4 ml-1" />
+                                                        <Edit2 className="w-4 h-4 ml-1" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDelete(rutina)}
+                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} 
+                                                        title="Eliminar Rutina Personal"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 ml-1" />
                                                     </button>
                                                 </>
                                             )}
@@ -250,12 +235,12 @@ export const UserRoutinesManager = ({ onNavigate, onEdit, onEditGroup }: { onNav
                                     </div>
 
                                     <div className="text-xs text-gray-500 pt-2 border-t border-white/10">
-                                        {esGrupo ? (
-                                            <span className="text-purple-400 flex items-center gap-1"><Calendar className="w-4 h-4" /> Rutina Multi-Día</span>
-                                        ) : canEditRoutine(rutina) ? (
-                                            <span className="text-green-400 flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Editable</span>
-                                        ) : (
+                                        {rutina.esGeneral ? (
                                             <span className="text-blue-400 flex items-center gap-1"><Info className="w-4 h-4" /> Gestión desde Rutinas Generales</span>
+                                        ) : esGrupo ? (
+                                            <span className="text-purple-400 flex items-center gap-1"><Calendar className="w-4 h-4" /> Rutina Multi-Día</span>
+                                        ) : (
+                                            <span className="text-green-400 flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Editable</span>
                                         )}
                                     </div>
                                 </Card>

@@ -278,10 +278,10 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null, group
               <div className="mb-4">
                 <div className="flex items-center gap-2 flex-wrap">
                   {dias.map((dia, index) => (
-                    <button
+                    <div
                       key={index}
                       onClick={() => handleSelectDay(index)}
-                      className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                      className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                         diaActual === index 
                           ? 'bg-green-500/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]' 
                           : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-gray-200'
@@ -304,7 +304,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null, group
                           <X className="w-3 h-3" />
                         </button>
                       )}
-                    </button>
+                    </div>
                   ))}
                   
                   {/* Botón Nuevo Día */} 

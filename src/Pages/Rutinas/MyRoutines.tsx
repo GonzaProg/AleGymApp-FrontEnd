@@ -83,6 +83,18 @@ export const MyRoutines = () => {
     }
   }, []);
 
+  // Resetear scroll al cambiar de rutina seleccionada o de día
+  useEffect(() => {
+    if (selectedRoutine) {
+      window.scrollTo(0, 0);
+      // Buscamos los contenedores con scroll que envuelven a MyRoutines (en Home.tsx)
+      const scrollContainers = document.querySelectorAll('.custom-scrollbar, .overflow-y-auto');
+      scrollContainers.forEach(container => {
+        container.scrollTop = 0;
+      });
+    }
+  }, [selectedRoutine, selectedDayIndex]);
+
   const toggleExerciseCheck = (routineId: string | number, exerciseId: string | number | undefined, index: number) => {
     const key = `${routineId}-${exerciseId || index}`;
     setCheckedExercises(prev => {
