@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, ChevronDown, Info, Dumbbell, ArrowUp, ArrowDown, Edit2, Trash2, RefreshCw, Plus, Save, CheckCircle2 } from "lucide-react";
+import { Play, ChevronDown, Info, Dumbbell, ArrowUp, ArrowDown, Edit2, Trash2, RefreshCw, Plus, Save, CheckCircle2, Calendar, X } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
@@ -11,9 +11,10 @@ import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 interface CreateRoutineProps {
     isGeneral?: boolean;
     routineIdToEdit?: number | null;
+    groupIdToEdit?: string | null;
 }
 
-export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: CreateRoutineProps) => {
+export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null, groupIdToEdit = null }: CreateRoutineProps) => {
   const {
     // Datos Generales
     nombreRutina, setNombreRutina,
@@ -35,8 +36,11 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     handleAddExercise, 
     detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, 
     moveRowUp, moveRowDown, handleSubmit,
-    ejercicios // <-- Extraemos los ejercicios para buscar detalles rápidos
-  } = useCreateRoutine(isGeneral, routineIdToEdit); 
+    ejercicios, // <-- Extraemos los ejercicios para buscar detalles rápidos
+    // --- MULTI-DÍA ---
+    dias, diaActual, handleAddDay, handleRemoveDay, handleSelectDay, MAX_DIAS,
+    isEditing
+  } = useCreateRoutine(isGeneral, routineIdToEdit, groupIdToEdit);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   
@@ -53,6 +57,9 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [previewUrl, setMostrarSugerenciasEjercicios]);
 
+  // Contar ejercicios totales en todos los días
+  const totalEjercicios = dias.reduce((sum, dia) => sum + dia.length, 0);
+
   return (
     <div className={`${AppStyles.principalContainer} principalContainer`}>
       <div className="w-full max-w-7xl mx-auto space-y-6">
@@ -65,7 +72,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
              
              <h3 className={`${AppStyles.sectionTitle} left-[100px]`}>
                 <span className={AppStyles.numberBadge}>1</span> 
-                {routineIdToEdit ? "Editar Rutina" : "Nueva Rutina"}
+                {isEditing ? "Editar Rutina" : "Nueva Rutina"}
              </h3>
 
             <Input 
@@ -77,8 +84,18 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
               labelClassName={AppStyles.label}
             />
             
+            {/* INFO: Si tiene más de 1 día, mostrar formato de nombre */}
+            {dias.length > 1 && (
+              <div className="mt-2 p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+                <p className="text-blue-300 text-xs flex items-center gap-2">
+                  <Info className="w-3 h-3 flex-shrink-0" />
+                  {isEditing ? 'Se actualizarán' : 'Se crearán'} {dias.length} rutinas: {dias.map((_, i) => `"${nombreRutina || "..."} - Día ${i+1}"`).join(", ")}
+                </p>
+              </div>
+            )}
+            
             {/* LÓGICA CORREGIDA CON ESTILO SIMPLE */}
-            {(!isGeneral && !routineIdToEdit) ? (
+            {(!isGeneral && !isEditing) ? (
                 /* CASO: CREANDO PERSONALIZADA (Buscador) */
                 <div className="relative mt-4">
                     <Input 
@@ -120,7 +137,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
              <div className={"absolute top-[1px] left-[6px] w-[calc(100%-2px)] h-1 bg-gradient-to-r from-green-500/50 to-transparent rounded-t-3xl"}></div>
              <h3 className={`${AppStyles.sectionTitle} left-[100px]`}>
               <span className={AppStyles.numberBadge}>2</span>
-              Ejercicios
+              Ejercicios {dias.length > 1 && <span className="text-green-400 text-sm font-normal ml-2">→ Día {diaActual + 1}</span>}
              </h3>
              
              <div className="mt-4 bg-black/20 rounded-xl border border-white/5 mb-4">
@@ -246,7 +263,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
                     <Button variant="danger" onClick={cancelEditRow} className="flex-1 bg-gray-700">CANCELAR</Button>
                 )}
                 <Button variant="info" fullWidth onClick={handleAddExercise} className={`${editIndex !== null ? "flex-[2] bg-yellow-500/20 text-yellow-400" : AppStyles.btnPrimary} flex items-center justify-center gap-2`}>
-                    {editIndex !== null ? <><RefreshCw className="w-4 h-4" /> ACTUALIZAR</> : <><Plus className="w-4 h-4" /> AGREGAR</>}
+                    {editIndex !== null ? <><RefreshCw className="w-4 h-4" /> ACTUALIZAR</> : <><Plus className="w-4 h-4" /> AGREGAR A DÍA {diaActual + 1}</>}
                 </Button>
             </div>
           </div>
@@ -256,7 +273,76 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
         <div className={AppStyles.glassCard}>
             <div className={AppStyles.sectionTitle}><h3>Resumen</h3></div>
             
-            {detalles.length === 0 ? <div className="text-center py-10 text-gray-500">Sin ejercicios</div> : (
+            {/* === TABS DE DÍAS === */}
+            {!(routineIdToEdit) && (
+              <div className="mb-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {dias.map((dia, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSelectDay(index)}
+                      className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                        diaActual === index 
+                          ? 'bg-green-500/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.15)]' 
+                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-gray-200'
+                      }`}
+                    >
+                      <Calendar className="w-3.5 h-3.5" />
+                      Día {index + 1}
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                        diaActual === index ? 'bg-green-500/30 text-green-300' : 'bg-white/10 text-gray-500'
+                      }`}>
+                        {dia.length}
+                      </span>
+                      {/* Botón eliminar día (solo si hay más de 1) */}
+                      {dias.length > 1 && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleRemoveDay(index); }}
+                          className="ml-1 p-0.5 rounded-full hover:bg-red-500/30 text-gray-500 hover:text-red-400 transition-colors"
+                          title={`Eliminar Día ${index + 1}`}
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </button>
+                  ))}
+                  
+                  {/* Botón Nuevo Día */} 
+                  {dias.length < MAX_DIAS && (
+                    <button
+                      onClick={handleAddDay}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50 transition-all"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Nuevo Día
+                    </button>
+                  )}
+                </div>
+
+                {/* Info de resumen multi-día */}
+                {dias.length > 1 && (
+                  <div className="mt-3 text-xs text-gray-500 flex items-center gap-2">
+                    <Info className="w-3 h-3" />
+                    {dias.length} días · {totalEjercicios} ejercicios en total · Máximo {MAX_DIAS} días
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* === ENCABEZADO DEL DÍA ACTUAL === */}
+            {dias.length > 1 && (
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-white/10">
+                <div className="w-8 h-8 rounded-lg bg-green-500/20 border border-green-500/30 flex items-center justify-center">
+                  <span className="text-green-400 font-bold text-sm">{diaActual + 1}</span>
+                </div>
+                <div>
+                  <h4 className="text-white font-bold text-sm">Día {diaActual + 1}</h4>
+                  <p className="text-gray-500 text-xs">{detalles.length} ejercicio{detalles.length !== 1 ? 's' : ''}</p>
+                </div>
+              </div>
+            )}
+            
+            {detalles.length === 0 ? <div className="text-center py-10 text-gray-500">Sin ejercicios en {dias.length > 1 ? `Día ${diaActual + 1}` : 'la rutina'}</div> : (
             <div className="overflow-x-auto rounded-xl border border-white/10">
               <table className="min-w-full text-sm text-left">
                 <thead className={AppStyles.tableHeader}>
@@ -297,7 +383,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null }: Cre
 
           <div className="mt-8 flex justify-end pt-6 border-t border-white/10">
             <Button variant="info" onClick={handleSubmit} size="lg" className={`${AppStyles.btnPrimary} flex items-center justify-center gap-2`}>
-                {routineIdToEdit ? <><Save className="w-5 h-5" /> GUARDAR CAMBIOS</> : <><CheckCircle2 className="w-5 h-5" /> CONFIRMAR</>}
+                {routineIdToEdit ? <><Save className="w-5 h-5" /> GUARDAR CAMBIOS</> : <><CheckCircle2 className="w-5 h-5" /> {dias.length > 1 ? `CONFIRMAR (${dias.length} DÍAS)` : 'CONFIRMAR'}</>}
             </Button>
           </div>
         </div>

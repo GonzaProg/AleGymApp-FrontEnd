@@ -4,7 +4,7 @@ import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { showSuccess, showError } from "../../Helpers/Alerts";
 import { useAlumnoSearch } from "../useAlumnoSearch";
 
-export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: number | null = null) => {
+export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: number | null = null, groupIdToEdit: string | null = null) => {
 
   // Estados Base
   const [ejercicios, setEjercicios] = useState<any[]>([]);
@@ -33,9 +33,56 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   const [pesosArray, setPesosArray] = useState<string[]>(Array(4).fill(""));
   const [repsArrayCalculado, setRepsArrayCalculado] = useState<string[]>([]);
 
-  // Tabla
-  const [detalles, setDetalles] = useState<any[]>([]);
+  // === SISTEMA MULTI-DÍA ===
+  const [dias, setDias] = useState<any[][]>([[]]); // Array de arrays de detalles
+  const [diaActual, setDiaActual] = useState(0);   // Índice del día activo
+  const MAX_DIAS = 5;
+
+  // Tabla (ahora referencia al día actual)
+  const detalles = dias[diaActual] || [];
   const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  // Helper para actualizar detalles del día actual
+  const setDetallesDiaActual = (updater: (prev: any[]) => any[]) => {
+    setDias(prev => {
+      const copia = [...prev];
+      copia[diaActual] = updater(copia[diaActual] || []);
+      return copia;
+    });
+  };
+
+  // Agregar nuevo día
+  const handleAddDay = () => {
+    if (dias.length >= MAX_DIAS) {
+      showError(`Máximo ${MAX_DIAS} días por rutina`);
+      return;
+    }
+    setDias(prev => [...prev, []]);
+    setDiaActual(dias.length); // Ir al nuevo día
+    cancelEditRow();
+  };
+
+  // Eliminar día
+  const handleRemoveDay = (dayIndex: number) => {
+    if (dias.length <= 1) {
+      showError("Debe haber al menos 1 día");
+      return;
+    }
+    setDias(prev => prev.filter((_, i) => i !== dayIndex));
+    // Ajustar día actual
+    if (diaActual >= dias.length - 1) {
+      setDiaActual(Math.max(0, dias.length - 2));
+    } else if (dayIndex < diaActual) {
+      setDiaActual(diaActual - 1);
+    }
+    cancelEditRow();
+  };
+
+  // Cambiar de día
+  const handleSelectDay = (dayIndex: number) => {
+    cancelEditRow();
+    setDiaActual(dayIndex);
+  };
 
   // Hook del buscador de Alumnos (Solo se usa si estamos CREANDO una rutina PERSONAL)
   const {
@@ -88,6 +135,9 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
      });
   }, [series, reps, tipoSerie, repsInicial]);
 
+  // Flag de edición (individual o grupo)
+  const isEditing = !!(routineIdToEdit || groupIdToEdit);
+
   // 1. CARGA INICIAL (Ejercicios y Datos de Rutina si es edición)
   useEffect(() => {
     let mounted = true;
@@ -100,7 +150,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
             setEjerciciosFiltrados(dataEjercicios); // Inicialmente todos
         }
 
-        // --- MODO EDICIÓN ---
+        // --- MODO EDICIÓN INDIVIDUAL ---
         if (routineIdToEdit) {
             const rutina = await RutinasApi.getOne(routineIdToEdit);
             
@@ -121,7 +171,36 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
                     repeticiones: d.repeticiones,
                     peso: d.peso
                 }));
-                setDetalles(detallesFormateados);
+                setDias([detallesFormateados]); // Un solo día en edición
+                setDiaActual(0);
+            }
+        }
+
+        // --- MODO EDICIÓN MULTI-DÍA ---
+        if (groupIdToEdit) {
+            const grupo = await RutinasApi.getGrupo(groupIdToEdit);
+            
+            if (mounted) {
+                setNombreRutina(grupo.nombreRutina);
+                
+                // Si es personalizada, extraemos el dueño original
+                if (!grupo.esGeneral && grupo.usuario) {
+                    setAlumnoId(grupo.usuario.id.toString());
+                    setAlumnoNombreDisplay(`${grupo.usuario.nombre} ${grupo.usuario.apellido}`);
+                }
+
+                // Cargar todos los días
+                const diasFormateados = grupo.dias.map((dia: any) => 
+                    dia.detalles.map((d: any) => ({
+                        ejercicioId: d.ejercicio.id,
+                        nombreEjercicio: d.ejercicio.nombre,
+                        series: d.series,
+                        repeticiones: d.repeticiones,
+                        peso: d.peso
+                    }))
+                );
+                setDias(diasFormateados);
+                setDiaActual(0);
             }
         }
       } catch (error) { 
@@ -133,7 +212,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     fetchData();
 
     return () => { mounted = false; };
-  }, [routineIdToEdit]); 
+  }, [routineIdToEdit, groupIdToEdit]); 
 
   // --- WRAPPER PARA SELECCIONAR ALUMNO (SOLO CREACIÓN) ---
   const onSelectAlumno = (alumno: any) => {
@@ -220,14 +299,14 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     };
 
     if (editIndex !== null) {
-        setDetalles(prev => {
+        setDetallesDiaActual(prev => {
             const copia = [...prev];
             copia[editIndex] = nuevoDetalle;
             return copia;
         });
         setEditIndex(null); 
     } else {
-        setDetalles(prev => [...prev, nuevoDetalle]);
+        setDetallesDiaActual(prev => [...prev, nuevoDetalle]);
     }
 
     // RESET COMPLETO DEL FORMULARIO DE EJERCICIO
@@ -277,13 +356,13 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   };
 
   const handleDeleteRow = (index: number) => {
-      setDetalles(prev => prev.filter((_, i) => i !== index));
+      setDetallesDiaActual(prev => prev.filter((_, i) => i !== index));
       if (editIndex === index) cancelEditRow();
   };
 
   const moveRowUp = (index: number) => {
       if (index === 0) return;
-      setDetalles(prev => {
+      setDetallesDiaActual(prev => {
           const copia = [...prev];
           const temp = copia[index];
           copia[index] = copia[index - 1];
@@ -294,7 +373,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
 
   const moveRowDown = (index: number) => {
       if (index === detalles.length - 1) return;
-      setDetalles(prev => {
+      setDetallesDiaActual(prev => {
           const copia = [...prev];
           const temp = copia[index];
           copia[index] = copia[index + 1];
@@ -306,7 +385,12 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   // --- GUARDAR ---
   const handleSubmit = async () => {
     if (!nombreRutina.trim()) return showError("Falta el nombre de la rutina");
-    if (detalles.length === 0) return showError("Agrega al menos un ejercicio");
+    
+    // Validar que todos los días tengan al menos un ejercicio
+    const diasVacios = dias.filter(d => d.length === 0);
+    if (diasVacios.length > 0) {
+      return showError(`Hay ${diasVacios.length} día(s) sin ejercicios. Agrega ejercicios a todos los días o elimina los vacíos.`);
+    }
     
     // Validación de Alumno solo si es Personalizada
     if (!isGeneral && !alumnoId) {
@@ -314,20 +398,45 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     }
 
     try {
-      const body = {
-        // Si es general, mandamos null. Si es personal, mandamos el ID.
-        usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
-        nombreRutina,
-        detalles,
-        esGeneral: isGeneral
-      };
-
-      if (routineIdToEdit) {
-          await RutinasApi.update(routineIdToEdit, body);
-          await showSuccess("Rutina Actualizada");
+      if (groupIdToEdit) {
+        // --- MODO EDICIÓN MULTI-DÍA ---
+        const body = {
+          nombreRutina,
+          dias: dias,
+          esGeneral: isGeneral
+        };
+        await RutinasApi.updateGrupo(groupIdToEdit, body);
+        await showSuccess(`Rutina actualizada (${dias.length} días)`);
+      } else if (routineIdToEdit) {
+        // --- MODO EDICIÓN INDIVIDUAL ---
+        const body = {
+          usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
+          nombreRutina,
+          detalles: dias[0] || [],
+          esGeneral: isGeneral
+        };
+        await RutinasApi.update(routineIdToEdit, body);
+        await showSuccess("Rutina Actualizada");
+      } else if (dias.length === 1) {
+        // --- CREACIÓN SIMPLE (1 día) ---
+        const body = {
+          usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
+          nombreRutina,
+          detalles: dias[0],
+          esGeneral: isGeneral
+        };
+        await RutinasApi.create(body);
+        await showSuccess("Rutina Creada");
       } else {
-          await RutinasApi.create(body);
-          await showSuccess("Rutina Creada");
+        // --- CREACIÓN MULTI-DÍA ---
+        const body = {
+          usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
+          nombreRutina,
+          dias: dias,
+          esGeneral: isGeneral
+        };
+        await RutinasApi.createMultiDay(body);
+        await showSuccess(`Rutina creada con ${dias.length} días`);
       }
       
       // Recarga suave o redirección
@@ -368,6 +477,15 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     handleAddExercise, 
     editIndex, handleEditRow, cancelEditRow, handleDeleteRow,
     moveRowUp, moveRowDown,
-    handleSubmit
+    handleSubmit,
+    // --- MULTI-DÍA ---
+    dias,
+    diaActual,
+    handleAddDay,
+    handleRemoveDay,
+    handleSelectDay,
+    MAX_DIAS,
+    isEditing,
+    groupIdToEdit
   };
 };

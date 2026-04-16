@@ -48,8 +48,10 @@ export const useUserRoutinesManager = () => {
         }
     };
 
-    // Determinar si una rutina se puede editar (solo las personales)
+    // Determinar si una rutina se puede editar (solo las personales individuales)
     const canEditRoutine = (rutina: any) => {
+        // Si es grupo, no se puede editar aquí (por ahora)
+        if (rutina.esGrupo) return false;
         // Si es general, no se puede editar aquí
         if (rutina.esGeneral) return false;
         
@@ -57,51 +59,64 @@ export const useUserRoutinesManager = () => {
         return currentUser?.rol === 'Entrenador' || currentUser?.rol === 'Admin';
     };
 
-    // Eliminar Rutina Personal
+    // Eliminar Rutina Personal (Soporta grupos)
     const handleDelete = async (rutina: any) => {
-        if (!canEditRoutine(rutina)) {
+        if (!canEditRoutine(rutina) && !rutina.esGrupo) {
             showError("No tienes permisos para eliminar esta rutina");
             return;
         }
 
+        const esGrupo = rutina.esGrupo;
+        const nombre = rutina.nombreRutina;
+
         const confirm = await showConfirmSuccess(
-            "¿Eliminar Rutina Personal?",
-            `Se eliminará "${rutina.nombreRutina}" permanentemente.`
+            esGrupo ? "¿Eliminar Rutina Multi-Día?" : "¿Eliminar Rutina Personal?",
+            esGrupo 
+                ? `Se eliminarán los ${rutina.dias.length} días de "${nombre}" permanentemente.`
+                : `Se eliminará "${nombre}" permanentemente.`
         );
 
         if (!confirm.isConfirmed) return;
 
         try {
-            await RutinasApi.delete(rutina.id);
-            showSuccess("Rutina personal eliminada correctamente.");
+            if (esGrupo) {
+                await RutinasApi.deleteGrupo(rutina.grupoId);
+            } else {
+                await RutinasApi.delete(rutina.id);
+            }
+            showSuccess(esGrupo ? "Rutina multi-día eliminada correctamente." : "Rutina personal eliminada correctamente.");
             loadRutinasAlumno(); // Recargar las rutinas del alumno
         } catch (error) {
             showError("No se pudo eliminar la rutina.");
         }
     };
 
-    // Desvincular Rutina General
+    // Desvincular Rutina General (Soporta grupos)
     const handleUnlink = async (rutina: any) => {
-        if (!rutina.esGeneral) {
-            showError("Solo se pueden desvincular rutinas generales");
-            return;
-        }
-
         if (!alumnoSeleccionado) {
             showError("No hay alumno seleccionado");
             return;
         }
 
+        const esGrupo = rutina.esGrupo;
+        const nombre = rutina.nombreRutina;
+
         const confirm = await showConfirmSuccess(
-            "¿Desvincular Rutina General?",
-            `Se desvinculará "${rutina.nombreRutina}" del alumno ${alumnoSeleccionado.nombre} ${alumnoSeleccionado.apellido}.`
+            esGrupo ? "¿Desvincular Rutina Multi-Día?" : "¿Desvincular Rutina General?",
+            esGrupo 
+                ? `Se desvincularán los ${rutina.dias.length} días de "${nombre}" del alumno ${alumnoSeleccionado.nombre} ${alumnoSeleccionado.apellido}.`
+                : `Se desvinculará "${nombre}" del alumno ${alumnoSeleccionado.nombre} ${alumnoSeleccionado.apellido}.`
         );
 
         if (!confirm.isConfirmed) return;
 
         try {
-            await RutinasApi.desvincularGeneral(rutina.id, alumnoSeleccionado.id);
-            showSuccess("Rutina general desvinculada correctamente.");
+            if (esGrupo) {
+                await RutinasApi.desvincularGrupo(rutina.grupoId, alumnoSeleccionado.id);
+            } else {
+                await RutinasApi.desvincularGeneral(rutina.id, alumnoSeleccionado.id);
+            }
+            showSuccess(esGrupo ? "Rutina multi-día desvinculada correctamente." : "Rutina general desvinculada correctamente.");
             loadRutinasAlumno(); // Recargar las rutinas del alumno
         } catch (error) {
             showError("No se pudo desvincular la rutina.");
