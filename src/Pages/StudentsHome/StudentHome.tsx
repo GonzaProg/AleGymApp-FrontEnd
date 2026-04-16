@@ -3,7 +3,9 @@ import { createPortal } from "react-dom";
 import { Scanner } from '@yudiel/react-qr-scanner'; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { useStudentHome } from "../../Hooks/StudentsHome/useStudentHome";
-import { Camera, Info, Flame, Dumbbell, Quote } from "lucide-react";
+import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
+import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
+import { Camera, Info, Flame, Dumbbell, Quote, Handshake } from "lucide-react";
 import { useFraseMotivacional } from "../../Hooks/StudentsHome/useFraseMotivacional";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
@@ -24,16 +26,82 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
     const { frase, loading: loadingFrase } = useFraseMotivacional();
 
+    // Planes del usuario
+    const { activePlans, loading: loadingPlans } = useUserPlan();
+    const unexpiredPlans = activePlans.filter(p => p.diasRestantes >= 0);
+    
+    // Función helper para la fecha
+    const formatFechaDia = (fechaISO: string) => {
+        const d = new Date(fechaISO);
+        const diaStr = d.toLocaleDateString('es-AR', { weekday: 'short' }).replace('.', '').replace(',', '');
+        const diaCapitalized = diaStr.charAt(0).toUpperCase() + diaStr.slice(1);
+        const fechaNums = d.toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' });
+        return `${diaCapitalized} ${fechaNums}`;
+    };
+
+    // Info del Gym para la tarjeta
+    const gymName = currentUser?.gym?.nombre || "Gimnasio";
+    const gymLogo = currentUser?.gym?.logoUrl ? CloudinaryApi.getUrl(currentUser.gym.logoUrl) : null;
+
     return (
         <div className="pt-safe mt-24 p-4 animate-fade-in pb-32 space-y-6 max-w-lg mx-auto relative">
             
-            {/* SALUDO INICIAL */}
-            <div className="mb-8 px-2">
+            <div className="mb-4 px-2">
                 <h1 className="text-3xl font-black text-white mb-2 tracking-tight">
                     Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">{currentUser?.nombre}</span> 👋
                 </h1>
                 <p className="text-gray-400 text-lg font-medium">¿Qué vamos a entrenar hoy?</p>
             </div>
+
+            {/* PLANES DEL USUARIO */}
+            {!loadingPlans && unexpiredPlans.length > 0 && (
+                <div className="space-y-4 mb-8">
+                    {unexpiredPlans.map(plan => {
+                        const estaPorVencer = plan.diasRestantes <= 3;
+                        const borderColor = estaPorVencer ? "border-orange-500" : "border-green-500";
+                        const fechaDesdeStr = formatFechaDia(plan.fechaInicio);
+                        const fechaHastaStr = formatFechaDia(plan.fechaVencimiento);
+
+                        return (
+                            <div key={plan.userPlanId} className={`bg-[#1c1c1e] p-5 rounded-3xl shadow-xl relative overflow-hidden group`}>
+                                {/* Cabecera de la tarjeta */}
+                                <div className="flex items-center gap-4 mb-6">
+                                    {gymLogo ? (
+                                        <img src={gymLogo} alt="Logo" className={`w-14 h-14 rounded-full object-cover border-2 ${borderColor} p-0.5 bg-black`} />
+                                    ) : (
+                                        <div className={`w-14 h-14 rounded-full bg-[#1c1c1e] border-2 ${borderColor} flex items-center justify-center p-0.5 shadow-lg`}>
+                                            <span className="font-bold text-white text-xs">{gymName.slice(0,3).toUpperCase()}</span>
+                                        </div>
+                                    )}
+                                    <h2 className="text-xl font-bold text-white tracking-wide">{gymName}</h2>
+                                </div>
+
+                                {plan.descripcion && (
+                                    <p className="text-gray-400 text-xs italic mb-4 line-clamp-2 leading-relaxed">
+                                        {plan.descripcion}
+                                    </p>
+                                )}
+                                
+                                {/* 3 Columnas Info */}
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Membresía</p>
+                                        <p className="text-white font-bold text-[13px] leading-tight">{plan.nombre}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Desde</p>
+                                        <p className="text-white font-bold text-[13px] leading-tight">{fechaDesdeStr}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Hasta</p>
+                                        <p className="text-white font-bold text-[13px] leading-tight">{fechaHastaStr}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
 
             {/* CONDICIONAL: Solo mostramos la asistencia si el gimnasio la habilitó */}
             {isAsistenciaHabilitada ? (
@@ -71,7 +139,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                         <div className={`transition-all duration-500 ease-in-out px-4 ${isInfoOpen ? 'max-h-[500px] opacity-100 pb-4' : 'max-h-0 opacity-0'}`}>
                             <div className="pt-4 border-t border-white/10 text-gray-300 text-sm leading-relaxed">
                                 <p>
-                                    ¡Ayúdanos a mantener la información actualizada! 🤝<br/><br/>
+                                    ¡Ayúdanos a mantener la información actualizada! <Handshake className="w-4 h-4 inline text-blue-400 mx-1" /><br/><br/>
                                     Toca el botón <strong>"Escanear QR"</strong> cada vez que llegues al gimnasio.<br/><br/>
                                     Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios.
                                 </p>

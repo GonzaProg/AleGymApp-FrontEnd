@@ -1,4 +1,5 @@
 import { Button } from "../UI/Button";
+import { Calendar } from "lucide-react";
 
 interface Props {
   isOpen: boolean;
@@ -13,7 +14,7 @@ export const PlanExpiredModal = ({ isOpen, onClose }: Props) => {
       <div className="bg-gray-900 border border-red-500/30 rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl shadow-red-900/20 relative transform transition-all scale-100">
         
         <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl">📅</span>
+          <Calendar className="w-8 h-8 text-red-500" />
         </div>
 
         <h2 className="text-2xl font-bold text-white mb-2">¡Plan Vencido!</h2>

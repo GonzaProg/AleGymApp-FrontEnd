@@ -2,6 +2,7 @@ import { useRenewPlan } from "../../Hooks/Planes/useRenewPlan";
 import { AppStyles } from "../../Styles/AppStyles";
 import { RenewPlanStyles } from "../../Styles/RenewPlanStyles";
 import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
+import { Search, ClipboardList, RefreshCcw, X, Plus, Hourglass } from "lucide-react";
 
 export const RenewPlan = () => {
   const {
@@ -34,12 +35,15 @@ export const RenewPlan = () => {
             <div className={AppStyles.searchWrapper}>
               <div className={`${AppStyles.searchGlow} bg-gradient-to-r from-green-600 to-blue-600`}></div>
               <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                  <Search className="w-5 h-5 text-gray-400" />
+                </div>
                 <input
                   type="text"
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
-                  placeholder="🔍 Buscar alumno por nombre..."
-                  className={`${AppStyles.searchInput} focus:border-green-500 focus:ring-1 focus:ring-green-500`}
+                  placeholder="Buscar alumno por nombre..."
+                  className={`${AppStyles.searchInput} pl-10 focus:border-green-500 focus:ring-1 focus:ring-green-500`}
                 />
                 
                 {sugerencias.length > 0 && (
@@ -101,7 +105,7 @@ export const RenewPlan = () => {
               {/* LISTA DE SUSCRIPCIONES ACTIVAS */}
               <div className="mb-8">
                   <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
-                      📋 Suscripciones Activas
+                      <ClipboardList className="w-5 h-5 text-blue-400" /> Suscripciones Activas
                       <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
                           {alumnoSeleccionado.userPlans?.filter((p: any) => p.activo).length || 0}
                       </span>
@@ -140,7 +144,7 @@ export const RenewPlan = () => {
                                           className="bg-green-600 hover:bg-green-500 text-white p-2 rounded-lg transition shadow-lg disabled:opacity-50"
                                           title="Renovar este plan"
                                       >
-                                          {loadingAction ? '...' : '♻️ Renovar'}
+                                          {loadingAction ? '...' : <span className="flex items-center justify-center gap-2"><RefreshCcw className="w-4 h-4" /> Renovar</span>}
                                       </button>
                                       <button 
                                           onClick={() => cancelarPlan()}
@@ -148,7 +152,7 @@ export const RenewPlan = () => {
                                           className="bg-red-900/50 hover:bg-red-600 text-white p-2 rounded-lg transition border border-red-800/50 disabled:opacity-50"
                                           title="Cancelar este plan"
                                       >
-                                          {loadingAction ? '...' : '✕ Cancelar'}
+                                          {loadingAction ? '...' : <span className="flex items-center justify-center gap-2"><X className="w-4 h-4" /> Cancelar</span>}
                                       </button>
                                   </div>
                               </div>
@@ -165,7 +169,7 @@ export const RenewPlan = () => {
               {!alumnoSeleccionado.userPlans || !alumnoSeleccionado.userPlans.some((p: any) => p.activo) && (
               <div className="border-t border-white/10 pt-6">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                      <h3 className="text-white font-bold text-lg">➕ Asignar Nuevo Plan</h3>
+                      <h3 className="text-white font-bold text-lg flex items-center gap-2"><Plus className="w-5 h-5 text-green-400" /> Asignar Nuevo Plan</h3>
                       <div className="w-full md:w-64">
                           <label className="text-gray-400 text-xs mb-1 block">Método de Pago para Alta:</label>
                           <PaymentMethodSelect value={metodoPago} onChange={setMetodoPago} />
@@ -193,7 +197,7 @@ export const RenewPlan = () => {
                                   </span>
                               </div>
                               <p className="text-gray-500 text-xs mt-3 flex items-center gap-1">
-                                  <span>⏳</span> {plan.duracionDias} días
+                                  <span className="flex items-center justify-center"><Hourglass className="w-4 h-4" /></span> {plan.duracionDias} días
                               </p>
                           </div>
                       ))}

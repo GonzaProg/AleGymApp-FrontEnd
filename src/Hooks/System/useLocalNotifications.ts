@@ -41,27 +41,7 @@ export const useLocalNotifications = () => {
         visibility: 1, // 1 = Public
       });
 
-      // 3. Programar la notificación (Para pruebas: a los 10 segundos!)
-      await LocalNotifications.schedule({
-        notifications: [
-          {
-            title: '¡GymMate te necesita! 🚀',
-            body: '¡Utiliza la app Diariamente!', 
-            largeBody: 'Entra a la app un ratito al día para ayudarnos a terminar la prueba cerrada y así poder publicarlo en la Play Store. Y cualquier duda o error que encuentres hazmelo saber. ¡Muchas Gracias!',
-            largeIcon: 'gymmate512x512',
-            smallIcon: 'gymmate_silueta512x512', 
-            iconColor: '#FF6B00', 
-            id: 2, // ID cambiado a 2 por si el 1 fue bloqueado por el sistema antes
-            channelId: 'gymmate_channel_v2', 
-            schedule: {
-              on: { hour: 10, minute: 0 }, // Suena todos los días exactamente a las 10:00 AM
-              allowWhileIdle: true 
-            }
-          }
-        ]
-      });
-      
-      console.log('Notificación recurrente diaria programada con éxito.');
+      // Eliminé la notificación diaria recurrente
 
     } catch (error) {
       console.error('Error configurando LocalNotifications:', error);

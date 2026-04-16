@@ -42,5 +42,31 @@ export const RutinasApi = {
     getOne: async (id: number) => {
         const response = await api.get(`/rutinas/${id}`);
         return response.data;
+    },
+
+    // --- MULTI-DÍA ---
+    createMultiDay: async (data: any) => {
+        const response = await api.post('/rutinas/multi-day', data);
+        return response.data;
+    },
+    deleteGrupo: async (grupoId: string) => {
+        const response = await api.delete(`/rutinas/grupo/${grupoId}`);
+        return response.data;
+    },
+    asignarGrupo: async (grupoId: string, alumnoId: number) => {
+        const response = await api.post('/rutinas/asignar-grupo', { grupoId, alumnoId });
+        return response.data;
+    },
+    desvincularGrupo: async (grupoId: string, alumnoId: number) => {
+        const response = await api.post('/rutinas/desvincular-grupo', { grupoId, alumnoId });
+        return response.data;
+    },
+    getGrupo: async (grupoId: string) => {
+        const response = await api.get(`/rutinas/grupo/${grupoId}`);
+        return response.data;
+    },
+    updateGrupo: async (grupoId: string, data: any) => {
+        const response = await api.put(`/rutinas/grupo/${grupoId}`, data);
+        return response.data;
     }
 };

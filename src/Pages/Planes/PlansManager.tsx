@@ -6,6 +6,7 @@ import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { usePlans } from "../../Hooks/Planes/usePlans";
 import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
+import { Edit2, Calendar, Dumbbell, UserPlus } from "lucide-react";
 
 export const PlansManager = () => {
   const { 
@@ -31,7 +32,9 @@ export const PlansManager = () => {
     handleSavePlan,
     handleSubscribeUser,
     handleSearchChange,
-    handleSelectAlumno
+    handleSelectAlumno,
+    fechaInicio,
+    setFechaInicio
   } = usePlans();
 
   return (
@@ -73,8 +76,8 @@ export const PlansManager = () => {
                   
                   <div className="flex justify-between items-start mb-2">
                       <h3 className="text-2xl font-bold text-white">{plan.nombre}</h3>
-                      <button onClick={() => openEditModal(plan)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} title="Editar Plan">
-                        ✏️
+                      <button onClick={() => openEditModal(plan)} className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit} flex justify-center items-center`} title="Editar Plan">
+                        <Edit2 className="w-4 h-4" />
                       </button>
                   </div>
 
@@ -90,11 +93,11 @@ export const PlansManager = () => {
 
                   <div className="space-y-3 mb-6 text-sm text-gray-300 flex-grow">
                     <div className="flex items-center gap-2">
-                        <span className="bg-white/10 p-1 rounded">📅</span> 
+                        <span className="bg-white/10 p-1.5 rounded flex justify-center items-center"><Calendar className="w-4 h-4 text-white" /></span> 
                         <span>Duración: <b>{plan.duracionDias} días</b></span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="bg-white/10 p-1 rounded">💪</span> 
+                        <span className="bg-white/10 p-1.5 rounded flex justify-center items-center"><Dumbbell className="w-4 h-4 text-white" /></span> 
                         <span>Acceso: <b>{plan.diasPorSemana === 7 ? "Pase Libre" : `${plan.diasPorSemana} días por semana`}</b></span>
                     </div>
                     <div className="border-t border-white/10 pt-2 mt-2 italic text-gray-400">
@@ -104,9 +107,9 @@ export const PlansManager = () => {
 
                   <Button 
                     onClick={() => openSubscribeModal(plan)}
-                    className={`${AppStyles.btnPrimary} w-full mt-auto border-green-500/30 hover:bg-green-600 hover:text-white group-hover:shadow-lg transition-all`}
+                    className={`${AppStyles.btnPrimary} w-full mt-auto border-green-500/30 hover:bg-green-600 hover:text-white group-hover:shadow-lg transition-all flex items-center justify-center gap-2`}
                   >
-                    👤 ASIGNAR A ALUMNO
+                    <UserPlus className="w-5 h-5" /> ASIGNAR A ALUMNO
                   </Button>
                 </Card>
               ))}
@@ -151,6 +154,8 @@ export const PlansManager = () => {
                         // Pasamos props de pago
                         metodoPago={metodoPago}
                         setMetodoPago={setMetodoPago}
+                        fechaInicio={fechaInicio}
+                        setFechaInicio={setFechaInicio}
                     />
                 </div>
             </div>,
@@ -234,7 +239,8 @@ const SubscribeForm = ({
     busqueda, sugerencias, mostrarSugerencias, 
     handleSearchChange, handleSelectAlumno, setMostrarSugerencias, 
     onConfirm, onCancel,
-    metodoPago, setMetodoPago // Recibimos props
+    metodoPago, setMetodoPago, // Recibimos props
+    fechaInicio, setFechaInicio
 }: any) => {
     return (
         <div className="space-y-6">
@@ -268,6 +274,17 @@ const SubscribeForm = ({
                 value={metodoPago} 
                 onChange={setMetodoPago} 
             />
+
+            <div>
+                <Input 
+                    type="date"
+                    label="Fecha de Inicio"
+                    value={fechaInicio}
+                    onChange={(e: any) => setFechaInicio(e.target.value)}
+                    className={AppStyles.inputDark}
+                    labelClassName={AppStyles.label}
+                />
+            </div>
 
             <div className="flex gap-4 pt-2">
                 <button type="button" onClick={onCancel} className={AppStyles.btnSecondary + " w-full"}>CANCELAR</button>

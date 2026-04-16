@@ -1,6 +1,7 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { Card } from "../../Components/UI/Card";
 import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
+import { Zap } from "lucide-react";
 
 export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () => void }) => {
     const isPlanActuallyActive = (fecha: string, activo: boolean) => activo && new Date(fecha).setHours(23, 59, 59, 999) >= new Date().getTime();
@@ -36,7 +37,7 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                 {/* PLANES DERECHA */}
                 <div className="lg:col-span-2 space-y-6">
                     <h3 className="text-xl font-black text-white flex items-center gap-2">
-                        <span className="text-green-500">⚡</span> ESTADO DE SUSCRIPCIONES
+                        <Zap className="w-6 h-6 text-green-500" /> ESTADO DE SUSCRIPCIONES
                     </h3>
                     <div className="grid gap-4">
                         {user.userPlans

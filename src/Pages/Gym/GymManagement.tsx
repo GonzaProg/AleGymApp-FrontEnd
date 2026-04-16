@@ -7,6 +7,7 @@ import { useEditGym } from "../../Hooks/Gym/useEditGym";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
+import { Edit2, Image as ImageIcon, Camera } from "lucide-react";
 
 export const GymManagement = () => {
   const [gyms, setGyms] = useState<GymDTO[]>([]);
@@ -70,9 +71,9 @@ export const GymManagement = () => {
               <div className="flex gap-2">
                 <button 
                   onClick={() => openEditModal(gym)}
-                  className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-sm hover:bg-blue-500/30 transition"
+                  className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-sm hover:bg-blue-500/30 transition flex items-center gap-1"
                 >
-                  ✏️ Editar
+                  <Edit2 className="w-3 h-3" /> Editar
                 </button>
                 <span className={`px-2 py-1 rounded text-xs font-bold ${gym.activo ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                   {gym.activo ? 'ACTIVO' : 'BLOQUEADO'}
@@ -132,12 +133,12 @@ export const GymManagement = () => {
                   <div className="flex flex-col items-center gap-2 pointer-events-none">
                     {selectedLogo ? (
                       <>
-                        <span className="text-3xl">🖼️</span>
+                        <ImageIcon className="w-8 h-8 text-purple-400" />
                         <p className="text-purple-400 font-bold text-sm truncate max-w-[150px]">{selectedLogo.name}</p>
                       </>
                     ) : (
                       <>
-                        <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📷</span>
+                        <Camera className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
                         <p className="text-gray-400 text-xs">Arrastra logo</p>
                       </>
                     )}

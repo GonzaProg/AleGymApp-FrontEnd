@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../API/axios";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
-import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary"; 
-import { Bell } from "lucide-react";
-
+import { Bell, BellOff } from "lucide-react";
 export const Navbar = () => {
   const navigate = useNavigate();
   const { notificaciones, unreadCount, markAsRead, refresh } = useNotificaciones();
@@ -13,26 +10,6 @@ export const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedNotif, setSelectedNotif] = useState<any>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const [gymLogo, setGymLogo] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchGymData = async () => {
-        try {
-            const codigoAcceso = localStorage.getItem("GYMMATE_LOCAL_CODE"); 
-            if (codigoAcceso) {
-                const { data } = await api.get(`/gyms/by-code/${codigoAcceso}`);
-                if (data && data.logoUrl) {
-                    const logoUrlProcesada = CloudinaryApi.getUrl(data.logoUrl);
-                    setGymLogo(logoUrlProcesada);
-                }
-            }
-        } catch (error) {
-            console.error("No se pudo cargar el logo del gym", error);
-        }
-    };
-    fetchGymData();
-  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,25 +39,9 @@ export const Navbar = () => {
             onClick={() => navigate("/home")} 
             className="flex items-center cursor-pointer group z-20"
         >
-            {/* 1. SIEMPRE EL TEXTO GYMMATE */}
             <span className="self-center text-2xl font-semibold whitespace-nowrap text-white group-hover:text-gray-200 transition-colors">
                 Gym<span className="text-green-500 group-hover:text-green-400">Mate</span>
             </span>
-
-            {/* 2. LOGO DEL GYM A LA DERECHA (Si existe) */}
-            {gymLogo && (
-                <div className="flex items-center ml-3 pl-3 border-l border-white/20 h-10 animate-fade-in">
-                    <img 
-                        src={gymLogo} 
-                        alt="Logo Gym"
-                        className="h-14 w-auto object-contain transition-transform group-hover:scale-105"
-                        onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            setGymLogo(null); 
-                        }}
-                    />
-                </div>
-            )}
         </div>
         
         {/* --- DERECHA: NOTIFICACIONES --- */}
@@ -105,8 +66,9 @@ export const Navbar = () => {
                     </div>
                     <div className={`max-h-80 ${AppStyles.customScrollbar}`}>
                         {notificaciones.length === 0 ? (
-                            <div className="p-8 text-center text-gray-500 text-sm">
-                                <p>🔕 No tienes notificaciones nuevas</p>
+                            <div className="p-8 text-center text-gray-500 text-sm flex flex-col items-center">
+                                <BellOff className="w-8 h-8 mb-2 opacity-50" />
+                                <p>No tienes notificaciones nuevas</p>
                             </div>
                         ) : (
                             <ul className="divide-y divide-white/5">

@@ -3,14 +3,20 @@ import { Card } from "../../Components/UI/Card";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { useUserRoutinesManager } from "../../Hooks/Rutinas/useUserRoutinesManager";
+import { Search, Edit2, Trash2, Link as LinkIcon, CheckCircle2, Info, Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
-export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: string) => void, onEdit: (id: number) => void }) => {
+export const UserRoutinesManager = ({ onNavigate, onEdit, onEditGroup }: { onNavigate: (tab: string) => void, onEdit: (id: number) => void, onEditGroup: (grupoId: string) => void }) => {
     const {
         rutinasAlumno, loading,
         busqueda, handleSearchChange, sugerencias, mostrarSugerencias, setMostrarSugerencias,
         handleSelectAlumno, alumnoSeleccionado, clearSelection,
-        handleDelete, handleUnlink, canEditRoutine
+        handleDelete, handleUnlink
     } = useUserRoutinesManager();
+
+    // Estado para expandir/contraer vista de días en cards de grupo
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+    const toggleExpand = (key: string) => setExpandedGroups(prev => ({ ...prev, [key]: !prev[key] }));
 
     return (
         <div className={AppStyles.principalContainer}>
@@ -38,8 +44,8 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
                             className={`${AppStyles.inputDark} text-lg`}
                             labelClassName={AppStyles.label}
                         />
-                        <div className="absolute right-4 top-8 text-gray-400">
-                            🔍
+                        <div className="absolute right-4 top-9 text-gray-400">
+                            <Search className="w-5 h-5" />
                         </div>
                         
                         {/* SUGERENCIAS DE ALUMNOS */}
@@ -90,93 +96,156 @@ export const UserRoutinesManager = ({ onNavigate, onEdit }: { onNavigate: (tab: 
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {rutinasAlumno.map((rutina: any) => (
-                            <Card key={rutina.id} className={`${AppStyles.glassCard} hover:border-green-500/50 transition-all flex flex-col relative group`}>
-                                
-                                <div className="flex justify-between items-start mb-3">
-                                    <h3 className="text-xl font-bold text-white break-words leading-tight" title={rutina.nombreRutina}>
-                                        {rutina.nombreRutina}
-                                    </h3>
-                                    <div className="flex gap-2">
-                                        {canEditRoutine(rutina) && (
-                                            <>
-                                                <button 
-                                                    onClick={() => onEdit(rutina.id)}
-                                                    className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} 
-                                                    title="Editar Rutina Personal"
-                                                >
-                                                    ✏️
-                                                </button>
+                        {rutinasAlumno.map((rutina: any) => {
+                            const esGrupo = rutina.esGrupo;
+                            const key = esGrupo ? rutina.grupoId : `r-${rutina.id}`;
+                            const isExpanded = expandedGroups[key];
+                            
+                            const totalEjercicios = esGrupo 
+                                ? rutina.dias.reduce((sum: number, d: any) => sum + (d.detalles?.length || 0), 0)
+                                : (rutina.detalles?.length || 0);
 
-                                                <button 
-                                                    onClick={() => handleDelete(rutina)}
-                                                    className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} 
-                                                    title="Eliminar Rutina Personal"
-                                                >
-                                                    🗑️
-                                                </button>
-                                            </>
-                                        )}
-                                        {!canEditRoutine(rutina) && (
-                                            <>
+                            return (
+                                <Card key={key} className={`${AppStyles.glassCard} hover:border-green-500/50 transition-all flex flex-col relative group`}>
+                                    
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="text-xl font-bold text-white break-words leading-tight" title={rutina.nombreRutina}>
+                                            {rutina.nombreRutina}
+                                        </h3>
+                                        <div className="flex gap-2">
+                                            {rutina.esGeneral ? (
                                                 <button 
                                                     onClick={() => handleUnlink(rutina)}
                                                     className={`${AppStyles.btnIconBase} bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white border-orange-500/20`} 
                                                     title="Desvincular Rutina General del Alumno"
                                                 >
-                                                    🔗
+                                                    <LinkIcon className="w-4 h-4 ml-1" />
                                                 </button>
-                                            </>
-                                        )}
+                                            ) : esGrupo ? (
+                                                <>
+                                                    <button 
+                                                        onClick={() => onEditGroup(rutina.grupoId)}
+                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} 
+                                                        title="Editar Rutina Multi-Día"
+                                                    >
+                                                        <Edit2 className="w-4 h-4 ml-1" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDelete(rutina)}
+                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} 
+                                                        title="Eliminar todos los días"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 ml-1" />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button 
+                                                        onClick={() => onEdit(rutina.id)}
+                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnEdit}`} 
+                                                        title="Editar Rutina Personal"
+                                                    >
+                                                        <Edit2 className="w-4 h-4 ml-1" />
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDelete(rutina)}
+                                                        className={`${AppStyles.btnIconBase} ${AppStyles.btnDelete}`} 
+                                                        title="Eliminar Rutina Personal"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 ml-1" />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="space-y-2 mb-6 flex-grow">
-                                    <div className="text-sm text-gray-300">
-                                        <span className={`${rutina.esGeneral ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'} px-2 py-0.5 rounded text-xs border ${rutina.esGeneral ? 'border-blue-500/30' : 'border-green-500/30'} mr-2`}>
-                                            {rutina.esGeneral ? 'GENERAL' : 'PERSONAL'}
-                                        </span>
-                                        <span className="text-xs text-gray-500">
-                                            Creada: {new Date(rutina.fechaCreacion).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                    
-                                    <p className="text-gray-400 text-sm">
-                                        Entrenador: <b className="text-white">{rutina.entrenador}</b>
-                                    </p>
-
-                                    {rutina.usuario && (
+                                    <div className="space-y-2 mb-6 flex-grow">
+                                        <div className="text-sm text-gray-300 flex flex-wrap gap-2">
+                                            <span className={`${rutina.esGeneral ? 'bg-blue-500/20 text-blue-300' : 'bg-green-500/20 text-green-300'} px-2 py-0.5 rounded text-xs border ${rutina.esGeneral ? 'border-blue-500/30' : 'border-green-500/30'}`}>
+                                                {rutina.esGeneral ? 'GENERAL' : 'PERSONAL'}
+                                            </span>
+                                            {esGrupo && (
+                                                <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-xs border border-purple-500/30 flex items-center gap-1">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {rutina.dias.length} días
+                                                </span>
+                                            )}
+                                            <span className="text-xs text-gray-500">
+                                                Creada: {new Date(rutina.fechaCreacion).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        
                                         <p className="text-gray-400 text-sm">
-                                            Alumno: <b className="text-green-400">{rutina.usuario.nombre}</b>
+                                            Entrenador: <b className="text-white">{rutina.entrenador}</b>
                                         </p>
-                                    )}
-                                    
-                                    <p className="text-gray-400 text-sm">
-                                        Contiene <b>{rutina.detalles?.length || 0} ejercicios</b>.
-                                    </p>
 
-                                    {/* Preview ejercicios (Max 3) */}
-                                    <div className="mt-3 space-y-1">
-                                        {rutina.detalles?.slice(0, 3).map((d: any, i: number) => (
-                                            <div key={i} className="text-xs text-gray-500 flex items-center gap-1">
-                                                • {d.ejercicio.nombre} 
+                                        {rutina.usuario && !esGrupo && (
+                                            <p className="text-gray-400 text-sm">
+                                                Alumno: <b className="text-green-400">{rutina.usuario.nombre}</b>
+                                            </p>
+                                        )}
+                                        
+                                        <p className="text-gray-400 text-sm">
+                                            Contiene <b>{totalEjercicios} ejercicios</b>{esGrupo ? ` en ${rutina.dias.length} días` : ''}.
+                                        </p>
+
+                                        {/* Preview ejercicios */}
+                                        {esGrupo ? (
+                                            <>
+                                                <button 
+                                                    onClick={() => toggleExpand(key)}
+                                                    className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mt-2 transition-colors"
+                                                >
+                                                    {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                                    {isExpanded ? 'Ocultar días' : 'Ver días'}
+                                                </button>
+                                                
+                                                {isExpanded && (
+                                                    <div className="mt-2 space-y-3">
+                                                        {rutina.dias.map((dia: any, diaIndex: number) => (
+                                                            <div key={diaIndex} className="bg-black/20 rounded-lg p-3 border border-white/5">
+                                                                <p className="text-xs text-green-400 font-bold mb-1.5">Día {diaIndex + 1}</p>
+                                                                <div className="space-y-1">
+                                                                    {dia.detalles?.slice(0, 3).map((d: any, i: number) => (
+                                                                        <div key={i} className="text-xs text-gray-500 flex items-center gap-1">
+                                                                            • {d.ejercicio.nombre}
+                                                                        </div>
+                                                                    ))}
+                                                                    {(dia.detalles?.length || 0) > 3 && (
+                                                                        <div className="text-xs text-gray-600 italic">... y {dia.detalles.length - 3} más</div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <div className="mt-3 space-y-1">
+                                                {rutina.detalles?.slice(0, 3).map((d: any, i: number) => (
+                                                    <div key={i} className="text-xs text-gray-500 flex items-center gap-1">
+                                                        • {d.ejercicio.nombre} 
+                                                    </div>
+                                                ))}
+                                                {(rutina.detalles?.length || 0) > 3 && (
+                                                    <div className="text-xs text-gray-600 italic">... y {rutina.detalles.length - 3} más</div>
+                                                )}
                                             </div>
-                                        ))}
-                                        {(rutina.detalles?.length || 0) > 3 && (
-                                            <div className="text-xs text-gray-600 italic">... y {rutina.detalles.length - 3} más</div>
                                         )}
                                     </div>
-                                </div>
 
-                                <div className="text-xs text-gray-500 pt-2 border-t border-white/10">
-                                    {canEditRoutine(rutina) ? (
-                                        <span className="text-green-400">✓ Editable</span>
-                                    ) : (
-                                        <span className="text-blue-400">ℹ️ Gestión desde Rutinas Generales</span>
-                                    )}
-                                </div>
-                            </Card>
-                        ))}
+                                    <div className="text-xs text-gray-500 pt-2 border-t border-white/10">
+                                        {rutina.esGeneral ? (
+                                            <span className="text-blue-400 flex items-center gap-1"><Info className="w-4 h-4" /> Gestión desde Rutinas Generales</span>
+                                        ) : esGrupo ? (
+                                            <span className="text-purple-400 flex items-center gap-1"><Calendar className="w-4 h-4" /> Rutina Multi-Día</span>
+                                        ) : (
+                                            <span className="text-green-400 flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Editable</span>
+                                        )}
+                                    </div>
+                                </Card>
+                            );
+                        })}
                     </div>
                 )}
             </div>

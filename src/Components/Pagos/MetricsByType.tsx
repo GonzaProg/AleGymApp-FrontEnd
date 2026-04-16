@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { PagosApi, type MetricsByTypeDTO, type BreakdownItem } from "../../API/Pagos/PagosApi";
 import { AppStyles } from "../../Styles/AppStyles";
+import { Calendar, TrendingUp } from "lucide-react";
 
 export const MetricsByType = () => {
     const [data, setData] = useState<MetricsByTypeDTO | null>(null);
@@ -26,16 +27,16 @@ export const MetricsByType = () => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 animate-fade-in">
             {/* MES ACTUAL */}
-            <CategoryChart title="📅 Ingresos este Mes" items={data.desgloseMensual} />
+            <CategoryChart title={<span className="flex items-center justify-center gap-2"><Calendar className="w-4 h-4"/> Ingresos este Mes</span>} items={data.desgloseMensual} />
             
             {/* ANUAL */}
-            <CategoryChart title="📈 Acumulado Anual" items={data.desgloseAnual} />
+            <CategoryChart title={<span className="flex items-center justify-center gap-2"><TrendingUp className="w-4 h-4"/> Acumulado Anual</span>} items={data.desgloseAnual} />
         </div>
     );
 };
 
 // --- SUBCOMPONENTE DE TARJETA CON GRÁFICO ---
-const CategoryChart = ({ title, items }: { title: string, items: BreakdownItem[] }) => {
+const CategoryChart = ({ title, items }: { title: React.ReactNode, items: BreakdownItem[] }) => {
     // Calcular Total
     const totalGeneral = items.reduce((acc, item) => acc + item.total, 0);
 

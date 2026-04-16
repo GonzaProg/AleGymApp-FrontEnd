@@ -1,4 +1,5 @@
 import { AppStyles } from "../../Styles/AppStyles";
+import { TrendingUp, BarChart3 } from "lucide-react";
 
 interface Props {
     dataAnual: number[];
@@ -18,8 +19,8 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
             {/* GRÁFICO 1: LINEAL ANUAL */}
             <div className={`${AppStyles.glassCard} p-6 border border-white/5`}>
                 <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-2">
-                    <h4 className="text-gray-300 font-bold text-sm uppercase tracking-wider">
-                        📈 Evolución Anual
+                    <h4 className="text-gray-300 font-bold text-sm uppercase tracking-wider flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" /> Evolución Anual
                     </h4>
                     <span className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded">Ene - Dic</span>
                 </div>
@@ -31,8 +32,8 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
             {/* GRÁFICO 2: BARRAS MENSUAL */}
             <div className={`${AppStyles.glassCard} p-6 border border-white/5`}>
                 <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-2">
-                    <h4 className="text-gray-300 font-bold text-sm uppercase tracking-wider">
-                        📊 Ingresos Diarios (Mes Actual)
+                    <h4 className="text-gray-300 font-bold text-sm uppercase tracking-wider flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4" /> Ingresos Diarios (Mes Actual)
                     </h4>
                     <span className="text-xs text-blue-400 bg-blue-500/10 px-2 py-1 rounded">Día a Día</span>
                 </div>

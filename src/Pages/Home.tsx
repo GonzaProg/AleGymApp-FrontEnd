@@ -22,7 +22,6 @@ import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary";
 
 // IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
-const UserPlan = lazy(() => import("./Planes/UserPlan").then(module => ({ default: module.UserPlan })));
 const Profile = lazy(() => import("./Usuarios/Profile").then(module => ({ default: module.Profile })));
 
 // Vistas de Admin (Lazy Loading)
@@ -81,6 +80,7 @@ export const Home = () => {
   // ESTADOS ADMIN
   const [activeTab, setActiveTab] = useState("Inicio");
   const [routineIdToEdit, setRoutineIdToEdit] = useState<number | null>(null);
+  const [groupIdToEdit, setGroupIdToEdit] = useState<string | null>(null);
 
   // ESTADOS ALUMNO
   const [activeSlide, setActiveSlide] = useState(0); 
@@ -100,11 +100,19 @@ export const Home = () => {
 
   const handleEditRoutine = (id: number) => {
       setRoutineIdToEdit(id);
+      setGroupIdToEdit(null);
+      setActiveTab("Crear Rutina General");
+  };
+
+  const handleEditGroup = (grupoId: string) => {
+      setGroupIdToEdit(grupoId);
+      setRoutineIdToEdit(null);
       setActiveTab("Crear Rutina General");
   };
 
   const handleSidebarClick = (tabName: string) => {
       setRoutineIdToEdit(null);
+      setGroupIdToEdit(null);
       setActiveTab(tabName);
       
       // Si entra a ver las asistencias, apagamos la luz roja
@@ -161,9 +169,9 @@ export const Home = () => {
                         case "Planes": return <PlansManager />;
                         case "Finanzas": return <MetricasFinancieras />;
                         case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
-                        case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
-                        case "Rutinas Usuarios": return <UserRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine}/>;
-                        case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} />;
+                        case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine} onEditGroup={handleEditGroup}/>;
+                        case "Rutinas Usuarios": return <UserRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine} onEditGroup={handleEditGroup}/>;
+                        case "Crear Rutina General": return <CreateRoutine isGeneral={true} routineIdToEdit={routineIdToEdit} groupIdToEdit={groupIdToEdit} />;
                         case "Ejercicios": return <EjerciciosGestion onNavigate={setActiveTab} />;
                         case "Crear Ejercicio": return <EjerciciosCrear onNavigate={setActiveTab} />;
                         case "Notificaciones": return <CreateNotification />;
@@ -321,14 +329,6 @@ export const Home = () => {
             <SwiperSlide className="overflow-y-auto h-full">
                 <div className="h-full overflow-y-auto custom-scrollbar pb-32">
                     <LazySlideContent index={3} activeIndex={activeSlide} visited={visitedSlides.has(3)}>
-                        <UserPlan />
-                    </LazySlideContent>
-                </div>
-            </SwiperSlide>
-
-            <SwiperSlide className="overflow-y-auto h-full">
-                <div className="h-full overflow-y-auto custom-scrollbar pb-32">
-                    <LazySlideContent index={4} activeIndex={activeSlide} visited={visitedSlides.has(4)}>
                         <Profile isMobile={true} />
                     </LazySlideContent>
                 </div>

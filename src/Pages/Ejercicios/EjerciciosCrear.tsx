@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useEjerciciosCrear } from '../../Hooks/Ejercicios/useEjerciciosCrear'; 
 import { AppStyles } from '../../Styles/AppStyles';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
+import { TIPOS_AGARRE, MUSCULOS_PERMITIDOS } from '../../API/Ejercicios/EjerciciosApi';
+import { ChevronDown, Image as ImageIcon, Camera, Video, Upload, Save } from 'lucide-react';
 
 interface Props {
     onNavigate?: (tab: string) => void;
@@ -55,17 +57,75 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                         <span className={AppStyles.numberBadge}>1</span> Datos del Ejercicio
                     </h3>
 
-                    {/* El mensaje de error visual se eliminó porque ahora usamos SweetAlert en el Hook */}
-
                     <form onSubmit={onSubmitWrapper} className="space-y-6">
                         {/* NOMBRE */}
                         <div>
-                            <label className={AppStyles.label}>Nombre del Ejercicio</label>
+                            <label className={AppStyles.label}>Nombre del Ejercicio <span className="text-red-500">*</span></label>
                             <input 
                                 type="text" name="nombre" 
                                 className={AppStyles.inputDark}
-                                placeholder="Ej: Press de Banca Plano"
+                                placeholder="Ej: Press Inclinado"
                                 value={form.nombre} onChange={handleInputChange} required autoFocus
+                            />
+                        </div>
+
+                        {/* DETALLES EXTRA (Músculo, Elementos, Agarre) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className={AppStyles.label}>Músculo Trabajado <span className="text-red-500">*</span></label>
+                                <div className="relative group">
+                                    <select 
+                                        name="musculoTrabajado" 
+                                        className={`${AppStyles.inputDark} appearance-none cursor-pointer pr-10`}
+                                        value={form.musculoTrabajado} onChange={handleInputChange}
+                                    >
+                                        <option value="" className={AppStyles.darkBackgroundSelect} disabled>Seleccione un músculo</option>
+                                        {MUSCULOS_PERMITIDOS.map(m => (
+                                            <option key={m} value={m} className={AppStyles.darkBackgroundSelect}>{m}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500 group-hover:text-purple-400 transition-colors">
+                                        <ChevronDown className="w-4 h-4 fill-current" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label className={AppStyles.label}>Elementos del Gym <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                                <input 
+                                    type="text" name="elementosGym" 
+                                    className={AppStyles.inputDark}
+                                    placeholder="Ej: Barra/Mancuernas/Máquina/etc."
+                                    value={form.elementosGym} onChange={handleInputChange}
+                                />
+                            </div>
+                            <div>
+                                <label className={AppStyles.label}>Tipo de Agarre <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                                <div className="relative group">
+                                    <select 
+                                        name="tipoAgarre" 
+                                        className={`${AppStyles.inputDark} appearance-none cursor-pointer pr-10`}
+                                        value={form.tipoAgarre} onChange={handleInputChange}
+                                    >
+                                        <option value="" className={AppStyles.darkBackgroundSelect}>Ninguno</option>
+                                        {TIPOS_AGARRE.map(agarre => (
+                                            <option key={agarre} value={agarre} className={AppStyles.darkBackgroundSelect}>{agarre}</option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500 group-hover:text-purple-400 transition-colors">
+                                        <ChevronDown className="w-4 h-4 fill-current" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* DETALLES TEXTAREA */}
+                        <div>
+                            <label className={AppStyles.label}>Detalles a tener en cuenta <span className="text-gray-500 font-normal text-xs">(Opcional)</span></label>
+                            <textarea 
+                                name="detalles" 
+                                className={AppStyles.inputDark + " min-h-[100px] resize-y"}
+                                placeholder="Anotaciones extra sobre la técnica o cuidados especiales..."
+                                value={form.detalles} onChange={handleInputChange}
                             />
                         </div>
 
@@ -84,12 +144,12 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                                         <div className="flex flex-col items-center gap-2 pointer-events-none">
                                             {selectedImage ? (
                                                 <>
-                                                    <span className="text-3xl">🖼️</span>
+                                                    <ImageIcon className="w-8 h-8 text-purple-400" />
                                                     <p className="text-purple-400 font-bold text-sm truncate max-w-[150px]">{selectedImage.name}</p>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📷</span>
+                                                    <Camera className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
                                                     <p className="text-gray-400 text-xs">Arrastra imagen</p>
                                                 </>
                                             )}
@@ -109,12 +169,12 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                                         <div className="flex flex-col items-center gap-2 pointer-events-none">
                                             {selectedVideo ? (
                                                 <>
-                                                    <span className="text-3xl">📹</span>
+                                                    <Video className="w-8 h-8 text-green-400" />
                                                     <p className="text-green-400 font-bold text-sm truncate max-w-[150px]">{selectedVideo.name}</p>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className="text-3xl text-gray-500 group-hover:scale-110 transition">📤</span>
+                                                    <Upload className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
                                                     <p className="text-gray-400 text-xs">Arrastra video</p>
                                                 </>
                                             )}
@@ -128,8 +188,7 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                         {!isAdmin && (
                             <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
                                 <p className="text-blue-300 text-sm">
-                                    <strong>Nota:</strong> Como entrenador, solo puedes poner el nombre. 
-                                    Los campos imagen y video los cargo yo más tarde.
+                                    <strong>Nota:</strong> El video demostrativo del ejercicio será cargado más adelante por el administrador.
                                 </p>
                             </div>
                         )}
@@ -148,9 +207,9 @@ export const EjerciciosCrear = ({ onNavigate }: Props) => {
                             <button 
                                 type="submit" 
                                 disabled={loading} 
-                                className={`${AppStyles.btnPrimary} ${loading ? 'opacity-70 cursor-wait' : ''}`}
+                                className={`${AppStyles.btnPrimary} ${loading ? 'opacity-70 cursor-wait' : ''} flex justify-center items-center gap-2`}
                             >
-                                {loading ? 'Guardando...' : '💾 Guardar'}
+                                {loading ? 'Guardando...' : <><Save className="w-4 h-4" /> Guardar</>}
                             </button>
                         </div>
                     </form>
