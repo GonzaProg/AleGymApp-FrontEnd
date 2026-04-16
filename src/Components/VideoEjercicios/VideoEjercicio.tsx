@@ -4,7 +4,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 
 interface VideoProps {
   url: string;
-  // Añadimos estas props opcionales
+  fallbackUrl?: string; // URL de la nube para fallback
   controls?: boolean;
   muted?: boolean;
   loop?: boolean;
@@ -27,7 +27,21 @@ const b64toBlob = (b64Data: string, contentType = '', sliceSize = 512) => {
   return new Blob(byteArrays, { type: contentType });
 };
 
-export const VideoEjercicio = ({ url, controls = false, muted = true, loop = true }: VideoProps) => {
+// Intentar leer un archivo de Capacitor Filesystem y devolver un blob URL
+const readLocalFile = async (path: string): Promise<string | null> => {
+  try {
+    const file = await Filesystem.readFile({
+      path: path,
+      directory: Directory.Data
+    });
+    const blob = b64toBlob(file.data as string, 'video/mp4');
+    return URL.createObjectURL(blob);
+  } catch {
+    return null;
+  }
+};
+
+export const VideoEjercicio = ({ url, fallbackUrl, controls = false, muted = true, loop = true }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoSrc, setVideoSrc] = useState<string>('');
 
@@ -38,33 +52,50 @@ export const VideoEjercicio = ({ url, controls = false, muted = true, loop = tru
     const loadVideo = async () => {
       if (!url) return;
 
+      // === NATIVO (Android/iOS) ===
       if (Capacitor.isNativePlatform()) {
         const isNativeFile = url.startsWith('file://');
         if (isMounted) setVideoSrc(isNativeFile ? Capacitor.convertFileSrc(url) : url);
-      } else {
-        // En WEB
-        if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) {
-          if (isMounted) setVideoSrc(url);
-        } else {
-          // Asumimos que es un archivo guardado en Web (IndexedDB vía Capacitor Filesystem)
-          try {
-            const fileName = url.split('/').pop() || url;
-            const file = await Filesystem.readFile({
-              path: fileName,
-              directory: Directory.Data
-            });
-            
-            // Convertir de base64 a Blob sin usar fetch() para evitar límites de longitud en Data URI
-            const blob = b64toBlob(file.data as string, 'video/mp4');
-            objectUrl = URL.createObjectURL(blob);
-            
-            if (isMounted) setVideoSrc(objectUrl);
-          } catch (e) {
-            console.error("Error al cargar vídeo offline en web", e);
-            if (isMounted) setVideoSrc(url); // fallback
-          }
+        return;
+      }
+
+      // === WEB ===
+      // Si es una URL directa (http, data, blob), usarla directamente
+      if (url.startsWith('http') || url.startsWith('data:') || url.startsWith('blob:')) {
+        if (isMounted) setVideoSrc(url);
+        return;
+      }
+
+      // Si NO es URL directa, es un archivo local guardado en IndexedDB
+
+      // 1. Intentar con el path tal cual (para formato fileName directo: "vid_123_456.mp4")
+      let blobUrl = await readLocalFile(url);
+      if (blobUrl) {
+        objectUrl = blobUrl;
+        if (isMounted) setVideoSrc(blobUrl);
+        return;
+      }
+
+      // 2. Intentar extrayendo solo el fileName del path
+      const fileName = url.split('/').pop();
+      if (fileName && fileName !== url) {
+        blobUrl = await readLocalFile(fileName);
+        if (blobUrl) {
+          objectUrl = blobUrl;
+          if (isMounted) setVideoSrc(blobUrl);
+          return;
         }
       }
+
+      // 3. Fallback: usar la URL de la nube si se proporcionó
+      if (fallbackUrl) {
+        console.warn("⚠️ Video offline no encontrado, usando nube:", fallbackUrl);
+        if (isMounted) setVideoSrc(fallbackUrl);
+        return;
+      }
+
+      // 4. Último recurso
+      if (isMounted) setVideoSrc(url);
     };
 
     loadVideo();
@@ -75,7 +106,7 @@ export const VideoEjercicio = ({ url, controls = false, muted = true, loop = tru
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [url]);
+  }, [url, fallbackUrl]);
 
   useEffect(() => {
     if (videoSrc && videoRef.current) {
@@ -100,10 +131,9 @@ export const VideoEjercicio = ({ url, controls = false, muted = true, loop = tru
             loop={loop}
             muted={muted}
             playsInline
-            controls={controls} // Usamos la prop
+            controls={controls}
             disablePictureInPicture={!controls}
             disableRemotePlayback={!controls}
-            // Si tiene controles, permitimos los clicks. Si no, lo bloqueamos.
             style={{ pointerEvents: controls ? 'auto' : 'none' }}
           />
       )}
