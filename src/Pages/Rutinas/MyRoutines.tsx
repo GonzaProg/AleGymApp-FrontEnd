@@ -20,7 +20,24 @@ const OfflineThumbnail = ({ path, alt }: { path: string; alt: string }) => {
 
         const load = async () => {
             if (Capacitor.isNativePlatform()) {
-                if (mounted) setSrc(path.startsWith('file://') ? Capacitor.convertFileSrc(path) : path);
+                // Si es una URL de la nube, usarla directo
+                if (path.startsWith('http')) {
+                    if (mounted) setSrc(path);
+                    return;
+                }
+
+                // Resolver path local nativo
+                try {
+                    const fileName = path.split('/').pop() || path;
+                    const result = await Filesystem.getUri({
+                        path: fileName,
+                        directory: Directory.Data
+                    });
+                    if (mounted) setSrc(Capacitor.convertFileSrc(result.uri));
+                } catch (e) {
+                    console.error("Error obteniendo URI nativa de miniatura:", e);
+                    if (mounted) setSrc(path); // Fallback
+                }
                 return;
             }
             
