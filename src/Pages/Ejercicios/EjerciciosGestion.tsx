@@ -100,9 +100,20 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                 </div>
                                 
                                 {/* Modal de Imagen Preview */}
-                                <div className="absolute top-0 inset-x-0 p-3 bg-gradient-to-b from-black/90 via-black/50 to-transparent z-10 pointer-events-none">
-                                    <p className="text-white text-sm font-bold leading-tight drop-shadow-md text-center">{ej.nombre}</p>
-                                    <p className="text-gray-400 text-[10px] text-center font-bold tracking-widest uppercase mt-1">{ej.musculoTrabajado || 'Múltiples'}</p>
+                                 <div className="absolute top-0 inset-x-0 p-3 bg-gradient-to-b from-black/90 via-black/50 to-transparent z-10 pointer-events-none">
+                                    <p className="text-white text-sm font-bold leading-tight drop-shadow-md text-center mb-2">{ej.nombre}</p>
+                                    <div className="flex flex-wrap justify-center gap-1">
+                                        {ej.musculoTrabajado && (
+                                            <span className={AppStyles.tagMuscle}>
+                                                {ej.musculoTrabajado}
+                                            </span>
+                                        )}
+                                        {ej.tipoAgarre && (
+                                            <span className={AppStyles.tagGrip}>
+                                                Agarre {ej.tipoAgarre}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Play Button Centrado */}
