@@ -1,6 +1,6 @@
 export const LoginStyles = {
     
-    glassCard: "p-8 shadow-2xl bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl",
+    glassCard: "p-4 shadow-2xl bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl",
     
     inputDark: "w-full bg-gray-900/60 border border-cyan-500/70 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent rounded-lg transition-all duration-200 p-3",
     
