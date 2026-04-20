@@ -9,6 +9,8 @@ export const useEditGym = (onSuccess?: () => void) => {
     const [nombre, setNombre] = useState("");
     const [codigo, setCodigo] = useState("");
     const [selectedLogo, setSelectedLogo] = useState<File | null>(null);
+    const [selectedFondo, setSelectedFondo] = useState<File | null>(null);
+    const [removeFondo, setRemoveFondo] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const openEditModal = (gym: GymDTO) => {
@@ -16,6 +18,8 @@ export const useEditGym = (onSuccess?: () => void) => {
         setNombre(gym.nombre);
         setCodigo(gym.codigoAcceso);
         setSelectedLogo(null);
+        setSelectedFondo(null);
+        setRemoveFondo(false);
         setShowEditModal(true);
     };
 
@@ -25,11 +29,22 @@ export const useEditGym = (onSuccess?: () => void) => {
         setNombre("");
         setCodigo("");
         setSelectedLogo(null);
+        setSelectedFondo(null);
+        setRemoveFondo(false);
     };
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             setSelectedLogo(e.target.files[0]);
+        }
+    };
+
+    const handleFondoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setSelectedFondo(e.target.files[0]);
+            setRemoveFondo(false);
+        } else {
+            setSelectedFondo(null);
         }
     };
 
@@ -54,10 +69,26 @@ export const useEditGym = (onSuccess?: () => void) => {
                 logoUrl = await CloudinaryApi.upload(selectedLogo, 'logos');
             }
 
+            let fondoInicioCelularUrl = editingGym.fondoInicioCelularUrl || null;
+
+            if (removeFondo) {
+                if (editingGym.fondoInicioCelularUrl) {
+                    await CloudinaryApi.delete(editingGym.fondoInicioCelularUrl, 'image');
+                }
+                fondoInicioCelularUrl = null;
+            } else if (selectedFondo) {
+                // Si subimos uno nuevo, borramos el anterior si existía
+                if (editingGym.fondoInicioCelularUrl) {
+                    await CloudinaryApi.delete(editingGym.fondoInicioCelularUrl, 'image');
+                }
+                fondoInicioCelularUrl = await CloudinaryApi.upload(selectedFondo, 'fondoInicioCelular', `FondoInicioCelular/${nombre.trim()}`);
+            }
+
             const updateData: CreateUpdateGymDTO = {
                 nombre: nombre.trim(),
                 codigoAcceso: codigo.trim().toUpperCase(),
-                logoUrl
+                logoUrl,
+                fondoInicioCelularUrl
             };
 
             await GymApi.update(editingGym.id, updateData);
@@ -78,6 +109,8 @@ export const useEditGym = (onSuccess?: () => void) => {
         nombre, setNombre,
         codigo, setCodigo,
         selectedLogo, handleLogoChange,
+        selectedFondo, handleFondoChange,
+        removeFondo, setRemoveFondo,
         loading,
         openEditModal,
         closeEditModal,

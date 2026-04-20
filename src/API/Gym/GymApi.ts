@@ -7,6 +7,7 @@ export interface GymDTO {
     codigoAcceso: string;
     activo: boolean;
     logoUrl?: string;
+    fondoInicioCelularUrl?: string;
 }
 
 // Interfaz para ACTUALIZAR datos
@@ -14,6 +15,7 @@ export interface CreateUpdateGymDTO {
     nombre: string;
     codigoAcceso: string;
     logoUrl?: string;
+    fondoInicioCelularUrl?: string | null;
 }
 
 export const GymApi = {

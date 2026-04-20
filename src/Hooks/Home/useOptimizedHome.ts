@@ -18,6 +18,8 @@ export interface User {
         nombre?: string;
         codigoAcceso?: string;
         moduloAsistencia?: boolean;
+        logoUrl?: string;
+        fondoInicioCelularUrl?: string;
     };
 }
 
@@ -59,6 +61,8 @@ export const useOptimizedHome = () => {
                 
                 // Cargar métricas solo después de tener el usuario
                 loadMetrics(userObj.rol);
+
+
             } catch (error) {
                 console.error("Error sesión:", error);
                 logout();

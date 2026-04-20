@@ -35,6 +35,7 @@ export interface LoginResponse {
             nombre: string;
             logoUrl?: string;
             moduloAsistencia?: boolean;
+            fondoInicioCelularUrl?: string;
         }
     };
 }
