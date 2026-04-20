@@ -18,6 +18,14 @@ export interface CreateUpdateGymDTO {
     fondoInicioCelularUrl?: string | null;
 }
 
+export interface GymPreferencesDTO {
+    envioAutomaticoCumpleanos?: boolean; 
+    envioAutomaticoRecibos?: boolean;
+    mensajeCumpleanos?: string;
+    moduloAsistencia?: boolean;
+    finanzasPassword?: string;
+}
+
 export const GymApi = {
     // 1. Crear: Ahora acepta CreateGymDTO (sin id ni activo)
     create: async (data: CreateUpdateGymDTO) => {
@@ -53,13 +61,13 @@ export const GymApi = {
         return response.data;
     },
     
-    updatePreferences: async (data: { 
-        envioAutomaticoCumpleanos?: boolean; 
-        envioAutomaticoRecibos?: boolean;
-        mensajeCumpleanos?: string;
-        moduloAsistencia?: boolean;
-     }) => {
-        const response = await api.put('/gyms/preferences', data);
+    updatePreferences: async (data: GymPreferencesDTO) => {
+        const response = await api.put("/gyms/preferences", data);
+        return response.data;
+    },
+
+    verifyFinancePassword: async (password: string) => {
+        const response = await api.post("/gyms/verify-finance-password", { password });
         return response.data;
     }
 };
