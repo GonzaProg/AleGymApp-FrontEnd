@@ -7,6 +7,7 @@ export interface GymDTO {
     codigoAcceso: string;
     activo: boolean;
     logoUrl?: string;
+    fondoInicioCelularUrl?: string;
 }
 
 // Interfaz para ACTUALIZAR datos
@@ -14,6 +15,15 @@ export interface CreateUpdateGymDTO {
     nombre: string;
     codigoAcceso: string;
     logoUrl?: string;
+    fondoInicioCelularUrl?: string | null;
+}
+
+export interface GymPreferencesDTO {
+    envioAutomaticoCumpleanos?: boolean; 
+    envioAutomaticoRecibos?: boolean;
+    mensajeCumpleanos?: string;
+    moduloAsistencia?: boolean;
+    finanzasPassword?: string;
 }
 
 export const GymApi = {
@@ -51,13 +61,13 @@ export const GymApi = {
         return response.data;
     },
     
-    updatePreferences: async (data: { 
-        envioAutomaticoCumpleanos?: boolean; 
-        envioAutomaticoRecibos?: boolean;
-        mensajeCumpleanos?: string;
-        moduloAsistencia?: boolean;
-     }) => {
-        const response = await api.put('/gyms/preferences', data);
+    updatePreferences: async (data: GymPreferencesDTO) => {
+        const response = await api.put("/gyms/preferences", data);
+        return response.data;
+    },
+
+    verifyFinancePassword: async (password: string) => {
+        const response = await api.post("/gyms/verify-finance-password", { password });
         return response.data;
     }
 };

@@ -6,7 +6,9 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { FinancialDashboard } from "../../Components/Pagos/FinancialDashboard";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
-import { DollarSign, Search, Undo2 } from "lucide-react";
+import { DollarSign, Search, Undo2, Lock } from "lucide-react";
+import { GymApi } from "../../API/Gym/GymApi";
+import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const MetricasFinancieras = () => {
     
@@ -27,6 +29,28 @@ export const MetricasFinancieras = () => {
         setShowMetrics(val);
         localStorage.setItem("showFinancialMetrics", JSON.stringify(val));
         window.dispatchEvent(new Event("storage")); 
+    };
+
+    // Estados para la Contraseña Financiera
+    const [isUnlocked, setIsUnlocked] = useState(false);
+    const [passwordInput, setPasswordInput] = useState("");
+    const [verifying, setVerifying] = useState(false);
+
+    const handleDesbloquear = async () => {
+        if (!passwordInput.trim()) return;
+        setVerifying(true);
+        try {
+            const res = await GymApi.verifyFinancePassword(passwordInput);
+            if (res.success) {
+                setIsUnlocked(true);
+                setPasswordInput("");
+                showSuccess("Acceso financiero desbloqueado");
+            }
+        } catch (error) {
+            showError("Contraseña incorrecta");
+        } finally {
+            setVerifying(false);
+        }
     };
 
     // Formateadores
@@ -65,7 +89,30 @@ export const MetricasFinancieras = () => {
                 {/* --- DASHBOARD METRICAS --- */}
                 {showMetrics && (
                     <div className="animate-fade-in-down">
-                        <FinancialDashboard />
+                        {!isUnlocked ? (
+                            <div className={`${AppStyles.glassCard} flex flex-col items-center justify-center p-8 border-red-500/30 text-center`}>
+                                <Lock className="w-12 h-12 text-red-400 mb-6" />
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <Input 
+                                        type="password" 
+                                        placeholder="Contraseña" 
+                                        value={passwordInput} 
+                                        onChange={(e) => setPasswordInput(e.target.value)} 
+                                        className={`${AppStyles.inputDark} text-center tracking-[0.3em] font-mono`}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleDesbloquear()}
+                                    />
+                                    <Button 
+                                        onClick={handleDesbloquear} 
+                                        disabled={verifying}
+                                        className="bg-red-600/50 hover:bg-red-500 text-white font-bold px-6 border-0"
+                                    >
+                                        {verifying ? "Verificando..." : "Desbloquear"}
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <FinancialDashboard />
+                        )}
                     </div>
                 )}
 

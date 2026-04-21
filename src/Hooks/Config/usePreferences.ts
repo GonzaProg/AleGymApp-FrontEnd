@@ -9,6 +9,12 @@ export const usePreferences = () => {
     const [birthdayMessage, setBirthdayMessage] = useState("");
     const [moduloAsistencia, setModuloAsistencia] = useState(true);
     
+    // Estados para el cambio de contraseña
+    const [passwordCurrent, setPasswordCurrent] = useState("");
+    const [passwordNew, setPasswordNew] = useState("");
+    const [passwordConfirm, setPasswordConfirm] = useState("");
+    const [changingPassword, setChangingPassword] = useState(false);
+    
     // LocalStorage Settings (Métricas)
     // Inicializamos leyendo de localStorage
     const [showFinancialMetrics, setShowFinancialMetricsState] = useState(() => {
@@ -109,6 +115,43 @@ export const usePreferences = () => {
         }
     };
 
+    const updateFinanzasPassword = async () => {
+        if (!passwordCurrent || !passwordNew || !passwordConfirm) {
+            showError("Todos los campos de contraseña son obligatorios");
+            return;
+        }
+
+        if (passwordNew !== passwordConfirm) {
+            showError("Las nuevas contraseñas no coinciden");
+            return;
+        }
+
+        setChangingPassword(true);
+        try {
+            // 1. Verificar la contraseña actual
+            const verifyRes = await GymApi.verifyFinancePassword(passwordCurrent);
+            
+            if (verifyRes.success) {
+                // 2. Si es válida, proceder al cambio
+                await GymApi.updatePreferences({ finanzasPassword: passwordNew });
+                showSuccess("Contraseña financiera actualizada ✅");
+                
+                // Limpiar campos
+                setPasswordCurrent("");
+                setPasswordNew("");
+                setPasswordConfirm("");
+            }
+        } catch (error: any) {
+            if (error.response?.status === 401) {
+                showError("La contraseña actual es incorrecta");
+            } else {
+                showError("No se pudo actualizar la contraseña");
+            }
+        } finally {
+            setChangingPassword(false);
+        }
+    };
+
     return {
         loading,
         savingMessage, 
@@ -121,6 +164,10 @@ export const usePreferences = () => {
         toggleReceipts,
         showFinancialMetrics,
         setShowFinancialMetrics,
-        moduloAsistencia, toggleAsistencia
+        moduloAsistencia, toggleAsistencia,
+        passwordCurrent, setPasswordCurrent,
+        passwordNew, setPasswordNew,
+        passwordConfirm, setPasswordConfirm,
+        changingPassword, updateFinanzasPassword
     };
 };

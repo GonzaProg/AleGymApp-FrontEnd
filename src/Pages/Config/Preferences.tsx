@@ -1,7 +1,7 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
 import { usePreferences } from "../../Hooks/Config/usePreferences";
-import { Settings, Bot, Save, Monitor, Package } from "lucide-react";
+import { Settings, Bot, Save, Monitor, Package, Lock } from "lucide-react";
 
 export const Preferences = () => {
     const { 
@@ -10,7 +10,11 @@ export const Preferences = () => {
         autoReceipts, toggleReceipts,
         birthdayMessage, setBirthdayMessage, saveBirthdayMessage, savingMessage,
         showFinancialMetrics, setShowFinancialMetrics,
-        moduloAsistencia, toggleAsistencia
+        moduloAsistencia, toggleAsistencia,
+        passwordCurrent, setPasswordCurrent,
+        passwordNew, setPasswordNew,
+        passwordConfirm, setPasswordConfirm,
+        changingPassword, updateFinanzasPassword
     } = usePreferences();
 
     if (loading) return <div className="text-white text-center pt-20">Cargando preferencias...</div>;
@@ -97,6 +101,67 @@ export const Preferences = () => {
                                 <p className="text-gray-400 text-sm">Mostrar gráficas de ingresos y métricas en el historial de pagos.</p>
                             </div>
                             <ToggleSwitch checked={showFinancialMetrics} onChange={setShowFinancialMetrics} />
+                        </div>
+                    </div>
+
+                    {/* SECCIÓN: SEGURIDAD FINANCIERA */}
+                    <div className={AppStyles.glassCard}>
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+                            <Lock className="w-6 h-6 text-red-400" /> Seguridad Financiera
+                        </h3>
+                        
+                        <div className="mb-4">
+                            <p className="text-white font-bold text-lg mb-1">Cambiar Contraseña del Dashboard</p>
+                            <p className="text-gray-400 text-sm mb-6">Completa los campos para actualizar la seguridad de acceso a finanzas.</p>
+                            
+                            <div className="space-y-4 max-w-sm">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 shadow-sm">Contraseña Actual</label>
+                                    <input 
+                                        type="password" 
+                                        value={passwordCurrent}
+                                        onChange={(e) => setPasswordCurrent(e.target.value)}
+                                        placeholder="••••"
+                                        className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-white/10 focus:border-red-500 transition-all font-mono tracking-widest"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Nueva Clave</label>
+                                        <input 
+                                            type="password" 
+                                            value={passwordNew}
+                                            onChange={(e) => setPasswordNew(e.target.value)}
+                                            placeholder="••••"
+                                            className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-white/10 focus:border-red-500 transition-all font-mono tracking-widest"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Confirmar</label>
+                                        <input 
+                                            type="password" 
+                                            value={passwordConfirm}
+                                            onChange={(e) => setPasswordConfirm(e.target.value)}
+                                            placeholder="••••"
+                                            className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-white/10 focus:border-red-500 transition-all font-mono tracking-widest"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={updateFinanzasPassword}
+                                    disabled={changingPassword}
+                                    className="w-full bg-red-600 hover:bg-red-500 disabled:bg-gray-700 text-white text-sm font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {changingPassword ? "Actualizando..." : (
+                                        <>
+                                            <Save className="w-4 h-4" /> 
+                                            Actualizar Seguridad
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
