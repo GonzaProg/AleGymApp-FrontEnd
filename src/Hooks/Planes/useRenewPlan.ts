@@ -55,7 +55,7 @@ export const useRenewPlan = () => {
 
     // --- ACCIONES ---
 
-    const renovarPlan = async (userPlanId?: number) => {
+    const renovarPlan = async (userPlanId?: number, forzarDesdeVencimiento: boolean = false) => {
         if (!alumnoSeleccionado) return;
         
         // Buscamos un plan para renovar si no viene el ID específico
@@ -68,7 +68,7 @@ export const useRenewPlan = () => {
 
         setLoadingAction(true);
         try {
-            const response: any = await PlansApi.renewPlan(idRenovar, metodoPago);
+            const response: any = await PlansApi.renewPlan(idRenovar, metodoPago, forzarDesdeVencimiento);
 
             switch (response.estadoRecibo) {
                 case 'ENVIADO': showSuccess(`✅ Renovado. Recibo enviado 📱`); break;

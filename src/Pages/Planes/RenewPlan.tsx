@@ -21,6 +21,10 @@ export const RenewPlan = () => {
     asignarPlan
   } = useRenewPlan();
 
+  const ultimoPlan = alumnoSeleccionado?.userPlans
+    ?.filter((p: any) => !p.activo)
+    ?.sort((a: any, b: any) => new Date(b.fechaVencimiento).getTime() - new Date(a.fechaVencimiento).getTime())[0];
+
   return (
     <div className={AppStyles.principalContainer}>
         <div className="container mx-auto px-4 max-w-5xl">
@@ -159,9 +163,52 @@ export const RenewPlan = () => {
                           ))}
                       </div>
                   ) : (
-                      <p className="text-gray-500 italic text-center bg-black/20 py-4 rounded-lg border border-white/5">
-                          Este usuario no tiene planes activos.
-                      </p>
+                      <div className="bg-black/20 p-6 rounded-lg border border-white/5 flex flex-col items-center text-center">
+                          <p className="text-gray-400 mb-4 text-lg">
+                              Este usuario no tiene planes activos.
+                          </p>
+                          
+                          {ultimoPlan && (
+                              <div className="w-full max-w-lg bg-gray-800/80 border border-white/10 rounded-xl p-5 mt-2 flex flex-col gap-4">
+                                  <h4 className="text-white font-semibold text-md">¿Quiere renovar su último plan registrado?</h4>
+                                  
+                                  <div className="flex flex-col text-left bg-black/30 p-4 rounded-lg">
+                                      <div className="flex items-center gap-2 mb-2">
+                                          <span className="text-green-400 font-bold text-lg">{ultimoPlan.plan.nombre}</span>
+                                          <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded border border-gray-600 uppercase">
+                                              {ultimoPlan.plan.tipo}
+                                          </span>
+                                      </div>
+                                      <div className="flex justify-between text-sm">
+                                          <span className="text-gray-400">Venció el:</span>
+                                          <span className="text-red-400 font-mono font-medium">{new Date(ultimoPlan.fechaVencimiento).toLocaleDateString()}</span>
+                                      </div>
+                                      <div className="flex justify-between text-sm mt-1">
+                                          <span className="text-gray-400">Precio original:</span>
+                                          <span className="text-white font-mono">${ultimoPlan.plan.precio}</span>
+                                      </div>
+                                  </div>
+
+                                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+                                      <div className="w-full sm:flex-1">
+                                          <PaymentMethodSelect 
+                                              value={metodoPago} 
+                                              onChange={setMetodoPago}
+                                              className="mb-0"
+                                          />
+                                      </div>
+                                      <button 
+                                          onClick={() => renovarPlan(ultimoPlan.id, true)} 
+                                          disabled={loadingAction}
+                                          className="bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg transition shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 w-full sm:w-auto"
+                                          title="Renovar desde fecha de vencimiento"
+                                      >
+                                          {loadingAction ? '...' : <><RefreshCcw className="w-4 h-4" /> Renovar desde Vencimiento</>}
+                                      </button>
+                                  </div>
+                              </div>
+                          )}
+                      </div>
                   )}
               </div>
 
