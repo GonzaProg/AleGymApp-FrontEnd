@@ -2,9 +2,12 @@ import { useRenewPlan } from "../../Hooks/Planes/useRenewPlan";
 import { AppStyles } from "../../Styles/AppStyles";
 import { RenewPlanStyles } from "../../Styles/RenewPlanStyles";
 import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
-import { Search, ClipboardList, RefreshCcw, X, Plus, Hourglass } from "lucide-react";
+import { Search, ClipboardList, RefreshCcw, X, Plus, Hourglass, FileText } from "lucide-react";
+import { useState } from "react";
+import { UserPaymentHistory } from "./UserPaymentHistory";
 
 export const RenewPlan = () => {
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
   const {
     planesDisponibles,
     alumnoSeleccionado,
@@ -14,12 +17,22 @@ export const RenewPlan = () => {
     metodoPago,      
     setMetodoPago,   
     setBusqueda,
-    seleccionarAlumno,
-    limpiarSeleccion,
+    seleccionarAlumno: originalSeleccionarAlumno,
+    limpiarSeleccion: originalLimpiarSeleccion,
     renovarPlan,
     cancelarPlan,
     asignarPlan
   } = useRenewPlan();
+
+  const seleccionarAlumno = (alumno: any) => {
+    setMostrarHistorial(false);
+    originalSeleccionarAlumno(alumno);
+  };
+
+  const limpiarSeleccion = () => {
+    setMostrarHistorial(false);
+    originalLimpiarSeleccion();
+  };
 
   const ultimoPlan = alumnoSeleccionado?.userPlans
     ?.filter((p: any) => !p.activo)
@@ -72,6 +85,12 @@ export const RenewPlan = () => {
 
           {/* DETALLE ALUMNO SELECCIONADO  */}
           {alumnoSeleccionado && (
+            mostrarHistorial ? (
+              <UserPaymentHistory 
+                alumnoSeleccionado={alumnoSeleccionado} 
+                onBack={() => setMostrarHistorial(false)}
+              />
+            ) : (
             <div className={`${AppStyles.glassCard} animate-fade-in`}>
               
               {/* Encabezado del Alumno */}
@@ -92,8 +111,16 @@ export const RenewPlan = () => {
                     )}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                       {alumnoSeleccionado.nombre} {alumnoSeleccionado.apellido}
+                      <button 
+                        onClick={() => setMostrarHistorial(true)}
+                        className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-sm py-1.5 px-3 rounded-lg transition-colors border border-blue-500/30 font-medium ml-2"
+                        title="Ver Historial de Pagos Anual"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span className="hidden sm:inline">Historial Anual</span>
+                      </button>
                     </h2>
                   </div>
                 </div>
@@ -253,6 +280,7 @@ export const RenewPlan = () => {
               )}
 
             </div>
+            )
           )}
         </div>
     </div>
