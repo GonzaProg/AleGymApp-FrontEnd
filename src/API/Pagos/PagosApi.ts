@@ -19,6 +19,20 @@ export interface PagoDTO {
     };
 }
 
+export interface MatrizAnualDTO {
+    user: {
+        id: number;
+        nombre: string;
+        apellido: string;
+        dni: string;
+        fechaCreacion?: string;
+    };
+    pagos: {
+        id: number;
+        fechaPago: string;
+    }[];
+}
+
 export interface FinancialMetricsDTO {
     ingresosMesActual: number;
     ingresosMesPasado: number;
@@ -74,6 +88,11 @@ export const PagosApi = {
 
     getHistorialCompletoPorUsuario: async (userId: number, year: number): Promise<PagoDTO[]> => {
         const response = await api.get(`/pagos/historial-completo/${userId}/${year}`);
+        return response.data;
+    },
+
+    getMatrizAnualMembresias: async (year: number): Promise<MatrizAnualDTO[]> => {
+        const response = await api.get(`/pagos/matriz-anual/${year}`);
         return response.data;
     },
 

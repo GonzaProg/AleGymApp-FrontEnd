@@ -14,6 +14,7 @@ interface UseAlumnoSearchReturn {
     sugerencias: AlumnoDTO[];
     mostrarSugerencias: boolean;
     alumnoSeleccionado: AlumnoDTO | null;
+    setAlumnoSeleccionado: (alumno: AlumnoDTO | null) => void;
     todosLosAlumnos: AlumnoDTO[];
     loading: boolean;
     
@@ -133,6 +134,7 @@ export const useAlumnoSearch = (options: UseAlumnoSearchOptions = {}): UseAlumno
         sugerencias,
         mostrarSugerencias,
         alumnoSeleccionado,
+        setAlumnoSeleccionado, // <--- AÑADIDO
         todosLosAlumnos,
         loading,
         

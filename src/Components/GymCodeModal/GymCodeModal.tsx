@@ -43,7 +43,10 @@ export const GymCodeModal = ({ isOpen, onClose, onCodeChange }: GymCodeModalProp
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-white mb-2">Código de Gimnasio</h2>
+            <h2 className="text-3xl font-black tracking-tight">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#0071BC]">Gym</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF8C00] to-[#d3932b]">Mate</span>
+            </h2>
             <p className="text-gray-400 text-sm">
               Configura el código de tu gimnasio para acceder a las funciones específicas
             </p>

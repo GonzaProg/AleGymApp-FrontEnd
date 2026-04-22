@@ -119,7 +119,7 @@ export const RenewPlan = () => {
                         title="Ver Historial de Pagos Anual"
                       >
                         <FileText className="w-4 h-4" />
-                        <span className="hidden sm:inline">Historial Anual</span>
+                        <span className="hidden sm:inline">Historial</span>
                       </button>
                     </h2>
                   </div>

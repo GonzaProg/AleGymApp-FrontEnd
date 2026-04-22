@@ -70,15 +70,15 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
                             <ArrowLeft className="w-5 h-5 text-gray-300" />
                         </button>
                         <div>
-                            <h2 className="text-2xl font-bold text-white tracking-tight">Historial Completo <span className="text-blue-400">Pagos</span></h2>
-                            <div className="flex items-center gap-2 mt-1">
-                                <p className="text-gray-400 font-medium text-sm">{user.nombre} {user.apellido}</p>
+                            <h2 className="text-2xl font-bold text-white tracking-tight">Historial Completo</h2>
+                            <div className="flex items-center gap-2 mt-2">
+                                <p className="text-green-400 font-medium text-2xl">• {user.nombre} {user.apellido}</p>
                             </div>
                             <div className="mt-2">
                                 {user.fechaCreacion && (
-                                    <span className="text-green-400 font-medium bg-green-500/10 px-2.5 py-1 rounded border border-green-500/20 inline-flex items-center gap-1.5 shadow-sm">
+                                    <span className="text-blue-400 font-medium bg-blue-500/10 px-2.5 py-1 rounded border border-blue-500/20 inline-flex items-center gap-1.5 shadow-sm">
                                         <Clock className="w-3.5 h-3.5 opacity-70" />
-                                        <span className="text-[12px] tracking-tight">En GymMate desde: {new Date(user.fechaCreacion).toLocaleDateString()}</span>
+                                        <span className="text-base tracking-tight">Ingreso al Gym: {new Date(user.fechaCreacion).toLocaleDateString()}</span>
                                     </span>
                                 )}
                             </div>
@@ -134,25 +134,25 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
                                                 
                                                 {tienePagos ? (
                                                     <>
-                                                        <td className="p-3">
+                                                        <td className="p-3 align-middle">
                                                             {pagosDelMes.map((p: any) => (
-                                                                <div key={p.id} className="text-gray-300 font-mono py-1.5">
+                                                                <div key={p.id} className="text-gray-300 font-mono h-10 flex items-center">
                                                                     {new Date(p.fechaPago).toLocaleDateString()}
                                                                 </div>
                                                             ))}
                                                         </td>
-                                                        <td className="p-3">
+                                                        <td className="p-3 align-middle">
                                                             {pagosDelMes.map((p: any) => {
                                                                 const isProduct = !!p.producto;
                                                                 return (
-                                                                    <div key={p.id} className="py-1">
+                                                                    <div key={p.id} className="h-10 flex items-center">
                                                                         {isProduct ? (
-                                                                            <span className="text-orange-400 font-medium bg-orange-500/10 px-2.5 py-0.5 rounded border border-orange-500/20 inline-flex items-center gap-1.5">
+                                                                            <span className="text-orange-400 font-medium bg-orange-500/10 px-2.5 py-1 rounded border border-orange-500/20 inline-flex items-center gap-1.5">
                                                                                 <ShoppingBag className="w-3 h-3" />
                                                                                 {p.producto?.nombre || "Producto"}
                                                                             </span>
                                                                         ) : (
-                                                                            <span className="text-green-400 font-medium bg-green-500/10 px-2.5 py-0.5 rounded border border-green-500/20">
+                                                                            <span className="text-green-400 font-medium bg-green-500/10 px-2.5 py-1 rounded border border-green-500/20">
                                                                                 {p.plan?.nombre || "Membresía"}
                                                                             </span>
                                                                         )}
@@ -160,10 +160,10 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
                                                                 );
                                                             })}
                                                         </td>
-                                                        <td className="p-3 text-right">
+                                                        <td className="p-3 text-right align-middle">
                                                             {pagosDelMes.map((p: any) => (
-                                                                <div key={p.id} className="py-1.5">
-                                                                    <span className="text-white font-mono font-medium px-2 py-0.5 rounded border border-white/10 bg-white/5 opacity-90 inline-block shadow-sm">
+                                                                <div key={p.id} className="h-10 flex items-center justify-end">
+                                                                    <span className="text-white font-mono font-medium px-2 py-1 rounded border border-white/10 bg-white/5 opacity-90 inline-block shadow-sm">
                                                                         ${Number(p.monto).toLocaleString()}
                                                                     </span>
                                                                 </div>

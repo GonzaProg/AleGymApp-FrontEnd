@@ -63,7 +63,10 @@ export const Login = () => {
         
         {/* ENCABEZADO */}
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold text-white drop-shadow-md tracking-tight">GymMate</h1>
+          <h1 className="text-4xl font-black tracking-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#0071BC]">Gym</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF8C00] to-[#d3932b]">Mate</span>
+          </h1>
           <p className="text-gray-200 mt-2 text-lg">
             {isRegistering ? "Crea tu cuenta gratis" : "Inicia sesión para entrenar"}
           </p>
