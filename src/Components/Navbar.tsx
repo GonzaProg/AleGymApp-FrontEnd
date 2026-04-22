@@ -39,8 +39,9 @@ export const Navbar = () => {
             onClick={() => navigate("/home")} 
             className="flex items-center cursor-pointer group z-20"
         >
-            <span className="self-center text-2xl font-semibold whitespace-nowrap text-white group-hover:text-gray-200 transition-colors">
-                Gym<span className="text-green-500 group-hover:text-green-400">Mate</span>
+            <span className="self-center text-2xl font-bold whitespace-nowrap">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#0071BC]">Gym</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF8C00] to-[#d3932b]">Mate</span>
             </span>
         </div>
         

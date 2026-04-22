@@ -23,6 +23,7 @@ export interface AlumnoDTO {
     telefono?: string;      
     fechaNacimiento?: string; 
     fotoPerfil?: string;
+    fechaCreacion?: string;
     // CAMBIO: Ahora es una lista de planes
     userPlans?: UserPlanInfo[]; 
     fechaVencimientoPlan?: string; 

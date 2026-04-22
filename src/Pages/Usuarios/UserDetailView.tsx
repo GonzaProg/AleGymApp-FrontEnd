@@ -1,11 +1,18 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { Card } from "../../Components/UI/Card";
 import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
-import { Zap } from "lucide-react";
+import { Zap, FileText } from "lucide-react";
+import { useState } from "react";
+import { FullUserPaymentHistory } from "./FullUserPaymentHistory";
 
 export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () => void }) => {
     const isPlanActuallyActive = (fecha: string, activo: boolean) => activo && new Date(fecha).setHours(23, 59, 59, 999) >= new Date().getTime();
     const hasActivePlan = user.userPlans?.some(up => isPlanActuallyActive(up.fechaVencimiento, up.activo));
+    const [showHistory, setShowHistory] = useState(false);
+
+    if (showHistory) {
+        return <FullUserPaymentHistory user={user} onBack={() => setShowHistory(false)} />;
+    }
 
     return (
         <div className="w-full max-w-5xl mx-auto mt-14 animate-fade-in-up">
@@ -31,6 +38,14 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                             <div className="flex justify-between text-sm"><span className="text-gray-500">DNI</span><span className="text-white font-mono text-base">{user.dni}</span></div>
                             <div className="flex justify-between text-sm"><span className="text-gray-500">Teléfono</span><span className="text-white text-base">{user.telefono || '-'}</span></div>
                         </div>
+
+                        <button 
+                            onClick={() => setShowHistory(true)}
+                            className="mt-6 w-full flex justify-center items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-sm py-2.5 px-4 rounded-xl transition-colors border border-blue-500/30 font-bold tracking-wide"
+                        >
+                            <FileText className="w-5 h-5" />
+                            HISTORIAL DE PAGOS
+                        </button>
                     </div>
                 </Card>
 

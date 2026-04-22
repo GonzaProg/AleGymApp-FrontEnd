@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { PlansApi, type PlanDTO } from "../../API/Planes/PlansApi";
+import { UsuarioApi } from "../../API/Usuarios/UsuarioApi";
 import { showConfirmSuccess, showError, showSuccess } from "../../Helpers/Alerts";
 // Asegúrate de que la ruta de importación sea correcta según tu estructura
 import { useAlumnoSearch } from "../useAlumnoSearch"; 
@@ -20,6 +21,7 @@ export const useRenewPlan = () => {
         busqueda,
         sugerencias,
         alumnoSeleccionado,
+        setAlumnoSeleccionado,
         loading: loadingSearch,
         handleSearchChange,
         handleSelectAlumno,
@@ -55,20 +57,34 @@ export const useRenewPlan = () => {
 
     // --- ACCIONES ---
 
-    const renovarPlan = async (userPlanId?: number) => {
+    const refrescarAlumno = async () => {
+        if (!alumnoSeleccionado) return;
+        try {
+            // Buscamos al mismo alumno por su DNI para obtener sus planes actualizados
+            const res = await UsuarioApi.getAlumnos({ 
+                search: alumnoSeleccionado.dni, 
+                includePlan: true,
+                showAll: false 
+            });
+            if (res.alumnos.length > 0) {
+                setAlumnoSeleccionado(res.alumnos[0]);
+            }
+        } catch (error) {
+            console.error("Error refrescando alumno:", error);
+        }
+    };
+
+    const renovarPlan = async (userPlanId?: number, forzarDesdeVencimiento: boolean = false) => {
         if (!alumnoSeleccionado) return;
         
         // Buscamos un plan para renovar si no viene el ID específico
         const idRenovar = userPlanId || alumnoSeleccionado.userPlans?.find((p:any) => p.activo)?.id;
         
-        // Si no tiene plan activo, quizás queremos renovar el último vencido? 
-        // Por seguridad, pedimos que seleccione explícitamente si hay ambigüedad, 
-        // pero aquí asumimos el flujo simple.
         if (!idRenovar) return showError("No se encontró una suscripción activa para renovar.");
 
         setLoadingAction(true);
         try {
-            const response: any = await PlansApi.renewPlan(idRenovar, metodoPago);
+            const response: any = await PlansApi.renewPlan(idRenovar, metodoPago, forzarDesdeVencimiento);
 
             switch (response.estadoRecibo) {
                 case 'ENVIADO': showSuccess(`✅ Renovado. Recibo enviado 📱`); break;
@@ -77,7 +93,7 @@ export const useRenewPlan = () => {
                 default: showSuccess(`✅ Renovado correctamente.`);
             }
 
-            limpiarSeleccion(); 
+            await refrescarAlumno(); 
         } catch (error: any) {
             showError(error.response?.data?.message || "Error al renovar");
         } finally {
@@ -102,7 +118,7 @@ export const useRenewPlan = () => {
         try {
             await PlansApi.cancelPlan(idCancelar);
             showSuccess("Plan cancelado correctamente");
-            limpiarSeleccion();
+            await refrescarAlumno();
         } catch (error: any) {
             showError("Error al cancelar");
         } finally {
@@ -131,7 +147,7 @@ export const useRenewPlan = () => {
                 default: showSuccess(`✅ Asignado correctamente.`);
             }
             
-            limpiarSeleccion();
+            await refrescarAlumno();
         } catch (error: any) {
             showError("Error al asignar plan");
         } finally {
