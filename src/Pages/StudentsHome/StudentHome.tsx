@@ -7,6 +7,7 @@ import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { Camera, Info, Flame, Dumbbell, Quote, Handshake } from "lucide-react";
 import { useFraseMotivacional } from "../../Hooks/StudentsHome/useFraseMotivacional";
+import { useGymCachedImages } from "../../Hooks/StudentsHome/useGymCachedImages";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const [isInfoOpen, setIsInfoOpen] = useState(false);
@@ -19,8 +20,8 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
     // Lógica simple para cambiar el texto y color según la cantidad de gente
     const getMensajeConcurrencia = (cantidad: number) => {
-        if (cantidad <= 6) return { texto: "Está súper tranquilo. ¡Es el momento perfecto para entrenar!", color: "text-green-400" };
-        if (cantidad > 6 && cantidad <= 12) return { texto: "Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!", color: "text-yellow-400" };
+        if (cantidad <= 8) return { texto: "Está súper tranquilo. ¡Es el momento perfecto para entrenar!", color: "text-green-400" };
+        if (cantidad > 8 && cantidad <= 20) return { texto: "Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!", color: "text-yellow-400" };
         return { texto: "Está bastante lleno. ¡Queda a tu elección!", color: "text-orange-400" };
     };
 
@@ -41,13 +42,38 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
     // Info del Gym para la tarjeta
     const gymName = currentUser?.gym?.nombre || "Gimnasio";
-    const gymLogo = currentUser?.gym?.logoUrl ? CloudinaryApi.getUrl(currentUser.gym.logoUrl) : null;
+    const gymLogoData = currentUser?.gym?.logoUrl ? CloudinaryApi.getUrl(currentUser.gym.logoUrl) : null;
+    const fondoGymUrlData = currentUser?.gym?.fondoInicioCelularUrl ? CloudinaryApi.getUrl(currentUser.gym.fondoInicioCelularUrl) : null;
+
+    // Caché local de las imágenes del gym usando el nuevo hook
+    const { localLogoUrl: gymLogo, localFondoUrl: fondoGymUrl } = useGymCachedImages(gymLogoData, fondoGymUrlData);
 
     return (
-        <div className="pt-safe mt-24 p-4 animate-fade-in pb-32 space-y-6 max-w-lg mx-auto relative">
+        <div className="pt-safe mt-24 p-0 animate-fade-in pb-32 space-y-6 max-w-lg mx-auto relative">
             
-            <div className="mb-4 px-2">
-                <h1 className="text-3xl font-black text-white mb-2 tracking-tight">
+            {/* SECCIÓN CON FONDO DINÁMICO */}
+            <div className={`relative p-4 ${fondoGymUrl ? 'overflow-hidden' : ''}`}>
+                {/* Capa de Fondo */}
+                {fondoGymUrl && (
+                    <div 
+                        className="absolute inset-0 z-0 pointer-events-none bg-transparent bg-no-repeat bg-[length:100%_auto] bg-[35%_10%]"
+                        style={{ 
+                            backgroundImage: `url(${fondoGymUrl})`,
+                            WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 5%, black 90%, transparent)',
+                            maskImage: 'linear-gradient(to bottom, transparent, black 25%, black 90%, transparent)'
+                        }}
+                    >
+                        {/* Sombras profundas para una transición invisible */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-transparent to-gray-950"></div>
+                        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black to-transparent opacity-60"></div>
+                        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+                    </div>
+                )}
+
+                {/* Contenido sobre el fondo */}
+                <div className="relative z-10 space-y-6">
+                    <div className="mb-4 px-2">
+                        <h1 className="text-3xl font-black text-white mb-2 tracking-tight">
                     Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">{currentUser?.nombre}</span> 👋
                 </h1>
                 <p className="text-gray-400 text-lg font-medium">¿Qué vamos a entrenar hoy?</p>
@@ -63,7 +89,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                         const fechaHastaStr = formatFechaDia(plan.fechaVencimiento);
 
                         return (
-                            <div key={plan.userPlanId} className={`bg-[#1c1c1e] p-5 rounded-3xl shadow-xl relative overflow-hidden group`}>
+                            <div key={plan.userPlanId} className={`bg-black/50 p-5 rounded-3xl shadow-xl relative overflow-hidden group border border-white/5`}>
                                 {/* Cabecera de la tarjeta */}
                                 <div className="flex items-center gap-4 mb-6">
                                     {gymLogo ? (
@@ -103,27 +129,14 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 </div>
             )}
 
+            {/* ESPACIADOR PARA VER EL TEXTO DEL FONDO */}
+            {fondoGymUrl && <div className="h-20 md:h-40 pointer-events-none"></div>}
+
             {/* CONDICIONAL: Solo mostramos la asistencia si el gimnasio la habilitó */}
             {isAsistenciaHabilitada ? (
                 <>
-                    {/* BOTÓN GIGANTE DE ESCANEO */}
-                    <button 
-                        onClick={() => setIsScannerOpen(true)}
-                        disabled={isCheckingIn}
-                        className={`w-full ${AppStyles.btnPrimary} flex flex-col items-center justify-center gap-2 py-6 relative overflow-hidden group`}
-                    >
-                        {/* Brillo de fondo animado */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                        
-                        <Camera className="w-10 h-10 text-white" />
-                        <span className="text-lg font-black tracking-wider">
-                            Escanear QR de Entrada
-                        </span>
-                        <span className="text-xs font-normal text-white/80">Apunta al código de la recepción</span>
-                    </button>
-
                     {/* ACORDEÓN DE INFORMACIÓN */}
-                    <div className={AppStyles.glassCard.replace("p-8", "p-2")}>
+                    <div className={AppStyles.glassCard.replace("p-8", "p-2").replace("bg-gray-900/80", "bg-black/20")}>
                         <button 
                             onClick={() => setIsInfoOpen(!isInfoOpen)}
                             className="w-full p-2 flex items-center justify-between hover:bg-white/5 transition-colors rounded-2xl"
@@ -140,7 +153,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                             <div className="pt-4 border-t border-white/10 text-gray-300 text-sm leading-relaxed">
                                 <p>
                                     ¡Ayúdanos a mantener la información actualizada! <Handshake className="w-4 h-4 inline text-blue-400 mx-1" /><br/><br/>
-                                    Toca el botón <strong>"Escanear QR"</strong> cada vez que llegues al gimnasio.<br/><br/>
+                                    Toca la <strong>"Camara Verde"</strong> cada vez que llegues al gimnasio.<br/><br/>
                                     Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios.
                                 </p>
                             </div>
@@ -148,8 +161,18 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                     </div>
 
                     {/* TARJETA DE CONCURRENCIA */}
-                    <div className={`${AppStyles.glassCard} relative overflow-hidden border-green-500/30 shadow-lg shadow-green-900/10`}>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                    <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50").replace("backdrop-blur-xl", "")} relative overflow-hidden border-green-500/30 shadow-lg shadow-green-900/10`}>
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/30 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                        
+                        {/* BOTÓN COMPACTO DE ESCANEO */}
+                        <button 
+                            onClick={() => setIsScannerOpen(true)}
+                            disabled={isCheckingIn}
+                            title="Escanear QR"
+                            className="absolute top-3 right-3 z-30 p-2.5 bg-green-500 shadow-lg shadow-green-500/20 rounded-full hover:bg-green-400 active:scale-90 transition-all text-white border border-white/20"
+                        >
+                            <Camera className="w-5 h-5" />
+                        </button>
                         
                         <div className="relative z-10 flex items-start gap-4">
                             <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/10 p-4 rounded-2xl flex-shrink-0 border border-green-500/30 shadow-inner">
@@ -186,17 +209,20 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 </>
             ) : (
                 // SI EL MÓDULO ESTÁ DESACTIVADO, MOSTRAMOS UN MENSAJE DE MOTIVACIÓN
-                <div className={`${AppStyles.glassCard} text-center py-12 border-white/5 flex flex-col items-center`}>
+                <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50").replace("backdrop-blur-xl", "")} text-center py-12 border-white/5 flex flex-col items-center`}>
                     <Dumbbell className="w-16 h-16 text-white mb-6 animate-pulse" />
-                    <h3 className="text-2xl font-black text-white mb-2 tracking-wide">¡A darle con todo!</h3>
+                    <h3 className="text-2xl font-black text-white mb-2 tracking-wide">¡A entrenar con todo!</h3>
                     <p className="text-gray-400 text-sm max-w-xs mx-auto">
-                        Desliza hacia los costados para ver tus rutinas, revisar tu plan actual o superar tus récords personales.
+                        Desliza hacia los costados para ver tus rutinas o superar tus récords personales.
                     </p>
                 </div>
-            )}
-
-            {/* FRASE MOTIVADORA DEL DÍA */}
-            <div className={`${AppStyles.glassCard} relative overflow-hidden border-blue-500/20 shadow-lg shadow-blue-900/10 bg-gradient-to-r from-gray-900/80 to-blue-900/20 p-5`}>
+                )}
+                </div> {/* Cierre de Contenido sobre el fondo */}
+            </div>{/* FIN SECCIÓN CON FONDO DINÁMICO */}
+            
+            <div className="px-4 space-y-6">
+                {/* FRASE MOTIVADORA DEL DÍA */}
+            <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} relative overflow-hidden border-green-500/20 shadow-lg shadow-green-500/20`}>
                 <div className="flex flex-col gap-4 relative z-10">
                     <div className="flex items-start gap-3">
                         <Quote className="w-5 h-5 text-blue-400 flex-shrink-0 opacity-80 mt-0.5" />
@@ -270,5 +296,6 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             )}
             
         </div>
+        </div>  
     );
 };

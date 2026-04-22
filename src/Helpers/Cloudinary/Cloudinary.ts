@@ -7,10 +7,11 @@ const API_URL_BASE = `${VITE_API_URL_CLOUDINARY}${CLOUD_NAME}`;
 const PRESETS = {
     usuarios: import.meta.env.VITE_PRESET_USUARIOS,
     ejercicios: import.meta.env.VITE_PRESET_EJERCICIOS,
+    fondoInicioCelular: import.meta.env.VITE_PRESET_FONDO_INICIO_CELULAR,
 };
 
-// 1. AÑADIMOS 'productos' AL TIPO
-type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs' | 'evolucion';
+// 1. AÑADIMOS 'productos' y 'fondoInicioCelular' AL TIPO
+type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs' | 'evolucion' | 'fondoInicioCelular';
 
 // Uso el preset de ejercicios para los PRs y el de usuarios para los productos. 
 
@@ -49,6 +50,7 @@ export const CloudinaryApi = {
                 case 'productos': defaultFolder = 'Productos/General'; break;
                 case 'prs': defaultFolder = 'PRs/General'; break;
                 case 'evolucion': defaultFolder = 'EvolucionCorporal/General'; break;
+                case 'fondoInicioCelular': defaultFolder = 'FondoInicioCelular/General'; break;
             }
             formData.append('folder', defaultFolder);
         }

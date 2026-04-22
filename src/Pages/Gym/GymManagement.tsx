@@ -29,6 +29,8 @@ export const GymManagement = () => {
     nombre, setNombre,
     codigo, setCodigo,
     selectedLogo, handleLogoChange,
+    selectedFondo, handleFondoChange,
+    removeFondo, setRemoveFondo,
     loading: editLoading,
     openEditModal,
     closeEditModal,
@@ -107,45 +109,93 @@ export const GymManagement = () => {
               <h2 className="text-2xl font-bold text-white">Editar Gimnasio</h2>
               <button onClick={closeEditModal} className="text-gray-400 hover:text-white text-3xl leading-none">&times;</button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <Input
-                label="Nombre del Gimnasio"
-                type="text"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
-              />
-              <Input
-                label="Código de Acceso"
-                type="text"
-                value={codigo}
-                onChange={(e) => setCodigo(e.target.value)}
-                required
-              />
-              <div>
-                <label className={AppStyles.label}>Logo (Opcional)</label>
-                <div className="mt-2 border-2 border-dashed border-white/20 rounded-xl p-4 text-center hover:border-purple-500/50 hover:bg-white/5 transition-all group cursor-pointer relative h-40 flex items-center justify-center">
-                  <input 
-                    type="file" accept="image/*" 
-                    onChange={handleLogoChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="flex flex-col items-center gap-2 pointer-events-none">
-                    {selectedLogo ? (
-                      <>
-                        <ImageIcon className="w-8 h-8 text-purple-400" />
-                        <p className="text-purple-400 font-bold text-sm truncate max-w-[150px]">{selectedLogo.name}</p>
-                      </>
-                    ) : (
-                      <>
-                        <Camera className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
-                        <p className="text-gray-400 text-xs">Arrastra logo</p>
-                      </>
-                    )}
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <div className={`p-6 space-y-4 flex-1 ${AppStyles.customScrollbar}`}>
+                <Input
+                  label="Nombre del Gimnasio"
+                  type="text"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Código de Acceso"
+                  type="text"
+                  value={codigo}
+                  onChange={(e) => setCodigo(e.target.value)}
+                  required
+                />
+                <div>
+                  <label className={AppStyles.label}>Logo (Opcional)</label>
+                  <div className="mt-2 border-2 border-dashed border-white/20 rounded-xl p-4 text-center hover:border-purple-500/50 hover:bg-white/5 transition-all group cursor-pointer relative h-20 flex items-center justify-center">
+                    <input 
+                      type="file" accept="image/*" 
+                      onChange={handleLogoChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="flex flex-col items-center gap-2 pointer-events-none">
+                      {selectedLogo ? (
+                        <>
+                          <ImageIcon className="w-8 h-8 text-purple-400" />
+                          <p className="text-purple-400 font-bold text-sm truncate max-w-[150px]">{selectedLogo.name}</p>
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
+                          <p className="text-gray-400 text-xs">Arrastra logo</p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
+                
+                <div>
+                  <label className={AppStyles.label}>Fondo de Inicio de Alumnos (Opcional)</label>
+                  <div className="mt-2 border-2 border-dashed border-white/20 rounded-xl p-4 text-center hover:border-blue-500/50 hover:bg-white/5 transition-all group cursor-pointer relative h-20 flex items-center justify-center">
+                    <input 
+                      type="file" accept="image/*" 
+                      onChange={handleFondoChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="flex flex-col items-center gap-2 pointer-events-none">
+                      {selectedFondo ? (
+                        <>
+                          <ImageIcon className="w-8 h-8 text-blue-400" />
+                          <p className="text-blue-400 font-bold text-sm truncate max-w-[150px]">{selectedFondo.name}</p>
+                        </>
+                      ) : removeFondo ? (
+                        <>
+                          <Camera className="w-8 h-8 text-red-500" />
+                          <p className="text-red-400 text-xs font-bold w-full">Fondo será eliminado</p>
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-8 h-8 text-gray-500 group-hover:scale-110 transition" />
+                          <p className="text-gray-400 text-xs">Arrastra imagen de fondo</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-end mt-2 relative z-20">
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const nextState = !removeFondo;
+                        setRemoveFondo(nextState);
+                        if (nextState) {
+                            handleFondoChange({ target: { files: null } } as any);
+                        }
+                      }}
+                      className={`text-xs px-3 py-1 rounded transition-colors ${removeFondo ? 'bg-gray-700 text-gray-300' : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'}`}
+                    >
+                      {removeFondo ? "Deshacer eliminación" : "Eliminar fondo actual"}
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-400">Eliminar el fondo actual solo lo elimina de mi DB pero no de cloudinary, eso debo eliminarlo manualmente.</p>
+                </div>
               </div>
-              <div className="flex gap-4 pt-4">
+
+              <div className="p-6 border-t border-white/10 flex gap-4 shrink-0">
                 <Button type="submit" disabled={editLoading} className="flex-1">
                   {editLoading ? "Guardando..." : "Guardar Cambios"}
                 </Button>

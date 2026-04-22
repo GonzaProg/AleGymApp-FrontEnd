@@ -55,9 +55,9 @@ export const PlansApi = {
         return response.data;
     },
 
-    // 6. Renovar Plan (CAMBIO: Recibe userPlanId)
-    renewPlan: async (userPlanId: number, metodoPago: string = "Transferencia") => {
-        const response = await api.post('/planes/renovar', { userPlanId, metodoPago });
+    // 6. Renovar Plan (CAMBIO: Recibe userPlanId y forzarDesdeVencimiento)
+    renewPlan: async (userPlanId: number, metodoPago: string = "Transferencia", forzarDesdeVencimiento: boolean = false) => {
+        const response = await api.post('/planes/renovar', { userPlanId, metodoPago, forzarDesdeVencimiento });
         return response.data;
     },
 

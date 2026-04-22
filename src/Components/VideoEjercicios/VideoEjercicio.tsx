@@ -54,8 +54,24 @@ export const VideoEjercicio = ({ url, fallbackUrl, controls = false, muted = tru
 
       // === NATIVO (Android/iOS) ===
       if (Capacitor.isNativePlatform()) {
-        const isNativeFile = url.startsWith('file://');
-        if (isMounted) setVideoSrc(isNativeFile ? Capacitor.convertFileSrc(url) : url);
+        // Si ya es una URL de la nube, no hacemos nada
+        if (url.startsWith('http')) {
+          if (isMounted) setVideoSrc(url);
+          return;
+        }
+
+        // Si es un archivo local (sea path completo o solo fileName)
+        try {
+          const fileName = url.split('/').pop() || url;
+          const result = await Filesystem.getUri({
+            path: fileName,
+            directory: Directory.Data
+          });
+          if (isMounted) setVideoSrc(Capacitor.convertFileSrc(result.uri));
+        } catch (e) {
+          console.error("Error obteniendo URI nativa del video:", e);
+          if (fallbackUrl && isMounted) setVideoSrc(fallbackUrl);
+        }
         return;
       }
 

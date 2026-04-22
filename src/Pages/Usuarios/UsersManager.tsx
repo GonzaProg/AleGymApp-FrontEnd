@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { useUsersManager } from "../../Hooks/Users/useUsersManager";
 import { AppStyles } from "../../Styles/AppStyles";
 import { UserDetailView } from "./UserDetailView";
+import { YearlyPaymentMatrix } from "./YearlyPaymentMatrix";
+import { FullUserPaymentHistory } from "./FullUserPaymentHistory";
+import { Table } from "lucide-react";
 
 export const UsersManager = () => {
     const {
@@ -9,6 +13,25 @@ export const UsersManager = () => {
         showAll, setShowAll,
         selectedUser, setSelectedUser
     } = useUsersManager();
+
+    const [view, setView] = useState<'list' | 'matrix' | 'history'>('list');
+    const [userForHistory, setUserForHistory] = useState<any>(null);
+
+    if (view === 'history' && userForHistory) {
+        return <FullUserPaymentHistory user={userForHistory} onBack={() => setView('matrix')} />;
+    }
+
+    if (view === 'matrix') {
+        return (
+            <YearlyPaymentMatrix 
+                onBack={() => setView('list')} 
+                onSelectUserForHistory={(user) => {
+                    setUserForHistory(user);
+                    setView('history');
+                }} 
+            />
+        );
+    }
 
     if (selectedUser) {
         return <UserDetailView user={selectedUser} onBack={() => setSelectedUser(null)} />;
@@ -42,6 +65,15 @@ export const UsersManager = () => {
                         />
                     </div>
                 </div>
+
+                {/* Botón Matriz */}
+                <button 
+                    onClick={() => setView('matrix')}
+                    className="flex items-center gap-2 px-5 py-3 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 rounded-2xl transition-all font-bold text-sm group shadow-lg shadow-blue-500/10"
+                >
+                    <Table size={18} className="group-hover:rotate-12 transition-transform" />
+                    <span>Matriz de Pagos</span>
+                </button>
 
                 {/* Switcher y Contador */}
                 <div className="flex items-center gap-5 bg-black/30 p-4 rounded-2xl border border-white/5">

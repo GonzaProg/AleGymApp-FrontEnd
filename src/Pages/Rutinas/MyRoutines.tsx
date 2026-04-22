@@ -20,7 +20,24 @@ const OfflineThumbnail = ({ path, alt }: { path: string; alt: string }) => {
 
         const load = async () => {
             if (Capacitor.isNativePlatform()) {
-                if (mounted) setSrc(path.startsWith('file://') ? Capacitor.convertFileSrc(path) : path);
+                // Si es una URL de la nube, usarla directo
+                if (path.startsWith('http')) {
+                    if (mounted) setSrc(path);
+                    return;
+                }
+
+                // Resolver path local nativo
+                try {
+                    const fileName = path.split('/').pop() || path;
+                    const result = await Filesystem.getUri({
+                        path: fileName,
+                        directory: Directory.Data
+                    });
+                    if (mounted) setSrc(Capacitor.convertFileSrc(result.uri));
+                } catch (e) {
+                    console.error("Error obteniendo URI nativa de miniatura:", e);
+                    if (mounted) setSrc(path); // Fallback
+                }
                 return;
             }
             
@@ -222,9 +239,9 @@ export const MyRoutines = () => {
                                   {/* INFO EXTRA DEL EJERCICIO */}
                                   {(d.ejercicio.musculoTrabajado || d.ejercicio.tipoAgarre || d.ejercicio.elementosGym) && !isChecked && (
                                       <div className="flex flex-wrap gap-2 mt-1 md:ml-10">
-                                          {d.ejercicio.musculoTrabajado && <span className="flex items-center gap-1 text-[10px] md:text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30"><Activity className="w-3 h-3" /> {d.ejercicio.musculoTrabajado}</span>}
+                                          {d.ejercicio.musculoTrabajado && <span className={AppStyles.tagMuscle}><Activity className="w-3 h-3" /> {d.ejercicio.musculoTrabajado}</span>}
                                           {d.ejercicio.elementosGym && <span className="flex items-center gap-1 text-[10px] md:text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30"><Dumbbell className="w-3 h-3" /> {d.ejercicio.elementosGym}</span>}
-                                          {d.ejercicio.tipoAgarre && <span className="flex items-center gap-1 text-[10px] md:text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded border border-orange-500/30"><Hand className="w-3 h-3" /> Agarre {d.ejercicio.tipoAgarre}</span>}
+                                          {d.ejercicio.tipoAgarre && <span className={AppStyles.tagGrip}><Hand className="w-3 h-3" /> Agarre {d.ejercicio.tipoAgarre}</span>}
                                       </div>
                                   )}
                                   
