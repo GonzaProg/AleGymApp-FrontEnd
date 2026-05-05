@@ -66,13 +66,13 @@ export const UsersManager = () => {
                     </div>
                 </div>
 
-                {/* Botón Matriz */}
+                {/* Botón Matriz de Pagos de los Alumnos */}
                 <button 
                     onClick={() => setView('matrix')}
                     className="flex items-center gap-2 px-5 py-3 bg-blue-600/20 hover:bg-blue-600/40 border border-blue-500/30 text-blue-400 rounded-2xl transition-all font-bold text-sm group shadow-lg shadow-blue-500/10"
                 >
                     <Table size={18} className="group-hover:rotate-12 transition-transform" />
-                    <span>Matriz de Pagos</span>
+                    <span>Listado Alumnos</span>
                 </button>
 
                 {/* Switcher y Contador */}
