@@ -1,5 +1,6 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { TrendingUp, BarChart3 } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 interface Props {
     dataAnual: number[];
@@ -8,11 +9,23 @@ interface Props {
 
 export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
     
-    const labelsAnuales = ["E", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+    // Cambiamos las inicial ("E", "F", "M", "A"...) por nombres de 3 letras 
+    // para evitar que Recharts agrupe o confunda meses con la misma inicial (ej. Abril y Agosto)
+    const labelsAnuales = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
     // Validaciones de seguridad para evitar errores con arrays vacíos
     const safeDataAnual = dataAnual?.length === 12 ? dataAnual : Array(12).fill(0);
     const safeDataMensual = dataMensual?.length > 0 ? dataMensual : Array(28).fill(0);
+
+    const formattedDataAnual = safeDataAnual.map((val, i) => ({
+        name: labelsAnuales[i],
+        value: val
+    }));
+
+    const formattedDataMensual = safeDataMensual.map((val, i) => ({
+        name: i + 1,
+        value: val
+    }));
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 animate-fade-in">
@@ -25,7 +38,19 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
                     <span className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded">Ene - Dic</span>
                 </div>
                 <div className="h-48 w-full">
-                    <LineChart data={safeDataAnual} labels={labelsAnuales} />
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={formattedDataAnual}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <Tooltip 
+                                contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                                itemStyle={{ color: '#4ade80' }}
+                                labelStyle={{ color: '#fff' }}
+                                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Ingresos']}
+                            />
+                            <Line type="monotone" dataKey="value" stroke="#4ade80" strokeWidth={2} dot={{ r: 3, fill: "#fff" }} activeDot={{ r: 5 }} />
+                            <XAxis dataKey="name" stroke="#6b7280" fontSize={10} axisLine={false} tickLine={false} dy={10} interval={0} padding={{ left: 10, right: 10 }} />
+                        </LineChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
 
@@ -38,110 +63,29 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
                     <span className="text-xs text-blue-400 bg-blue-500/10 px-2 py-1 rounded">Día a Día</span>
                 </div>
                 <div className="h-48 w-full">
-                    <BarChart data={safeDataMensual} />
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={formattedDataMensual}>
+                            <Tooltip 
+                                contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                                itemStyle={{ color: '#3b82f6' }}
+                                labelStyle={{ color: '#fff' }}
+                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Ingresos']}
+                            />
+                            <Bar dataKey="value" fill="#3b82f6" radius={[2, 2, 0, 0]} opacity={0.8} activeBar={{ opacity: 1, fill: '#60a5fa' }} />
+                            <XAxis 
+                                dataKey="name" 
+                                stroke="#6b7280" 
+                                fontSize={10} 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tickFormatter={(value) => value % 2 === 0 ? value : ''} 
+                                dy={10} 
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
-        </div>
-    );
-};
-
-// --- LINE CHART (Igual que antes) ---
-const LineChart = ({ data, labels }: { data: number[], labels: string[] }) => {
-    const max = Math.max(...data) || 1;
-    const points = data.map((val, i) => {
-        const x = (i / (data.length - 1)) * 100;
-        const y = 100 - ((val / max) * 80); 
-        return `${x},${y}`;
-    }).join(" ");
-    const fillPath = `${points} 100,100 0,100`;
-
-    return (
-        <div className="relative w-full h-full flex flex-col justify-end">
-            <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                <defs>
-                    <linearGradient id="gradientLine" x1="0" x2="0" y1="0" y2="1">
-                        <stop offset="0%" stopColor="#4ade80" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#4ade80" stopOpacity="0" />
-                    </linearGradient>
-                </defs>
-                <line x1="0" y1="25" x2="100" y2="25" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                <line x1="0" y1="50" x2="100" y2="50" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                <line x1="0" y1="75" x2="100" y2="75" stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />
-                <polygon points={fillPath} fill="url(#gradientLine)" />
-                <polyline fill="none" stroke="#4ade80" strokeWidth="2" points={points} strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-                {data.map((val, i) => {
-                    const x = (i / (data.length - 1)) * 100;
-                    const y = 100 - ((val / max) * 80);
-                    return <circle key={i} cx={x} cy={y} r="1.5" fill="#fff" className="hover:r-3 transition-all" />;
-                })}
-            </svg>
-            <div className="flex justify-between text-[10px] text-gray-500 mt-2 font-mono">
-                {labels.map((l, i) => <span key={i}>{l}</span>)}
-            </div>
-        </div>
-    );
-};
-
-// --- BAR CHART (MODIFICADO: FUENTES MÁS GRANDES) ---
-const BarChart = ({ data }: { data: number[] }) => {
-    const max = Math.max(...data) || 1;
-
-    return (
-        <div className="relative w-full h-full flex flex-col justify-end">
-            {/* Aumentamos el viewBox en Y a 120 para dar más espacio abajo */}
-            <svg 
-                viewBox={`0 0 ${data.length * 10} 120`} 
-                className="w-full h-full overflow-visible" 
-                preserveAspectRatio="none"
-            >
-                {data.map((val, i) => {
-                    const barHeight = (val / max) * 90;
-                    const finalHeight = barHeight === 0 ? 0.5 : barHeight;
-                    const dia = i + 1;
-
-                    return (
-                        <g key={i} className="group">
-                            {/* Barra (Base en 100) */}
-                            <rect 
-                                x={i * 10 + 2} 
-                                y={100 - finalHeight}
-                                width="6" 
-                                height={finalHeight} 
-                                className="fill-blue-500/50 hover:fill-blue-400 transition-all duration-300" 
-                                rx="1"
-                            />
-                            
-                            {/* Etiqueta Eje X (Días Pares) - FUENTE AGRANDADA */}
-                            {dia % 2 === 0 && (
-                                <text
-                                    x={i * 10 + 5}
-                                    y={117} // Bajamos un poco la posición
-                                    textAnchor="middle"
-                                    // Cambiamos fontSize de 4 a 7 y la clase Tailwind a text-[7px]
-                                    className="fill-gray-500 text-[7px] font-mono"
-                                    fontSize="7"
-                                >
-                                    {dia}
-                                </text>
-                            )}
-
-                            {/* Tooltip con valor (También agrandado ligeramente) */}
-                            {val > 0 && (
-                                <text 
-                                    x={i * 10 + 5} 
-                                    y={100 - finalHeight - 3} 
-                                    textAnchor="middle" 
-                                    fill="white" 
-                                    fontSize="5" // Agrandado de 4 a 5 para mejor lectura
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold"
-                                >
-                                    ${(val >= 1000 ? (val/1000).toFixed(1) + 'k' : val)}
-                                </text>
-                            )}
-                        </g>
-                    );
-                })}
-            </svg>
         </div>
     );
 };
