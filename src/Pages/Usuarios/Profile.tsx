@@ -1,5 +1,6 @@
 import { useProfile } from "../../Hooks/Profile/useProfile";
 import { useLogout } from "../../Hooks/Login/useLogout"; // Importamos el hook de logout
+import { UsuarioApi } from "../../API/Usuarios/UsuarioApi"; // Importamos la API de usuario para limpiar token
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles"; 
@@ -38,6 +39,18 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
 
   const avatarSrc = imagePreview || (isEditingProfile ? editForm.fotoPerfil : userData.fotoPerfil);
   
+  const handleLogout = async () => {
+    try {
+      if (userData?.rol === 'Alumno') {
+        await UsuarioApi.logout();
+      }
+    } catch (error) {
+      console.error("Error al cerrar sesión en el servidor:", error);
+    } finally {
+      logout();
+    }
+  };
+
   // Estilos condicionales según el entorno
   const containerClasses = isMobile 
     ? `${AppStyles.contentContainer} pt-32 pb-24` // Estilo Mobile (Swiper)
@@ -228,7 +241,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
                       <span className="font-bold text-gray-100 text-base block">Cerrar Sesión</span>
                     </div>
                     <button 
-                      onClick={logout} 
+                      onClick={handleLogout} 
                       className={AppStyles.btnSecondaryNotFlex}
                     >
                        Salir

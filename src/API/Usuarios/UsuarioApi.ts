@@ -85,5 +85,10 @@ export const UsuarioApi = {
     saveFcmToken: async (fcmToken: string) => {
         const response = await api.put(`/users/fcm-token`, { fcmToken });
         return response.data;
+    },
+
+    logout: async () => {
+        const response = await api.post(`/users/logout`);
+        return response.data;
     }
 };
