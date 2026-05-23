@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuthUser } from "../Auth/useAuthUser";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { DownloadRoutineService } from "../../Helpers/DownloadRoutineService"; 
+import { Preferences } from '@capacitor/preferences';
 import { showSuccess, showError } from "../../Helpers/Alerts";
 
 export const useMyRoutines = () => {
@@ -43,6 +44,7 @@ export const useMyRoutines = () => {
             
             setIsOfflineMode(false);
             checkDownloadedRoutines(data);
+            return data;
 
         } catch (error) {
             console.warn("⚠️ Sin conexión o error API. Cargando modo offline...");
@@ -55,8 +57,10 @@ export const useMyRoutines = () => {
                 setIsOfflineMode(true); // Para mostrar aviso en UI
                 checkDownloadedRoutines(localRoutines);
                 showSuccess("Modo Offline: Cargando rutinas guardadas.");
+                return localRoutines;
             } else {
                 showError("No hay conexión y no tienes rutinas guardadas.");
+                return [];
             }
         } finally {
             setLoading(false);
@@ -190,6 +194,84 @@ export const useMyRoutines = () => {
     };
     const closeVideo = () => { setVideoUrl(null); setVideoFallbackUrl(null); };
 
+    const syncOfflineRoutineUpdate = async (oldRoutine: any, newRoutine: any) => {
+        const offlineCheckId = oldRoutine.esGrupo ? oldRoutine.grupoId : oldRoutine.id;
+        let oldRutinaWasDownloaded = false;
+        
+        if (oldRoutine.esGrupo) {
+            oldRutinaWasDownloaded = downloadedGroupIds.includes(offlineCheckId);
+        } else {
+            oldRutinaWasDownloaded = downloadedIds.includes(offlineCheckId);
+        }
+
+        if (!oldRutinaWasDownloaded) return;
+
+        if (oldRoutine.esGeneral) {
+            if (oldRoutine.esGrupo) {
+                const oldOfflineGroup = await DownloadRoutineService.getOfflineGroup(oldRoutine);
+                newRoutine.dias.forEach((newDia: any, diaIndex: number) => {
+                    const oldDia = oldOfflineGroup.dias[diaIndex];
+                    if (oldDia) {
+                        newDia.detalles.forEach((newDet: any) => {
+                            const oldDet = oldDia.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
+                            if (oldDet) {
+                                newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
+                                newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
+                            }
+                        });
+                    }
+                    Preferences.set({ key: `offline_routine_${newDia.id}`, value: JSON.stringify(newDia) });
+                });
+                await DownloadRoutineService.deleteOfflineGroup(oldRoutine);
+                
+                setDownloadedGroupIds(prev => prev.filter(id => id !== oldRoutine.grupoId).concat(newRoutine.grupoId));
+                const oldDiaIds = oldRoutine.dias.map((d:any) => d.id);
+                const newDiaIds = newRoutine.dias.map((d:any) => d.id);
+                setDownloadedIds(prev => prev.filter(id => !oldDiaIds.includes(id)).concat(newDiaIds));
+            } else {
+                const oldOfflineRoutine = await DownloadRoutineService.getOfflineRoutine(oldRoutine.id);
+                newRoutine.detalles.forEach((newDet: any) => {
+                    const oldDet = oldOfflineRoutine?.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
+                    if (oldDet) {
+                        newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
+                        newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
+                    }
+                });
+                await Preferences.set({ key: `offline_routine_${newRoutine.id}`, value: JSON.stringify(newRoutine) });
+                await DownloadRoutineService.deleteOfflineRoutine(oldRoutine);
+                
+                setDownloadedIds(prev => prev.filter(id => id !== oldRoutine.id).concat(newRoutine.id));
+            }
+        } else {
+            if (oldRoutine.esGrupo) {
+                const offlineGroup = await DownloadRoutineService.getOfflineGroup(oldRoutine);
+                newRoutine.dias.forEach((newDia: any, diaIndex: number) => {
+                    const offDia = offlineGroup.dias[diaIndex];
+                    if (offDia) {
+                        newDia.detalles.forEach((newDet: any) => {
+                            const oldDet = offDia.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
+                            if (oldDet) {
+                                newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
+                                newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
+                            }
+                        });
+                    }
+                    Preferences.set({ key: `offline_routine_${newDia.id}`, value: JSON.stringify(newDia) });
+                });
+            } else {
+                const offlineRoutine = await DownloadRoutineService.getOfflineRoutine(oldRoutine.id);
+                newRoutine.detalles.forEach((newDet: any) => {
+                    const oldDet = offlineRoutine?.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
+                    if (oldDet) {
+                        newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
+                        newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
+                    }
+                });
+                await Preferences.set({ key: `offline_routine_${newRoutine.id}`, value: JSON.stringify(newRoutine) });
+            }
+        }
+    };
+
     return {
         rutinas,
         loading,
@@ -205,7 +287,10 @@ export const useMyRoutines = () => {
         downloadProgress,
         downloadedIds,
         downloadedGroupIds,
-        isOfflineMode, // Puedo usar esto mas adelante para poner un cartelito "Sin Conexión"
+        isOfflineMode, 
+        updateSelectedRoutine: setSelectedRoutine,
+        fetchRoutines,
+        syncOfflineRoutineUpdate,
         // Multi-día
         selectedDayIndex,
         setSelectedDayIndex

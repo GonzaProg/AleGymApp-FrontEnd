@@ -44,6 +44,12 @@ export const RutinasApi = {
         return response.data;
     },
 
+    // Personalizar rutina general para un usuario desde celular
+    personalizar: async (data: { rutinaId?: number, grupoId?: string }) => {
+        const response = await api.post('/rutinas/personalizar', data);
+        return response.data;
+    },
+
     // --- MULTI-DÍA ---
     createMultiDay: async (data: any) => {
         const response = await api.post('/rutinas/multi-day', data);

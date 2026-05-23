@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthApi, type LoginDTO } from "../../API/Auth/AuthApi";
 import { useGymConfig } from "../../Context/GymConfigContext";
+import { Preferences } from '@capacitor/preferences';
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -19,12 +20,26 @@ export const useLogin = () => {
 
   // EFECTO: CARGAR CREDENCIALES GUARDADAS AL INICIAR 
   useEffect(() => {
-    const savedDni = localStorage.getItem("remember_dni"); 
-    
-    if (savedDni) {
-      setDni(savedDni);
-      setRememberMe(true);
-    }
+    const loadSavedCredentials = async () => {
+      const { value: savedDni } = await Preferences.get({ key: 'saved_dni' });
+      const { value: savedPassword } = await Preferences.get({ key: 'saved_password' });
+
+      if (savedDni && savedPassword) {
+        setDni(savedDni);
+        setPassword(savedPassword);
+        setRememberMe(true);
+      } else if (savedDni) {
+        setDni(savedDni);
+      } else {
+        // Fallback por si quedó en localStorage en versiones viejas
+        const legacyDni = localStorage.getItem("remember_dni");
+        if (legacyDni) {
+            setDni(legacyDni);
+        }
+      }
+    };
+
+    loadSavedCredentials();
   }, []);
 
   // HANDLERS PARA INPUTS 
@@ -62,6 +77,10 @@ export const useLogin = () => {
 
       // --- LÓGICA DE PERSISTENCIA ---
             if (rememberMe) {
+                // GUARDAR CREDENCIALES DE AUTO-LOGIN (DNI y Contraseña)
+                await Preferences.set({ key: 'saved_dni', value: dni });
+                await Preferences.set({ key: 'saved_password', value: password });
+
                 // CASO A: PERSISTIR (LocalStorage)
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("refreshToken", data.refreshToken);
@@ -72,6 +91,10 @@ export const useLogin = () => {
                 sessionStorage.removeItem("refreshToken");
                 sessionStorage.removeItem("user");
             } else {
+                // LIMPIAR CREDENCIALES GUARDADAS SI LAS HUBIERA
+                await Preferences.remove({ key: 'saved_dni' });
+                await Preferences.remove({ key: 'saved_password' });
+
                 // CASO B: SESIÓN TEMPORAL (SessionStorage)
                 sessionStorage.setItem("token", data.token);
                 sessionStorage.setItem("refreshToken", data.refreshToken);
