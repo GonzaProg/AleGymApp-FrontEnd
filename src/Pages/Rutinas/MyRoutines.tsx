@@ -107,6 +107,11 @@ export const MyRoutines = () => {
   };
 
   const handleSaveExercise = async (detalleId: number, originalData: any) => {
+      if (!navigator.onLine) {
+          showError("Debes tener conexión para poder editar la rutina");
+          return;
+      }
+
       const data = editValues[detalleId];
       if (!data) return; // No changes
       
@@ -192,9 +197,13 @@ export const MyRoutines = () => {
               delete newObj[detalleId];
               return newObj;
           });
-      } catch (e) {
+      } catch (e: any) {
           console.error(e);
-          showError("Error al actualizar");
+          if (!navigator.onLine || e.message === "Network Error") {
+              showError("Debes tener conexión para poder editar la rutina");
+          } else {
+              showError("Error al actualizar");
+          }
       }
   };
 
@@ -244,6 +253,7 @@ export const MyRoutines = () => {
   // === VISTA DETALLE DE RUTINA SELECCIONADA ===
   if (selectedRoutine) {
     const esGrupo = selectedRoutine.esGrupo;
+    const isDownloaded = esGrupo ? downloadedGroupIds.includes(selectedRoutine.grupoId) : downloadedIds.includes(selectedRoutine.id);
     
     // Determinar la rutina actual a mostrar
     let currentDayRoutine: any;
@@ -280,7 +290,7 @@ export const MyRoutines = () => {
                                 {selectedRoutine.dias.length} días
                             </span>
                         )}
-                        {currentDetalles.some((d: any) => d.ejercicio?.localVideoPath || d.ejercicio?.localThumbnailPath) && (
+                        {isDownloaded && (
                             <span className="text-[10px] md:text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 whitespace-nowrap">Offline</span>
                         )}
                     </h2>

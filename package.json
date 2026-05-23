@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "update-ip": "node update-ip.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
