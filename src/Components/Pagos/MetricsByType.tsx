@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PagosApi, type MetricsByTypeDTO, type BreakdownItem } from "../../API/Pagos/PagosApi";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Calendar, TrendingUp } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 export const MetricsByType = () => {
     const [data, setData] = useState<MetricsByTypeDTO | null>(null);
@@ -40,6 +41,12 @@ const CategoryChart = ({ title, items }: { title: React.ReactNode, items: Breakd
     // Calcular Total
     const totalGeneral = items.reduce((acc, item) => acc + item.total, 0);
 
+    const chartData = items.map(item => ({
+        name: item.categoria,
+        value: item.total,
+        color: getColorByType(item.categoria).hex
+    }));
+
     return (
         <div className={`${AppStyles.glassCard} p-6 border border-white/5 flex flex-col h-full`}>
             <h4 className="text-gray-300 font-bold mb-6 text-sm uppercase tracking-wider border-b border-white/10 pb-2">
@@ -53,12 +60,34 @@ const CategoryChart = ({ title, items }: { title: React.ReactNode, items: Breakd
             ) : (
                 <div className="flex flex-col sm:flex-row items-center gap-8">
                     
-                    {/* 1. GRÁFICO DE TORTA (SVG Puro) */}
+                    {/* 1. GRÁFICO DE TORTA (RECHARTS) */}
                     <div className="relative w-40 h-40 flex-shrink-0">
-                        <PieChart items={items} total={totalGeneral} />
-                        {/* Texto central (opcional, para convertirlo en Donut si quisieras) */}
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={chartData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={55}
+                                    outerRadius={75}
+                                    paddingAngle={5}
+                                    dataKey="value"
+                                    stroke="none"
+                                >
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Pie>
+                                <Tooltip 
+                                    contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                                    itemStyle={{ color: '#fff' }}
+                                    formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Total']}
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        {/* Texto central */}
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <span className="text-xs font-bold text-white/20">Total</span>
+                            <span className="text-xs font-bold text-white">Total</span>
                         </div>
                     </div>
 
@@ -95,50 +124,12 @@ const CategoryChart = ({ title, items }: { title: React.ReactNode, items: Breakd
     );
 };
 
-// --- COMPONENTE PIE CHART SVG OPTIMIZADO ---
-// --- COMPONENTE PIE CHART SVG OPTIMIZADO ---
-const PieChart = ({ items, total }: { items: BreakdownItem[], total: number }) => {
-    let accumulatedPercent = 0;
-
-    // MATEMÁTICA CORREGIDA:
-    // Radio (r) = 15.9155 (para que la circunferencia sea 100 exacto)
-    // Stroke (Grosor) = 10
-    // Radio Externo = r + (stroke / 2) = 15.9 + 5 = 20.9
-    // Diámetro Total = 20.9 * 2 = 41.8
-    // -> Usamos viewBox="0 0 42 42" para que quepa perfecto y no se vea cuadrado.
-
-    return (
-        <svg viewBox="0 0 42 42" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
-            {items.map((item, index) => {
-                const percent = total > 0 ? (item.total / total) * 100 : 0;
-                const colors = getColorByType(item.categoria);
-                
-                const circle = (
-                    <circle
-                        key={index}
-                        r="15.9155"
-                        cx="21"  // Centro ajustado al nuevo viewBox (42/2)
-                        cy="21"  // Centro ajustado al nuevo viewBox (42/2)
-                        fill="transparent"
-                        stroke="currentColor"
-                        strokeWidth="8" // Ajusté a 8 para que se vea más elegante (Donut)
-                        strokeDasharray={`${percent} 100`}
-                        strokeDashoffset={-accumulatedPercent}
-                        className={`${colors.text} transition-all duration-1000 hover:opacity-80`}
-                    />
-                );
-
-                accumulatedPercent += percent;
-                return circle;
-            })}
-        </svg>
-    );
-};
-// --- HELPER DE COLORES (Bg para barras, Text para SVG) ---
+// --- HELPER DE COLORES (Bg para barras, Text para SVG, Hex para Recharts) ---
 const getColorByType = (type: string) => {
     switch (type) {
-        case 'Gym': return {bg: 'bg-green-500', text: "text-green-500"};
-        case 'Natacion': return {bg: 'bg-blue-500', text: "text-blue-500"};
-        case 'Productos': return { bg: 'bg-yellow-500', text: "text-yellow-500" };
-        default: return { bg: 'bg-purple-500', text: "text-purple-500" };    }
+        case 'Gym': return { bg: 'bg-green-500', text: "text-green-500", hex: "#22c55e" };
+        case 'Natacion': return { bg: 'bg-blue-500', text: "text-blue-500", hex: "#3b82f6" };
+        case 'Productos': return { bg: 'bg-yellow-500', text: "text-yellow-500", hex: "#eab308" };
+        default: return { bg: 'bg-purple-500', text: "text-purple-500", hex: "#a855f7" };    
+    }
 };

@@ -9,7 +9,7 @@ const config: CapacitorConfig = {
     androidScheme: "http", // <--- ESTO SOLUCIONA EL ERROR
     cleartext: true,       // Permite tráfico sin encriptar
     allowNavigation: [
-      "192.168.1.8" // Opcional: permite navegar a tu IP
+      "[IP_ADDRESS]" // Opcional: permite navegar a tu IP
     ]
   },
 };
