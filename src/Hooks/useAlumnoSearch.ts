@@ -134,7 +134,7 @@ export const useAlumnoSearch = (options: UseAlumnoSearchOptions = {}): UseAlumno
         sugerencias,
         mostrarSugerencias,
         alumnoSeleccionado,
-        setAlumnoSeleccionado, // <--- AÑADIDO
+        setAlumnoSeleccionado,
         todosLosAlumnos,
         loading,
         
