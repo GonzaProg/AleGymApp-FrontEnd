@@ -14,6 +14,8 @@ export const PagoEmpleadoForm = ({ empleado, onBack, onSuccess, gymId }: Props) 
     const [monto, setMonto] = useState("");
     const [concepto, setConcepto] = useState("Sueldo Mensual");
     const [metodoPago, setMetodoPago] = useState("Efectivo");
+    // Inicializar fecha con la fecha de hoy en formato YYYY-MM-DD
+    const [fechaPago, setFechaPago] = useState(() => new Date().toISOString().split('T')[0]);
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +31,8 @@ export const PagoEmpleadoForm = ({ empleado, onBack, onSuccess, gymId }: Props) 
             await EmpleadoApi.asignarPago(gymId, empleado.id, {
                 monto: Number(monto),
                 concepto,
-                metodoPago
+                metodoPago,
+                fechaPago: fechaPago ? `${fechaPago}T00:00:00` : undefined // Añadimos T00:00:00 para la BD
             });
             
             showSuccess('Pago registrado correctamente.');
@@ -68,6 +71,17 @@ export const PagoEmpleadoForm = ({ empleado, onBack, onSuccess, gymId }: Props) 
                             onChange={(e) => setMonto(e.target.value)}
                             className={AppStyles.inputDark}
                             placeholder="Ej: 20000"
+                            required
+                        />
+                    </div>
+                    
+                    <div>
+                        <label className={AppStyles.label}>Fecha de Pago *</label>
+                        <input 
+                            type="date"
+                            value={fechaPago}
+                            onChange={(e) => setFechaPago(e.target.value)}
+                            className={AppStyles.inputDark}
                             required
                         />
                     </div>

@@ -45,8 +45,8 @@ export const EmpleadoApi = {
         return response.data.empleado;
     },
 
-    asignarPago: async (gymId: number, id: number, data: { monto: number; metodoPago: string; concepto?: string }): Promise<PagoEmpleadoDTO> => {
-        const response = await api.post(`/empleados/${gymId}/${id}/pagos`, data);
+    asignarPago: async (gymId: number, empleadoId: number, data: { monto: number, metodoPago: string, concepto?: string, fechaPago?: string }): Promise<PagoEmpleadoDTO> => {
+        const response = await api.post(`/empleados/${gymId}/${empleadoId}/pagos`, data);
         return response.data;
     },
 

@@ -104,7 +104,7 @@ export const EmpleadosList = ({ empleados, onCreate, onSelect }: Props) => {
                                             )}
                                         </td>
                                         <td className="p-4 text-right">
-                                            <span className="text-gray-500 group-hover:text-white transition-colors">
+                                            <span className="text-gray-300 group-hover:text-white transition-colors">
                                                 Ver Detalle &rarr;
                                             </span>
                                         </td>
