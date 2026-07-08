@@ -10,8 +10,8 @@ const PRESETS = {
     fondoInicioCelular: import.meta.env.VITE_PRESET_FONDO_INICIO_CELULAR,
 };
 
-// 1. AÑADIMOS 'productos' y 'fondoInicioCelular' AL TIPO
-type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs' | 'evolucion' | 'fondoInicioCelular';
+// 1. AÑADIMOS 'productos', 'fondoInicioCelular' y 'empleados' AL TIPO
+type UploadType = 'usuarios' | 'ejercicios' | 'logos' | 'productos' | 'prs' | 'evolucion' | 'fondoInicioCelular' | 'empleados';
 
 // Uso el preset de ejercicios para los PRs y el de usuarios para los productos. 
 
@@ -25,6 +25,7 @@ export const CloudinaryApi = {
         // Mapeos especiales si reutilizamos presets
         if (type === 'logos') presetKey = 'usuarios';
         if (type === 'productos') presetKey = 'usuarios';
+        if (type === 'empleados') presetKey = 'usuarios';
         if (type === 'prs' || type === 'evolucion') presetKey = 'ejercicios';
 
         // @ts-ignore (Para que TS confíe en el acceso dinámico)
@@ -45,6 +46,7 @@ export const CloudinaryApi = {
             let defaultFolder = '';
             switch (type) {
                 case 'usuarios': defaultFolder = 'Usuarios/General'; break;
+                case 'empleados': defaultFolder = 'Empleados/General'; break;
                 case 'ejercicios': defaultFolder = 'Ejercicios'; break;
                 case 'logos': defaultFolder = 'Logos'; break;
                 case 'productos': defaultFolder = 'Productos/General'; break;

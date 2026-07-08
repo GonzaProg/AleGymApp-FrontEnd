@@ -17,7 +17,7 @@ export const MuscleFilter = ({ selectedMuscle, onSelectMuscle }: Props) => {
             <div 
                 ref={scrollRef}
                 className={`flex gap-4 overflow-x-auto pb-4 pt-2 px-2 snap-x justify-center ${AppStyles.customScrollbar}`}
-                style={{ scrollbarWidth: 'thin', scrollbarColor: '#374151 transparent' }}
+                style={{ scrollbarWidth: 'thin', scrollbarColor: '#374151 #030712' }}
             >
                 {MUSCULOS_PERMITIDOS.map(musculo => {
                     const IconSrc = MuscleImageMap[musculo];

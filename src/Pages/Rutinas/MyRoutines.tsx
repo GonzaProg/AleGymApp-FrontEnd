@@ -270,7 +270,7 @@ export const MyRoutines = () => {
     const currentDetalles = currentDayRoutine?.detalles || [];
 
     return (
-      <div className="mt-20 w-full min-h-full bg-[#1a1225] flex flex-col pt-safe animate-fade-in-up">
+      <div className="mt-20 w-full min-h-full flex flex-col pt-safe animate-fade-in-up">
         {/* ENCABEZADO FIJO */}
         <div className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur-xl border-b border-white/10 px-4 py-4 shrink-0 shadow-lg mt-0">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-green-900"></div>
@@ -320,8 +320,12 @@ export const MyRoutines = () => {
 
         {/* LISTA DE EJERCICIOS */}
         <div className="p-4 md:p-6 space-y-4 flex-1 overflow-y-auto custom-scrollbar">
-            {currentDetalles.map((d:any, i:number) => {
-              const thumbnail = d.ejercicio.localThumbnailPath || CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
+            {(() => {
+                const uniqueUuids = Array.from(new Set(currentDetalles.map((d:any) => d.grupoSuperserie).filter(Boolean)));
+                const getSuperserieIndex = (uuid: string) => uniqueUuids.indexOf(uuid) + 1;
+                
+                return currentDetalles.map((d:any, i:number) => {
+                  const thumbnail = d.ejercicio.localThumbnailPath || CloudinaryApi.getThumbnail(d.ejercicio.imagenUrl, d.ejercicio.urlVideo);
               const videoSource = d.ejercicio.localVideoPath || d.ejercicio.urlVideo;
               // Si hay thumbnail local, necesitamos leerlo de IndexedDB
               const isLocalThumb = !!d.ejercicio.localThumbnailPath;
@@ -330,18 +334,40 @@ export const MyRoutines = () => {
               const exerciseKey = `${routineIdForCheck}-${d.ejercicio.id || i}`;
               const isChecked = !!checkedExercises[exerciseKey];
 
+              // --- NUEVA LÓGICA DE SUPERSERIES ---
+              const isSuperserie = !!d.grupoSuperserie;
+              const isFirstInSuperserie = isSuperserie && (i === 0 || d.grupoSuperserie !== currentDetalles[i - 1].grupoSuperserie);
+              const isLinkedWithPrev = isSuperserie && !isFirstInSuperserie;
+              const isLinkedWithNext = isSuperserie && i < currentDetalles.length - 1 && d.grupoSuperserie === currentDetalles[i + 1].grupoSuperserie;
+
               return (
-                  <div 
-                      key={i} 
-                      onClick={() => {
-                          if (isRoutineEditMode && !editValues[d.id]) {
-                              handleEditChange(d.id, 'series', d.series, d);
-                              handleEditChange(d.id, 'repeticiones', d.repeticiones, d);
-                              handleEditChange(d.id, 'peso', d.peso, d);
-                          }
-                      }}
-                      className={`bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row gap-4 md:gap-6 items-center md:items-stretch transition-all group ${isChecked ? 'opacity-70 grayscale-[0.3]' : 'hover:bg-gray-800/80'} ${isRoutineEditMode && !editValues[d.id] ? 'cursor-pointer hover:border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : ''}`}
-                  >
+                  <div key={i} className={`flex flex-col relative ${isLinkedWithPrev ? '!mt-0' : ''}`}>
+                      {isFirstInSuperserie && (
+                          <div className="flex items-center gap-2 mt-4 mb-2 justify-center">
+                              <div className="h-[1px] flex-1 bg-red-500/30"></div>
+                              <span className="text-red-400 font-bold text-xs tracking-widest uppercase flex items-center gap-1">
+                                  🔥 Superserie {getSuperserieIndex(d.grupoSuperserie)}
+                              </span>
+                              <div className="h-[1px] flex-1 bg-red-500/30"></div>
+                          </div>
+                      )}
+
+                      {isLinkedWithPrev && (
+                          <div className="flex justify-center -my-[1px] relative z-10 h-[2px]">
+                              {/* Esta línea conecta un bloque con el otro visualmente */}
+                          </div>
+                      )}
+
+                      <div 
+                          onClick={() => {
+                              if (isRoutineEditMode && !editValues[d.id]) {
+                                  handleEditChange(d.id, 'series', d.series, d);
+                                  handleEditChange(d.id, 'repeticiones', d.repeticiones, d);
+                                  handleEditChange(d.id, 'peso', d.peso, d);
+                              }
+                          }}
+                          className={`border p-4 flex flex-col md:flex-row gap-4 md:gap-6 items-center md:items-stretch transition-all group ${isChecked ? 'opacity-70 grayscale-[0.3]' : ''} ${isRoutineEditMode && !editValues[d.id] ? 'cursor-pointer hover:border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : ''} ${isSuperserie ? 'bg-red-500/15 border-red-500/20' : 'bg-black/70 border-white/5 hover:bg-black/70'} ${isLinkedWithPrev ? 'rounded-t-none border-t-0' : 'rounded-t-xl'} ${isLinkedWithNext ? 'rounded-b-none border-b-0' : 'rounded-b-xl'}`}
+                      >
                       <div className="w-full md:w-48 h-40 md:h-32 flex-shrink-0 bg-black/40 rounded-lg border border-white/5 overflow-hidden relative">
                           {thumbnail ? (
                               isLocalThumb ? (
@@ -368,8 +394,8 @@ export const MyRoutines = () => {
                           <div className="flex justify-between items-start mb-4">
                               <div className="flex flex-col gap-1 w-full mr-2">
                                   <div className="flex items-center gap-3">
-                                      <span className="bg-green-900/50 text-green-400 text-xs font-bold px-2 py-1 rounded border border-green-500/20">#{i + 1}</span>
-                                      <h4 className={`font-bold text-lg md:text-xl transition-colors ${isChecked ? 'text-gray-500 line-through' : 'text-white'}`}>{d.ejercicio.nombre}</h4>
+                                      <span className={`${isSuperserie ? 'bg-red-900/50 text-red-400 border-red-500/20' : 'bg-green-900/50 text-green-400 border-green-500/20'} text-xs font-bold px-2 py-1 rounded border`}>#{i + 1}</span>
+                                      <h4 className={`font-bold text-lg md:text-xl transition-colors ${isChecked ? 'text-gray-500 line-through' : isSuperserie ? 'text-red-400' : 'text-white'}`}>{d.ejercicio.nombre}</h4>
                                   </div>
                                   
                                   {/* INFO EXTRA DEL EJERCICIO */}
@@ -504,8 +530,10 @@ export const MyRoutines = () => {
                           </div>
                       </div>
                   </div>
+                  </div>
               );
-            })}
+            });
+            })()}
         </div>
         
         {/* VIDEO MODAL (Aún necesario para mostrar el video por encima de todo) */}

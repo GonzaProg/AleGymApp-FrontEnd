@@ -206,7 +206,7 @@ export const MetricasFinancieras = () => {
                                                         {pago.plan && <span className="ml-2 text-xs bg-gray-700 px-1.5 py-0.5 rounded text-gray-400">{pago.plan.nombre}</span>}
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
-                                                        <span className="px-2 py-1 rounded border border-white/10 bg-white/5 text-xs text-gray-400">
+                                                        <span className="px-2 py-1 rounded border bg-blue-500/10 text-blue-400 border-blue-500/30 text-xs font-bold">
                                                             {pago.metodoPago}
                                                         </span>
                                                     </td>

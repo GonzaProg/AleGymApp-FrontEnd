@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, ChevronDown, Info, Dumbbell, ArrowUp, ArrowDown, Edit2, Trash2, RefreshCw, Plus, Save, CheckCircle2, Calendar, X } from "lucide-react";
+import { Play, ChevronDown, Info, Dumbbell, ArrowUp, ArrowDown, Edit2, Trash2, RefreshCw, Plus, Save, CheckCircle2, Calendar, X, Link, Unlink } from "lucide-react";
 import { createPortal } from "react-dom";
 import { useCreateRoutine } from "../../Hooks/Rutinas/useCreateRoutine";
 import { Input, Button } from "../../Components/UI";
@@ -7,6 +7,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio";
 import { MuscleFilter } from "../../Components/MuscleFilter/MuscleFilter";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
+import React from "react";
 
 interface CreateRoutineProps {
     isGeneral?: boolean;
@@ -36,6 +37,7 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null, group
     handleAddExercise, 
     detalles, editIndex, handleEditRow, cancelEditRow, handleDeleteRow, 
     moveRowUp, moveRowDown, handleSubmit,
+    selectedForSuperserie, toggleSelectForSuperserie, groupSelectedIntoSuperserie, removeFromSuperserie, getSuperserieIndex,
     ejercicios, // <-- Extraemos los ejercicios para buscar detalles rápidos
     // --- MULTI-DÍA ---
     dias, diaActual, handleAddDay, handleRemoveDay, handleSelectDay, MAX_DIAS,
@@ -346,19 +348,71 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null, group
             <div className="overflow-x-auto rounded-xl border border-white/10">
               <table className="min-w-full text-sm text-left">
                 <thead className={AppStyles.tableHeader}>
-                  <tr><th className="p-4">Ejercicio</th><th className="p-4 text-center">Series</th><th className="p-4 text-center">Reps</th><th className="p-4 text-center">Peso</th><th className="p-4 text-right">Acción</th></tr>
+                  <tr>
+                    <th className="p-4 w-12 text-center text-xs font-bold uppercase tracking-wider text-gray-500">SuperSerie</th>
+                    <th className="p-4">Ejercicio</th>
+                    <th className="p-4 text-center">Series</th>
+                    <th className="p-4 text-center">Reps</th>
+                    <th className="p-4 text-center">Peso</th>
+                    <th className="p-4 text-right">Acción</th>
+                  </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {detalles.map((d: any, index: number) => {
                       const ejOriginal = ejercicios.find((e: any) => e.id === d.ejercicioId);
+                      const isSuperserie = !!d.grupoSuperserie;
+                      const isFirstInSuperserie = isSuperserie && (index === 0 || d.grupoSuperserie !== detalles[index - 1].grupoSuperserie);
+                      const isLinkedWithPrev = isSuperserie && !isFirstInSuperserie;
+                      const isLastInSuperserie = isSuperserie && (index === detalles.length - 1 || detalles[index + 1].grupoSuperserie !== d.grupoSuperserie);
+                      const isSelected = selectedForSuperserie.includes(index);
+
                       return (
-                      <tr key={index} className={`${AppStyles.tableRow} ${editIndex === index ? 'bg-yellow-500/10' : ''}`}>
-                        <td className="p-4 font-medium text-white flex items-center gap-2">
-                          {d.nombreEjercicio}
+                      <React.Fragment key={index}>
+                      {isFirstInSuperserie && (
+                          <tr className="bg-red-500/10 border-t border-b border-red-500/20">
+                              <td colSpan={6} className="py-2 px-4 text-center text-red-400 font-bold text-xs tracking-widest uppercase shadow-[inset_0_0_10px_rgba(239,68,68,0.1)]">
+                                  🔥 Superserie {getSuperserieIndex(d.grupoSuperserie)}
+                              </td>
+                          </tr>
+                      )}
+                      <tr className={`${AppStyles.tableRow} ${editIndex === index ? 'bg-yellow-500/10' : ''} ${isSuperserie ? 'bg-red-500/5' : ''} ${isSelected ? 'bg-blue-500/10' : ''} ${isLinkedWithPrev ? 'border-t-0' : ''}`}>
+                        <td className="p-4 text-center">
+                            {!isSuperserie ? (
+                                <input 
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => toggleSelectForSuperserie(index)}
+                                    className="w-4 h-4 rounded border-white/20 bg-black/40 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900 cursor-pointer"
+                                    title="Seleccionar para agrupar en superserie"
+                                />
+                            ) : (
+                                <button 
+                                    onClick={() => removeFromSuperserie(index)} 
+                                    className="p-1.5 rounded-full transition-colors flex justify-center items-center text-red-400 hover:bg-red-500/20 mx-auto"
+                                    title="Desvincular de la Superserie"
+                                >
+                                    <Unlink className="w-4 h-4" />
+                                </button>
+                            )}
+                        </td>
+                        <td className="p-4 font-medium text-white flex items-center gap-2 relative">
+                          {isSuperserie && (
+                              <div className="absolute left-0 top-0 bottom-0 w-8 flex flex-col items-center">
+                                  {/* Top half line (only if not first) */}
+                                  <div className={`w-0.5 h-1/2 ${!isFirstInSuperserie ? 'bg-red-500/40' : 'bg-transparent'}`}></div>
+                                  
+                                  {/* Center dot */}
+                                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0 shadow-[0_0_8px_rgba(239,68,68,0.8)] absolute top-1/2 transform -translate-y-1/2"></div>
+                                  
+                                  {/* Bottom half line (only if not last) */}
+                                  <div className={`w-0.5 h-1/2 ${!isLastInSuperserie ? 'bg-red-500/40' : 'bg-transparent'}`}></div>
+                              </div>
+                          )}
+                          <span className={`${isSuperserie ? 'text-red-400 ml-6' : ''}`}>{d.nombreEjercicio}</span>
                           {ejOriginal?.urlVideo && (
                               <button 
                                   onClick={() => setPreviewUrl(ejOriginal.urlVideo)}
-                                  className="text-blue-400 hover:text-blue-300 bg-blue-500/10 p-1.5 rounded-full transition-colors ml-2"
+                                  className="text-blue-400 hover:text-blue-300 bg-blue-500/10 p-1.5 rounded-full transition-colors ml-2 flex-shrink-0"
                                   title="Ver video"
                               >
                                   <Play size={12} className="fill-current" />
@@ -375,9 +429,22 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null, group
                           <button onClick={() => handleDeleteRow(index)} className="text-red-500 bg-red-500/10 hover:bg-red-500/20 p-2 border border-red-500/20 rounded transition-colors flex justify-center items-center"><Trash2 className="w-4 h-4" /></button>
                         </td>
                       </tr>
+                      </React.Fragment>
                     )})}
                 </tbody>
               </table>
+              
+              {selectedForSuperserie.length >= 2 && (
+                  <div className="bg-blue-500/20 border-t border-blue-500/30 p-4 flex justify-between items-center sticky bottom-0 z-10 backdrop-blur-md">
+                      <span className="text-blue-300 font-bold text-sm">
+                          {selectedForSuperserie.length} ejercicios seleccionados
+                      </span>
+                      <Button variant="info" onClick={groupSelectedIntoSuperserie} className="bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-2">
+                          <Link className="w-4 h-4" />
+                          Agrupar en Superserie
+                      </Button>
+                  </div>
+              )}
             </div>
            )}
 
