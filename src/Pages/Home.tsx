@@ -239,9 +239,9 @@ export const Home = () => {
 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Planes</p>
                 <SidebarItem icon={Icons.planes} label="Planes Mensuales" active={activeTab === "Planes"} onClick={() => handleSidebarClick("Planes")} />
-                <SidebarItem icon={Icons.usuarios} label="Empleados" active={activeTab === "Empleados"} onClick={() => handleSidebarClick("Empleados")} />
                 <SidebarItem icon={Icons.renovar} label="Renovar Mensualidad" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
                 <SidebarItem icon={Icons.finanzas} label="Finanzas" active={activeTab === "Finanzas"} onClick={() => handleSidebarClick("Finanzas")} />
+                <SidebarItem icon={Icons.usuarios} label="Empleados" active={activeTab === "Empleados"} onClick={() => handleSidebarClick("Empleados")} />
                 <SidebarItem icon={Icons.usuarios} label="Gestionar Usuarios" active={activeTab === "Gestionar Usuarios"} onClick={() => handleSidebarClick("Gestionar Usuarios")} />
                 
                 <p className="px-4 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>

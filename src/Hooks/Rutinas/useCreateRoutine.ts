@@ -3,6 +3,7 @@ import { EjerciciosApi } from "../../API/Ejercicios/EjerciciosApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { showSuccess, showError } from "../../Helpers/Alerts";
 import { useAlumnoSearch } from "../useAlumnoSearch";
+import { v4 as uuidv4 } from "uuid";
 
 export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: number | null = null, groupIdToEdit: string | null = null) => {
 
@@ -14,7 +15,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   const [alumnoId, setAlumnoId] = useState(""); 
   const [alumnoNombreDisplay, setAlumnoNombreDisplay] = useState(""); // Solo para mostrar en el cartel
 
-  // --- NUEVA LÓGICA DE EJERCICIOS ---
+  // NUEVA LÓGICA DE EJERCICIOS
   // Separamos el texto de búsqueda del ID seleccionado
   const [ejercicioBusqueda, setEjercicioBusqueda] = useState(""); 
   const [ejercicioId, setEjercicioId] = useState("");
@@ -41,6 +42,9 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   // Tabla (ahora referencia al día actual)
   const detalles = dias[diaActual] || [];
   const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  // Seleccionados para crear superserie
+  const [selectedForSuperserie, setSelectedForSuperserie] = useState<number[]>([]);
 
   // Helper para actualizar detalles del día actual
   const setDetallesDiaActual = (updater: (prev: any[]) => any[]) => {
@@ -81,6 +85,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   // Cambiar de día
   const handleSelectDay = (dayIndex: number) => {
     cancelEditRow();
+    setSelectedForSuperserie([]);
     setDiaActual(dayIndex);
   };
 
@@ -150,7 +155,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
             setEjerciciosFiltrados(dataEjercicios); // Inicialmente todos
         }
 
-        // --- MODO EDICIÓN INDIVIDUAL ---
+        // MODO EDICIÓN INDIVIDUAL
         if (routineIdToEdit) {
             const rutina = await RutinasApi.getOne(routineIdToEdit);
             
@@ -169,14 +174,15 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
                     nombreEjercicio: d.ejercicio.nombre,
                     series: d.series,
                     repeticiones: d.repeticiones,
-                    peso: d.peso
+                    peso: d.peso,
+                    grupoSuperserie: d.grupoSuperserie || null
                 }));
                 setDias([detallesFormateados]); // Un solo día en edición
                 setDiaActual(0);
             }
         }
 
-        // --- MODO EDICIÓN MULTI-DÍA ---
+        // MODO EDICIÓN MULTI-DÍA
         if (groupIdToEdit) {
             const grupo = await RutinasApi.getGrupo(groupIdToEdit);
             
@@ -196,7 +202,8 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
                         nombreEjercicio: d.ejercicio.nombre,
                         series: d.series,
                         repeticiones: d.repeticiones,
-                        peso: d.peso
+                        peso: d.peso,
+                        grupoSuperserie: d.grupoSuperserie || null
                     }))
                 );
                 setDias(diasFormateados);
@@ -214,13 +221,13 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     return () => { mounted = false; };
   }, [routineIdToEdit, groupIdToEdit]); 
 
-  // --- WRAPPER PARA SELECCIONAR ALUMNO (SOLO CREACIÓN) ---
+  // WRAPPER PARA SELECCIONAR ALUMNO (SOLO CREACIÓN)
   const onSelectAlumno = (alumno: any) => {
     handleSelectAlumno(alumno); // Actualiza el buscador visual
     setAlumnoId(alumno.id);     // Guarda el ID para el submit
   };
 
-  // --- EFECTO PARA FILTRAR EJERCICIOS ---
+  // EFECTO PARA FILTRAR EJERCICIOS
   useEffect(() => {
       let filtrados = ejercicios;
       if (selectedMuscle) {
@@ -252,7 +259,6 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
   };
 
 
-  // --- HANDLERS INPUTS ---
   const handleSeriesChange = (e: any) => setSeries(e.target.value);
   const handleRepsChange = (e: any) => {
       const value = e.target.value;
@@ -275,7 +281,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       });
   };
 
-  // --- LÓGICA TABLA ---
+  // LÓGICA TABLA
   const handleAddExercise = () => {
     if (!ejercicioId) return showError("Selecciona un ejercicio válido de la lista");
     
@@ -296,6 +302,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       series: Number(series),
       repeticiones: repsFinal,
       peso: pesoFinal,
+      grupoSuperserie: editIndex !== null && detalles[editIndex].grupoSuperserie ? detalles[editIndex].grupoSuperserie : null,
     };
 
     if (editIndex !== null) {
@@ -364,25 +371,159 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
       if (index === 0) return;
       setDetallesDiaActual(prev => {
           const copia = [...prev];
-          const temp = copia[index];
-          copia[index] = copia[index - 1];
-          copia[index - 1] = temp;
+          const curr = copia[index];
+          
+          let currStart = index;
+          let currEnd = index;
+          
+          if (curr.grupoSuperserie) {
+              const isFirst = index === 0 || copia[index - 1].grupoSuperserie !== curr.grupoSuperserie;
+              if (isFirst) {
+                  // Mover toda la superserie
+                  while (currEnd + 1 < copia.length && copia[currEnd + 1].grupoSuperserie === curr.grupoSuperserie) {
+                      currEnd++;
+                  }
+              } else {
+                  // Mover solo el ejercicio
+                  const temp = copia[index];
+                  copia[index] = copia[index - 1];
+                  copia[index - 1] = temp;
+                  return copia;
+              }
+          }
+          
+          if (currStart === 0) return copia;
+          
+          let aboveEnd = currStart - 1;
+          let aboveStart = aboveEnd;
+          const aboveItem = copia[aboveEnd];
+          
+          if (aboveItem.grupoSuperserie) {
+              // Bloque superior es una superserie completa
+              while (aboveStart - 1 >= 0 && copia[aboveStart - 1].grupoSuperserie === aboveItem.grupoSuperserie) {
+                  aboveStart--;
+              }
+          }
+          
+          const blockAbove = copia.slice(aboveStart, aboveEnd + 1);
+          const currentBlock = copia.slice(currStart, currEnd + 1);
+          
+          copia.splice(aboveStart, blockAbove.length + currentBlock.length, ...currentBlock, ...blockAbove);
           return copia;
       });
   };
 
   const moveRowDown = (index: number) => {
-      if (index === detalles.length - 1) return;
       setDetallesDiaActual(prev => {
+          if (index === prev.length - 1) return prev;
           const copia = [...prev];
-          const temp = copia[index];
-          copia[index] = copia[index + 1];
-          copia[index + 1] = temp;
+          const curr = copia[index];
+          
+          let currStart = index;
+          let currEnd = index;
+          
+          if (curr.grupoSuperserie) {
+              const isLast = index === copia.length - 1 || copia[index + 1].grupoSuperserie !== curr.grupoSuperserie;
+              if (isLast) {
+                  // Mover toda la superserie hacia abajo
+                  while (currStart - 1 >= 0 && copia[currStart - 1].grupoSuperserie === curr.grupoSuperserie) {
+                      currStart--;
+                  }
+              } else {
+                  // Mover solo el ejercicio hacia abajo
+                  const temp = copia[index];
+                  copia[index] = copia[index + 1];
+                  copia[index + 1] = temp;
+                  return copia;
+              }
+          }
+          
+          if (currEnd === copia.length - 1) return copia;
+          
+          let belowStart = currEnd + 1;
+          let belowEnd = belowStart;
+          const belowItem = copia[belowStart];
+          
+          if (belowItem.grupoSuperserie) {
+              // El bloque inferior es una superserie completa
+              while (belowEnd + 1 < copia.length && copia[belowEnd + 1].grupoSuperserie === belowItem.grupoSuperserie) {
+                  belowEnd++;
+              }
+          }
+          
+          const currentBlock = copia.slice(currStart, currEnd + 1);
+          const blockBelow = copia.slice(belowStart, belowEnd + 1);
+          
+          copia.splice(currStart, currentBlock.length + blockBelow.length, ...blockBelow, ...currentBlock);
           return copia;
       });
   };
 
-  // --- GUARDAR ---
+  const toggleSelectForSuperserie = (index: number) => {
+      setSelectedForSuperserie(prev => {
+          if (prev.includes(index)) {
+              return prev.filter(i => i !== index);
+          } else {
+              return [...prev, index];
+          }
+      });
+  };
+
+  const groupSelectedIntoSuperserie = () => {
+      if (selectedForSuperserie.length < 2) return;
+      
+      setDetallesDiaActual(prev => {
+          const copia = [...prev];
+          const newUuid = uuidv4();
+          
+          // Ordenar los índices seleccionados
+          const sortedIndices = [...selectedForSuperserie].sort((a, b) => a - b);
+          
+          // Extraer los ejercicios seleccionados
+          const selectedItems = sortedIndices.map(i => ({ ...copia[i], grupoSuperserie: newUuid }));
+          
+          // Filtrar los que NO están seleccionados
+          const unselectedItems = copia.filter((_, i) => !selectedForSuperserie.includes(i));
+          
+          // Insertar los seleccionados todos juntos en la posición del primer elemento que fue seleccionado
+          const firstIndex = sortedIndices[0];
+          unselectedItems.splice(firstIndex, 0, ...selectedItems);
+          
+          return unselectedItems;
+      });
+      
+      setSelectedForSuperserie([]);
+  };
+
+  const removeFromSuperserie = (index: number) => {
+      setDetallesDiaActual(prev => {
+          const copia = [...prev];
+          const uuid = copia[index].grupoSuperserie;
+          
+          // Desvincular el actual
+          copia[index] = { ...copia[index], grupoSuperserie: null };
+          
+          // Verificar si quedó huérfano el resto de la superserie
+          const remainingInGroup = copia.filter(d => d.grupoSuperserie === uuid);
+          if (remainingInGroup.length === 1) {
+              const orphanIndex = copia.findIndex(d => d.grupoSuperserie === uuid);
+              if (orphanIndex !== -1) {
+                  copia[orphanIndex] = { ...copia[orphanIndex], grupoSuperserie: null };
+              }
+          }
+          
+          return copia;
+      });
+  };
+
+  // Helper para asignar un índice a cada superserie del día
+  const getSuperserieIndex = (uuid: string | null) => {
+      if (!uuid) return null;
+      const uniqueUuids = Array.from(new Set(detalles.map((d: any) => d.grupoSuperserie).filter(Boolean)));
+      return uniqueUuids.indexOf(uuid) + 1;
+  };
+
+  // GUARDAR
   const handleSubmit = async () => {
     if (!nombreRutina.trim()) return showError("Falta el nombre de la rutina");
     
@@ -399,7 +540,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
 
     try {
       if (groupIdToEdit) {
-        // --- MODO EDICIÓN MULTI-DÍA ---
+        // MODO EDICIÓN MULTI-DÍA
         const body = {
           nombreRutina,
           dias: dias,
@@ -408,7 +549,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
         await RutinasApi.updateGrupo(groupIdToEdit, body);
         await showSuccess(`Rutina actualizada (${dias.length} días)`);
       } else if (routineIdToEdit) {
-        // --- MODO EDICIÓN INDIVIDUAL ---
+        // MODO EDICIÓN INDIVIDUAL
         const body = {
           usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
           nombreRutina,
@@ -418,7 +559,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
         await RutinasApi.update(routineIdToEdit, body);
         await showSuccess("Rutina Actualizada");
       } else if (dias.length === 1) {
-        // --- CREACIÓN SIMPLE (1 día) ---
+        // CREACIÓN SIMPLE (1 día)
         const body = {
           usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
           nombreRutina,
@@ -428,7 +569,7 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
         await RutinasApi.create(body);
         await showSuccess("Rutina Creada");
       } else {
-        // --- CREACIÓN MULTI-DÍA ---
+        // CREACIÓN MULTI-DÍA
         const body = {
           usuarioAlumnoId: isGeneral ? null : Number(alumnoId),
           nombreRutina,
@@ -476,9 +617,10 @@ export const useCreateRoutine = (isGeneral: boolean = false, routineIdToEdit: nu
     pesosArray, handlePesoArrayChange, repsArrayCalculado,
     handleAddExercise, 
     editIndex, handleEditRow, cancelEditRow, handleDeleteRow,
-    moveRowUp, moveRowDown,
+    moveRowUp, moveRowDown, 
+    selectedForSuperserie, toggleSelectForSuperserie, groupSelectedIntoSuperserie, removeFromSuperserie, getSuperserieIndex,
     handleSubmit,
-    // --- MULTI-DÍA ---
+    // MULTI-DÍA
     dias,
     diaActual,
     handleAddDay,
