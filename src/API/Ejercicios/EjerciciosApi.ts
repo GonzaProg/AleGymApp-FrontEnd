@@ -25,7 +25,7 @@ export interface EjercicioDTO {
 export const TIPOS_AGARRE = ["Prono", "Supino", "Neutro", "Mixto"];
 
 export const MUSCULOS_PERMITIDOS = [
-    "Abdomen", "Antebrazos", "Bíceps", "Cuádriceps", 
+    "Cardio", "Abdomen", "Antebrazos", "Bíceps", "Cuádriceps", 
     "Cuello", "Espalda", "Glúteos", "Hombros", 
     "Isquiotibiales", "Pantorrillas", "Pectoral", "Tríceps"
 ];
