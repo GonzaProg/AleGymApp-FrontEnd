@@ -50,10 +50,17 @@ export const useGastosManager = () => {
 
         setSubmitting(true);
         try {
+            let finalDate = undefined;
+            if (fechaGasto) {
+                // Tomamos la fecha seleccionada y le agregamos la hora actual local
+                const currentTime = new Date().toTimeString().split(' ')[0];
+                finalDate = new Date(`${fechaGasto}T${currentTime}`);
+            }
+
             await GastoApi.crearGasto({
                 monto: montoNum,
                 concepto,
-                fechaGasto: fechaGasto ? new Date(fechaGasto + 'T12:00:00Z') : undefined
+                fechaGasto: finalDate
             });
             showSuccess("Gasto registrado correctamente");
             setMonto('');

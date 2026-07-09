@@ -116,11 +116,16 @@ export const GastosManager = () => {
                                     </div>
                                     <div>
                                         <label className={AppStyles.label}>Concepto / Motivo</label>
-                                        <Input
+                                        <textarea
                                             value={concepto}
-                                            onChange={(e) => setConcepto(e.target.value)}
+                                            onChange={(e) => {
+                                                setConcepto(e.target.value);
+                                                e.target.style.height = 'auto';
+                                                e.target.style.height = `${e.target.scrollHeight}px`;
+                                            }}
                                             placeholder="Ej: Mantenimiento poleas"
-                                            className={AppStyles.inputDark}
+                                            className={`${AppStyles.inputDark} resize-none overflow-hidden min-h-[42px]`}
+                                            rows={1}
                                         />
                                     </div>
                                     <div>
@@ -180,7 +185,7 @@ export const GastosManager = () => {
                                                 {gastos.map((gasto) => (
                                                     <tr key={gasto.id} className="hover:bg-white/5 transition-colors group">
                                                         <td className="px-6 py-4 font-mono text-gray-400">{formatDate(gasto.fechaGasto)}</td>
-                                                        <td className="px-6 py-4 text-gray-300">{gasto.concepto}</td>
+                                                        <td className="px-6 py-4 text-gray-300 whitespace-pre-wrap break-words max-w-[240px]">{gasto.concepto}</td>
                                                         <td className="px-6 py-4 text-right font-mono text-base text-red-400 font-bold">
                                                             -{formatCurrency(gasto.monto)}
                                                         </td>
