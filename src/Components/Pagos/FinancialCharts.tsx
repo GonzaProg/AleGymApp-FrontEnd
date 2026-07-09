@@ -1,6 +1,6 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { TrendingUp, BarChart3 } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
 interface Props {
     dataAnual: number[];
@@ -19,12 +19,18 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
 
     const formattedDataAnual = safeDataAnual.map((val, i) => ({
         name: labelsAnuales[i],
-        value: val
+        value: Math.max(0, val),
+        realValue: val // Guardamos el valor real por si se necesita
     }));
+
+    const maxValMensual = Math.max(...safeDataMensual);
+    // 5% of max value to guarantee visibility, or 100 if max is 0
+    const minVisibleMensual = maxValMensual > 0 ? maxValMensual * 0.05 : 100;
 
     const formattedDataMensual = safeDataMensual.map((val, i) => ({
         name: i + 1,
-        value: val
+        value: val < 0 ? minVisibleMensual : val,
+        realValue: val // Guardamos el valor real por si se necesita
     }));
 
     return (
@@ -45,7 +51,10 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
                                 contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                                 itemStyle={{ color: '#4ade80' }}
                                 labelStyle={{ color: '#fff' }}
-                                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Ingresos']}
+                                formatter={(value: any, _name: any, props: any) => {
+                                    const realValue = props.payload?.realValue ?? value;
+                                    return [`$${Number(realValue).toLocaleString()}`, 'Ingresos'];
+                                }}
                             />
                             <Line type="monotone" dataKey="value" stroke="#4ade80" strokeWidth={2} dot={{ r: 3, fill: "#fff" }} activeDot={{ r: 5 }} />
                             <XAxis dataKey="name" stroke="#6b7280" fontSize={10} axisLine={false} tickLine={false} dy={10} interval={0} padding={{ left: 10, right: 10 }} />
@@ -70,9 +79,16 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
                                 itemStyle={{ color: '#3b82f6' }}
                                 labelStyle={{ color: '#fff' }}
                                 cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                formatter={(value: any) => [`$${Number(value).toLocaleString()}`, 'Ingresos']}
+                                formatter={(value: any, _name: any, props: any) => {
+                                    const realValue = props.payload?.realValue ?? value;
+                                    return [`$${Number(realValue).toLocaleString()}`, 'Ingresos'];
+                                }}
                             />
-                            <Bar dataKey="value" fill="#3b82f6" radius={[2, 2, 0, 0]} opacity={0.8} activeBar={{ opacity: 1, fill: '#60a5fa' }} />
+                            <Bar dataKey="value" radius={[2, 2, 0, 0]} opacity={0.8} activeBar={{ opacity: 1 }}>
+                                {formattedDataMensual.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.realValue < 0 ? '#ef4444' : '#3b82f6'} />
+                                ))}
+                            </Bar>
                             <XAxis 
                                 dataKey="name" 
                                 stroke="#6b7280" 

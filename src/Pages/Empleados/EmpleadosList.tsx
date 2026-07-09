@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { type EmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Plus, Users } from "lucide-react";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
+import { useEmpleadosList } from "../../Hooks/Empleados/useEmpleadosList";
 
 interface Props {
     empleados: EmpleadoDTO[];
@@ -12,9 +12,11 @@ interface Props {
 }
 
 export const EmpleadosList = ({ empleados, onCreate, onSelect }: Props) => {
-    const [showInactive, setShowInactive] = useState(false);
-
-    const empleadosFiltrados = showInactive ? empleados : empleados.filter(e => e.activo);
+    const {
+        showInactive,
+        setShowInactive,
+        empleadosFiltrados
+    } = useEmpleadosList(empleados);
 
     return (
         <div className="w-full max-w-4xl animate-fade-in-up">

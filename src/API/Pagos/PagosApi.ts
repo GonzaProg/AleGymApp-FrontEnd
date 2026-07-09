@@ -33,6 +33,11 @@ export interface MatrizAnualDTO {
     }[];
 }
 
+export interface BreakdownItem {
+    categoria: string;
+    total: number;
+}
+
 export interface FinancialMetricsDTO {
     ingresosMesActual: number;
     ingresosMesPasado: number;
@@ -43,14 +48,6 @@ export interface FinancialMetricsDTO {
     metodoPorcentaje: number;
     chartAnual: number[];
     chartMensual: number[];
-}
-
-export interface BreakdownItem {
-    categoria: string;
-    total: number;
-}
-
-export interface MetricsByTypeDTO {
     desgloseMensual: BreakdownItem[];
     desgloseAnual: BreakdownItem[];
 }
@@ -63,11 +60,6 @@ export const PagosApi = {
 
     getMetrics: async (): Promise<FinancialMetricsDTO> => {
         const response = await api.get('/pagos/metrics');
-        return response.data;
-    },
-
-    getMetricsByType: async (): Promise<MetricsByTypeDTO> => {
-        const response = await api.get('/pagos/metrics/types');
         return response.data;
     },
 
