@@ -1,77 +1,34 @@
-import { useState, useEffect } from "react";
-import { EmpleadoApi, type EmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
 import { EmpleadosList } from "./EmpleadosList";
 import { EmpleadoDetail } from "./EmpleadoDetail";
 import { EmpleadoForm } from "./EmpleadoForm";
 import { PagoEmpleadoForm } from "./PagoEmpleadoForm";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 import { AppStyles } from "../../Styles/AppStyles";
-
-export type EmpleadosView = 'list' | 'detail' | 'create' | 'edit' | 'pay';
+import { Input } from "../../Components/UI/Input";
+import { Button } from "../../Components/UI/Button";
+import { useEmpleadosManager } from "../../Hooks/Empleados/useEmpleadosManager";
 
 export const EmpleadosManager = () => {
-    // Obtener gymId de la sesión actual
-    const userStr = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const currentUser = userStr ? JSON.parse(userStr) : null;
-    const gymId = currentUser?.gym?.id;
-
-    const [view, setView] = useState<EmpleadosView>('list');
-    const [empleados, setEmpleados] = useState<EmpleadoDTO[]>([]);
-    const [ultimosPagos, setUltimosPagos] = useState<any[]>([]);
-    const [selectedEmpleado, setSelectedEmpleado] = useState<EmpleadoDTO | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    const loadData = async () => {
-        if (!gymId) return;
-        setLoading(true);
-        try {
-            const [empleadosData, pagosData] = await Promise.all([
-                EmpleadoApi.getEmpleados(gymId),
-                EmpleadoApi.obtenerUltimosPagos(gymId)
-            ]);
-            setEmpleados(empleadosData);
-            setUltimosPagos(pagosData);
-        } catch (error) {
-            console.error("Error al cargar datos:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadData();
-    }, [gymId]);
-
-    const handleCreate = () => {
-        setSelectedEmpleado(null);
-        setView('create');
-    };
-
-    const handleEdit = (empleado: EmpleadoDTO) => {
-        setSelectedEmpleado(empleado);
-        setView('edit');
-    };
-
-    const handleSelect = (empleado: EmpleadoDTO) => {
-        setSelectedEmpleado(empleado);
-        setView('detail');
-    };
-
-    const handlePay = (empleado: EmpleadoDTO) => {
-        setSelectedEmpleado(empleado);
-        setView('pay');
-    };
-
-    const handleBackToList = () => {
-        setView('list');
-        setSelectedEmpleado(null);
-        loadData(); // Refrescar por si hubo cambios
-    };
-
-    const handleBackToDetail = () => {
-        setView('detail');
-        loadData(); // Refrescar por si hubo cambios
-    };
+    const {
+        gymId,
+        view,
+        empleados,
+        ultimosPagos,
+        selectedEmpleado,
+        loading,
+        isUnlocked,
+        passwordInput,
+        setPasswordInput,
+        verifying,
+        handleDesbloquear,
+        loadData,
+        handleCreate,
+        handleEdit,
+        handleSelect,
+        handlePay,
+        handleBackToList,
+        handleBackToDetail
+    } = useEmpleadosManager();
 
     if (loading) {
         return (
@@ -83,7 +40,33 @@ export const EmpleadosManager = () => {
 
     return (
         <div className={AppStyles.principalContainer}>
-            {view === 'list' && (
+            {!isUnlocked ? (
+                <div className="flex justify-center items-center pt-20">
+                    <div className={`${AppStyles.glassCard} flex flex-col items-center justify-center p-8 border-red-500/30 text-center w-full max-w-md`}>
+                        <Lock className="w-12 h-12 text-red-400 mb-6" />
+                        <h2 className="text-xl font-bold text-white mb-4">Acceso Restringido</h2>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full">
+                            <Input 
+                                type="password" 
+                                placeholder="Contraseña" 
+                                value={passwordInput} 
+                                onChange={(e) => setPasswordInput(e.target.value)} 
+                                className={`${AppStyles.inputDark} text-center tracking-[0.3em] font-mono`}
+                                onKeyDown={(e) => e.key === 'Enter' && handleDesbloquear()}
+                            />
+                            <Button 
+                                onClick={handleDesbloquear} 
+                                disabled={verifying}
+                                className="bg-red-600/50 hover:bg-red-500 text-white font-bold px-6 border-0"
+                            >
+                                {verifying ? "Verificando..." : "Desbloquear"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    {view === 'list' && (
                 <>
                     <EmpleadosList 
                         empleados={empleados} 
@@ -165,6 +148,8 @@ export const EmpleadosManager = () => {
                     onSuccess={handleBackToDetail}
                     gymId={gymId}
                 />
+            )}
+                </>
             )}
         </div>
     );

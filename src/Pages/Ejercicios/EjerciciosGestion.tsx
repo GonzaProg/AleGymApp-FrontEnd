@@ -128,9 +128,9 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
 
                                 {/* Botones de Edición / Eliminar abajo */}
                                 <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-center gap-2 z-20">
-                                    <button onClick={(e) => { e.stopPropagation(); startEdit(ej); }} className="bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500 hover:text-black p-2 rounded-lg transition-colors border border-yellow-500/30 flex justify-center items-center" title="Editar"><Edit2 className="w-4 h-4" /></button>
+                                    <button onClick={(e) => { e.stopPropagation(); startEdit(ej); }} className={AppStyles.btnEdit} title="Editar"><Edit2 className="w-4 h-4" /></button>
                                     {isAdmin && (
-                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(ej.id); }} className="bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white p-2 rounded-lg transition-colors border border-red-500/30 flex justify-center items-center" title="Eliminar"><Trash2 className="w-4 h-4" /></button>
+                                        <button onClick={(e) => { e.stopPropagation(); handleDelete(ej.id); }} className={AppStyles.btnDelete} title="Eliminar"><Trash2 className="w-4 h-4" /></button>
                                     )}
                                 </div>
                             </div>

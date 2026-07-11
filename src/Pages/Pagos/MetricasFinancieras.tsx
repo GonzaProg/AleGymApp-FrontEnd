@@ -72,13 +72,13 @@ export const MetricasFinancieras = () => {
 
                 {/* --- HEADER SUPERIOR --- */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
                         <div className="flex items-center gap-3">
-                            <h1 className={AppStyles.title}>Gestión Financiera</h1>
                             <DollarSign className="w-8 h-8 text-green-400" />
+                            <div>
+                                <h1 className={AppStyles.title}>Gestión Financiera</h1>
+                                <p className={AppStyles.subtitle}>Control de ingresos, egresos y devoluciones.</p>
+                            </div>
                         </div>
-                        <p className={AppStyles.subtitle}>Control de ingresos, egresos y devoluciones.</p>
-                    </div>
 
                     <div className="flex items-center gap-4 bg-gray-800/40 p-2 pr-4 rounded-xl border border-white/5 backdrop-blur-sm">
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider pl-2">Métricas</span>
