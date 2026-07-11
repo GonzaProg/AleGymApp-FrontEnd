@@ -1,51 +1,37 @@
-import { useEffect, useState } from "react";
-import { PagosApi, type MetricsByTypeDTO, type BreakdownItem } from "../../API/Pagos/PagosApi";
+import { type BreakdownItem } from "../../API/Pagos/PagosApi";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Calendar, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
-export const MetricsByType = () => {
-    const [data, setData] = useState<MetricsByTypeDTO | null>(null);
-    const [loading, setLoading] = useState(true);
+interface Props {
+    desgloseMensual: BreakdownItem[];
+    desgloseAnual: BreakdownItem[];
+}
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const result = await PagosApi.getMetricsByType();
-                setData(result);
-            } catch (error) {
-                console.error("Error loading detailed metrics");
-            } finally {
-                setLoading(false);
-            }
-        };
-        load();
-    }, []);
-
-    if (loading) return <div className="text-center py-8 text-gray-500 animate-pulse text-xs">Cargando desglose...</div>;
-    if (!data) return null;
-
+export const MetricsByType = ({ desgloseMensual, desgloseAnual }: Props) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 animate-fade-in">
             {/* MES ACTUAL */}
-            <CategoryChart title={<span className="flex items-center justify-center gap-2"><Calendar className="w-4 h-4"/> Ingresos este Mes</span>} items={data.desgloseMensual} />
+            <CategoryChart title={<span className="flex items-center justify-center gap-2"><Calendar className="w-4 h-4"/> Ingresos este Mes</span>} items={desgloseMensual} />
             
             {/* ANUAL */}
-            <CategoryChart title={<span className="flex items-center justify-center gap-2"><TrendingUp className="w-4 h-4"/> Acumulado Anual</span>} items={data.desgloseAnual} />
+            <CategoryChart title={<span className="flex items-center justify-center gap-2"><TrendingUp className="w-4 h-4"/> Acumulado Anual</span>} items={desgloseAnual} />
         </div>
     );
 };
 
 // --- SUBCOMPONENTE DE TARJETA CON GRÁFICO ---
 const CategoryChart = ({ title, items }: { title: React.ReactNode, items: BreakdownItem[] }) => {
-    // Calcular Total
-    const totalGeneral = items.reduce((acc, item) => acc + item.total, 0);
+    // Calcular Total Bruto (Solo ingresos positivos) para el porcentaje
+    const totalBruto = items.reduce((acc, item) => item.total > 0 ? acc + item.total : acc, 0);
 
-    const chartData = items.map(item => ({
-        name: item.categoria,
-        value: item.total,
-        color: getColorByType(item.categoria).hex
-    }));
+    const chartData = items
+        .filter(item => item.total > 0)
+        .map(item => ({
+            name: item.categoria,
+            value: item.total,
+            color: getColorByType(item.categoria).hex
+        }));
 
     return (
         <div className={`${AppStyles.glassCard} p-6 border border-white/5 flex flex-col h-full`}>
@@ -94,7 +80,9 @@ const CategoryChart = ({ title, items }: { title: React.ReactNode, items: Breakd
                     {/* 2. LISTA DE BARRAS (Leyenda) */}
                     <div className="flex-1 w-full space-y-4">
                         {items.map((item) => {
-                            const porcentaje = totalGeneral > 0 ? (item.total / totalGeneral) * 100 : 0;
+                            // Porcentaje en base a ingresos brutos
+                            const porcentajeAbsoluto = totalBruto > 0 ? (Math.abs(item.total) / totalBruto) * 100 : 0;
+                            const signo = item.total < 0 ? '-' : '';
                             const colors = getColorByType(item.categoria);
 
                             return (
@@ -105,13 +93,13 @@ const CategoryChart = ({ title, items }: { title: React.ReactNode, items: Breakd
                                             {item.categoria}
                                         </span>
                                         <span className="text-gray-400 font-mono">
-                                            ${item.total.toLocaleString()} ({porcentaje.toFixed(1)}%)
+                                            ${item.total.toLocaleString()} ({signo}{porcentajeAbsoluto.toFixed(1)}%)
                                         </span>
                                     </div>
                                     <div className="w-full bg-gray-700/50 rounded-full h-1.5 overflow-hidden">
                                         <div 
                                             className={`h-full rounded-full ${colors.bg} transition-all duration-1000 ease-out`}
-                                            style={{ width: `${porcentaje}%` }}
+                                            style={{ width: `${porcentajeAbsoluto}%` }}
                                         ></div>
                                     </div>
                                 </div>
@@ -130,6 +118,9 @@ const getColorByType = (type: string) => {
         case 'Gym': return { bg: 'bg-green-500', text: "text-green-500", hex: "#22c55e" };
         case 'Natacion': return { bg: 'bg-blue-500', text: "text-blue-500", hex: "#3b82f6" };
         case 'Productos': return { bg: 'bg-yellow-500', text: "text-yellow-500", hex: "#eab308" };
+        case 'Gastos y Sueldos': return { bg: 'bg-red-500', text: "text-red-500", hex: "#ef4444" };
+        case 'Gastos': return { bg: 'bg-red-500', text: "text-red-500", hex: "#ef4444" };
+        case 'Pago a Empleados': return { bg: 'bg-red-500', text: "text-red-500", hex: "#ef4444" };
         default: return { bg: 'bg-purple-500', text: "text-purple-500", hex: "#a855f7" };    
     }
 };

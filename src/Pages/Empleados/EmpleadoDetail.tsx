@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import { EmpleadoApi, type EmpleadoDTO, type PagoEmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
+import type { EmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Edit } from "lucide-react";
-import { showSuccess, showError, showConfirmSuccess } from "../../Helpers/Alerts";
+import { useEmpleadoDetail } from "../../Hooks/Empleados/useEmpleadoDetail";
 
 interface Props {
     empleado: EmpleadoDTO;
@@ -15,42 +14,11 @@ interface Props {
 }
 
 export const EmpleadoDetail = ({ empleado, onBack, onEdit, onPay, onRefresh, gymId }: Props) => {
-    const [pagos, setPagos] = useState<PagoEmpleadoDTO[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const loadPagos = async () => {
-        try {
-            const data = await EmpleadoApi.obtenerHistorialPagos(gymId, empleado.id);
-            setPagos(data);
-        } catch (error) {
-            console.error("Error cargando historial de pagos", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadPagos();
-    }, [empleado.id]);
-
-    const handleToggleStatus = async () => {
-        const action = empleado.activo ? 'dar de baja' : 'reactivar';
-        const result = await showConfirmSuccess(
-            '¿Estás seguro?',
-            `Vas a ${action} a ${empleado.nombre}.`
-        );
-
-        if (result.isConfirmed) {
-            try {
-                await EmpleadoApi.bajaLogicaEmpleado(gymId, empleado.id);
-                showSuccess('El empleado fue actualizado correctamente.');
-                onRefresh(); 
-                onBack(); // Volver a la lista para ver el cambio reflejado
-            } catch (error: any) {
-                showError(error.response?.data?.error || 'Ocurrió un error');
-            }
-        }
-    };
+    const {
+        pagos,
+        loading,
+        handleToggleStatus
+    } = useEmpleadoDetail(gymId, empleado, onRefresh, onBack);
 
     return (
         <div className="w-full max-w-4xl animate-fade-in-right">

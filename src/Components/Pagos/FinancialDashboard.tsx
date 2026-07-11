@@ -67,6 +67,11 @@ export const FinancialDashboard = () => {
                         </span>
                         <span className="text-gray-500 text-xs">vs mes pasado</span>
                     </div>
+                    <div className="mt-4 pt-3 border-t border-white/5">
+                        <p className="text-[10px] text-gray-400/80 leading-tight italic">
+                            * Las ganancias son reales: se descuentan automáticamente los sueldos y gastos. Es normal ver saldos negativos a principio de mes.
+                        </p>
+                    </div>
                 </div>
 
                 {/* Ingresos Anuales */}
@@ -90,7 +95,7 @@ export const FinancialDashboard = () => {
                     </div>
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-indigo-600"></div>
 
-                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Medio de Pago (Anual)</p>
+                    <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Medio de Pago Preferido (Anual)</p>
                     <h3 className="text-3xl font-black text-white drop-shadow-md mb-1">
                         {metrics.metodoPreferido}
                     </h3>
@@ -128,7 +133,7 @@ export const FinancialDashboard = () => {
             {/* 4. DESGLOSE POR TIPO (Carga diferida) */}
             {/* Solo se muestra si el switch está activo */}
             {showDetails && (
-                <MetricsByType />
+                <MetricsByType desgloseMensual={metrics.desgloseMensual} desgloseAnual={metrics.desgloseAnual} />
             )}
 
         </div>

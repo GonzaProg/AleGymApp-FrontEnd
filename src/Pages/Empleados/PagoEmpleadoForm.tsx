@@ -1,7 +1,6 @@
-import { useState } from "react";
-import { EmpleadoApi, type EmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
+import type { EmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
 import { AppStyles } from "../../Styles/AppStyles";
-import { showSuccess, showError } from "../../Helpers/Alerts";
+import { usePagoEmpleadoForm } from "../../Hooks/Empleados/usePagoEmpleadoForm";
 
 interface Props {
     empleado: EmpleadoDTO;
@@ -11,38 +10,18 @@ interface Props {
 }
 
 export const PagoEmpleadoForm = ({ empleado, onBack, onSuccess, gymId }: Props) => {
-    const [monto, setMonto] = useState("");
-    const [concepto, setConcepto] = useState("Sueldo Mensual");
-    const [metodoPago, setMetodoPago] = useState("Efectivo");
-    // Inicializar fecha con la fecha de hoy en formato YYYY-MM-DD
-    const [fechaPago, setFechaPago] = useState(() => new Date().toISOString().split('T')[0]);
-    const [loading, setLoading] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!monto || isNaN(Number(monto)) || Number(monto) <= 0) {
-            showError('Ingrese un monto válido');
-            return;
-        }
-
-        setLoading(true);
-        try {
-            await EmpleadoApi.asignarPago(gymId, empleado.id, {
-                monto: Number(monto),
-                concepto,
-                metodoPago,
-                fechaPago: fechaPago ? `${fechaPago}T00:00:00` : undefined // Añadimos T00:00:00 para la BD
-            });
-            
-            showSuccess('Pago registrado correctamente.');
-            onSuccess();
-        } catch (error: any) {
-            showError(error.response?.data?.error || 'Ocurrió un error');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const {
+        monto,
+        setMonto,
+        concepto,
+        setConcepto,
+        metodoPago,
+        setMetodoPago,
+        fechaPago,
+        setFechaPago,
+        loading,
+        handleSubmit
+    } = usePagoEmpleadoForm(gymId, empleado, onSuccess);
 
     return (
         <div className="w-full max-w-xl animate-fade-in-up">
