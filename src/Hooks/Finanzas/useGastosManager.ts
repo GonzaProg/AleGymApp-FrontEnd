@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { GastoApi, type GastoDTO } from '../../API/Finanzas/GastoApi';
+import { NotasApi } from '../../API/Notas/NotasApi';
 import { showSuccess, showError, showConfirmDelete } from '../../Helpers/Alerts';
 
 export const useGastosManager = () => {
@@ -12,8 +13,16 @@ export const useGastosManager = () => {
     const [monto, setMonto] = useState<string>('');
     const [concepto, setConcepto] = useState<string>('');
     
-    // Default today date format YYYY-MM-DD
-    const [fechaGasto, setFechaGasto] = useState<string>(new Date().toISOString().split('T')[0]);
+    const getLocalISODate = () => {
+        const d = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }));
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // Default today date format YYYY-MM-DD in local time
+    const [fechaGasto, setFechaGasto] = useState<string>(getLocalISODate());
 
     const fetchGastos = useCallback(async () => {
         setLoading(true);
@@ -36,7 +45,7 @@ export const useGastosManager = () => {
         setVerTodos(prev => !prev);
     };
 
-    const handleCrearGasto = async (e: React.FormEvent) => {
+    const handleCrearGasto = async (e: React.FormEvent, pendingNotaData?: any) => {
         e.preventDefault();
         
         const montoNum = Number(monto);
@@ -63,6 +72,25 @@ export const useGastosManager = () => {
                 fechaGasto: finalDate
             });
             showSuccess("Gasto registrado correctamente");
+
+            // Lógica para marcar nota como resuelta
+            if (pendingNotaData) {
+                try {
+                    const today = new Date().toLocaleString('es-AR', { 
+                        timeZone: 'America/Argentina/Buenos_Aires',
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    const nuevoConcepto = pendingNotaData.concepto + `\n\nResuelto: ${today}`;
+                    await NotasApi.modificarNota(pendingNotaData.notaId, pendingNotaData.password, { 
+                        resuelta: true,
+                        concepto: nuevoConcepto 
+                    });
+                } catch (e) {
+                    console.error("Error resolviendo nota", e);
+                }
+            }
+
             setMonto('');
             setConcepto('');
             fetchGastos();

@@ -48,11 +48,12 @@ const AsistenciaManual = lazy(() => import("../Pages/Asistencias/AsistenciaManua
 const FrasesManager = lazy(() => import("../Pages/Config/FrasesManager").then(module => ({ default: module.FrasesManager })));
 const EmpleadosManager = lazy(() => import("../Pages/Empleados/EmpleadosManager").then(module => ({ default: module.EmpleadosManager })));
 const GastosManager = lazy(() => import("../Pages/Pagos/GastosManager").then(module => ({ default: module.GastosManager })));
+const NotasManager = lazy(() => import("../Pages/Notas/NotasManager").then(module => ({ default: module.NotasManager })));
 
 import {
   Home as HomeIcon, Dumbbell, Gem, TrendingUp, Users, RefreshCw, Send,
   LogOut, User, Settings, Building2, Receipt, BookOpen, ShoppingBag,
-  FileText, CheckSquare, Bell, UserPlus, MessageSquare, Wallet
+  FileText, CheckSquare, Bell, UserPlus, MessageSquare, Wallet, ClipboardList
 } from "lucide-react";
 
 const Icons = {
@@ -60,7 +61,7 @@ const Icons = {
   ejercicios: <Dumbbell size={20} />, notificaciones: <Bell size={20} />, usuarios: <Users size={20} />, nuevoUsuario: <UserPlus size={20} />,
   enviarPDF: <Send size={20} />, renovar: <RefreshCw size={20} />, salir: <LogOut size={20} />, perfil: <User size={20} />, preferencias: <Settings size={20} />, 
   nuevoGym: <Building2 size={20} />, gestionGyms: <Settings size={20} />, reciboManual: <Receipt size={20} />, crearRutinaGeneral: <BookOpen size={20} />,
-  tienda: <ShoppingBag size={20} />, rutinasUsuarios: <FileText size={20} />, asistencia: <CheckSquare size={20} />, frases: <MessageSquare size={20} />, gastos: <Wallet size={20} />,
+  tienda: <ShoppingBag size={20} />, rutinasUsuarios: <FileText size={20} />, asistencia: <CheckSquare size={20} />, frases: <MessageSquare size={20} />, gastos: <Wallet size={20} />, notas: <ClipboardList size={20} />
 };
 
 const TabLoading = () => (
@@ -172,6 +173,7 @@ export const Home = () => {
                         case "Empleados": return <EmpleadosManager />;
                         case "Finanzas": return <MetricasFinancieras />;
                         case "Control de Gastos": return <GastosManager />;
+                        case "Notas y Recordatorios": return <NotasManager onNavigate={handleSidebarClick} />;
                         case "Crear Rutina": return <CreateRoutine isGeneral={false} />;
                         case "Rutinas Generales": return <GeneralRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine} onEditGroup={handleEditGroup}/>;
                         case "Rutinas Usuarios": return <UserRoutinesManager onNavigate={handleSidebarClick} onEdit={handleEditRoutine} onEditGroup={handleEditGroup}/>;
@@ -223,7 +225,10 @@ export const Home = () => {
                 )}
               </div>
               <nav className={`p-4 space-y-2 mt-4 ${AppStyles.customScrollbar}`}>
+                
                 <SidebarItem icon={Icons.dashboard} label="Inicio" active={activeTab === "Inicio"} onClick={() => handleSidebarClick("Inicio")} />
+                <SidebarItem icon={Icons.notas} label="Notas y Recordatorios" active={activeTab === "Notas y Recordatorios"} onClick={() => handleSidebarClick("Notas y Recordatorios")} />
+
                 
                 {isAsistenciaHabilitada && (
                     <>

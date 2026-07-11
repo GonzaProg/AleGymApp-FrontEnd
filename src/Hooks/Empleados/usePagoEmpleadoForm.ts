@@ -10,7 +10,15 @@ export const usePagoEmpleadoForm = (
     const [monto, setMonto] = useState("");
     const [concepto, setConcepto] = useState("Sueldo Mensual");
     const [metodoPago, setMetodoPago] = useState("Efectivo");
-    const [fechaPago, setFechaPago] = useState(() => new Date().toISOString().split('T')[0]);
+    const getLocalISODate = () => {
+        const d = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }));
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const [fechaPago, setFechaPago] = useState(() => getLocalISODate());
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {

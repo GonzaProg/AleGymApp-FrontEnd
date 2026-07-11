@@ -63,3 +63,59 @@ export const showConfirmSuccess = (title: string, text: string) => {
         customClass: commonCustomClass // Aplicamos el z-index alto
     });
 };
+
+export const showPasswordPrompt = async (title: string, text: string) => {
+    return Swal.fire({
+        title: title,
+        text: text,
+        input: 'password',
+        inputPlaceholder: 'Ingrese su contraseña',
+        inputAttributes: {
+            autocapitalize: 'off',
+            autocorrect: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        background: '#1f2937',
+        color: '#e5e7eb',
+        customClass: commonCustomClass,
+        inputValidator: (value) => {
+            if (!value) {
+                return '¡Necesitas escribir la contraseña!';
+            }
+            return null;
+        }
+    });
+};
+
+export const showEditNotePrompt = async (conceptoActual: string) => {
+    return Swal.fire({
+        title: 'Modificar Nota',
+        html: `
+            <div style="text-align: left; margin-top: 10px;">
+                <label style="color: #9ca3af; font-size: 14px; margin-bottom: 5px; display: block;">Concepto</label>
+                <textarea id="swal-input-concepto" class="swal2-textarea" style="width: 100%; margin: 0; box-sizing: border-box;">${conceptoActual}</textarea>
+            </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Guardar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        background: '#1f2937',
+        color: '#e5e7eb',
+        customClass: commonCustomClass,
+        preConfirm: () => {
+            const concepto = (document.getElementById('swal-input-concepto') as HTMLTextAreaElement).value;
+            if (!concepto.trim()) {
+                Swal.showValidationMessage('El concepto no puede estar vacío');
+                return false;
+            }
+            return { concepto };
+        }
+    });
+};

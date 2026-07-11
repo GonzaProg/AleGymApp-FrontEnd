@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useGastosManager } from "../../Hooks/Finanzas/useGastosManager";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Input } from "../../Components/UI/Input";
@@ -28,6 +28,35 @@ export const GastosManager = () => {
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [passwordInput, setPasswordInput] = useState("");
     const [verifying, setVerifying] = useState(false);
+
+    const [pendingNotaData, setPendingNotaData] = useState<any>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Auto-resize textarea when concepto changes programmatically
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
+    }, [concepto]);
+
+    // Revisar si venimos redirigidos desde Notas
+    useEffect(() => {
+        const pendingStr = sessionStorage.getItem('pendingGastoNote');
+        if (pendingStr && !isUnlocked) {
+            try {
+                const pendingData = JSON.parse(pendingStr);
+                setConcepto(pendingData.concepto);
+                setIsUnlocked(true);
+                setPendingNotaData(pendingData);
+            } catch (e) {
+                console.error("Error al parsear nota pendiente:", e);
+            } finally {
+                // Limpiamos sessionStorage de inmediato. Si el usuario se va y vuelve, ya no se auto-completará
+                sessionStorage.removeItem('pendingGastoNote');
+            }
+        }
+    }, [isUnlocked, setConcepto]);
 
     const handleDesbloquear = async () => {
         if (!passwordInput.trim()) return;
@@ -97,7 +126,7 @@ export const GastosManager = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* FORMULARIO */}
                         <div className="lg:col-span-1">
-                            <form onSubmit={handleCrearGasto} className={`${AppStyles.glassCard} sticky top-24`}>
+                            <form onSubmit={(e) => handleCrearGasto(e, pendingNotaData)} className={`${AppStyles.glassCard} sticky top-24`}>
                                 <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-6">
                                     <Receipt className="w-5 h-5 text-green-400" /> Registrar Gasto
                                 </h3>
@@ -117,6 +146,7 @@ export const GastosManager = () => {
                                     <div>
                                         <label className={AppStyles.label}>Concepto / Motivo</label>
                                         <textarea
+                                            ref={textareaRef}
                                             value={concepto}
                                             onChange={(e) => {
                                                 setConcepto(e.target.value);
