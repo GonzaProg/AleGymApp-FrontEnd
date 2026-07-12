@@ -149,7 +149,13 @@ export const Home = () => {
   if (isEntrenador || isAdmin) {
     const AdminDashboardWelcome = () => (
         <div className="animate-fade-in-up space-y-6 mt-20">
-          <div className="bg-[linear-gradient(to_bottom,#75AADB_33.3%,#FFFFFF_33.3%,#FFFFFF_66.6%,#75AADB_66.6%)] p-8 rounded-3xl border-4 border-yellow-500 shadow-2xl relative overflow-hidden flex flex-col justify-center">
+          <div className="p-8 rounded-3xl border-4 border-yellow-500 shadow-2xl relative overflow-hidden flex flex-col justify-center" style={{ colorScheme: 'light' }}>
+            {/* Usamos un <img> de fondo porque los WebViews de Android ignoran las etiquetas <img> en su algoritmo de Inversión de Modo Oscuro */}
+            <img 
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 100' preserveAspectRatio='none'%3E%3Crect width='1' height='33.3' fill='%2375AADB'/%3E%3Crect y='33.3' width='1' height='33.4' fill='%23ffffff'/%3E%3Crect y='66.7' width='1' height='33.3' fill='%2375AADB'/%3E%3C/svg%3E" 
+              className="absolute inset-0 w-full h-full object-cover z-0" 
+              alt=""
+            />
             
             {/* Trofeo */}
             <div className="absolute top-1/2 right-10 -translate-y-1/2 pointer-events-none">
