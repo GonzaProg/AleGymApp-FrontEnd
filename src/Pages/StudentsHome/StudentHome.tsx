@@ -8,8 +8,11 @@ import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { Camera, Info, Flame, Dumbbell, Quote, Handshake } from "lucide-react";
 import { useFraseMotivacional } from "../../Hooks/StudentsHome/useFraseMotivacional";
 import { useGymCachedImages } from "../../Hooks/StudentsHome/useGymCachedImages";
+import { useStudentDietas } from "../../Hooks/Dietas/useStudentDietas";
+import { useNavigate } from "react-router-dom";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
+    const navigate = useNavigate();
     const [isInfoOpen, setIsInfoOpen] = useState(false);
     
     // Conectamos con nuestro nuevo Hook
@@ -30,6 +33,9 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     // Planes del usuario
     const { activePlans, loading: loadingPlans } = useUserPlan();
     const unexpiredPlans = activePlans.filter(p => p.diasRestantes >= 0);
+
+    // Nutrición del usuario
+    const { registroHoy, dietaAsignada, loadingDietas } = useStudentDietas();
     
     // Función helper para la fecha
     const formatFechaDia = (fechaISO: string) => {
@@ -131,6 +137,45 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
             {/* ESPACIADOR PARA VER EL TEXTO DEL FONDO */}
             {fondoGymUrl && <div className="h-20 md:h-40 pointer-events-none"></div>}
+
+            {/* NUTRICIÓN */}
+            <div 
+                onClick={() => navigate('/dietas')}
+                className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} mb-8 relative overflow-hidden border-orange-500/20 shadow-lg cursor-pointer transition-transform hover:scale-[1.02] active:scale-95`}
+            >
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-lg bg-orange-500/20">
+                            <Flame className="w-5 h-5 text-orange-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-white font-bold tracking-wide">Mi Nutrición</h3>
+                            <p className="text-gray-400 text-xs">{(dietaAsignada && dietaAsignada.caloriasDiarias) ? "Progreso de Hoy" : "Ver mi registro diario"}</p>
+                        </div>
+                    </div>
+                    <span className="text-orange-400 text-sm font-bold bg-orange-500/10 px-3 py-1 rounded-full">Abrir</span>
+                </div>
+                
+                {!loadingDietas && (
+                    <div className="relative z-10">
+                        <div className="flex justify-between items-end mb-2">
+                            <span className="text-3xl font-black text-white">{Math.round(registroHoy?.totalCalorias || 0)} <span className="text-sm text-gray-500 font-normal">kcal consumidas</span></span>
+                        </div>
+                        {dietaAsignada?.caloriasDiarias && (
+                            <>
+                                <div className="w-full h-2 bg-black/50 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-1000" 
+                                        style={{ width: `${Math.min(((registroHoy?.totalCalorias || 0) / dietaAsignada.caloriasDiarias) * 100, 100)}%` }}
+                                    ></div>
+                                </div>
+                                <p className="text-right text-xs text-gray-400 mt-2">Meta: {dietaAsignada.caloriasDiarias} kcal</p>
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
 
             {/* CONDICIONAL: Solo mostramos la asistencia si el gimnasio la habilitó */}
             {isAsistenciaHabilitada ? (
