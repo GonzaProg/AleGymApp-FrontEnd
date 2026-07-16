@@ -82,8 +82,8 @@ export const useDietasManager = () => {
         setComidas([]);
     };
 
-    const agregarComida = () => {
-        setComidas([...comidas, { tipo: '', alimentos: '', calorias: null, proteinas: null, carbohidratos: null, grasas: null }]);
+    const agregarComida = (diaSemana: string = 'Lunes') => {
+        setComidas([...comidas, { tipo: '', alimentos: '', calorias: null, proteinas: null, carbohidratos: null, grasas: null, diaSemana }]);
     };
 
     const eliminarComida = (index: number) => {

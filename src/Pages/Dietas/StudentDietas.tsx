@@ -18,44 +18,66 @@ export const StudentDietas = () => {
     } = useStudentDietas();
     
     const navigate = useNavigate();
-    const [view, setView] = useState<'HOY' | 'HISTORIAL' | 'PLAN'>('HOY');
+    const [view, setView] = useState<'HOY' | 'HISTORIAL' | 'DIETA'>('HOY');
+    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const [selectedDayPlan, setSelectedDayPlan] = useState('Lunes');
+    const [selectedDayHist, setSelectedDayHist] = useState('Lunes');
     
     // Modal states
     const [showAddModal, setShowAddModal] = useState(false);
     const [addTipo, setAddTipo] = useState("");
-    const [addNombre, setAddNombre] = useState("");
-    const [addCantidad, setAddCantidad] = useState("");
+    const [addDescripcion, setAddDescripcion] = useState("");
     const [addCals, setAddCals] = useState<number | "">("");
     const [addProts, setAddProts] = useState<number | "">("");
     const [addCarbs, setAddCarbs] = useState<number | "">("");
     const [addGrasas, setAddGrasas] = useState<number | "">("");
-
-    // Agrupación de Historial por semanas (Lógica simple, agrupando de a 7 días)
+    // Historial agrupado por semana real
     const [weekOffset, setWeekOffset] = useState(0); // 0 = esta semana, 1 = semana pasada, etc.
     
-    const { historyWeeks, currentWeekIndex } = useMemo(() => {
-        // Ordenamos el historial de más reciente a más viejo
-        const sortedHist = [...historial].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+    const getLocalDate = (d: Date) => {
+        const formatter = new Intl.DateTimeFormat('en-CA', { 
+            timeZone: 'America/Argentina/Buenos_Aires', 
+            year: 'numeric', month: '2-digit', day: '2-digit' 
+        });
+        return formatter.format(d);
+    };
+
+    const historialDiaSeleccionado = useMemo(() => {
+        const now = new Date();
+        const localNowStr = getLocalDate(now);
+        const localNow = new Date(`${localNowStr}T12:00:00Z`);
         
-        // Agrupamos en bloques de 7 (Semanas)
-        const weeks = [];
-        for (let i = 0; i < sortedHist.length; i += 7) {
-            weeks.push(sortedHist.slice(i, i + 7));
-        }
+        const dayOfWeek = localNow.getUTCDay();
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const thisMonday = new Date(localNow);
+        thisMonday.setUTCDate(localNow.getUTCDate() - daysToMonday);
         
-        return { 
-            historyWeeks: weeks,
-            currentWeekIndex: weekOffset
-        };
-    }, [historial, weekOffset]);
+        const startOfWeek = new Date(thisMonday);
+        startOfWeek.setUTCDate(startOfWeek.getUTCDate() - (weekOffset * 7));
+        
+        const selectedDayIndex = diasSemana.indexOf(selectedDayHist);
+        const targetDate = new Date(startOfWeek);
+        targetDate.setUTCDate(startOfWeek.getUTCDate() + selectedDayIndex);
+        
+        const targetDateStr = targetDate.toISOString().split('T')[0];
+        
+        return historial.find((h: any) => h.fecha === targetDateStr) || { fecha: targetDateStr, isEmpty: true };
+    }, [historial, weekOffset, selectedDayHist, diasSemana]);
 
     const handleSaveComida = async () => {
-        if (!addNombre || !addCantidad) return alert("Nombre y cantidad son obligatorios");
+        if (!addDescripcion.trim()) return alert("Agrega una descripción");
+        if (
+            (addCals !== '' && addCals < 0) ||
+            (addProts !== '' && addProts < 0) ||
+            (addCarbs !== '' && addCarbs < 0) ||
+            (addGrasas !== '' && addGrasas < 0)
+        ) {
+            return alert("No se pueden ingresar valores negativos en los macros.");
+        }
         
         await registrarComida({
             tipo: addTipo,
-            nombre: addNombre,
-            cantidad: addCantidad,
+            descripcion: addDescripcion,
             calorias: addCals || 0,
             proteinas: addProts || 0,
             carbohidratos: addCarbs || 0,
@@ -64,7 +86,7 @@ export const StudentDietas = () => {
         
         setShowAddModal(false);
         // Reset form
-        setAddNombre(""); setAddCantidad(""); setAddCals(""); setAddProts(""); setAddCarbs(""); setAddGrasas("");
+        setAddDescripcion(""); setAddCals(""); setAddProts(""); setAddCarbs(""); setAddGrasas("");
     };
 
     if (loadingDietas && !registroHoy) {
@@ -81,7 +103,7 @@ export const StudentDietas = () => {
                 <div className="flex-1">
                     <p className="text-gray-400 text-xs font-semibold uppercase">{title}</p>
                     <div className="flex justify-between items-end">
-                        <p className="text-white font-bold">{Number(value).toFixed(1)} <span className="text-xs text-gray-500">{unit}</span></p>
+                        <p className="text-white font-bold">{Number(value).toFixed(title === 'Agua' ? 2 : 0)} <span className="text-xs text-gray-500">{unit}</span></p>
                         {max && <p className="text-gray-500 text-xs">/ {max} {unit}</p>}
                     </div>
                     {max > 0 && (
@@ -106,7 +128,7 @@ export const StudentDietas = () => {
 
             {/* Selector de Vistas */}
             <div className="flex gap-2 p-4 overflow-x-auto scrollbar-none border-b border-white/5">
-                {['HOY', 'HISTORIAL', 'PLAN'].map(v => (
+                {['HOY', 'HISTORIAL', 'DIETA'].map(v => (
                     <button
                         key={v}
                         onClick={() => setView(v as any)}
@@ -114,7 +136,7 @@ export const StudentDietas = () => {
                             view === v ? 'bg-orange-500 text-white' : 'bg-white/5 text-gray-400'
                         }`}
                     >
-                        {v === 'HOY' ? 'Mi Día' : v === 'HISTORIAL' ? 'Historial' : 'Plan Asignado'}
+                        {v === 'HOY' ? 'Mi Día' : v === 'HISTORIAL' ? 'Historial' : 'Dieta Asignada'}
                     </button>
                 ))}
             </div>
@@ -162,12 +184,12 @@ export const StudentDietas = () => {
                                     <div key={comida.id} className="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center relative overflow-hidden">
                                         <div className="z-10 relative flex-1">
                                             <span className="text-orange-400 text-xs font-bold uppercase tracking-wider">{comida.tipo}</span>
-                                            <h4 className="font-bold text-white mt-1">{comida.nombre}</h4>
-                                            <p className="text-gray-400 text-sm">{comida.cantidad}</p>
+                                            <h4 className="font-bold text-white mt-1 whitespace-pre-line">{comida.descripcion}</h4>
                                             <div className="flex gap-3 mt-2">
                                                 {comida.calorias > 0 && <span className="text-xs text-gray-500"><b className="text-white">{comida.calorias}</b> kcal</span>}
                                                 {comida.proteinas > 0 && <span className="text-xs text-gray-500"><b className="text-white">{comida.proteinas}</b>g P</span>}
                                                 {comida.carbohidratos > 0 && <span className="text-xs text-gray-500"><b className="text-white">{comida.carbohidratos}</b>g C</span>}
+                                                {comida.grasas > 0 && <span className="text-xs text-gray-500"><b className="text-white">{comida.grasas}</b>g G</span>}
                                             </div>
                                         </div>
                                         <button 
@@ -187,69 +209,107 @@ export const StudentDietas = () => {
             {/* VISTA: HISTORIAL */}
             {view === 'HISTORIAL' && (
                 <div className="p-4 animate-fade-in space-y-4">
-                    {historyWeeks.length === 0 ? (
-                        <p className="text-gray-500 text-center py-10">No hay historial disponible aún.</p>
-                    ) : (
-                        <>
-                            <div className="flex items-center justify-between bg-black/30 p-3 rounded-2xl border border-white/5">
-                                <button 
-                                    disabled={currentWeekIndex >= historyWeeks.length - 1} 
-                                    onClick={() => setWeekOffset(prev => prev + 1)}
-                                    className="p-2 text-gray-400 disabled:opacity-30"
-                                >
-                                    <ChevronLeft className="w-6 h-6" />
-                                </button>
-                                <span className="font-bold text-orange-400">
-                                    {currentWeekIndex === 0 ? "Esta Semana" : `Hace ${currentWeekIndex} semana${currentWeekIndex > 1 ? 's' : ''}`}
-                                </span>
-                                <button 
-                                    disabled={currentWeekIndex === 0} 
-                                    onClick={() => setWeekOffset(prev => prev - 1)}
-                                    className="p-2 text-gray-400 disabled:opacity-30"
-                                >
-                                    <ChevronRight className="w-6 h-6" />
-                                </button>
-                            </div>
+                    <div className="flex items-center justify-between bg-black/30 p-3 rounded-2xl border border-white/5">
+                        <button 
+                            disabled={weekOffset >= 3}
+                            onClick={() => setWeekOffset(prev => prev + 1)}
+                            className="p-2 text-gray-400 disabled:opacity-30 hover:text-white transition-colors"
+                        >
+                            <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <span className="font-bold text-orange-400">
+                            {weekOffset === 0 ? "Esta Semana" : `Hace ${weekOffset} semana${weekOffset > 1 ? 's' : ''}`}
+                        </span>
+                        <button 
+                            disabled={weekOffset === 0} 
+                            onClick={() => setWeekOffset(prev => prev - 1)}
+                            className="p-2 text-gray-400 disabled:opacity-30 hover:text-white transition-colors"
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                    </div>
 
-                            <div className="space-y-4">
-                                {historyWeeks[currentWeekIndex]?.map((dia: any) => (
-                                    <div key={dia.id} className="bg-white/5 rounded-2xl border border-white/5 p-4">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <h4 className="font-bold text-white">{new Date(dia.fecha).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' })}</h4>
-                                        </div>
-                                        <div className="grid grid-cols-4 gap-2 text-center text-xs">
-                                            <div className="bg-black/40 p-2 rounded-xl">
-                                                <Flame className="w-4 h-4 mx-auto text-orange-400 mb-1" />
-                                                <p className="text-white font-bold">{Math.round(dia.totalCalorias)}</p>
-                                            </div>
-                                            <div className="bg-black/40 p-2 rounded-xl">
-                                                <Beef className="w-4 h-4 mx-auto text-red-400 mb-1" />
-                                                <p className="text-white font-bold">{Math.round(dia.totalProteinas)}g</p>
-                                            </div>
-                                            <div className="bg-black/40 p-2 rounded-xl">
-                                                <Wheat className="w-4 h-4 mx-auto text-yellow-400 mb-1" />
-                                                <p className="text-white font-bold">{Math.round(dia.totalCarbohidratos)}g</p>
-                                            </div>
-                                            <div className="bg-black/40 p-2 rounded-xl">
-                                                <Droplet className="w-4 h-4 mx-auto text-blue-400 mb-1" />
-                                                <p className="text-white font-bold">{dia.totalAgua.toFixed(1)}L</p>
-                                            </div>
-                                        </div>
+                    <div className="flex gap-2 overflow-x-auto scrollbar-none py-2 border-b border-white/5 mb-4">
+                        {diasSemana.map(dia => (
+                            <button
+                                key={dia}
+                                onClick={() => setSelectedDayHist(dia)}
+                                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-all ${
+                                    selectedDayHist === dia ? 'bg-orange-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                }`}
+                            >
+                                {dia}
+                            </button>
+                        ))}
+                    </div>
+
+                    {historialDiaSeleccionado.isEmpty ? (
+                        <p className="text-gray-500 text-center py-10 bg-white/5 rounded-2xl">No hay registros para este día.</p>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="bg-white/5 rounded-2xl border border-white/5 p-4 transition-colors">
+                                <div className="flex justify-between items-center mb-3">
+                                    <h4 className="font-bold text-white flex items-center gap-2">
+                                        {new Date(`${historialDiaSeleccionado.fecha}T12:00:00Z`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' })}
+                                    </h4>
+                                </div>
+                                <div className="grid grid-cols-8 gap-2 text-center text-xs mb-4">
+                                    <div className="col-span-2 bg-black/40 p-2 rounded-xl">
+                                        <Flame className="w-4 h-4 mx-auto text-orange-400 mb-1" />
+                                        <p className="text-white font-bold">{Math.round(historialDiaSeleccionado.totalCalorias)}</p>
                                     </div>
-                                ))}
+                                    <div className="col-span-2 bg-black/40 p-2 rounded-xl">
+                                        <Beef className="w-4 h-4 mx-auto text-red-400 mb-1" />
+                                        <p className="text-white font-bold">{Math.round(historialDiaSeleccionado.totalProteinas)}g</p>
+                                    </div>
+                                    <div className="col-span-2 bg-black/40 p-2 rounded-xl">
+                                        <Wheat className="w-4 h-4 mx-auto text-yellow-400 mb-1" />
+                                        <p className="text-white font-bold">{Math.round(historialDiaSeleccionado.totalCarbohidratos)}g</p>
+                                    </div>
+                                    <div className="col-span-2 bg-black/40 p-2 rounded-xl">
+                                        <Flame className="w-4 h-4 mx-auto text-green-400 mb-1" />
+                                        <p className="text-white font-bold">{Math.round(historialDiaSeleccionado.totalGrasas)}g</p>
+                                    </div>
+                                    <div className="col-span-2 col-start-4 bg-black/40 p-2 rounded-xl">
+                                        <Droplet className="w-4 h-4 mx-auto text-blue-400 mb-1" />
+                                        <p className="text-white font-bold">{Number(historialDiaSeleccionado.totalAgua || 0).toFixed(2)}L</p>
+                                    </div>
+                                </div>
+
+                                {historialDiaSeleccionado.comidasConsumidas && historialDiaSeleccionado.comidasConsumidas.length > 0 ? (
+                                    <div className="pt-4 border-t border-white/10 space-y-3 animate-fade-in">
+                                        <h5 className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Comidas registradas</h5>
+                                        {historialDiaSeleccionado.comidasConsumidas.map((comida: any) => (
+                                            <div key={comida.id} className="bg-black/30 p-3 rounded-xl border border-white/5">
+                                                <span className="text-orange-400 text-[10px] font-bold uppercase tracking-wider">{comida.tipo}</span>
+                                                <h4 className="font-bold text-gray-200 mt-1 whitespace-pre-line text-sm">{comida.descripcion}</h4>
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {comida.calorias > 0 && <span className="text-[10px] text-gray-500"><b className="text-white">{comida.calorias}</b> kcal</span>}
+                                                    {comida.proteinas > 0 && <span className="text-[10px] text-gray-500"><b className="text-white">{comida.proteinas}</b>g P</span>}
+                                                    {comida.carbohidratos > 0 && <span className="text-[10px] text-gray-500"><b className="text-white">{comida.carbohidratos}</b>g C</span>}
+                                                    {comida.grasas > 0 && <span className="text-[10px] text-gray-500"><b className="text-white">{comida.grasas}</b>g G</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="pt-4 border-t border-white/10 text-center animate-fade-in">
+                                        <p className="text-xs text-gray-500">No hay comidas detalladas este día.</p>
+                                    </div>
+                                )}
                             </div>
-                        </>
+                        </div>
                     )}
                 </div>
             )}
 
-            {/* VISTA: PLAN ASIGNADO */}
-            {view === 'PLAN' && (
+            {/* VISTA: DIETA ASIGNADA */}
+            {view === 'DIETA' && (
                 <div className="p-4 animate-fade-in space-y-6">
                     {!dietaAsignada ? (
                         <div className="text-center py-10 opacity-70">
                             <Info className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-                            <p className="text-gray-400">Tu entrenador aún no te ha asignado un plan nutricional estructurado.</p>
+                            <p className="text-gray-400">Tu entrenador aún no te ha asignado un plan nutricional.</p>
                         </div>
                     ) : (
                         <>
@@ -260,23 +320,43 @@ export const StudentDietas = () => {
                                 )}
                             </div>
 
+                            <div className="flex gap-2 overflow-x-auto scrollbar-none py-2 border-b border-white/5 mb-4 mt-2">
+                                {diasSemana.map(dia => (
+                                    <button
+                                        key={dia}
+                                        onClick={() => setSelectedDayPlan(dia)}
+                                        className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-all ${
+                                            selectedDayPlan === dia ? 'bg-orange-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                        }`}
+                                    >
+                                        {dia}
+                                    </button>
+                                ))}
+                            </div>
+
                             <div>
-                                <h4 className="font-bold text-gray-300 mb-3 ml-1">Comidas Sugeridas</h4>
-                                <div className="space-y-3">
-                                    {dietaAsignada.comidas?.map((c: any) => (
-                                        <div key={c.id} className="bg-white/5 border border-white/5 p-4 rounded-2xl">
-                                            <span className="bg-white/10 text-white text-xs px-2 py-1 rounded-md font-bold uppercase">{c.tipo}</span>
-                                            <p className="mt-3 text-white text-sm whitespace-pre-line">{c.alimentos}</p>
-                                            
-                                            {(c.calorias || c.proteinas) && (
-                                                <div className="mt-4 pt-3 border-t border-white/10 flex gap-4 text-xs text-gray-400">
-                                                    {c.calorias && <span><b>{c.calorias}</b> kcal</span>}
-                                                    {c.proteinas && <span><b>{c.proteinas}</b>g P</span>}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
+                                <h4 className="font-bold text-gray-300 mb-3 ml-1">Comidas Sugeridas para el {selectedDayPlan}</h4>
+                                {dietaAsignada.comidas?.filter((c: any) => (c.diaSemana || 'Lunes') === selectedDayPlan).length === 0 ? (
+                                    <p className="text-gray-500 text-center py-4 bg-white/5 rounded-2xl">No hay comidas sugeridas para este día.</p>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {dietaAsignada.comidas?.filter((c: any) => (c.diaSemana || 'Lunes') === selectedDayPlan).map((c: any) => (
+                                            <div key={c.id} className="bg-white/5 border border-white/5 p-4 rounded-2xl animate-fade-in">
+                                                <span className="bg-orange-500/30 text-orange-400 text-xs px-2 py-1 rounded-md font-bold uppercase">{c.tipo}</span>
+                                                <p className="mt-3 text-white text-sm whitespace-pre-line">{c.alimentos}</p>
+                                                
+                                                {(c.calorias || c.proteinas || c.carbohidratos || c.grasas) && (
+                                                    <div className="mt-4 pt-3 border-t border-white/10 grid grid-cols-2 gap-3 text-xs text-gray-400">
+                                                        {c.calorias && <span className="flex items-center gap-1 text-orange-400"><Flame className="w-3 h-3"/> <b>{c.calorias}</b> kcal</span>}
+                                                        {c.proteinas && <span className="flex items-center gap-1 text-red-400"><Beef className="w-3 h-3"/> <b>{c.proteinas}</b>g P</span>}
+                                                        {c.carbohidratos && <span className="flex items-center gap-1 text-yellow-400"><Wheat className="w-3 h-3"/> <b>{c.carbohidratos}</b>g C</span>}
+                                                        {c.grasas && <span className="flex items-center gap-1 text-green-400"><Flame className="w-3 h-3"/> <b>{c.grasas}</b>g G</span>}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}
@@ -299,27 +379,33 @@ export const StudentDietas = () => {
                                 <Input value={addTipo} onChange={(e) => setAddTipo(e.target.value)} className={AppStyles.inputDark} list="tipos-comida-mobile" />
                                 <datalist id="tipos-comida-mobile">
                                     <option value="Desayuno" />
+                                    <option value="Media mañana" />
                                     <option value="Almuerzo" />
+                                    <option value="Media tarde" />
                                     <option value="Merienda" />
+                                    <option value="Pre-Cena" />
                                     <option value="Cena" />
+                                    <option value="Media noche" />
                                 </datalist>
                             </div>
                             <div>
                                 <label className={AppStyles.label}>¿Qué comiste?</label>
-                                <Input placeholder="Ej: Pechuga de pollo, 2 huevos..." value={addNombre} onChange={(e) => setAddNombre(e.target.value)} className={AppStyles.inputDark} />
-                            </div>
-                            <div>
-                                <label className={AppStyles.label}>Cantidad</label>
-                                <Input placeholder="Ej: 200g, 1 porción..." value={addCantidad} onChange={(e) => setAddCantidad(e.target.value)} className={AppStyles.inputDark} />
+                                <textarea 
+                                    placeholder={`Ej: Pollo 200gr\n2 huevos\nPan 50gr`}
+                                    value={addDescripcion} 
+                                    onChange={(e) => setAddDescripcion(e.target.value)} 
+                                    className={`${AppStyles.inputDark} w-full resize-y overflow-hidden`}
+                                    rows={Math.max(3, addDescripcion.split('\n').length)}
+                                />
                             </div>
 
                             <div className="pt-4 border-t border-white/10">
                                 <label className="text-xs text-orange-400 font-bold mb-2 block uppercase">Macros (Opcional)</label>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <Input type="number" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" placeholder="Proteínas (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Proteínas (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
                                 </div>
                             </div>
 

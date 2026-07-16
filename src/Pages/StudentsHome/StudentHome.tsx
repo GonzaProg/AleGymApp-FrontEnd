@@ -173,6 +173,57 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                 <p className="text-right text-xs text-gray-400 mt-2">Meta: {dietaAsignada.caloriasDiarias} kcal</p>
                             </>
                         )}
+                        
+                        <div className="mt-6 space-y-4">
+                            {/* Proteínas */}
+                            <div>
+                                <div className="flex justify-between items-end mb-1">
+                                    <span className="text-gray-300 font-bold text-sm">Proteínas</span>
+                                    <span className="text-white font-bold text-sm">{Math.round(registroHoy?.totalProteinas || 0)}g <span className="text-gray-500 font-normal text-xs">{dietaAsignada?.proteinasDiarias ? `/ ${dietaAsignada.proteinasDiarias}g` : ''}</span></span>
+                                </div>
+                                {dietaAsignada?.proteinasDiarias && (
+                                    <div className="w-full h-1.5 bg-black/50 rounded-full overflow-hidden">
+                                        <div className="h-full bg-red-500 transition-all duration-1000" style={{ width: `${Math.min(((registroHoy?.totalProteinas || 0) / dietaAsignada.proteinasDiarias) * 100, 100)}%` }}></div>
+                                    </div>
+                                )}
+                            </div>
+                            {/* Carbohidratos */}
+                            <div>
+                                <div className="flex justify-between items-end mb-1">
+                                    <span className="text-gray-300 font-bold text-sm">Carbohidratos</span>
+                                    <span className="text-white font-bold text-sm">{Math.round(registroHoy?.totalCarbohidratos || 0)}g <span className="text-gray-500 font-normal text-xs">{dietaAsignada?.carbohidratosDiarios ? `/ ${dietaAsignada.carbohidratosDiarios}g` : ''}</span></span>
+                                </div>
+                                {dietaAsignada?.carbohidratosDiarios && (
+                                    <div className="w-full h-1.5 bg-black/50 rounded-full overflow-hidden">
+                                        <div className="h-full bg-yellow-400 transition-all duration-1000" style={{ width: `${Math.min(((registroHoy?.totalCarbohidratos || 0) / dietaAsignada.carbohidratosDiarios) * 100, 100)}%` }}></div>
+                                    </div>
+                                )}
+                            </div>
+                            {/* Grasas */}
+                            <div>
+                                <div className="flex justify-between items-end mb-1">
+                                    <span className="text-gray-300 font-bold text-sm">Grasas</span>
+                                    <span className="text-white font-bold text-sm">{Math.round(registroHoy?.totalGrasas || 0)}g <span className="text-gray-500 font-normal text-xs">{dietaAsignada?.grasasDiarias ? `/ ${dietaAsignada.grasasDiarias}g` : ''}</span></span>
+                                </div>
+                                {dietaAsignada?.grasasDiarias && (
+                                    <div className="w-full h-1.5 bg-black/50 rounded-full overflow-hidden">
+                                        <div className="h-full bg-green-500 transition-all duration-1000" style={{ width: `${Math.min(((registroHoy?.totalGrasas || 0) / dietaAsignada.grasasDiarias) * 100, 100)}%` }}></div>
+                                    </div>
+                                )}
+                            </div>
+                            {/* Agua */}
+                            <div>
+                                <div className="flex justify-between items-end mb-1">
+                                    <span className="text-gray-300 font-bold text-sm">Agua</span>
+                                    <span className="text-white font-bold text-sm">{(registroHoy?.totalAgua || 0).toFixed(2)}L <span className="text-gray-500 font-normal text-xs">{dietaAsignada?.litrosAguaDiarios ? `/ ${dietaAsignada.litrosAguaDiarios}L` : ''}</span></span>
+                                </div>
+                                {dietaAsignada?.litrosAguaDiarios && (
+                                    <div className="w-full h-1.5 bg-black/50 rounded-full overflow-hidden">
+                                        <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min(((registroHoy?.totalAgua || 0) / dietaAsignada.litrosAguaDiarios) * 100, 100)}%` }}></div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

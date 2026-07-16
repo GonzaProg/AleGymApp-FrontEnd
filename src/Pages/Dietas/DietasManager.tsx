@@ -29,6 +29,8 @@ export const DietasManager = () => {
     } = useDietasManager();
 
     const [searchTerm, setSearchTerm] = useState("");
+    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+    const [selectedDay, setSelectedDay] = useState('Lunes');
 
     const usuariosFiltrados = usuarios.filter((u: any) =>
         `${u.nombre} ${u.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -58,7 +60,7 @@ export const DietasManager = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className={AppStyles.inputDark}
                         />
-                        <div className="mt-4 max-h-96 overflow-y-auto space-y-2 pr-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent hover:scrollbar-thumb-gray-600">
+                        <div className={AppStyles.customScrollbar + " mt-4 max-h-96 space-y-2 pr-2"}>
                             {loadingUsuarios ? (
                                 <p className="text-gray-400 text-sm">Cargando alumnos...</p>
                             ) : usuariosFiltrados.length === 0 ? (
@@ -191,17 +193,34 @@ export const DietasManager = () => {
                                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
                                         <Utensils className="w-5 h-5 text-gray-400" /> Comidas Sugeridas
                                     </h3>
-                                    <Button type="button" onClick={agregarComida} className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 text-sm py-1.5">
+                                    <Button type="button" onClick={() => agregarComida(selectedDay)} className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 text-sm py-1.5">
                                         <PlusCircle className="w-4 h-4 mr-2" /> Añadir Comida
                                     </Button>
                                 </div>
 
-                                {comidas.length === 0 ? (
-                                    <p className="text-gray-500 text-center py-4">No has añadido comidas a esta dieta.</p>
+                                {/* Pestañas de días */}
+                                <div className="flex gap-2 overflow-x-auto scrollbar-none py-2 border-b border-white/5">
+                                    {diasSemana.map(dia => (
+                                        <button
+                                            key={dia}
+                                            onClick={(e) => { e.preventDefault(); setSelectedDay(dia); }}
+                                            className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-all ${
+                                                selectedDay === dia ? 'bg-orange-500 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                                            }`}
+                                        >
+                                            {dia}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {comidas.filter(c => (c.diaSemana || 'Lunes') === selectedDay).length === 0 ? (
+                                    <p className="text-gray-500 text-center py-4">No has añadido comidas para el {selectedDay}.</p>
                                 ) : (
                                     <div className="space-y-4">
-                                        {comidas.map((comida, index) => (
-                                            <div key={index} className="bg-black/30 p-4 rounded-xl border border-white/5 relative">
+                                        {comidas.map((comida, index) => {
+                                            if ((comida.diaSemana || 'Lunes') !== selectedDay) return null;
+                                            return (
+                                            <div key={index} className="bg-black/30 p-4 rounded-xl border border-white/5 relative animate-fade-in">
                                                 <button 
                                                     onClick={() => eliminarComida(index)}
                                                     className="absolute top-4 right-4 text-gray-500 hover:text-red-400 transition-colors"
@@ -261,7 +280,7 @@ export const DietasManager = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        ))}
+                                        )})}
                                     </div>
                                 )}
                             </div>
