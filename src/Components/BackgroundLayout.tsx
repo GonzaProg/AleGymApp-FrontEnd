@@ -1,44 +1,21 @@
-import React, { useState, useEffect } from 'react'; // <-- Agregamos useState y useEffect
+import React, { useState, useEffect } from 'react';
 
 interface BackgroundLayoutProps {
   children: React.ReactNode;
   className?: string;
 }
 
-// 1. NUEVO ICONO DE MANCUERNA (Estilo Outline/Líneas)
-const DumbbellIcon = ({ style }: { style: React.CSSProperties }) => (
-  <div style={style} className="text-white/50"> 
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="1.5"
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-      width="100%" 
-      height="100%"
-    >
-      {/* Barra central */}
-      <rect x="7" y="11" width="10" height="2" rx="0.5" />
+import PelotaFutbol from '../assets/PelotaFutbol.svg';
 
-      {/* 1. Discos GRANDES (Los más cercanos al centro) */}
-      <rect x="5" y="6" width="2" height="12" rx="1" />
-      <rect x="17" y="6" width="2" height="12" rx="1" />
-
-      {/* 2. Discos MEDIANOS */}
-      <rect x="3" y="7.5" width="2" height="9" rx="0.5" />
-      <rect x="19" y="7.5" width="2" height="9" rx="0.5" />
-
-      {/* 3. Discos PEQUEÑOS (Los de los extremos) */}
-      <rect x="1" y="9" width="2" height="6" rx="0.5" />
-      <rect x="21" y="9" width="2" height="6" rx="0.5" />
-    </svg>
+// 1. NUEVO ICONO DE PELOTA DE FUTBOL
+const SoccerBallIcon = ({ style }: { style: React.CSSProperties }) => (
+  <div style={style} className="opacity-30"> 
+    <img src={PelotaFutbol} alt="Pelota Fondo" className="w-full h-full" />
   </div>
 );
 
 export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, className = "" }) => {
-  // --- NUEVO ESTADO PARA CANTIDAD DE MANCUERNAS ---
+  // --- NUEVO ESTADO PARA CANTIDAD DE PELOTAS ---
   // Inicializamos en 4 (mobile first) por si acaso
   const [dumbbellCount, setDumbbellCount] = useState(4);
 
@@ -47,9 +24,9 @@ export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, cl
     const checkScreenSize = () => {
       // 768px es el breakpoint estándar entre celular y tablet/escritorio
       if (window.innerWidth < 768) {
-        setDumbbellCount(4); // Celulares: 4 mancuernas para no dar lag
+        setDumbbellCount(4); // Celulares: 4 pelotas para no dar lag
       } else {
-        setDumbbellCount(8); // Escritorio: 8 mancuernas
+        setDumbbellCount(8); // Escritorio: 8 pelotas
       }
     };
 
@@ -74,15 +51,15 @@ export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, cl
         <div style={styles.auroraEast}></div>
         <div style={styles.auroraWest}></div>
         
-        {/* 2. MANCUERNAS PARPADEANTES DINÁMICAS */}
+        {/* 2. PELOTAS PARPADEANTES DINÁMICAS */}
         <div style={styles.starsContainer}>
           {/* USAMOS LA VARIABLE dumbbellCount EN LUGAR DE UN NÚMERO FIJO */}
           {[...Array(dumbbellCount)].map((_, i) => { 
-            const randomSize = 20 + Math.random() * 25; 
+            const randomSize = 80 + Math.random() * 80;
             const randomRotation = Math.random() * 360;
             
             return (
-              <DumbbellIcon 
+              <SoccerBallIcon 
                 key={i} 
                 style={{
                   ...styles.star,

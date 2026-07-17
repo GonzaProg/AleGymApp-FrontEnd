@@ -1,4 +1,5 @@
 import { Dumbbell, Medal, User } from "lucide-react";
+import PelotaFutbol from "../../assets/PelotaFutbol.svg";
 
 interface MobileNavbarProps {
   activeTab: number;
@@ -14,7 +15,21 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 w-full bg-gray-900/95 backdrop-blur-md border-t border-white/10 px-6 z-50 flex justify-around items-center pt-2 pb-safe min-h-[5rem] shadow-2xl">
+    <div 
+      className="fixed bottom-0 left-0 w-full backdrop-blur-md border-t border-white/10 px-6 z-50 flex justify-around items-center pt-2 pb-safe min-h-[5rem] shadow-[0_-5px_20px_rgba(0,0,0,0.5)] overflow-hidden"
+      style={{
+        backgroundColor: '#125212', // Oscurecido para resaltar iconos blancos
+        backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.2) 15px, rgba(255,255,255,0.2) 18px), repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(255,255,255,0.2) 15px, rgba(255,255,255,0.2) 18px)`
+      }}
+    >
+      {/* Pelota Izquierda */}
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-24 h-24 pointer-events-none opacity-90 z-0">
+        <img src={PelotaFutbol} alt="Pelota" className="w-full h-full drop-shadow-lg" />
+      </div>
+      {/* Pelota Derecha */}
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-24 h-24 pointer-events-none opacity-90 z-0">
+        <img src={PelotaFutbol} alt="Pelota" className="w-full h-full drop-shadow-lg" />
+      </div>
       {navItems.map((item) => {
         const isActive = activeTab === item.index;
         const IconComponent = item.Icon;
@@ -23,8 +38,8 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
           <button
             key={item.index}
             onClick={() => setActiveTab(item.index)}
-            className={`flex flex-col items-center gap-1 transition-all duration-300 relative pb-2 ${
-              isActive ? "text-white scale-110" : "text-gray-500 hover:text-gray-300"
+            className={`flex flex-col items-center gap-1 transition-all duration-300 relative pb-2 z-10 ${
+              isActive ? "text-white scale-110 drop-shadow-xl font-black" : "text-white/70 hover:text-white drop-shadow-sm font-bold"
             }`}
           >
             {/* Contenedor del icono con animación de rebote al activar */}
@@ -32,7 +47,7 @@ export const MobileNavbar = ({ activeTab, setActiveTab }: MobileNavbarProps) => 
               <IconComponent isActive={isActive} />
             </div>
             
-            <span className={`text-[10px] font-bold tracking-wide uppercase transition-colors ${isActive ? "text-white" : "text-gray-500"}`}>
+            <span className={`text-[10px] tracking-wide uppercase transition-colors ${isActive ? "text-white font-black" : "text-white/70 font-bold"}`}>
               {item.label}
             </span>
 

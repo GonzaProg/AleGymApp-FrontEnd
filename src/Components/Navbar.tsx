@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
 import { AppStyles } from "../Styles/AppStyles";
 import { Bell, BellOff } from "lucide-react";
+import CopaMundial from "../assets/CopaMundial.svg";
+
 export const Navbar = () => {
   const navigate = useNavigate();
   const { notificaciones, unreadCount, markAsRead, refresh } = useNotificaciones();
@@ -31,15 +33,26 @@ export const Navbar = () => {
 
   return (
     <>
-    <nav className="fixed w-full z-50 top-0 start-0 bg-gradient-to-b from-gray-900 via-gray-900/90 to-transparent pt-safe pb-8 transition-all">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
+    <nav className="fixed w-full z-50 top-0 start-0 pt-safe pb-2 transition-all shadow-lg border-b-4 border-yellow-500" style={{ colorScheme: 'light' }}>
+      {/* Usamos un <img> de fondo porque los WebViews de Android ignoran las etiquetas <img> en su algoritmo de Inversión de Modo Oscuro */}
+      <img 
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 100' preserveAspectRatio='none'%3E%3Crect width='1' height='20' fill='%2375AADB'/%3E%3Crect y='20' width='1' height='60' fill='%23ffffff'/%3E%3Crect y='80' width='1' height='20' fill='%2375AADB'/%3E%3C/svg%3E" 
+        className="absolute inset-0 w-full h-full object-cover z-0" 
+        alt=""
+      />
+      <div className="max-w-screen-xl flex items-center justify-between mx-auto px-4 h-16 relative z-10">
         
+        {/* --- TROFEO CENTRAL --- */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none mt-3">
+          <img src={CopaMundial} alt="Copa Mundial" className="w-[140px] h-[140px] drop-shadow-md" />
+        </div>
+
         {/* --- IZQUIERDA: LOGO MIXTO (TEXTO + IMAGEN) --- */}
         <div 
             onClick={() => navigate("/home")} 
             className="flex items-center cursor-pointer group z-20"
         >
-            <span className="self-center text-2xl font-bold whitespace-nowrap">
+            <span className="self-center text-2xl font-black whitespace-nowrap drop-shadow-md">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#0071BC]">Gym</span>
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF8C00] to-[#d3932b]">Mate</span>
             </span>
@@ -50,9 +63,9 @@ export const Navbar = () => {
           <div className="relative" ref={dropdownRef}>
             <button 
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="relative p-2 text-gray-300 hover:text-white transition-colors hover:bg-white/10 rounded-full focus:outline-none"
+                className="relative p-2 transition-colors hover:bg-black/5 rounded-full focus:outline-none"
             >
-                <Bell className="w-6 h-6" />
+                <Bell className="w-7 h-7 text-[#EAB308] drop-shadow-md" />
                 {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full animate-pulse shadow-red-500/50 shadow-lg">
                         {unreadCount}

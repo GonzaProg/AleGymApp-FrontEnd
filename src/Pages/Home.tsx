@@ -19,6 +19,8 @@ import { BackgroundLayout } from "../Components/BackgroundLayout";
 import { Navbar } from "../Components/Navbar";
 import { StatsGrid } from "../Components/Dashboard/StatsGrid";
 import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary";
+import CopaMundial from "../assets/CopaMundial.svg";
+import PelotaFutbol from "../assets/PelotaFutbol.svg";
 
 // IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
@@ -149,16 +151,18 @@ export const Home = () => {
   if (isEntrenador || isAdmin) {
     const AdminDashboardWelcome = () => (
         <div className="animate-fade-in-up space-y-6 mt-20">
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-            <h2 className="text-3xl font-bold text-white relative z-10">
-              Hola, <span className="text-green-400">{currentUser?.nombre}</span> 👋
+          <div className="bg-[linear-gradient(to_bottom,#75AADB_33.3%,#FFFFFF_33.3%,#FFFFFF_66.6%,#75AADB_66.6%)] p-8 rounded-3xl border-4 border-yellow-500 shadow-2xl relative overflow-hidden flex flex-col justify-center">
+            
+            {/* Trofeo */}
+            <div className="absolute top-1/2 right-10 -translate-y-1/2 pointer-events-none">
+              <img src={CopaMundial} alt="Copa Mundial" className="w-48 h-48 drop-shadow-2xl" />
+            </div>
+
+            <h2 className="text-4xl font-black text-gray-900 relative z-10 drop-shadow-md">
+              Hola, <span className="text-[#00AEEF] drop-shadow-md">{currentUser?.nombre}</span> 👋
             </h2>
-            <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
-              Aquí tienes un resumen de la actividad del gimnasio.
-            </p>
-            <p className="text-gray-400 mt-2 relative z-10 max-w-lg">
-              Todo parece estar en orden 😎
+            <p className="text-gray-800 font-bold mt-2 relative z-10 max-w-lg text-lg bg-white/60 px-4 py-1 rounded-full w-fit">
+              ¡Vamos Argentina!
             </p>
           </div>
           {metrics && <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />}
@@ -207,8 +211,22 @@ export const Home = () => {
       <BackgroundLayout>
         <div className="flex h-screen overflow-hidden font-sans">
           <WhatsAppModal />
-          <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
-            <div className="flex-1 overflow-hidden flex flex-col">
+          <aside 
+            className="w-64 border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300 relative overflow-hidden"
+            style={{
+              backgroundColor: '#125212',
+              backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.2) 15px, rgba(255,255,255,0.2) 18px), repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(255,255,255,0.2) 15px, rgba(255,255,255,0.2) 18px)`
+            }}
+          >
+            {/* Pelota Izquierda (en este caso arriba y abajo) */}
+            <div className="absolute -left-8 top-1/4 w-32 h-32 pointer-events-none opacity-80 z-0">
+                <img src={PelotaFutbol} alt="Pelota" className="w-full h-full drop-shadow-lg" />
+            </div>
+            <div className="absolute -right-8 bottom-1/4 w-32 h-32 pointer-events-none opacity-80 z-0">
+                <img src={PelotaFutbol} alt="Pelota" className="w-full h-full drop-shadow-lg" />
+            </div>
+            
+            <div className="flex-1 overflow-hidden flex flex-col relative z-10 bg-black/50">
               <div className="h-20 flex items-center px-6 border-b border-white/5 cursor-pointer shrink-0 group" onClick={() => handleSidebarClick("Inicio")}>
                 <span className="text-2xl font-bold">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#0071BC]">Gym</span>
@@ -235,7 +253,7 @@ export const Home = () => {
                 
                 {isAsistenciaHabilitada && (
                     <>
-                        <p className="px-4 text-xs font-bold text-purple-500 uppercase tracking-wider mb-2 mt-4">Recepción</p>
+                        <p className="px-4 text-xs text-white font-bold uppercase tracking-wider mb-2 mt-4">Recepción</p>
                         <SidebarItem 
                             icon={Icons.asistencia} 
                             label="Asistencia Manual" 
@@ -252,32 +270,32 @@ export const Home = () => {
                 <SidebarItem icon={Icons.renovar} label="Renovar Mensualidad" active={activeTab === "Renovar"} onClick={() => handleSidebarClick("Renovar")} />
                 <SidebarItem icon={Icons.usuarios} label="Gestionar Usuarios" active={activeTab === "Gestionar Usuarios"} onClick={() => handleSidebarClick("Gestionar Usuarios")} />
                 
-                <p className="px-4 text-xs font-bold text-purple-500 uppercase tracking-wider mb-2 mt-4">Rutinas</p>
+                <p className="px-4 text-xs text-white font-bold uppercase tracking-wider mb-2 mt-4">Rutinas</p>
                 <SidebarItem icon={Icons.crearRutinaGeneral} label="Rutinas Generales" active={activeTab === "Rutinas Generales"} onClick={() => handleSidebarClick("Rutinas Generales")} />
                 <SidebarItem icon={Icons.rutinasUsuarios} label="Rutinas Usuarios" active={activeTab === "Rutinas Usuarios"} onClick={() => handleSidebarClick("Rutinas Usuarios")} />
                 <SidebarItem icon={Icons.ejercicios} label="Ejercicios" active={activeTab === "Ejercicios" || activeTab === "Crear Ejercicio"} onClick={() => handleSidebarClick("Ejercicios")} />
                 
-                <p className="px-4 text-xs font-bold text-purple-500 uppercase tracking-wider mb-2 mt-4">Finanzas</p>
+                <p className="px-4 text-xs text-white font-bold uppercase tracking-wider mb-2 mt-4">Finanzas</p>
                 <SidebarItem icon={Icons.finanzas} label="Finanzas" active={activeTab === "Finanzas"} onClick={() => handleSidebarClick("Finanzas")} />
                 <SidebarItem icon={Icons.gastos} label="Control de Gastos" active={activeTab === "Control de Gastos"} onClick={() => handleSidebarClick("Control de Gastos")} />
                 <SidebarItem icon={Icons.usuarios} label="Empleados" active={activeTab === "Empleados"} onClick={() => handleSidebarClick("Empleados")} />
 
-                <p className="px-4 text-xs font-bold text-purple-500 uppercase tracking-wider mb-2 mt-4">Tienda</p>
+                <p className="px-4 text-xs text-white font-bold uppercase tracking-wider mb-2 mt-4">Tienda</p>
                 <SidebarItem icon={Icons.tienda} label="Productos" active={activeTab === "Productos"} onClick={() => handleSidebarClick("Productos")} />
                 
-                <p className="px-4 text-xs font-bold text-purple-500 uppercase tracking-wider mb-2 mt-6">Social</p>
+                <p className="px-4 text-xs text-white font-bold uppercase tracking-wider mb-2 mt-6">Social</p>
                 <SidebarItem icon={Icons.notificaciones} label="Notificaciones" active={activeTab === "Notificaciones"} onClick={() => handleSidebarClick("Notificaciones")} />
                 <SidebarItem icon={Icons.enviarPDF} label="Enviar Rutina PDF" active={activeTab === "Enviar PDF"} onClick={() => handleSidebarClick("Enviar PDF")} />
                 <SidebarItem icon={Icons.reciboManual} label="Enviar Recibo Manualmente" active={activeTab === "Enviar Recibo Manualmente"} onClick={() => handleSidebarClick("Enviar Recibo Manualmente")} />
                 <SidebarItem icon={Icons.nuevoUsuario} label="Nuevo Usuario" active={activeTab === "Nuevo Usuario"} onClick={() => handleSidebarClick("Nuevo Usuario")} />
                 
-                <p className="px-4 text-xs font-bold text-purple-500 uppercase tracking-wider mb-2 mt-6">Sistema</p>
+                <p className="px-4 text-xs text-white font-bold uppercase tracking-wider mb-2 mt-6">Sistema</p>
                 <SidebarItem icon={Icons.preferencias} label="Preferencias" active={activeTab === "Preferencias"} onClick={() => handleSidebarClick("Preferencias")} />
                 <SidebarItem icon={Icons.perfil} label="Mi Perfil" active={activeTab === "Perfil"} onClick={() => handleSidebarClick("Perfil")} />
                 
                 {isAdmin && (
                   <>
-                    <p className="px-4 text-xs font-bold text-purple-500 uppercase tracking-wider mb-2 mt-6">Administración</p>
+                    <p className="px-4 text-xs text-white font-bold uppercase tracking-wider mb-2 mt-6">Administración</p>
                     <SidebarItem icon={Icons.frases} label="Frases" active={activeTab === "Frases"} onClick={() => handleSidebarClick("Frases")} />
                     <SidebarItem icon={Icons.nuevoGym} label="Nuevo Gimnasio" active={activeTab === "Nuevo Gimnasio"} onClick={() => handleSidebarClick("Nuevo Gimnasio")} />
                     <SidebarItem icon={Icons.gestionGyms} label="Gestión Gimnasios" active={activeTab === "Gestión Gimnasios"} onClick={() => handleSidebarClick("Gestión Gimnasios")} />
@@ -285,7 +303,7 @@ export const Home = () => {
                 )}
               </nav>
             </div>
-            <div className="shrink-0 bg-[#1a1225]">
+            <div className="shrink-0 bg-black/70 relative z-10">
               <WhatsAppStatus />
               <div className="p-4">
                 <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
@@ -363,9 +381,9 @@ export const Home = () => {
 // SidebarItem ahora recibe hasAlert para mostrar la luz roja
 const SidebarItem = ({ icon, label, active, onClick, hasAlert }: { icon: React.ReactNode, label: string, active: boolean, onClick: () => void, hasAlert?: boolean }) => {
   return (
-    <div onClick={onClick} className={`relative flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
-      <span className={`text-xl group-hover:scale-110 transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
-      <span className="font-medium text-sm">{label}</span>
+    <div onClick={onClick} className={`relative flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group font-bold ${active ? 'bg-white/20 text-white border-r-4 border-white scale-105 shadow-md' : 'text-white/70 hover:bg-white/20 hover:text-white'}`}>
+      <span className={`text-xl group-hover:scale-110 transition-transform ${active ? 'scale-110 text-white' : ''}`}>{icon}</span>
+      <span className="font-bold text-sm">{label}</span>
       
       {/* LA LUCECITA ROJA PARPADEANTE */}
       {hasAlert && (
