@@ -1,6 +1,7 @@
 import type { EmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
 import { AppStyles } from "../../Styles/AppStyles";
 import { usePagoEmpleadoForm } from "../../Hooks/Empleados/usePagoEmpleadoForm";
+import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
 
 interface Props {
     empleado: EmpleadoDTO;
@@ -77,16 +78,11 @@ export const PagoEmpleadoForm = ({ empleado, onBack, onSuccess, gymId }: Props) 
                     </div>
 
                     <div>
-                        <label className={AppStyles.label}>Método de Pago *</label>
-                        <select 
-                            value={metodoPago}
-                            onChange={(e) => setMetodoPago(e.target.value)}
-                            className={`${AppStyles.inputDark} ${AppStyles.darkBackgroundSelect}`}
-                            required
-                        >
-                            <option value="Efectivo">Efectivo</option>
-                            <option value="Transferencia">Transferencia</option>
-                        </select>
+                        <PaymentMethodSelect 
+                            value={metodoPago} 
+                            onChange={setMetodoPago} 
+                            label="Método de Pago *"
+                        />
                     </div>
 
                     <div className="flex gap-4 pt-4 border-t border-white/10 mt-6">

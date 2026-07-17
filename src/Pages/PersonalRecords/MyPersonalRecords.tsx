@@ -1,28 +1,31 @@
-import { useState } from "react"; 
+import { useState, useMemo } from "react"; 
 import { createPortal } from "react-dom";
 import { AppStyles } from "../../Styles/AppStyles";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { usePersonalRecords } from "../../Hooks/PersonalRecords/usePersonalRecords";
 import { VideoEjercicio } from "../../Components/VideoEjercicios/VideoEjercicio"; 
+import { CustomSelect } from "../../Components/UI/CustomSelect";
 import { Info, ChevronDown, Trophy, Pencil, Plus, Search, Video, Play, Dumbbell, ArrowUp, ArrowDown, Trash2, X } from "lucide-react";
 
 export const MyPersonalRecords = () => {
     const {
         prs, ejercicios, busqueda, loading,
         ejercicioId: _ejercicioId, peso, videoPreview, editandoId, fileInputRef, videoSeleccionado,
-        isFormOpen, ejercicioSearch, showDropdown, 
+        isFormOpen, 
         isSaveDisabled, esDuplicado, prExistente,
         setBusqueda, setEjercicioId, setPeso, setVideoSeleccionado, setIsFormOpen,
-        setEjercicioSearch, setShowDropdown,
         handleFileChange, handleSave, handleEdit, handleDelete, resetForm
     } = usePersonalRecords();
 
     // Estado local para el nuevo acordeón de información
     const [isInfoOpen, setIsInfoOpen] = useState(false);
 
-    const ejerciciosFiltrados = ejercicios.filter(ej => 
-        ej.nombre.toLowerCase().includes(ejercicioSearch.toLowerCase())
-    );
+    const ejercicioOptions = useMemo(() => {
+        return ejercicios.map(ej => ({
+            value: ej.id.toString(),
+            label: ej.nombre
+        }));
+    }, [ejercicios]);
 
     return (
         <div className="mt-6 p-2 animate-fade-in pb-24 space-y-6 max-w-lg mx-auto relative">
@@ -81,53 +84,15 @@ export const MyPersonalRecords = () => {
                         
                         {!editandoId && (
                             <div className="relative">
-                                {/* OVERLAY INVISIBLE PARA MÓVILES (Permite scrollear la lista y cierra al tocar afuera) */}
-                                {showDropdown && (
-                                    <div 
-                                        className="fixed inset-0 z-[90]" 
-                                        onClick={() => setShowDropdown(false)}
-                                    />
-                                )}
-
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-[101]" />
-                                    <input 
-                                        type="text" 
-                                        placeholder="Buscar y seleccionar ejercicio..." 
-                                        value={ejercicioSearch}
-                                        onFocus={() => setShowDropdown(true)}
-                                        // ⚠️ ELIMINAMOS EL onBlur QUE ROMPÍA EL SCROLL EN CELULARES
-                                        onChange={(e) => {
-                                            setEjercicioSearch(e.target.value);
-                                            setShowDropdown(true);
-                                            setEjercicioId(""); 
-                                        }}
-                                        // Le damos z-index mayor al input para que quede por encima del overlay invisible
-                                        className={AppStyles.inputDark + " pl-10 relative z-[100]"}
-                                    />
-                                </div>
+                                <CustomSelect 
+                                    options={ejercicioOptions}
+                                    value={_ejercicioId}
+                                    onChange={(val) => setEjercicioId(val)}
+                                    placeholder="Buscar y seleccionar ejercicio..."
+                                    searchable={true}
+                                    icon={<Search className="w-4 h-4" />}
+                                />
                                 
-                                {showDropdown && (
-                                    <div className="absolute z-[100] w-full mt-2 max-h-52 overflow-y-auto bg-gray-950 border border-white/20 rounded-xl shadow-2xl touch-pan-y">
-                                        {ejerciciosFiltrados.length > 0 ? (
-                                            ejerciciosFiltrados.map(ej => (
-                                                <div 
-                                                    key={ej.id} 
-                                                    onClick={() => {
-                                                        setEjercicioId(ej.id.toString());
-                                                        setEjercicioSearch(ej.nombre);
-                                                        setShowDropdown(false);
-                                                    }}
-                                                    className="p-4 active:bg-green-500/40 hover:bg-green-500/20 text-white border-b border-white/5 last:border-0 cursor-pointer"
-                                                >
-                                                    {ej.nombre}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="p-4 text-gray-500 text-sm text-center italic">No se encontró el ejercicio</div>
-                                        )}
-                                    </div>
-                                )}
 
                                 {/* ALERTA DE DUPLICIDAD */}
                                 {esDuplicado && prExistente && (

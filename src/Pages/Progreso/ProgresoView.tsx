@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { MyPersonalRecords } from "../PersonalRecords/MyPersonalRecords";
 import { EvolucionCorporal } from "../Evoluciones/EvolucionCorporal";
+import { ActividadCardioView } from "./ActividadCardioView";
 
 export const ProgresoView = ({ currentUser }: { currentUser: any }) => {
-    const [tab, setTab] = useState<'prs' | 'cuerpo'>('prs');
+    const [tab, setTab] = useState<'cardio' | 'prs' | 'cuerpo'>('cardio');
 
     return (
         <div className="pt-safe mt-24 px-4 pb-32 max-w-2xl mx-auto h-full flex flex-col">
@@ -14,9 +15,17 @@ export const ProgresoView = ({ currentUser }: { currentUser: any }) => {
                 <div className="bg-gray-900/80 p-1 rounded-xl flex items-center border border-white/5 relative">
                     {/* Fondo animado */}
                     <div 
-                        className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-green-500 rounded-lg shadow-lg transition-transform duration-300 ease-out ${tab === 'cuerpo' ? 'translate-x-[100%]' : 'translate-x-0'}`}
+                        className={`absolute top-1 bottom-1 w-[calc(33.33%-4px)] bg-green-500 rounded-lg shadow-lg transition-transform duration-300 ease-out ${
+                            tab === 'cardio' ? 'translate-x-0' : tab === 'prs' ? 'translate-x-[100%]' : 'translate-x-[200%]'
+                        }`}
                     ></div>
 
+                    <button 
+                        onClick={() => setTab('cardio')}
+                        className={`flex-1 py-2.5 text-sm font-bold z-10 transition-colors duration-300 ${tab === 'cardio' ? 'text-gray-950' : 'text-gray-400'}`}
+                    >
+                        Actividad Física
+                    </button>
                     <button 
                         onClick={() => setTab('prs')}
                         className={`flex-1 py-2.5 text-sm font-bold z-10 transition-colors duration-300 ${tab === 'prs' ? 'text-gray-950' : 'text-gray-400'}`}
@@ -34,7 +43,9 @@ export const ProgresoView = ({ currentUser }: { currentUser: any }) => {
 
             {/* CONTENIDO DINÁMICO */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-                {tab === 'prs' ? (
+                {tab === 'cardio' ? (
+                    <ActividadCardioView />
+                ) : tab === 'prs' ? (
                     <MyPersonalRecords />
                 ) : (
                     <EvolucionCorporal currentUser={currentUser} />

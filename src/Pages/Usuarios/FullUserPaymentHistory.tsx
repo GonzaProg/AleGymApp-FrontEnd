@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { PagosApi, type PagoDTO } from "../../API/Pagos/PagosApi";
-import { ArrowLeft, CalendarDays, Clock, ShoppingBag } from "lucide-react";
+import { CalendarDays, Clock, ShoppingBag, ArrowLeft, Filter } from "lucide-react";
 import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
+import { CustomSelect } from "../../Components/UI/CustomSelect";
 
 export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBack: () => void }) => {
     const currentYear = new Date().getFullYear();
@@ -86,17 +87,14 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
                     </div>
                     
                     {/* Selector de Año */}
-                    <div className="flex flex-col items-start md:items-end mt-4 md:mt-0">
+                    <div className="flex flex-col items-start md:items-end mt-4 md:mt-0 w-32">
                         <label className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Filtrar por Año</label>
-                        <select 
-                            value={selectedYear} 
-                            onChange={(e) => setSelectedYear(Number(e.target.value))}
-                            className="bg-black/40 border border-white/10 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 outline-none font-medium"
-                        >
-                            {availableYears.map(y => (
-                                <option key={y} value={y}>{y}</option>
-                            ))}
-                        </select>
+                        <CustomSelect 
+                            options={availableYears.map(y => ({ value: y.toString(), label: y.toString() }))}
+                            value={selectedYear.toString()}
+                            onChange={(val) => setSelectedYear(Number(val))}
+                            icon={<Filter className="w-4 h-4" />}
+                        />
                     </div>
                 </div>
 
