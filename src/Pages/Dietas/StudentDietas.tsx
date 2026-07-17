@@ -5,6 +5,7 @@ import { Flame, Beef, Droplet, Wheat, Plus, ArrowLeft, ChevronLeft, ChevronRight
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
+import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const StudentDietas = () => {
     const { 
@@ -65,17 +66,17 @@ export const StudentDietas = () => {
     }, [historial, weekOffset, selectedDayHist, diasSemana]);
 
     const handleSaveComida = async () => {
-        if (!addDescripcion.trim()) return alert("Agrega una descripción");
+        if (!addDescripcion.trim()) return showError("Agrega una descripción");
         if (
             (addCals !== '' && addCals < 0) ||
             (addProts !== '' && addProts < 0) ||
             (addCarbs !== '' && addCarbs < 0) ||
             (addGrasas !== '' && addGrasas < 0)
         ) {
-            return alert("No se pueden ingresar valores negativos en los macros.");
+            return showError("No se pueden ingresar valores negativos en los macros.");
         }
         
-        await registrarComida({
+        const success = await registrarComida({
             tipo: addTipo,
             descripcion: addDescripcion,
             calorias: addCals || 0,
@@ -84,9 +85,11 @@ export const StudentDietas = () => {
             grasas: addGrasas || 0
         });
         
-        setShowAddModal(false);
-        // Reset form
-        setAddDescripcion(""); setAddCals(""); setAddProts(""); setAddCarbs(""); setAddGrasas("");
+        if (success) {
+            showSuccess("Comida guardada");
+            setShowAddModal(false);
+            setAddDescripcion(""); setAddCals(""); setAddProts(""); setAddCarbs(""); setAddGrasas("");
+        }
     };
 
     if (loadingDietas && !registroHoy) {
@@ -229,7 +232,11 @@ export const StudentDietas = () => {
                         </button>
                     </div>
 
-                    <div className="flex gap-2 overflow-x-auto scrollbar-none py-2 border-b border-white/5 mb-4">
+                    <div 
+                        className="flex gap-2 overflow-x-auto scrollbar-none py-2 border-b border-white/5 mb-4"
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
+                    >
                         {diasSemana.map(dia => (
                             <button
                                 key={dia}

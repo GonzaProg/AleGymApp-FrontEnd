@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DietaApi } from '../../API/Dietas/DietaApi';
 import { useAuthUser } from '../Auth/useAuthUser';
+import { showError } from '../../Helpers/Alerts';
 
 export const useStudentDietas = () => {
     const { currentUser: user } = useAuthUser();
@@ -41,8 +42,11 @@ export const useStudentDietas = () => {
         try {
             await DietaApi.agregarComidaConsumida(comidaData, 0);
             await cargarDatos(); // Recargar para actualizar los totales
+            return true;
         } catch (error) {
             console.error(error);
+            showError("No se pudo registrar la comida");
+            return false;
         } finally {
             setLoadingDietas(false);
         }
@@ -53,8 +57,11 @@ export const useStudentDietas = () => {
         try {
             await DietaApi.agregarComidaConsumida(null, litros);
             await cargarDatos(); // Recargar para actualizar los totales
+            return true;
         } catch (error) {
             console.error(error);
+            showError("No se pudo registrar el agua");
+            return false;
         } finally {
             setLoadingDietas(false);
         }
@@ -65,8 +72,11 @@ export const useStudentDietas = () => {
         try {
             await DietaApi.eliminarComidaConsumida(comidaId);
             await cargarDatos();
+            return true;
         } catch (error) {
             console.error(error);
+            showError("No se pudo eliminar la comida");
+            return false;
         } finally {
             setLoadingDietas(false);
         }
