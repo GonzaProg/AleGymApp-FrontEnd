@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { PagosApi, type MatrizAnualDTO } from "../../API/Pagos/PagosApi";
 import { ArrowLeft, Table, Calendar } from "lucide-react";
+import { CustomSelect } from "../../Components/UI/CustomSelect";
 
 interface YearlyPaymentMatrixProps {
     onBack: () => void;
@@ -44,8 +45,12 @@ export const YearlyPaymentMatrix = ({ onBack, onSelectUserForHistory }: YearlyPa
     return (
         <div className="w-full max-w-[95%] mx-auto space-y-6 animate-fade-in">
             {/* Header */}
-            <div className="bg-gray-800/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+            <div className="bg-gray-800/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative">
+                
+                {/* Contenedor absoluto solo para la decoración para que no desborde las esquinas, sin cortar los selects */}
+                <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+                </div>
                 
                 <div className="flex items-center gap-4">
                     <button 
@@ -63,17 +68,14 @@ export const YearlyPaymentMatrix = ({ onBack, onSelectUserForHistory }: YearlyPa
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 bg-black/30 p-2 rounded-2xl border border-white/5">
-                    <Calendar className="text-gray-500 ml-2" size={18} />
-                    <select 
-                        value={year}
-                        onChange={(e) => setYear(Number(e.target.value))}
-                        className="bg-transparent text-white border-none focus:ring-0 font-bold pr-8"
-                    >
-                        {availableYears.map(y => (
-                            <option key={y} value={y} className="bg-gray-900">{y}</option>
-                        ))}
-                    </select>
+                <div className="w-32 z-20">
+                    <CustomSelect 
+                        options={availableYears.map(y => ({ value: y.toString(), label: y.toString() }))}
+                        value={year.toString()}
+                        onChange={(val) => setYear(Number(val))}
+                        icon={<Calendar className="w-4 h-4" />}
+                        className="w-full"
+                    />
                 </div>
             </div>
 

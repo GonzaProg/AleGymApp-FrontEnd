@@ -91,7 +91,7 @@ export const RenewPlan = () => {
                 onBack={() => setMostrarHistorial(false)}
               />
             ) : (
-            <div className={`${AppStyles.glassCard} animate-fade-in`}>
+            <div className={`${AppStyles.glassCard.replace("overflow-hidden", "")} animate-fade-in`}>
               
               {/* Encabezado del Alumno */}
               <div className="flex flex-col md:flex-row justify-between items-center border-b border-white/10 pb-6 mb-6">
@@ -144,8 +144,8 @@ export const RenewPlan = () => {
 
                   {alumnoSeleccionado.userPlans && alumnoSeleccionado.userPlans.some((p: any) => p.activo) ? (
                       <div className="grid grid-cols-1 gap-4">
-                          {alumnoSeleccionado.userPlans.filter((p: any) => p.activo).map((sus: any) => (
-                              <div key={sus.id} className="bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col lg:flex-row justify-between items-center gap-4 hover:border-white/20 transition-all">
+                          {alumnoSeleccionado.userPlans.filter((p: any) => p.activo).map((sus: any, index: number) => (
+                              <div key={sus.id} className="bg-gray-800/50 border border-white/10 rounded-xl p-4 flex flex-col lg:flex-row justify-between items-center gap-4 hover:border-white/20 transition-all relative" style={{ zIndex: 50 - index }}>
                                   
                                   {/* Info Plan */}
                                   <div className="flex-1 text-left w-full">
