@@ -5,8 +5,9 @@ import { Card } from "../../Components/UI/Card";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { usePlans } from "../../Hooks/Planes/usePlans";
+import { CustomSelect } from "../../Components/UI/CustomSelect";
 import { PaymentMethodSelect } from "../../Components/UI/PaymentMethodSelect";
-import { Edit2, Calendar, Dumbbell, UserPlus } from "lucide-react";
+import { Edit2, Calendar, Dumbbell, UserPlus, Filter, Tag } from "lucide-react";
 
 export const PlansManager = () => {
   const { 
@@ -51,15 +52,18 @@ export const PlansManager = () => {
               {/* Buscador por tipo */}
               <div className="flex items-center gap-2">
                 <label className="text-white text-sm font-medium">Filtrar por:</label>
-                <select 
-                  value={filtroTipo}
-                  onChange={(e) => setFiltroTipo(e.target.value as 'Gym' | 'Natacion' | 'Todos')}
-                  className={`${AppStyles.inputDark} appearance-none cursor-pointer max-w-36 min-w-32 text-center`}
-                >
-                  <option value="Gym" className={AppStyles.darkBackgroundSelect}>Gimnasio</option>
-                  <option value="Natacion" className={AppStyles.darkBackgroundSelect}>Natación</option>
-                  <option value="Todos" className={AppStyles.darkBackgroundSelect}>Todos</option>
-                </select>
+                <div className="w-40">
+                  <CustomSelect 
+                    options={[
+                      { value: "Gym", label: "Gimnasio" },
+                      { value: "Natacion", label: "Natación" },
+                      { value: "Todos", label: "Todos" }
+                    ]}
+                    value={filtroTipo}
+                    onChange={(val) => setFiltroTipo(val as 'Gym' | 'Natacion' | 'Todos')}
+                    icon={<Filter className="w-4 h-4" />}
+                  />
+                </div>
               </div>
             </div>
             
@@ -196,15 +200,15 @@ const PlanForm = ({ initialData, onSubmit, onCancel }: any) => {
                 </div>
                 <div>
                     <label className={AppStyles.label}>Categoría</label>
-                    <select 
-                        name="tipo" 
-                        value={form.tipo} 
-                        onChange={handleChange} 
-                        className={AppStyles.inputDark + " appearance-none cursor-pointer"}
-                    >
-                        <option value="Gym" className={AppStyles.darkBackgroundSelect}>Gimnasio / Musculación</option>
-                        <option value="Natacion" className={AppStyles.darkBackgroundSelect}>Natación</option>
-                    </select>
+                    <CustomSelect 
+                        options={[
+                            { value: "Gym", label: "Gimnasio / Musculación" },
+                            { value: "Natacion", label: "Natación" }
+                        ]}
+                        value={form.tipo}
+                        onChange={(val) => setForm({ ...form, tipo: val })}
+                        icon={<Tag className="w-4 h-4" />}
+                    />
                 </div>
             </div>
 

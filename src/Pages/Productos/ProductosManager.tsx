@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { useProductos } from "../../Hooks/Productos/useProductos";
-import { useAlumnoSearch } from "../../Hooks/useAlumnoSearch"; // Importamos tu hook de búsqueda
-import { useCarritoProductos } from "../../Hooks/Productos/useCarritoProductos"; // El hook nuevo
+import { useAlumnoSearch } from "../../Hooks/useAlumnoSearch"; 
+import { useCarritoProductos } from "../../Hooks/Productos/useCarritoProductos"; 
 import { AppStyles } from "../../Styles/AppStyles";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
@@ -20,7 +20,7 @@ export const ProductosManager = () => {
         handleSave, handleDelete,
         archivedProductos, handleRestore,
         editingProduct,
-        loadProductos // Necesitamos esto para refrescar el stock después de vender
+        loadProductos 
     } = useProductos();
 
     // 2. Hook de Búsqueda de Alumnos
@@ -51,7 +51,7 @@ export const ProductosManager = () => {
         <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-7xl mx-auto space-y-8 pb-20">
                 
-                {/* --- HEADER --- */}
+                {/*HEADER*/}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gray-900/50 p-6 rounded-2xl border border-white/5 backdrop-blur-sm">
                     <div>
                         <h1 className={`${AppStyles.title} flex items-center gap-3`}>Tienda & Stock <Store className="w-8 h-8 text-white" /></h1>
@@ -67,12 +67,12 @@ export const ProductosManager = () => {
                     </div>
                 </div>
 
-                {/* --- SECCIÓN PUNTO DE VENTA (CARRITO) --- */}
+                {/*SECCIÓN PUNTO DE VENTA (CARRITO)*/}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
                     {/* COLUMNA IZQ: BUSCADOR Y CARRITO */}
                     <div className="lg:col-span-3 space-y-6">
-                        <div className={`${AppStyles.glassCard} border-l-4 border-l-green-500`}>
+                        <div className={`${AppStyles.glassCard.replace("overflow-hidden", "")} border-l-4 border-l-green-500 relative z-50`}>
                             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                                 <Store className="w-6 h-6 text-white" /> Punto de Venta
                             </h3>
@@ -170,9 +170,7 @@ export const ProductosManager = () => {
                                                 <PaymentMethodSelect 
                                                     value={metodoPago}
                                                     onChange={setMetodoPago}
-                                                    // No pasamos 'label' para que se adapte al diseño horizontal
-                                                    // Ajustamos estilos para que quede alineado
-                                                    selectClassName="py-2 text-sm min-w-[160px]"
+                                                    className="min-w-[160px]"
                                                 />
                                             </div>
                                         </div>
@@ -202,7 +200,7 @@ export const ProductosManager = () => {
                     </div>
                 </div>
 
-                {/* --- GRID DE PRODUCTOS --- */}
+                {/*GRID DE PRODUCTOS*/}
                 <div className="pt-8 border-t border-white/10">
                     <h2 className="text-2xl font-bold text-white mb-6">Catálogo de Productos</h2>
                     
@@ -265,8 +263,7 @@ export const ProductosManager = () => {
                     )}
                 </div>
 
-                {/* --- MODALES (CREAR/EDITAR y PAPELERA) --- */}
-                {/* (Aquí va el mismo código de modales que ya tenías, no hace falta repetirlo si no cambió) */}
+                {/*MODALES (CREAR/EDITAR y PAPELERA)*/}
                 {/* ... Modal Crear/Editar ... */}
                 {isModalOpen && createPortal(
                     <div className={AppStyles.modalOverlay}>

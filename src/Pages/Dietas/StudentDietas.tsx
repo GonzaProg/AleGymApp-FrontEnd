@@ -136,7 +136,7 @@ export const StudentDietas = () => {
                         key={v}
                         onClick={() => setView(v as any)}
                         className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-colors ${
-                            view === v ? 'bg-orange-500 text-white' : 'bg-white/5 text-gray-400'
+                            view === v ? 'bg-orange-500 text-white' : 'bg-white/10 text-gray-400'
                         }`}
                     >
                         {v === 'HOY' ? 'Mi Día' : v === 'HISTORIAL' ? 'Historial' : 'Dieta Asignada'}
@@ -184,7 +184,7 @@ export const StudentDietas = () => {
                         ) : (
                             <div className="space-y-3">
                                 {registroHoy.comidasConsumidas.map((comida: any) => (
-                                    <div key={comida.id} className="bg-white/5 p-4 rounded-2xl border border-white/5 flex justify-between items-center relative overflow-hidden">
+                                    <div key={comida.id} className="bg-black/30 p-4 rounded-2xl border border-white/5 flex justify-between items-center relative overflow-hidden">
                                         <div className="z-10 relative flex-1">
                                             <span className="text-orange-400 text-xs font-bold uppercase tracking-wider">{comida.tipo}</span>
                                             <h4 className="font-bold text-white mt-1 whitespace-pre-line">{comida.descripcion}</h4>
@@ -211,7 +211,7 @@ export const StudentDietas = () => {
 
             {/* VISTA: HISTORIAL */}
             {view === 'HISTORIAL' && (
-                <div className="p-4 animate-fade-in space-y-4">
+                <div className="p-3 animate-fade-in space-y-4">
                     <div className="flex items-center justify-between bg-black/30 p-3 rounded-2xl border border-white/5">
                         <button 
                             disabled={weekOffset >= 3}
@@ -251,10 +251,10 @@ export const StudentDietas = () => {
                     </div>
 
                     {historialDiaSeleccionado.isEmpty ? (
-                        <p className="text-gray-500 text-center py-10 bg-white/5 rounded-2xl">No hay registros para este día.</p>
+                        <p className="text-gray-500 text-center py-10 bg-black/30 rounded-2xl">No hay registros para este día.</p>
                     ) : (
                         <div className="space-y-4">
-                            <div className="bg-white/5 rounded-2xl border border-white/5 p-4 transition-colors">
+                            <div className="bg-white/5 rounded-2xl border border-white/5 p-3 transition-colors">
                                 <div className="flex justify-between items-center mb-3">
                                     <h4 className="font-bold text-white flex items-center gap-2">
                                         {new Date(`${historialDiaSeleccionado.fecha}T12:00:00Z`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' })}
@@ -344,11 +344,11 @@ export const StudentDietas = () => {
                             <div>
                                 <h4 className="font-bold text-gray-300 mb-3 ml-1">Comidas Sugeridas para el {selectedDayPlan}</h4>
                                 {dietaAsignada.comidas?.filter((c: any) => (c.diaSemana || 'Lunes') === selectedDayPlan).length === 0 ? (
-                                    <p className="text-gray-500 text-center py-4 bg-white/5 rounded-2xl">No hay comidas sugeridas para este día.</p>
+                                    <p className="text-gray-500 text-center py-4 bg-black/30 rounded-2xl">No hay comidas sugeridas para este día.</p>
                                 ) : (
                                     <div className="space-y-3">
                                         {dietaAsignada.comidas?.filter((c: any) => (c.diaSemana || 'Lunes') === selectedDayPlan).map((c: any) => (
-                                            <div key={c.id} className="bg-white/5 border border-white/5 p-4 rounded-2xl animate-fade-in">
+                                            <div key={c.id} className="bg-black/30 border border-white/10 p-4 rounded-2xl animate-fade-in">
                                                 <span className="bg-orange-500/30 text-orange-400 text-xs px-2 py-1 rounded-md font-bold uppercase">{c.tipo}</span>
                                                 <p className="mt-3 text-white text-sm whitespace-pre-line">{c.alimentos}</p>
                                                 
@@ -383,17 +383,21 @@ export const StudentDietas = () => {
                         <div className="space-y-4 max-h-[70vh] overflow-y-auto scrollbar-none pb-4">
                             <div>
                                 <label className={AppStyles.label}>Momento del día</label>
-                                <Input value={addTipo} onChange={(e) => setAddTipo(e.target.value)} className={AppStyles.inputDark} list="tipos-comida-mobile" />
-                                <datalist id="tipos-comida-mobile">
-                                    <option value="Desayuno" />
-                                    <option value="Media mañana" />
-                                    <option value="Almuerzo" />
-                                    <option value="Media tarde" />
-                                    <option value="Merienda" />
-                                    <option value="Pre-Cena" />
-                                    <option value="Cena" />
-                                    <option value="Media noche" />
-                                </datalist>
+                                <select 
+                                    value={addTipo} 
+                                    onChange={(e) => setAddTipo(e.target.value)} 
+                                    className={AppStyles.inputDark}
+                                >
+                                    <option value="" disabled className="bg-gray-900 text-white">Seleccione un horario</option>
+                                    <option value="Desayuno" className="bg-gray-900 text-white">Desayuno</option>
+                                    <option value="Media mañana" className="bg-gray-900 text-white">Media mañana</option>
+                                    <option value="Almuerzo" className="bg-gray-900 text-white">Almuerzo</option>
+                                    <option value="Media tarde" className="bg-gray-900 text-white">Media tarde</option>
+                                    <option value="Merienda" className="bg-gray-900 text-white">Merienda</option>
+                                    <option value="Pre-Cena" className="bg-gray-900 text-white">Pre-Cena</option>
+                                    <option value="Cena" className="bg-gray-900 text-white">Cena</option>
+                                    <option value="Media noche" className="bg-gray-900 text-white">Media noche</option>
+                                </select>
                             </div>
                             <div>
                                 <label className={AppStyles.label}>¿Qué comiste?</label>
