@@ -7,6 +7,15 @@ import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { showError, showSuccess } from "../../Helpers/Alerts";
 
+const ORDEN_COMIDAS = ["Desayuno", "Media mañana", "Almuerzo", "Media tarde", "Merienda", "Pre-Cena", "Cena", "Media noche"];
+const sortComidasByTime = (a: any, b: any) => {
+    let indexA = ORDEN_COMIDAS.indexOf(a.tipo);
+    let indexB = ORDEN_COMIDAS.indexOf(b.tipo);
+    if (indexA === -1) indexA = 99;
+    if (indexB === -1) indexB = 99;
+    return indexA - indexB;
+};
+
 export const StudentDietas = () => {
     const { 
         dietaAsignada, 
@@ -183,7 +192,7 @@ export const StudentDietas = () => {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {registroHoy.comidasConsumidas.map((comida: any) => (
+                                {[...registroHoy.comidasConsumidas].sort(sortComidasByTime).map((comida: any) => (
                                     <div key={comida.id} className="bg-black/30 p-4 rounded-2xl border border-white/5 flex justify-between items-center relative overflow-hidden">
                                         <div className="z-10 relative flex-1">
                                             <span className="text-orange-400 text-xs font-bold uppercase tracking-wider">{comida.tipo}</span>
@@ -286,7 +295,7 @@ export const StudentDietas = () => {
                                 {historialDiaSeleccionado.comidasConsumidas && historialDiaSeleccionado.comidasConsumidas.length > 0 ? (
                                     <div className="pt-4 border-t border-white/10 space-y-3 animate-fade-in">
                                         <h5 className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Comidas registradas</h5>
-                                        {historialDiaSeleccionado.comidasConsumidas.map((comida: any) => (
+                                        {[...historialDiaSeleccionado.comidasConsumidas].sort(sortComidasByTime).map((comida: any) => (
                                             <div key={comida.id} className="bg-black/30 p-3 rounded-xl border border-white/5">
                                                 <span className="text-orange-400 text-[10px] font-bold uppercase tracking-wider">{comida.tipo}</span>
                                                 <h4 className="font-bold text-gray-200 mt-1 whitespace-pre-line text-sm">{comida.descripcion}</h4>
