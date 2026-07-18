@@ -14,6 +14,7 @@ import { SetupScreen } from "./Pages/Setup/SetupScreen";
 const Login = lazy(() => import("./Pages/Login/Login").then(module => ({ default: module.Login })));
 const Home = lazy(() => import("./Pages/Home").then(module => ({ default: module.Home })));
 const ForgotPassword = lazy(() => import("./Pages/Login/ForgotPassword").then(module => ({ default: module.ForgotPassword })));
+const StudentDietas = lazy(() => import("./Pages/Dietas/StudentDietas").then(module => ({ default: module.StudentDietas })));
 
 // Componente de carga simple y elegante
 const LoadingScreen = () => (
@@ -65,6 +66,12 @@ const AppContent = () => {
                 </ProtectedRoute>
             } />
             
+            <Route path="/dietas" element={
+                <ProtectedRoute>
+                    <StudentDietas />
+                </ProtectedRoute>
+            } />
+
             <Route path="/forgot-password" element={<ForgotPassword />} />
             
             {/* Si alguien intenta entrar a una ruta vieja, lo mandamos a home */}
