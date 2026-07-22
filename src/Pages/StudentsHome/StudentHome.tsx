@@ -10,8 +10,11 @@ import { useFraseMotivacional } from "../../Hooks/StudentsHome/useFraseMotivacio
 import { useGymCachedImages } from "../../Hooks/StudentsHome/useGymCachedImages";
 import { useStudentDietas } from "../../Hooks/Dietas/useStudentDietas";
 import { useNavigate } from "react-router-dom";
+import { MercadoPagoApi } from "../../API/Pagos/MercadoPagoApi";
+import { showError } from "../../Helpers/Alerts";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
+    const [loadingMP, setLoadingMP] = useState<number | null>(null);
     const navigate = useNavigate();
     const [isInfoOpen, setIsInfoOpen] = useState(false);
     
@@ -53,6 +56,21 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
     // Caché local de las imágenes del gym usando el nuevo hook
     const { localLogoUrl: gymLogo, localFondoUrl: fondoGymUrl } = useGymCachedImages(gymLogoData, fondoGymUrlData);
+
+    const handlePagoMP = async (userPlanId: number) => {
+        try {
+            setLoadingMP(userPlanId);
+            const { init_point } = await MercadoPagoApi.renovarPlan(userPlanId);
+            if (init_point) {
+                window.location.href = init_point;
+            }
+        } catch (err: any) {
+            console.error(err);
+            showError("No se pudo iniciar el pago con MercadoPago");
+        } finally {
+            setLoadingMP(null);
+        }
+    };
 
     return (
         <div className="pt-safe mt-24 p-0 animate-fade-in pb-32 space-y-6 max-w-lg mx-auto relative">
@@ -129,6 +147,26 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                         <p className="text-white font-bold text-[13px] leading-tight">{fechaHastaStr}</p>
                                     </div>
                                 </div>
+
+                                {/* BOTÓN DE MERCADOPAGO */}
+                                {estaPorVencer && (
+                                    <div className="mt-5">
+                                        <button
+                                            onClick={() => handlePagoMP(plan.userPlanId)}
+                                            disabled={loadingMP === plan.userPlanId}
+                                            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-[#009EE3] hover:bg-[#008CC9] transition-colors disabled:opacity-50"
+                                        >
+                                            {loadingMP === plan.userPlanId ? (
+                                                <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                                            ) : (
+                                                <>
+                                                    <span className="font-extrabold italic">Mercado</span>
+                                                    <span className="font-medium italic">Pago</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )
                     })}
