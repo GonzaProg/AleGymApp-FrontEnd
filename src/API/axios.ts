@@ -70,7 +70,7 @@ api.interceptors.response.use(
                     return Promise.reject(error);
                 }
             }
-            if (errorCode === "USER_LOCKED" || errorCode === "USER_EXPIRED") {
+            if (errorCode === "USER_LOCKED") {
                 limpiarSesion();
                 const msg = error.response?.data?.error || "Tu cuenta no está activa.";
                 if (!isAccessDeniedAlertShown) {
@@ -79,6 +79,10 @@ api.interceptors.response.use(
                     window.location.href = "/login";
                     setTimeout(() => { isAccessDeniedAlertShown = false; }, 5000);
                 }
+                return Promise.reject(error);
+            }
+            if (errorCode === "USER_EXPIRED") {
+                // No deslogueamos, simplemente rechazamos para que la UI lo maneje (ocultando partes de la app)
                 return Promise.reject(error);
             }
         }

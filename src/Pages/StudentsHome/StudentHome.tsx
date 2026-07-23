@@ -36,6 +36,9 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     // Planes del usuario
     const { activePlans, loading: loadingPlans } = useUserPlan();
     const unexpiredPlans = activePlans.filter(p => p.diasRestantes >= 0);
+    const expiredPlans = activePlans.filter(p => p.diasRestantes < 0);
+    const planesToShow = unexpiredPlans.length > 0 ? unexpiredPlans : expiredPlans;
+    const isUserExpired = unexpiredPlans.length === 0 && expiredPlans.length > 0;
 
     // Nutrición del usuario
     const { registroHoy, dietaAsignada, loadingDietas } = useStudentDietas();
@@ -104,11 +107,12 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             </div>
 
             {/* PLANES DEL USUARIO */}
-            {!loadingPlans && unexpiredPlans.length > 0 && (
+            {!loadingPlans && planesToShow.length > 0 && (
                 <div className="space-y-4 mb-8">
-                    {unexpiredPlans.map(plan => {
-                        const estaPorVencer = plan.diasRestantes <= 3;
-                        const borderColor = estaPorVencer ? "border-orange-500" : "border-green-500";
+                    {planesToShow.map(plan => {
+                        const estaVencido = plan.diasRestantes < 0;
+                        const estaPorVencer = plan.diasRestantes <= 3 && plan.diasRestantes >= 0;
+                        const borderColor = estaVencido ? "border-red-500" : (estaPorVencer ? "border-orange-500" : "border-green-500");
                         const fechaDesdeStr = formatFechaDia(plan.fechaInicio);
                         const fechaHastaStr = formatFechaDia(plan.fechaVencimiento);
 
@@ -149,7 +153,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                 </div>
 
                                 {/* BOTÓN DE MERCADOPAGO */}
-                                {estaPorVencer && (
+                                {(estaPorVencer || estaVencido) && (
                                     <div className="mt-5">
                                         <button
                                             onClick={() => handlePagoMP(plan.userPlanId)}
@@ -172,13 +176,15 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                     })}
                 </div>
             )}
+            {/* SI ESTÁ VENCIDO, OCULTAMOS EL RESTO DE LA APP */}
+            {!isUserExpired && (
+                <>
+                    {/* ESPACIADOR PARA VER EL TEXTO DEL FONDO */}
+                    {fondoGymUrl && <div className="h-20 md:h-40 pointer-events-none"></div>}
 
-            {/* ESPACIADOR PARA VER EL TEXTO DEL FONDO */}
-            {fondoGymUrl && <div className="h-20 md:h-40 pointer-events-none"></div>}
-
-            {/* NUTRICIÓN */}
-            <div 
-                onClick={() => navigate('/dietas')}
+                    {/* NUTRICIÓN */}
+                    <div 
+                        onClick={() => navigate('/dietas')}
                 className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} mb-8 relative overflow-hidden border-orange-500/20 shadow-lg cursor-pointer transition-transform hover:scale-[1.02] active:scale-95`}
             >
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
@@ -345,12 +351,14 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 // SI EL MÓDULO ESTÁ DESACTIVADO, MOSTRAMOS UN MENSAJE DE MOTIVACIÓN
                 <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50").replace("backdrop-blur-xl", "")} text-center py-12 border-white/5 flex flex-col items-center`}>
                     <Dumbbell className="w-16 h-16 text-white mb-6 animate-pulse" />
-                    <h3 className="text-2xl font-black text-white mb-2 tracking-wide">¡A entrenar con todo!</h3>
+                    <h3 className="text-2xl font-black text-white mb-2 tracking-wide">¡Vamos a entrenar!</h3>
                     <p className="text-gray-400 text-sm max-w-xs mx-auto">
                         Desliza hacia los costados para ver tus rutinas o superar tus récords personales.
                     </p>
                 </div>
                 )}
+                </>
+            )}
                 </div> {/* Cierre de Contenido sobre el fondo */}
             </div>{/* FIN SECCIÓN CON FONDO DINÁMICO */}
             

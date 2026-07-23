@@ -5,7 +5,7 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { Lock, Wallet, Receipt, Undo2, ChevronDown, ChevronUp } from "lucide-react";
 import { GymApi } from "../../API/Gym/GymApi";
-import { showError, showSuccess } from "../../Helpers/Alerts";
+import { showError } from "../../Helpers/Alerts";
 
 export const GastosManager = () => {
     const {
@@ -66,7 +66,6 @@ export const GastosManager = () => {
             if (res.success) {
                 setIsUnlocked(true);
                 setPasswordInput("");
-                showSuccess("Acceso a Gastos desbloqueado");
             }
         } catch (error) {
             showError("Contraseña incorrecta");

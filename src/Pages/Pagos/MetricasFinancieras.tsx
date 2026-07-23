@@ -8,7 +8,7 @@ import { FinancialDashboard } from "../../Components/Pagos/FinancialDashboard";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
 import { DollarSign, Search, Undo2, Lock } from "lucide-react";
 import { GymApi } from "../../API/Gym/GymApi";
-import { showError, showSuccess } from "../../Helpers/Alerts";
+import { showError } from "../../Helpers/Alerts";
 
 export const MetricasFinancieras = () => {
     
@@ -44,7 +44,6 @@ export const MetricasFinancieras = () => {
             if (res.success) {
                 setIsUnlocked(true);
                 setPasswordInput("");
-                showSuccess("Acceso financiero desbloqueado");
             }
         } catch (error) {
             showError("Contraseña incorrecta");

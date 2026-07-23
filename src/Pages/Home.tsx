@@ -14,6 +14,7 @@ import { useAlertasRecepcion } from "../Hooks/Asistencias/useAlertasRecepcion";
 import { MobileNavbar } from "../Components/Mobile/MobileNavbar"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
+import { useUserPlan } from "../Hooks/Planes/useUserPlan";
 import { AppStyles } from "../Styles/AppStyles";
 import { BackgroundLayout } from "../Components/BackgroundLayout"; 
 import { Navbar } from "../Components/Navbar";
@@ -87,9 +88,15 @@ export const Home = () => {
   const [routineIdToEdit, setRoutineIdToEdit] = useState<number | null>(null);
   const [groupIdToEdit, setGroupIdToEdit] = useState<string | null>(null);
 
-  // ESTADOS ALUMNO
-  const [activeSlide, setActiveSlide] = useState(0); 
+  // Estado principal
+  const [activeSlide, setActiveSlide] = useState(0);
   const swiperRef = useRef<any>(null);
+
+  // Verificamos si está vencido para ocultar navegación
+  const { activePlans } = useUserPlan();
+  const unexpiredPlans = activePlans.filter(p => p.diasRestantes >= 0);
+  const expiredPlans = activePlans.filter(p => p.diasRestantes < 0);
+  const isUserExpired = unexpiredPlans.length === 0 && expiredPlans.length > 0;
   
   const [visitedSlides, setVisitedSlides] = useState<Set<number>>(new Set([0]));
 
@@ -354,7 +361,9 @@ export const Home = () => {
             </SwiperSlide>
         </Swiper>
 
-        <MobileNavbar activeTab={activeSlide} setActiveTab={handleMenuClick} />
+        {!isUserExpired && (
+            <MobileNavbar activeTab={activeSlide} setActiveTab={handleMenuClick} />
+        )}
       </div>
     </BackgroundLayout>
   );
