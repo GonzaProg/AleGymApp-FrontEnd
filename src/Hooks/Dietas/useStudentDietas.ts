@@ -5,7 +5,7 @@ import { showError } from '../../Helpers/Alerts';
 
 export const useStudentDietas = () => {
     const { currentUser: user } = useAuthUser();
-    
+
     const [loadingDietas, setLoadingDietas] = useState(false);
     const [dietaAsignada, setDietaAsignada] = useState<any>(null);
     const [registroHoy, setRegistroHoy] = useState<any>(null);
@@ -19,7 +19,7 @@ export const useStudentDietas = () => {
 
     const cargarDatos = async () => {
         if (!user?.id) return;
-        
+
         setLoadingDietas(true);
         try {
             const [dieta, registro, hist] = await Promise.all([

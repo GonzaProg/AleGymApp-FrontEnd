@@ -14,11 +14,15 @@ import { useAlertasRecepcion } from "../Hooks/Asistencias/useAlertasRecepcion";
 import { MobileNavbar } from "../Components/Mobile/MobileNavbar"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
+import { useUserPlan } from "../Hooks/Planes/useUserPlan";
 import { AppStyles } from "../Styles/AppStyles";
 import { BackgroundLayout } from "../Components/BackgroundLayout"; 
 import { Navbar } from "../Components/Navbar";
 import { StatsGrid } from "../Components/Dashboard/StatsGrid";
 import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary";
+
+// Pagina inicial de alumnos con plan expirado
+import { ExpiredPlanPage } from "./StudentsHome/ExpiredPlanPage";
 
 // IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
@@ -87,9 +91,12 @@ export const Home = () => {
   const [routineIdToEdit, setRoutineIdToEdit] = useState<number | null>(null);
   const [groupIdToEdit, setGroupIdToEdit] = useState<string | null>(null);
 
-  // ESTADOS ALUMNO
-  const [activeSlide, setActiveSlide] = useState(0); 
+  // Estado principal
+  const [activeSlide, setActiveSlide] = useState(0);
   const swiperRef = useRef<any>(null);
+
+  // Verificamos si está vencido para ocultar navegación
+  const { activePlans, isUserExpired, loading: loadingPlans } = useUserPlan();
   
   const [visitedSlides, setVisitedSlides] = useState<Set<number>>(new Set([0]));
 
@@ -143,8 +150,13 @@ export const Home = () => {
     }
   };
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
+  if (isLoading || loadingPlans) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
   if (!currentUser) return null; 
+
+  if (isUserExpired && currentUser?.rol === 'Alumno') {
+      const planToRenew = activePlans.length > 0 ? activePlans[0] : null;
+      return <ExpiredPlanPage currentUser={currentUser} expiredPlan={planToRenew} />;
+  }
 
   if (isEntrenador || isAdmin) {
     const AdminDashboardWelcome = () => (
@@ -354,7 +366,9 @@ export const Home = () => {
             </SwiperSlide>
         </Swiper>
 
-        <MobileNavbar activeTab={activeSlide} setActiveTab={handleMenuClick} />
+        {!isUserExpired && (
+            <MobileNavbar activeTab={activeSlide} setActiveTab={handleMenuClick} />
+        )}
       </div>
     </BackgroundLayout>
   );

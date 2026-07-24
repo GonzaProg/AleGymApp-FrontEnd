@@ -8,6 +8,7 @@ export interface GymDTO {
     activo: boolean;
     logoUrl?: string;
     fondoInicioCelularUrl?: string;
+    cambiarMPAccessToken?: boolean;
 }
 
 // Interfaz para ACTUALIZAR datos
@@ -24,6 +25,8 @@ export interface GymPreferencesDTO {
     mensajeCumpleanos?: string;
     moduloAsistencia?: boolean;
     finanzasPassword?: string;
+    mpAccessToken?: string;
+    cambiarMPAccessToken?: boolean;
 }
 
 export const GymApi = {
@@ -47,6 +50,11 @@ export const GymApi = {
     // 3. Bloquear / Desbloquear
     toggleStatus: async (id: number, activo: boolean) => {
         const response = await api.patch(`/gyms/${id}/status`, { activo });
+        return response.data;
+    },
+
+    toggleMpAccess: async (id: number, cambiarMPAccessToken: boolean) => {
+        const response = await api.patch(`/gyms/${id}/mp-access`, { cambiarMPAccessToken });
         return response.data;
     },
 

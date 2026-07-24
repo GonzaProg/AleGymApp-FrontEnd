@@ -57,6 +57,19 @@ export const GymManagement = () => {
     }
   };
 
+  const handleToggleMpAccess = async (gym: GymDTO) => {
+    try {
+      const newStatus = !gym.cambiarMPAccessToken;
+      setGyms(prev => prev.map(g => g.id === gym.id ? { ...g, cambiarMPAccessToken: newStatus } : g));
+
+      await GymApi.toggleMpAccess(gym.id, newStatus);
+      showSuccess(newStatus ? "Permiso MP Activado" : "Permiso MP Bloqueado");
+    } catch (error) {
+      showError("Error al cambiar permiso");
+      loadGyms();
+    }
+  };
+
   if (loading) return <div className="text-white">Cargando gimnasios...</div>;
 
   return (
@@ -86,7 +99,7 @@ export const GymManagement = () => {
             <div className="mt-4 flex items-center justify-between bg-gray-800/50 p-3 rounded-lg">
               <span className="text-gray-300 text-sm">Acceso al sistema</span>
               
-              {/* Toggle Switch */}
+              {/* Toggle Switch Activo */}
               <label className="relative inline-flex items-center cursor-pointer">
                 <input 
                   type="checkbox" 
@@ -95,6 +108,21 @@ export const GymManagement = () => {
                   onChange={() => handleToggle(gym)}
                 />
                 <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+              </label>
+            </div>
+
+            <div className="mt-2 flex items-center justify-between bg-gray-800/50 p-3 rounded-lg">
+              <span className="text-gray-300 text-sm">Permitir cambiar MP Token</span>
+              
+              {/* Toggle Switch MP Access */}
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="sr-only peer" 
+                  checked={gym.cambiarMPAccessToken || false}
+                  onChange={() => handleToggleMpAccess(gym)}
+                />
+                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
               </label>
             </div>
           </Card>

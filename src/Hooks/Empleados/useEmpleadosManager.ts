@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { EmpleadoApi, type EmpleadoDTO } from "../../API/Empleados/EmpleadoApi";
 import { GymApi } from "../../API/Gym/GymApi";
-import { showSuccess, showError } from "../../Helpers/Alerts";
+import { showError } from "../../Helpers/Alerts";
 
 export type EmpleadosView = 'list' | 'detail' | 'create' | 'edit' | 'pay';
 
@@ -30,7 +30,6 @@ export const useEmpleadosManager = () => {
             if (res.success) {
                 setIsUnlocked(true);
                 setPasswordInput("");
-                showSuccess("Acceso a Empleados desbloqueado");
             }
         } catch (error) {
             showError("Contraseña incorrecta");

@@ -23,11 +23,11 @@ export const useFraseMotivacional = () => {
 
                 // 2. Revisar si ya descargamos la frase de HOY
                 const { value: lastDate } = await Preferences.get({ key: STORE_KEY_DATE });
-                
+
                 if (lastDate === currentDateSeed) {
                     // Ya tenemos la de hoy guardada, cargarla desde el almacenamiento local
                     const { value: savedText } = await Preferences.get({ key: STORE_KEY_TEXT });
-                    
+
                     let localImageUrl: string | null = null;
                     if (Capacitor.isNativePlatform()) {
                         try {
@@ -36,7 +36,7 @@ export const useFraseMotivacional = () => {
                                 directory: Directory.Data,
                                 path: IMAGE_FILENAME
                             });
-                            
+
                             const file = await Filesystem.getUri({
                                 directory: Directory.Data,
                                 path: IMAGE_FILENAME
@@ -68,10 +68,10 @@ export const useFraseMotivacional = () => {
 
                 // 4. Descargar la imagen si existe
                 if (backendQuote.imagenUrl) {
-                    
+
                     // SIEMPRE guardamos la URL online como respaldo vital
                     await Preferences.set({ key: STORE_KEY_FALLBACK_URL, value: backendQuote.imagenUrl });
-                    
+
                     if (Capacitor.isNativePlatform()) {
                         try {
                             // Borrar rastro anterior
@@ -80,7 +80,7 @@ export const useFraseMotivacional = () => {
                                     path: IMAGE_FILENAME,
                                     directory: Directory.Data
                                 });
-                            } catch (e) {}
+                            } catch (e) { }
 
                             // Descargar y guardar nativamente de a un solo paso (Evita cortes por RAM en Blob a Base64)
                             await Filesystem.downloadFile({
@@ -104,16 +104,16 @@ export const useFraseMotivacional = () => {
                         localImageUrl = backendQuote.imagenUrl;
                     }
                 } else {
-                     // Si hoy no hay imagen en ninguna
-                     if (Capacitor.isNativePlatform()) {
+                    // Si hoy no hay imagen en ninguna
+                    if (Capacitor.isNativePlatform()) {
                         try {
                             await Filesystem.deleteFile({
                                 path: IMAGE_FILENAME,
                                 directory: Directory.Data
                             });
-                        } catch (e) {}
-                     }
-                     await Preferences.remove({ key: STORE_KEY_FALLBACK_URL });
+                        } catch (e) { }
+                    }
+                    await Preferences.remove({ key: STORE_KEY_FALLBACK_URL });
                 }
 
                 // 5. Guardar el nuevo estado para de hoy en adelante
