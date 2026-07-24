@@ -62,6 +62,11 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const { localLogoUrl: gymLogo, localFondoUrl: fondoGymUrl } = useGymCachedImages(gymLogoData, fondoGymUrlData);
 
     const handlePagoMP = async (userPlanId: number) => {
+        if (currentUser?.gym && currentUser.gym.tieneMercadoPago === false) {
+            showError("El gimnasio no tiene MercadoPago configurado.");
+            return;
+        }
+
         try {
             setLoadingMP(userPlanId);
             const { init_point } = await MercadoPagoApi.renovarPlan(userPlanId);
@@ -70,7 +75,8 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             }
         } catch (err: any) {
             console.error(err);
-            showError("No se pudo iniciar el pago con MercadoPago");
+            const errMsg = err.response?.data?.error || "No se pudo iniciar el pago con MercadoPago";
+            showError(errMsg);
         } finally {
             setLoadingMP(null);
         }

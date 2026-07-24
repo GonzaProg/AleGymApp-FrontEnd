@@ -8,6 +8,8 @@ export const usePreferences = () => {
     const [autoReceipts, setAutoReceipts] = useState(true);
     const [birthdayMessage, setBirthdayMessage] = useState("");
     const [moduloAsistencia, setModuloAsistencia] = useState(true);
+    const [cambiarMPAccessToken, setCambiarMPAccessToken] = useState(false);
+    const [mpAccessToken, setMpAccessToken] = useState("");
     
     // Estados para el cambio de contraseña
     const [passwordCurrent, setPasswordCurrent] = useState("");
@@ -34,6 +36,7 @@ export const usePreferences = () => {
                 setAutoReceipts(data.envioAutomaticoRecibos);
                 setBirthdayMessage(data.mensajeCumpleanos || "");
                 setModuloAsistencia(data.moduloAsistencia ?? true);
+                setCambiarMPAccessToken(data.cambiarMPAccessToken ?? false);
             } catch (err) {
                 console.error("Error cargando preferencias", err);
             } finally {
@@ -115,6 +118,22 @@ export const usePreferences = () => {
         }
     };
 
+    const saveMpAccessToken = async () => {
+        if (!mpAccessToken.trim()) {
+            showError("El token no puede estar vacío");
+            return;
+        }
+
+        try {
+            await GymApi.updatePreferences({ mpAccessToken });
+            showSuccess("Token de MercadoPago guardado correctamente ✅");
+            setCambiarMPAccessToken(false);
+            setMpAccessToken(""); // Limpiar el input por seguridad
+        } catch (error) {
+            showError("No se pudo guardar el token");
+        }
+    };
+
     const updateFinanzasPassword = async () => {
         if (!passwordCurrent || !passwordNew || !passwordConfirm) {
             showError("Todos los campos de contraseña son obligatorios");
@@ -168,6 +187,7 @@ export const usePreferences = () => {
         passwordCurrent, setPasswordCurrent,
         passwordNew, setPasswordNew,
         passwordConfirm, setPasswordConfirm,
-        changingPassword, updateFinanzasPassword
+        changingPassword, updateFinanzasPassword,
+        cambiarMPAccessToken, mpAccessToken, setMpAccessToken, saveMpAccessToken
     };
 };

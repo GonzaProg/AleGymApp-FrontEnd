@@ -1,7 +1,7 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
 import { usePreferences } from "../../Hooks/Config/usePreferences";
-import { Settings, Bot, Save, Monitor, Package, Lock } from "lucide-react";
+import { Settings, Bot, Save, Monitor, Package, Lock, CreditCard } from "lucide-react";
 
 export const Preferences = () => {
     const { 
@@ -14,7 +14,8 @@ export const Preferences = () => {
         passwordCurrent, setPasswordCurrent,
         passwordNew, setPasswordNew,
         passwordConfirm, setPasswordConfirm,
-        changingPassword, updateFinanzasPassword
+        changingPassword, updateFinanzasPassword,
+        cambiarMPAccessToken, mpAccessToken, setMpAccessToken, saveMpAccessToken
     } = usePreferences();
 
     if (loading) return <div className="text-white text-center pt-20">Cargando preferencias...</div>;
@@ -31,7 +32,7 @@ export const Preferences = () => {
                     <p className={AppStyles.subtitle}>Personaliza el comportamiento de tu sistema.</p>
                 </div>
 
-                <div className="space-y-6 mt-8">
+                <div className="space-y-6 mt-8 mb-20">
                     
                     {/* SECCIÓN 1: AUTOMATIZACIONES (Backend) */}
                     <div className={AppStyles.glassCard}>
@@ -179,6 +180,34 @@ export const Preferences = () => {
                             <ToggleSwitch checked={moduloAsistencia} onChange={toggleAsistencia} />
                         </div>
                     </div>
+
+                    {/* SECCIÓN 4: MERCADOPAGO (Solo visible si cambiarMPAccessToken del Gym es true) */}
+                    {cambiarMPAccessToken && (
+                        <div className={`${AppStyles.glassCard} border-blue-500/30 animate-fade-in-up mb-20`}>
+                            <h3 className="text-xl font-bold text-white mb-4 border-b border-white/10 pb-4 flex items-center gap-2">
+                                <CreditCard className="w-6 h-6 text-[#009EE3]" /> Integración con MercadoPago
+                            </h3>
+
+                            <div className="space-y-4 max-w-lg">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Access Token de Producción</label>
+                                    <input 
+                                        type="password" 
+                                        value={mpAccessToken}
+                                        onChange={(e) => setMpAccessToken(e.target.value)}
+                                        placeholder="APP_USR-..."
+                                        className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-blue-500/30 focus:border-[#009EE3] focus:ring-1 focus:ring-[#009EE3] transition-all font-mono tracking-widest"
+                                    />
+                                </div>
+                                <button
+                                    onClick={saveMpAccessToken}
+                                    className="bg-[#009EE3] hover:bg-[#007EB5] text-white text-sm font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Save className="w-4 h-4" /> Guardar Token
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             </div>

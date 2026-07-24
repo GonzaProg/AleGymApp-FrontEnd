@@ -34,9 +34,11 @@ export interface LoginResponse {
             id: number;
             nombre: string;
             logoUrl?: string;
-            moduloAsistencia?: boolean;
             fondoInicioCelularUrl?: string;
-        }
+            codigoAcceso: string;
+            moduloAsistencia?: boolean;
+            tieneMercadoPago?: boolean;
+        };
     };
 }
 
