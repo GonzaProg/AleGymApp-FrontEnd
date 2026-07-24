@@ -69,8 +69,8 @@ export const GymCodeModal = ({ isOpen, onClose, onCodeChange }: GymCodeModalProp
               type="text"
               placeholder="Ingresa el código de tu gimnasio"
               value={tempCode}
-              onChange={(e) => setTempCode(e.target.value)}
-              className={LoginStyles.inputDark}
+              onChange={(e) => setTempCode(e.target.value.toUpperCase())}
+              className={`${LoginStyles.inputDark} uppercase`}
             />
           </div>
 

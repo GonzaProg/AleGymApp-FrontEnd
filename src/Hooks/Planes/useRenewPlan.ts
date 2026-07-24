@@ -60,14 +60,19 @@ export const useRenewPlan = () => {
     const refrescarAlumno = async () => {
         if (!alumnoSeleccionado) return;
         try {
-            // Buscamos al mismo alumno por su DNI para obtener sus planes actualizados
+            // Buscamos al mismo alumno para obtener sus planes actualizados
+            const searchTerm = alumnoSeleccionado.dni || alumnoSeleccionado.nombre;
             const res = await UsuarioApi.getAlumnos({ 
-                search: alumnoSeleccionado.dni, 
+                search: searchTerm, 
                 includePlan: true,
-                showAll: false 
+                showAll: true 
             });
-            if (res.alumnos.length > 0) {
-                setAlumnoSeleccionado(res.alumnos[0]);
+            
+            // Filtramos estrictamente por ID para evitar que se asigne otro usuario por error
+            const alumnoActualizado = res.alumnos.find((a: any) => a.id === alumnoSeleccionado.id);
+            
+            if (alumnoActualizado) {
+                setAlumnoSeleccionado(alumnoActualizado);
             }
         } catch (error) {
             console.error("Error refrescando alumno:", error);
