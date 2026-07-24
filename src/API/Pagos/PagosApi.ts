@@ -31,6 +31,7 @@ export interface MatrizAnualDTO {
     pagos: {
         id: number;
         fechaPago: string;
+        comprobanteUrl?: string;
     }[];
 }
 

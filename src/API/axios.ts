@@ -9,7 +9,7 @@ const getUserRole = () => {
     } catch (error) { return null; }
 };
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const baseURL = import.meta.env.VITE_API_URL;
 
 // --- VARIABLES PARA EL MANEJO DE CONCURRENCIA ---
 let isRefreshing = false;
@@ -51,7 +51,7 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const status = error.response?.status;
-        const errorCode = error.response?.data?.code; 
+        const errorCode = error.response?.data?.code;
 
         // --- CASO 1: BLOQUEOS DE NEGOCIO (403) ---
         // (Tu lógica aquí estaba perfecta, la mantengo igual)
@@ -94,10 +94,10 @@ api.interceptors.response.use(
         }
 
         if (status === 401 && !originalRequest._retry) {
-            
+
             // SI YA SE ESTÁ REFRESCANDO: Ponemos la petición en cola
             if (isRefreshing) {
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     failedQueue.push({ resolve, reject });
                 }).then(token => {
                     originalRequest.headers['Authorization'] = 'Bearer ' + token;
@@ -133,20 +133,20 @@ api.interceptors.response.use(
 
                 // Procesamos la cola de peticiones que estaban esperando
                 processQueue(null, newAccessToken);
-                
+
                 return api(originalRequest);
 
             } catch (refreshError) {
                 // Si el refresh falla (ej: pasaron 30 días o token inválido)
                 processQueue(refreshError, null);
-                
+
                 limpiarSesion();
 
                 if (!window.location.pathname.includes("/login") && !isSessionExpiredAlertShown) {
                     isSessionExpiredAlertShown = true;
                     // Opcional: Podrías usar un Toast en vez de alert
                     // alert("Tu sesión ha caducado."); 
-                    window.location.href = "/login"; 
+                    window.location.href = "/login";
                     setTimeout(() => { isSessionExpiredAlertShown = false; }, 5000);
                 }
                 return Promise.reject(refreshError);

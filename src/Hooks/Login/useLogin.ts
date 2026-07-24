@@ -125,7 +125,7 @@ export const useLogin = () => {
                setError("⛔ Acceso restringido. Tu cuenta está inactiva. Contacta a administración.");
           } else {
               // OTROS ERRORES (Pass incorrecta, etc)
-              setError(msg || "Credenciales incorrectas");
+              setError(msg || "Usuario o contraseña incorrectos");
           }
       } else {
         setError("Error al conectar con el servidor");

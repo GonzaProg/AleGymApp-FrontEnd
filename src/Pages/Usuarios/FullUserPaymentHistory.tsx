@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PagosApi, type PagoDTO } from "../../API/Pagos/PagosApi";
-import { CalendarDays, Clock, ShoppingBag, ArrowLeft, Filter, Receipt, X } from "lucide-react";
+import { CalendarDays, Clock, ShoppingBag, ArrowLeft, Filter, Receipt, X, Download } from "lucide-react";
 import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
 import { CustomSelect } from "../../Components/UI/CustomSelect";
 
@@ -59,25 +59,63 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
     ];
 
     // Buscar el último comprobante
-    const lastReceipt = pagos.slice().reverse().find(p => p.comprobanteUrl);
+    const lastReceipt = pagos.find(p => p.comprobanteUrl);
 
     return (
         <div className="w-full max-w-5xl mx-auto mt-14 animate-fade-in text-white relative">
             
             {/* Modal de Comprobante */}
             {showReceiptModal && selectedReceiptUrl && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowReceiptModal(false)}>
-                    <div className="relative max-w-lg w-full max-h-[90vh] flex flex-col items-center" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={() => setShowReceiptModal(false)}>
+                    
+                    {/* Controles Top/Right */}
+                    <div className="absolute top-4 right-4 md:top-6 md:right-6 flex items-center gap-3 z-[60]" onClick={e => e.stopPropagation()}>
+                        <button 
+                            onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                    const downloadUrl = selectedReceiptUrl.includes('/upload/') 
+                                        ? selectedReceiptUrl.replace('/upload/', '/upload/fl_attachment/')
+                                        : selectedReceiptUrl;
+                                        
+                                    // Fetch del blob para evitar problemas de CORS/Descarga en Electron
+                                    const response = await fetch(downloadUrl);
+                                    if (!response.ok) throw new Error("Error al descargar la imagen");
+                                    const blob = await response.blob();
+                                    const url = window.URL.createObjectURL(blob);
+                                    
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = 'comprobante_gymmate.jpg';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                    console.error("Error en la descarga:", error);
+                                    // Fallback
+                                    window.open(selectedReceiptUrl, '_blank');
+                                }
+                            }}
+                            className="bg-white/10 hover:bg-[#009EE3]/80 p-3 rounded-full transition-colors text-white shadow-lg backdrop-blur-md"
+                            title="Descargar comprobante"
+                        >
+                            <Download className="w-6 h-6" />
+                        </button>
                         <button 
                             onClick={() => setShowReceiptModal(false)}
-                            className="absolute -top-12 right-0 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors text-white"
+                            className="bg-red-500/80 hover:bg-red-500 p-3 rounded-full transition-colors text-white shadow-lg backdrop-blur-md"
+                            title="Cerrar"
                         >
                             <X className="w-6 h-6" />
                         </button>
+                    </div>
+
+                    <div className="relative max-w-2xl w-full flex flex-col items-center" onClick={e => e.stopPropagation()}>
                         <img 
                             src={selectedReceiptUrl} 
                             alt="Comprobante MercadoPago" 
-                            className="w-full h-auto rounded-xl shadow-2xl object-contain max-h-[85vh]"
+                            className="w-full h-auto max-h-[85vh] object-contain shadow-2xl rounded-xl"
                         />
                     </div>
                 </div>
@@ -157,8 +195,9 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
                                     <tr>
                                         <th className="p-4 border-b border-white/10 w-[20%] text-xs font-bold tracking-wider uppercase text-gray-400">Mes</th>
                                         <th className="p-4 border-b border-white/10 w-[20%] text-xs font-bold tracking-wider uppercase text-gray-400">Fecha de Pago</th>
-                                        <th className="p-4 border-b border-white/10 w-[40%] text-xs font-bold tracking-wider uppercase text-gray-400">Concepto</th>
+                                        <th className="p-4 border-b border-white/10 w-[20%] text-xs font-bold tracking-wider uppercase text-gray-400">Concepto</th>
                                         <th className="p-4 border-b border-white/10 w-[20%] text-right text-xs font-bold tracking-wider uppercase text-gray-400">Monto</th>
+                                        <th className="p-4 border-b border-white/10 w-[10%] text-center text-xs font-bold tracking-wider uppercase text-gray-400">Comprobante</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
@@ -212,12 +251,33 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
                                                                 </div>
                                                             ))}
                                                         </td>
+                                                        <td className="p-3 text-center align-middle">
+                                                            {pagosDelMes.map((p: any) => (
+                                                                <div key={p.id} className="h-10 flex items-center justify-center">
+                                                                    {p.comprobanteUrl ? (
+                                                                        <button 
+                                                                            onClick={() => {
+                                                                                setSelectedReceiptUrl(p.comprobanteUrl);
+                                                                                setShowReceiptModal(true);
+                                                                            }}
+                                                                            className="text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 p-1.5 rounded-lg transition-colors border border-blue-500/20"
+                                                                            title="Ver comprobante"
+                                                                        >
+                                                                            <Receipt className="w-4 h-4" />
+                                                                        </button>
+                                                                    ) : (
+                                                                        <span className="text-gray-600 text-xs">—</span>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                        </td>
                                                     </>
                                                 ) : (
                                                     <>
                                                         <td className="p-4 text-gray-600 italic opacity-50">—</td>
                                                         <td className="p-4 text-gray-600 italic opacity-50">—</td>
                                                         <td className="p-4 text-gray-600 italic opacity-50 text-right">—</td>
+                                                        <td className="p-4 text-gray-600 italic opacity-50 text-center">—</td>
                                                     </>
                                                 )}
                                             </tr>
