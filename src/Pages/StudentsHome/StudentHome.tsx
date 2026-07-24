@@ -12,6 +12,7 @@ import { useStudentDietas } from "../../Hooks/Dietas/useStudentDietas";
 import { useNavigate } from "react-router-dom";
 import { MercadoPagoApi } from "../../API/Pagos/MercadoPagoApi";
 import { showError } from "../../Helpers/Alerts";
+import MpLogo from "../../assets/MP_RGB_HANDSHAKE_color_horizontal.svg";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const [loadingMP, setLoadingMP] = useState<number | null>(null);
@@ -158,15 +159,12 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                         <button
                                             onClick={() => handlePagoMP(plan.userPlanId)}
                                             disabled={loadingMP === plan.userPlanId}
-                                            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-[#009EE3] hover:bg-[#008CC9] transition-colors disabled:opacity-50"
+                                            className="w-full flex items-center justify-center py-2 px-4 rounded-xl text-white bg-[#009EE3] hover:bg-[#008CC9] transition-colors disabled:opacity-50 h-12"
                                         >
                                             {loadingMP === plan.userPlanId ? (
                                                 <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
                                             ) : (
-                                                <>
-                                                    <span className="font-extrabold italic">Mercado</span>
-                                                    <span className="font-medium italic">Pago</span>
-                                                </>
+                                                <img src={MpLogo} alt="Pagar con MercadoPago" className="h-16" />
                                             )}
                                         </button>
                                     </div>

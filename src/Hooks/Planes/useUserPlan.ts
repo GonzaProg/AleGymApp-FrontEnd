@@ -4,6 +4,7 @@ import { PlansApi, type UserPlanDTO } from "../../API/Planes/PlansApi";
 export const useUserPlan = () => {
     // Ahora 'activePlans' es un array
     const [activePlans, setActivePlans] = useState<UserPlanDTO[]>([]);
+    const [isUserExpired, setIsUserExpired] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -15,11 +16,13 @@ export const useUserPlan = () => {
         setLoading(true);
         try {
             const result = await PlansApi.getMyPlan();
-            
-            if (result && result.tienePlan && Array.isArray(result.planes)) {
+
+            if (result && Array.isArray(result.planes)) {
                 setActivePlans(result.planes);
+                setIsUserExpired(!result.tienePlan);
             } else {
                 setActivePlans([]);
+                setIsUserExpired(true);
             }
         } catch (err) {
             console.error("Error al cargar mis planes:", err);
@@ -31,6 +34,7 @@ export const useUserPlan = () => {
 
     return {
         activePlans, // Array de planes
+        isUserExpired,
         loading,
         error
     };

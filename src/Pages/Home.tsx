@@ -21,6 +21,9 @@ import { Navbar } from "../Components/Navbar";
 import { StatsGrid } from "../Components/Dashboard/StatsGrid";
 import { CloudinaryApi } from "../Helpers/Cloudinary/Cloudinary";
 
+// Pagina inicial de alumnos con plan expirado
+import { ExpiredPlanPage } from "./StudentsHome/ExpiredPlanPage";
+
 // IMPORTACIONES PEREZOSAS
 const MyRoutines = lazy(() => import("./Rutinas/MyRoutines").then(module => ({ default: module.MyRoutines })));
 const Profile = lazy(() => import("./Usuarios/Profile").then(module => ({ default: module.Profile })));
@@ -93,10 +96,7 @@ export const Home = () => {
   const swiperRef = useRef<any>(null);
 
   // Verificamos si está vencido para ocultar navegación
-  const { activePlans } = useUserPlan();
-  const unexpiredPlans = activePlans.filter(p => p.diasRestantes >= 0);
-  const expiredPlans = activePlans.filter(p => p.diasRestantes < 0);
-  const isUserExpired = unexpiredPlans.length === 0 && expiredPlans.length > 0;
+  const { activePlans, isUserExpired, loading: loadingPlans } = useUserPlan();
   
   const [visitedSlides, setVisitedSlides] = useState<Set<number>>(new Set([0]));
 
@@ -150,8 +150,13 @@ export const Home = () => {
     }
   };
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
+  if (isLoading || loadingPlans) return <div className="min-h-screen flex items-center justify-center bg-gray-900"><p className="text-white animate-pulse">Cargando...</p></div>;
   if (!currentUser) return null; 
+
+  if (isUserExpired && currentUser?.rol === 'Alumno') {
+      const planToRenew = activePlans.length > 0 ? activePlans[0] : null;
+      return <ExpiredPlanPage currentUser={currentUser} expiredPlan={planToRenew} />;
+  }
 
   if (isEntrenador || isAdmin) {
     const AdminDashboardWelcome = () => (

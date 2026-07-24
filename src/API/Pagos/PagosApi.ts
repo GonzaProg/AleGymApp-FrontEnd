@@ -2,10 +2,11 @@ import api from '../axios';
 
 export interface PagoDTO {
     id: number;
-    monto: number; // Desde el back el tipo decimal de TypeORM suele venir como string, pero lo convertiremos a number
+    monto: number;
     metodoPago: string;
     concepto: string;
     fechaPago: string;
+    comprobanteUrl?: string;
     usuario: {
         nombre: string;
         apellido: string;
@@ -93,8 +94,8 @@ export const PagosApi = {
         const response = await api.post('/pagos/revertir', { pagoId });
         return response.data;
     },
-    
-venderCarrito: async (data: { usuarioId: number, metodoPago: string, items: { productoId: number, cantidad: number }[] }) => {
+
+    venderCarrito: async (data: { usuarioId: number, metodoPago: string, items: { productoId: number, cantidad: number }[] }) => {
         // Usamos la misma ruta, pero el body ahora lleva 'items'
         const response = await api.post('/pagos/venta-producto', data);
         return response.data;

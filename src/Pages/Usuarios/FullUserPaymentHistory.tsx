@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { PagosApi, type PagoDTO } from "../../API/Pagos/PagosApi";
-import { CalendarDays, Clock, ShoppingBag, ArrowLeft, Filter } from "lucide-react";
+import { CalendarDays, Clock, ShoppingBag, ArrowLeft, Filter, Receipt, X } from "lucide-react";
 import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
 import { CustomSelect } from "../../Components/UI/CustomSelect";
 
@@ -10,6 +10,8 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
     const [availableYears, setAvailableYears] = useState<number[]>([]);
     const [selectedYear, setSelectedYear] = useState<number>(currentYear);
     const [loading, setLoading] = useState(true);
+    const [showReceiptModal, setShowReceiptModal] = useState(false);
+    const [selectedReceiptUrl, setSelectedReceiptUrl] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchYears = async () => {
@@ -56,8 +58,31 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
     ];
 
+    // Buscar el último comprobante
+    const lastReceipt = pagos.slice().reverse().find(p => p.comprobanteUrl);
+
     return (
         <div className="w-full max-w-5xl mx-auto mt-14 animate-fade-in text-white relative">
+            
+            {/* Modal de Comprobante */}
+            {showReceiptModal && selectedReceiptUrl && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowReceiptModal(false)}>
+                    <div className="relative max-w-lg w-full max-h-[90vh] flex flex-col items-center" onClick={e => e.stopPropagation()}>
+                        <button 
+                            onClick={() => setShowReceiptModal(false)}
+                            className="absolute -top-12 right-0 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors text-white"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                        <img 
+                            src={selectedReceiptUrl} 
+                            alt="Comprobante MercadoPago" 
+                            className="w-full h-auto rounded-xl shadow-2xl object-contain max-h-[85vh]"
+                        />
+                    </div>
+                </div>
+            )}
+
             <div className="bg-[#1e1628]/95 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-2xl relative z-10 w-full mb-8">
                 
                 {/* Cabecera general y Volver */}
@@ -85,6 +110,26 @@ export const FullUserPaymentHistory = ({ user, onBack }: { user: AlumnoDTO, onBa
                             </div>
                         </div>
                     </div>
+                    
+                    {/* Botón de Último Comprobante */}
+                    {lastReceipt && (
+                        <div className="flex-1 flex justify-center mt-4 md:mt-0">
+                            <button
+                                onClick={() => {
+                                    setSelectedReceiptUrl(lastReceipt.comprobanteUrl || null);
+                                    setShowReceiptModal(true);
+                                }}
+                                className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all font-semibold shadow-lg ${
+                                    lastReceipt.metodoPago === 'MercadoPago' 
+                                    ? 'bg-[#009EE3]/10 hover:bg-[#009EE3]/20 border border-[#009EE3]/30 text-[#009EE3] shadow-[#009EE3]/10' 
+                                    : 'bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-400 shadow-green-500/10'
+                                }`}
+                            >
+                                <Receipt className="w-5 h-5" />
+                                Último comprobante ({lastReceipt.metodoPago})
+                            </button>
+                        </div>
+                    )}
                     
                     {/* Selector de Año */}
                     <div className="flex flex-col items-start md:items-end mt-4 md:mt-0 w-32">

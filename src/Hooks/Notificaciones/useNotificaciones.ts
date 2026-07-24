@@ -27,7 +27,7 @@ export const useNotificaciones = () => {
         prev.map((n) => (n.id === id ? { ...n, leida: true } : n))
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
-      
+
       await NotificacionesApi.markAsRead(id);
     } catch (error) {
       console.error("Error al marcar como leída", error);

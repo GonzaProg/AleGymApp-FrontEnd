@@ -7,9 +7,9 @@ export const useStudentHome = (currentUser: any) => {
     const [loadingConcurrencia, setLoadingConcurrencia] = useState(true);
     const [isCheckingIn, setIsCheckingIn] = useState(false);
     const isAsistenciaHabilitada = currentUser?.gym?.moduloAsistencia !== false; // true por defecto
-    
+
     // Estado para abrir/cerrar la cámara
-    const [isScannerOpen, setIsScannerOpen] = useState(false); 
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
 
     const gymId = currentUser?.gym?.id;
 
@@ -33,9 +33,9 @@ export const useStudentHome = (currentUser: any) => {
 
     const handleCheckIn = async (scannedText: string) => {
         if (!gymId) return;
-        
+
         const scannedGymId = Number(scannedText.trim());
-        
+
         if (scannedGymId !== gymId) {
             showError("Este código QR no pertenece a tu gimnasio.");
             return;
@@ -45,7 +45,7 @@ export const useStudentHome = (currentUser: any) => {
         try {
             // Guardamos la respuesta completa
             const response = await AsistenciaApi.registrarEntrada(gymId);
-            
+
             // Verificamos si se pasó de los días de su plan
             if (response.excedido) {
                 // Puedes usar showError o crear un showWarning en tus alertas
@@ -53,7 +53,7 @@ export const useStudentHome = (currentUser: any) => {
             } else {
                 showSuccess("¡Entrada registrada! A entrenar duro 💪");
             }
-            
+
             cargarConcurrencia();
         } catch (error: any) {
             const errorMsg = error.response?.data?.error || "Error al registrar entrada";
