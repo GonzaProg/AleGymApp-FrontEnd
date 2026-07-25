@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { GymApi } from "../../API/Gym/GymApi";
+import { MercadoPagoApi } from "../../API/Pagos/MercadoPagoApi";
 import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const usePreferences = () => {
@@ -9,14 +10,18 @@ export const usePreferences = () => {
     const [birthdayMessage, setBirthdayMessage] = useState("");
     const [moduloAsistencia, setModuloAsistencia] = useState(true);
     const [cambiarMPAccessToken, setCambiarMPAccessToken] = useState(false);
-    const [mpAccessToken, setMpAccessToken] = useState("");
-    
+
+    // Auth info to check if already linked
+    const currentUserStr = localStorage.getItem("user");
+    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+    const [tieneMercadoPago, setTieneMercadoPago] = useState(currentUser?.gym?.tieneMercadoPago ?? false);
+
     // Estados para el cambio de contraseña
     const [passwordCurrent, setPasswordCurrent] = useState("");
     const [passwordNew, setPasswordNew] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
     const [changingPassword, setChangingPassword] = useState(false);
-    
+
     // LocalStorage Settings (Métricas)
     // Inicializamos leyendo de localStorage
     const [showFinancialMetrics, setShowFinancialMetricsState] = useState(() => {
@@ -44,6 +49,26 @@ export const usePreferences = () => {
             }
         };
         load();
+
+        // Check for OAuth callbacks
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mp_success')) {
+            showSuccess("¡Cuenta de Mercado Pago vinculada exitosamente! ✅");
+            setTieneMercadoPago(true);
+            setCambiarMPAccessToken(false);
+
+            // Actualizar localstorage
+            if (currentUser && currentUser.gym) {
+                currentUser.gym.tieneMercadoPago = true;
+                localStorage.setItem("user", JSON.stringify(currentUser));
+            }
+
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (urlParams.get('mp_error')) {
+            showError("Hubo un error al vincular tu cuenta de Mercado Pago.");
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
     }, []);
 
     // --- HANDLERS DB ---
@@ -68,10 +93,10 @@ export const usePreferences = () => {
     };
 
     const toggleAsistencia = async (val: boolean) => {
-        setModuloAsistencia(val); 
+        setModuloAsistencia(val);
         try {
             await GymApi.updatePreferences({ moduloAsistencia: val });
-            
+
             // --- EL TRUCO ESTÁ AQUÍ: Actualizamos la "memoria" del navegador ---
             const storage = localStorage.getItem("user") ? localStorage : sessionStorage;
             const userStr = storage.getItem("user");
@@ -92,7 +117,7 @@ export const usePreferences = () => {
             }, 1000);
 
         } catch (e) {
-            setModuloAsistencia(!val); 
+            setModuloAsistencia(!val);
             showError("No se pudo actualizar el módulo");
         }
     };
@@ -118,19 +143,27 @@ export const usePreferences = () => {
         }
     };
 
-    const saveMpAccessToken = async () => {
-        if (!mpAccessToken.trim()) {
-            showError("El token no puede estar vacío");
-            return;
-        }
-
+    const vincularMercadoPago = async () => {
         try {
-            await GymApi.updatePreferences({ mpAccessToken });
-            showSuccess("Token de MercadoPago guardado correctamente ✅");
-            setCambiarMPAccessToken(false);
-            setMpAccessToken(""); // Limpiar el input por seguridad
+            const { url } = await MercadoPagoApi.getOAuthUrl();
+            window.location.href = url; // Redirigir al usuario al flujo OAuth
         } catch (error) {
-            showError("No se pudo guardar el token");
+            showError("No se pudo obtener la URL de vinculación.");
+        }
+    };
+
+    const desvincularMercadoPago = async () => {
+        try {
+            await GymApi.desvincularMercadoPago();
+            showSuccess("Cuenta de Mercado Pago desvinculada ✅");
+            setTieneMercadoPago(false);
+
+            if (currentUser && currentUser.gym) {
+                currentUser.gym.tieneMercadoPago = false;
+                localStorage.setItem("user", JSON.stringify(currentUser));
+            }
+        } catch (error) {
+            showError("No se pudo desvincular la cuenta");
         }
     };
 
@@ -149,12 +182,12 @@ export const usePreferences = () => {
         try {
             // 1. Verificar la contraseña actual
             const verifyRes = await GymApi.verifyFinancePassword(passwordCurrent);
-            
+
             if (verifyRes.success) {
                 // 2. Si es válida, proceder al cambio
                 await GymApi.updatePreferences({ finanzasPassword: passwordNew });
                 showSuccess("Contraseña financiera actualizada ✅");
-                
+
                 // Limpiar campos
                 setPasswordCurrent("");
                 setPasswordNew("");
@@ -173,12 +206,12 @@ export const usePreferences = () => {
 
     return {
         loading,
-        savingMessage, 
+        savingMessage,
         autoBirthday,
         autoReceipts,
-        birthdayMessage, 
-        setBirthdayMessage, 
-        saveBirthdayMessage, 
+        birthdayMessage,
+        setBirthdayMessage,
+        saveBirthdayMessage,
         toggleBirthday,
         toggleReceipts,
         showFinancialMetrics,
@@ -188,6 +221,6 @@ export const usePreferences = () => {
         passwordNew, setPasswordNew,
         passwordConfirm, setPasswordConfirm,
         changingPassword, updateFinanzasPassword,
-        cambiarMPAccessToken, mpAccessToken, setMpAccessToken, saveMpAccessToken
+        cambiarMPAccessToken, tieneMercadoPago, vincularMercadoPago, desvincularMercadoPago
     };
 };

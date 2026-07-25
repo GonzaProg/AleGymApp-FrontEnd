@@ -9,5 +9,10 @@ export const MercadoPagoApi = {
     asignarPlan: async (planId: number): Promise<{ init_point: string, preferenceId: string }> => {
         const { data } = await api.post("/mp/asignar", { planId });
         return data;
+    },
+
+    getOAuthUrl: async (): Promise<{ url: string }> => {
+        const { data } = await api.get("/mp/oauth/url");
+        return data;
     }
 };
