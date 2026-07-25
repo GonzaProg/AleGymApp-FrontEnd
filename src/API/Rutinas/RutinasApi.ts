@@ -24,8 +24,8 @@ export const RutinasApi = {
     },
 
     // Asignar una rutina general a un alumno (Vinculación M:N)
-    asignarGeneral: async (rutinaId: number, alumnoId: number) => {
-        const response = await api.post('/rutinas/asignar-general', { rutinaId, alumnoId });
+    asignarGeneral: async (rutinaId: number, alumnoId: number, nombrePersonalizado?: string) => {
+        const response = await api.post('/rutinas/asignar-general', { rutinaId, alumnoId, nombrePersonalizado });
         return response.data;
     },
 
@@ -59,8 +59,8 @@ export const RutinasApi = {
         const response = await api.delete(`/rutinas/grupo/${grupoId}`);
         return response.data;
     },
-    asignarGrupo: async (grupoId: string, alumnoId: number) => {
-        const response = await api.post('/rutinas/asignar-grupo', { grupoId, alumnoId });
+    asignarGrupo: async (grupoId: string, alumnoId: number, nombrePersonalizado?: string) => {
+        const response = await api.post('/rutinas/asignar-grupo', { grupoId, alumnoId, nombrePersonalizado });
         return response.data;
     },
     desvincularGrupo: async (grupoId: string, alumnoId: number) => {

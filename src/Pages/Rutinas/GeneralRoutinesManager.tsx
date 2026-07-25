@@ -11,6 +11,7 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit, onEditGroup }: { on
     const {
         rutinas, loading,
         isAssignModalOpen, setIsAssignModalOpen, openAssignModal, selectedRutina,
+        nombrePersonalizado, setNombrePersonalizado,
         busqueda, handleSearchChange, sugerencias, mostrarSugerencias, setMostrarSugerencias, handleSelectAlumno, alumnoSeleccionado,
         handleAsignar, handleDelete
     } = useGeneralRoutinesManager();
@@ -208,6 +209,18 @@ export const GeneralRoutinesManager = ({ onNavigate, onEdit, onEditGroup }: { on
                                             ))}
                                         </ul>
                                     )}
+                                </div>
+
+                                <div>
+                                    <Input 
+                                        label="Nombre Personalizado (Opcional)"
+                                        value={nombrePersonalizado}
+                                        onChange={(e) => setNombrePersonalizado(e.target.value)}
+                                        placeholder="Ej: Rutina para ..."
+                                        className={AppStyles.inputDark}
+                                        labelClassName={AppStyles.label}
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Si lo dejas en blanco, el alumno verá el nombre original.</p>
                                 </div>
 
                                 <div className="flex gap-4 pt-2">
