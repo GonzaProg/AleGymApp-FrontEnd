@@ -299,7 +299,12 @@ export const MyRoutines = () => {
 
             {/* TABS DE DÍAS (solo si es grupo) */}
             {esGrupo && (
-                <div className="flex gap-2 mt-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+                <div 
+                    className="flex gap-2 mt-2 overflow-x-auto pb-1" 
+                    style={{ scrollbarWidth: 'none' }}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onTouchMove={(e) => e.stopPropagation()}
+                >
                     {selectedRoutine.dias.map((_: any, index: number) => (
                         <button
                             key={index}

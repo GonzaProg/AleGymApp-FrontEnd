@@ -11,6 +11,7 @@ export const useGeneralRoutinesManager = () => {
     // Buscador y Modal
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [selectedRutina, setSelectedRutina] = useState<any | null>(null);
+    const [nombrePersonalizado, setNombrePersonalizado] = useState("");
 
     // Usamos el hook centralizado para la búsqueda de alumnos
     const {
@@ -45,6 +46,7 @@ export const useGeneralRoutinesManager = () => {
     // 3. Abrir Modal Asignar
     const openAssignModal = (rutina: any) => {
         setSelectedRutina(rutina);
+        setNombrePersonalizado("");
         clearSelection();
         setIsAssignModalOpen(true);
     };
@@ -67,10 +69,10 @@ export const useGeneralRoutinesManager = () => {
 
         try {
             if (esGrupo) {
-                await RutinasApi.asignarGrupo(selectedRutina.grupoId, alumnoSeleccionado.id);
+                await RutinasApi.asignarGrupo(selectedRutina.grupoId, alumnoSeleccionado.id, nombrePersonalizado);
                 showSuccess(`Rutina asignada a ${alumnoSeleccionado.nombre} (${selectedRutina.dias.length} días) ✅`);
             } else {
-                await RutinasApi.asignarGeneral(selectedRutina.id, alumnoSeleccionado.id);
+                await RutinasApi.asignarGeneral(selectedRutina.id, alumnoSeleccionado.id, nombrePersonalizado);
                 showSuccess(`Rutina asignada a ${alumnoSeleccionado.nombre} ✅`);
             }
             setIsAssignModalOpen(false);
@@ -114,6 +116,8 @@ export const useGeneralRoutinesManager = () => {
         setIsAssignModalOpen,
         openAssignModal,
         selectedRutina,
+        nombrePersonalizado,
+        setNombrePersonalizado,
         // Buscador
         busqueda,
         handleSearchChange,
