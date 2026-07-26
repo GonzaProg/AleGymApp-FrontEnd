@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useGastosManager } from "../../Hooks/Finanzas/useGastosManager";
 import { AppStyles } from "../../Styles/AppStyles";
+import { UnlockSection } from "../../Components/Security/UnlockSection";
 import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
-import { Lock, Wallet, Receipt, Undo2, ChevronDown, ChevronUp } from "lucide-react";
+import { Wallet, Receipt, Undo2, ChevronDown, ChevronUp } from "lucide-react";
 import { GymApi } from "../../API/Gym/GymApi";
 import { showError } from "../../Helpers/Alerts";
 
@@ -89,29 +90,13 @@ export const GastosManager = () => {
     return (
         <div className={AppStyles.principalContainer}>
             {!isUnlocked ? (
-                <div className="flex justify-center items-center pt-20">
-                    <div className={`${AppStyles.glassCard} flex flex-col items-center justify-center p-8 border-red-500/30 text-center w-full max-w-md`}>
-                        <Lock className="w-12 h-12 text-red-400 mb-6" />
-                        <h2 className="text-xl font-bold text-white mb-4">Acceso Restringido</h2>
-                        <div className="flex flex-col sm:flex-row gap-3 w-full">
-                            <Input 
-                                type="password" 
-                                placeholder="Contraseña" 
-                                value={passwordInput} 
-                                onChange={(e) => setPasswordInput(e.target.value)} 
-                                className={`${AppStyles.inputDark} text-center tracking-[0.3em] font-mono`}
-                                onKeyDown={(e) => e.key === 'Enter' && handleDesbloquear()}
-                            />
-                            <Button 
-                                onClick={handleDesbloquear} 
-                                disabled={verifying}
-                                className="bg-red-600/50 hover:bg-red-500 text-white font-bold px-6 border-0"
-                            >
-                                {verifying ? "Verificando..." : "Desbloquear"}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                <UnlockSection 
+                    passwordInput={passwordInput}
+                    setPasswordInput={setPasswordInput}
+                    handleDesbloquear={handleDesbloquear}
+                    verifying={verifying}
+                    className="pt-20"
+                />
             ) : (
                 <div className="w-full max-w-5xl mx-auto space-y-8 animate-fade-in-up">
                     <div className="flex items-center gap-3">

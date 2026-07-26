@@ -153,7 +153,7 @@ export const Preferences = () => {
                                 <button
                                     onClick={updateFinanzasPassword}
                                     disabled={changingPassword}
-                                    className="w-full bg-red-600 hover:bg-red-500 disabled:bg-gray-700 text-white text-sm font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                    className="w-full bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/50 disabled:bg-gray-700 text-sm font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
                                 >
                                     {changingPassword ? "Actualizando..." : (
                                         <>
@@ -181,8 +181,8 @@ export const Preferences = () => {
                         </div>
                     </div>
 
-                    {/* SECCIÓN 4: MERCADOPAGO (Solo visible si cambiarMPAccessToken del Gym es true) */}
-                    {cambiarMPAccessToken && (
+                    {/* SECCIÓN 4: MERCADOPAGO (Visible si cambiarMPAccessToken es true O si ya tiene cuenta vinculada) */}
+                    {(cambiarMPAccessToken || tieneMercadoPago) && (
                         <div className={`${AppStyles.glassCard} border-blue-500/30 animate-fade-in-up mb-20`}>
                             <h3 className="text-xl font-bold text-white mb-4 border-b border-white/10 pb-4 flex items-center gap-2">
                                 <CreditCard className="w-6 h-6 text-[#009EE3]" /> Integración con MercadoPago

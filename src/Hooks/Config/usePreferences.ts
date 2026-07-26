@@ -12,7 +12,7 @@ export const usePreferences = () => {
     const [cambiarMPAccessToken, setCambiarMPAccessToken] = useState(false);
 
     // Auth info to check if already linked
-    const currentUserStr = localStorage.getItem("user");
+    const currentUserStr = localStorage.getItem("user") || sessionStorage.getItem("user");
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
     const [tieneMercadoPago, setTieneMercadoPago] = useState(currentUser?.gym?.tieneMercadoPago ?? false);
 
@@ -57,10 +57,11 @@ export const usePreferences = () => {
             setTieneMercadoPago(true);
             setCambiarMPAccessToken(false);
 
-            // Actualizar localstorage
+            // Actualizar localstorage / sessionstorage
             if (currentUser && currentUser.gym) {
                 currentUser.gym.tieneMercadoPago = true;
-                localStorage.setItem("user", JSON.stringify(currentUser));
+                const storage = localStorage.getItem("user") ? localStorage : sessionStorage;
+                storage.setItem("user", JSON.stringify(currentUser));
             }
 
             // Clean URL

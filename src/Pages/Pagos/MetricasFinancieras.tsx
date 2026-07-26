@@ -6,9 +6,10 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { FinancialDashboard } from "../../Components/Pagos/FinancialDashboard";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
-import { DollarSign, Search, Undo2, Lock } from "lucide-react";
+import { DollarSign, Search, Undo2 } from "lucide-react";
 import { GymApi } from "../../API/Gym/GymApi";
 import { showError } from "../../Helpers/Alerts";
+import { UnlockSection } from "../../Components/Security/UnlockSection";
 
 export const MetricasFinancieras = () => {
     
@@ -89,26 +90,12 @@ export const MetricasFinancieras = () => {
                 {showMetrics && (
                     <div className="animate-fade-in-down">
                         {!isUnlocked ? (
-                            <div className={`${AppStyles.glassCard} flex flex-col items-center justify-center p-8 border-red-500/30 text-center`}>
-                                <Lock className="w-12 h-12 text-red-400 mb-6" />
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    <Input 
-                                        type="password" 
-                                        placeholder="Contraseña" 
-                                        value={passwordInput} 
-                                        onChange={(e) => setPasswordInput(e.target.value)} 
-                                        className={`${AppStyles.inputDark} text-center tracking-[0.3em] font-mono`}
-                                        onKeyDown={(e) => e.key === 'Enter' && handleDesbloquear()}
-                                    />
-                                    <Button 
-                                        onClick={handleDesbloquear} 
-                                        disabled={verifying}
-                                        className="bg-red-600/50 hover:bg-red-500 text-white font-bold px-6 border-0"
-                                    >
-                                        {verifying ? "Verificando..." : "Desbloquear"}
-                                    </Button>
-                                </div>
-                            </div>
+                            <UnlockSection 
+                                passwordInput={passwordInput}
+                                setPasswordInput={setPasswordInput}
+                                handleDesbloquear={handleDesbloquear}
+                                verifying={verifying}
+                            />
                         ) : (
                             <FinancialDashboard />
                         )}

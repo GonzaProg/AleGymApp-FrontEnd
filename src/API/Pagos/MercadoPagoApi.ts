@@ -1,8 +1,8 @@
 import api from "../axios";
 
 export const MercadoPagoApi = {
-    renovarPlan: async (userPlanId: number): Promise<{ init_point: string, preferenceId: string }> => {
-        const { data } = await api.post("/mp/renovar", { userPlanId });
+    renovarPlan: async (userPlanId: number, isNative?: boolean): Promise<{ init_point: string, preferenceId: string }> => {
+        const { data } = await api.post("/mp/renovar", { userPlanId, isNative });
         return data;
     },
 

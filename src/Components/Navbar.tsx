@@ -1,14 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotificaciones } from "../Hooks/Notificaciones/useNotificaciones";
+import { useAuthUser } from "../Hooks/Auth/useAuthUser";
+import { useGymCachedImages } from "../Hooks/StudentsHome/useGymCachedImages";
 import { AppStyles } from "../Styles/AppStyles";
 import { Bell, BellOff } from "lucide-react";
+
 export const Navbar = () => {
   const navigate = useNavigate();
   const { notificaciones, unreadCount, markAsRead, refresh } = useNotificaciones();
+  const { currentUser } = useAuthUser();
+  const { localLogoUrl } = useGymCachedImages(currentUser?.gym?.logoUrl, undefined);
   
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedNotif, setSelectedNotif] = useState<any>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,10 +27,6 @@ export const Navbar = () => {
 
   const handleNotifClick = (notif: any) => {
     if (!notif.leida) markAsRead(notif.id);
-    if (notif.mensaje.length > 100) {
-        setSelectedNotif(notif);
-        setShowDropdown(false);
-    }
   };
 
   return (
@@ -34,18 +34,25 @@ export const Navbar = () => {
     <nav className="fixed w-full z-50 top-0 start-0 bg-gradient-to-b from-gray-900 via-gray-900/90 to-transparent pt-safe pb-8 transition-all">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 relative">
         
-        {/* --- IZQUIERDA: LOGO MIXTO (TEXTO + IMAGEN) --- */}
+        {/* IZQUIERDA: LOGO MIXTO (TEXTO + IMAGEN) */}
         <div 
             onClick={() => navigate("/home")} 
-            className="flex items-center cursor-pointer group z-20"
+            className="flex items-center cursor-pointer group z-20 gap-3"
         >
             <span className="self-center text-2xl font-bold whitespace-nowrap">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#0071BC]">Gym</span>
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF8C00] to-[#d3932b]">Mate</span>
             </span>
+            {localLogoUrl && (
+                <img 
+                    src={localLogoUrl} 
+                    alt="Logo Gym" 
+                    className="h-12 w-12 object-contain"
+                />
+            )}
         </div>
         
-        {/* --- DERECHA: NOTIFICACIONES --- */}
+        {/* DERECHA: NOTIFICACIONES */}
         <div className="flex items-center gap-4 z-20">
           <div className="relative" ref={dropdownRef}>
             <button 
@@ -78,7 +85,7 @@ export const Navbar = () => {
                                         {!n.leida && <span className="absolute left-2 top-4 w-2 h-2 rounded-full bg-green-500 shadow-green-500/50 shadow-md"></span>}
                                         <div className="ml-3">
                                             <p className={`text-sm mb-1 ${!n.leida ? 'text-white font-bold' : 'text-gray-300 font-medium'}`}>{n.titulo}</p>
-                                            <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{n.mensaje}</p>
+                                            <p className="text-xs text-gray-400 leading-relaxed whitespace-pre-wrap break-words">{n.mensaje}</p>
                                             <span className="text-[10px] text-gray-600 mt-2 block">{new Date(n.fechaCreacion).toLocaleDateString()}</span>
                                         </div>
                                     </li>
@@ -96,23 +103,6 @@ export const Navbar = () => {
       </div>
     </nav>
 
-    {selectedNotif && (
-        <div className={AppStyles.modalOverlay} onClick={() => setSelectedNotif(null)}>
-            <div className={AppStyles.modalContent + " max-w-2xl w-full mx-4"} onClick={(e) => e.stopPropagation()}>
-                <div className="p-6 border-b border-white/10 flex justify-between items-center bg-gradient-to-r from-green-900/20 to-transparent">
-                    <h3 className="text-2xl font-bold text-white break-words w-11/12">{selectedNotif.titulo}</h3>
-                    <button onClick={() => setSelectedNotif(null)} className="text-gray-400 hover:text-white text-3xl transition-colors">&times;</button>
-                </div>
-                <div className="p-8 overflow-y-auto max-h-[70vh]">
-                    <p className="text-gray-200 text-lg leading-relaxed break-words">{selectedNotif.mensaje}</p>
-                    <p className="text-right text-sm text-gray-500 mt-8 pt-4 border-t border-white/5">Recibido el: {new Date(selectedNotif.fechaCreacion).toLocaleString()}</p>
-                </div>
-                <div className="p-4 bg-black/20 text-right">
-                    <button onClick={() => setSelectedNotif(null)} className={AppStyles.btnSecondary + " py-2 px-8 text-base"}>Cerrar</button>
-                </div>
-            </div>
-        </div>
-    )}
     </>
   );
 };

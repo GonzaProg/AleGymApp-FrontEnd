@@ -33,9 +33,10 @@ export const useUserPlan = () => {
     };
 
     return {
-        activePlans, // Array de planes
+        activePlans,
         isUserExpired,
         loading,
-        error
+        error,
+        fetchMyPlans
     };
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Scanner } from '@yudiel/react-qr-scanner'; 
 import { AppStyles } from "../../Styles/AppStyles";
@@ -11,6 +11,9 @@ import { useGymCachedImages } from "../../Hooks/StudentsHome/useGymCachedImages"
 import { useStudentDietas } from "../../Hooks/Dietas/useStudentDietas";
 import { useNavigate } from "react-router-dom";
 import { MercadoPagoApi } from "../../API/Pagos/MercadoPagoApi";
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
+import { App as CapacitorApp } from '@capacitor/app';
 import { showError } from "../../Helpers/Alerts";
 import MpLogo from "../../assets/MP_RGB_HANDSHAKE_color_horizontal.svg";
 
@@ -35,7 +38,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const { frase, loading: loadingFrase } = useFraseMotivacional();
 
     // Planes del usuario
-    const { activePlans, loading: loadingPlans } = useUserPlan();
+    const { activePlans, loading: loadingPlans, fetchMyPlans } = useUserPlan();
     const unexpiredPlans = activePlans.filter(p => p.diasRestantes >= 0);
     const expiredPlans = activePlans.filter(p => p.diasRestantes < 0);
     const planesToShow = unexpiredPlans.length > 0 ? unexpiredPlans : expiredPlans;
@@ -69,9 +72,14 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
         try {
             setLoadingMP(userPlanId);
-            const { init_point } = await MercadoPagoApi.renovarPlan(userPlanId);
+            const { init_point } = await MercadoPagoApi.renovarPlan(userPlanId, Capacitor.isNativePlatform());
             if (init_point) {
-                window.location.href = init_point;
+                if (Capacitor.isNativePlatform()) {
+                    // Abrir en Chrome Custom Tabs permite que Android detecte si la app de MP está instalada y la abra
+                    await Browser.open({ url: init_point });
+                } else {
+                    window.location.href = init_point;
+                }
             }
         } catch (err: any) {
             console.error(err);
@@ -81,6 +89,25 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             setLoadingMP(null);
         }
     };
+
+    // Escuchar el retorno del Deep Link de Mercado Pago
+    useEffect(() => {
+        if (!Capacitor.isNativePlatform()) return;
+
+        const urlListener = CapacitorApp.addListener('appUrlOpen', (data) => {
+            if (data.url.includes("gymmate://payment")) {
+                // Cerramos el Chrome Custom Tab que abrió MP
+                Browser.close().catch(console.error);
+                
+                // Recargamos el plan para reflejar el pago exitoso
+                fetchMyPlans();
+            }
+        });
+
+        return () => {
+            urlListener.then(listener => listener.remove());
+        };
+    }, []);
 
     return (
         <div className="pt-safe mt-24 p-0 animate-fade-in pb-32 space-y-6 max-w-lg mx-auto relative">
