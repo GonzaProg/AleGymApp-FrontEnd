@@ -149,15 +149,36 @@ export const RenewPlan = () => {
                                   
                                   {/* Info Plan */}
                                   <div className="flex-1 text-left w-full">
-                                      <div className="flex items-center gap-2 mb-1">
+                                      <div className="flex flex-wrap items-center gap-2 mb-1">
                                           <h4 className="text-xl font-bold text-green-400">{sus.plan.nombre}</h4>
                                           <span className="text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded border border-gray-600 uppercase">
                                               {sus.plan.tipo}
                                           </span>
                                       </div>
-                                      <p className="text-gray-400 text-sm">
+                                      <p className="text-gray-400 text-sm mb-3">
                                           Vence: <span className="text-white font-mono">{new Date(sus.fechaVencimiento).toLocaleDateString()}</span>
                                       </p>
+
+                                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-gray-300 mb-3 bg-black/20 p-3 rounded-lg border border-white/5 w-full max-w-lg">
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500 font-bold mb-0.5">Precio</span>
+                                            <span className="text-green-400 font-mono font-bold">${sus.plan.precio}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500 font-bold mb-0.5">Duración</span>
+                                            <span className="font-medium flex items-center gap-1"><Hourglass className="w-3 h-3"/> {sus.plan.duracionDias} días</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500 font-bold mb-0.5">Acceso</span>
+                                            <span className="font-medium">{sus.plan.diasPorSemana === 7 ? "Pase Libre" : `${sus.plan.diasPorSemana} días/sem`}</span>
+                                        </div>
+                                      </div>
+
+                                      {sus.plan.descripcion && (
+                                        <p className="text-gray-400 text-xs italic border-l-2 border-white/10 pl-2 max-w-lg line-clamp-2">
+                                            "{sus.plan.descripcion}"
+                                        </p>
+                                      )}
                                   </div>
 
                                   {/* Botones de Acción Individuales */}

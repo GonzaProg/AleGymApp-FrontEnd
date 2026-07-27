@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { GymApi } from "../../API/Gym/GymApi";
 import { MercadoPagoApi } from "../../API/Pagos/MercadoPagoApi";
 import { showError, showSuccess } from "../../Helpers/Alerts";
+import { Capacitor } from '@capacitor/core';
 
 export const usePreferences = () => {
     // DB Settings
@@ -146,8 +147,25 @@ export const usePreferences = () => {
 
     const vincularMercadoPago = async () => {
         try {
-            const { url } = await MercadoPagoApi.getOAuthUrl();
-            window.location.href = url; // Redirigir al usuario al flujo OAuth
+            const platform = Capacitor.getPlatform();
+            const isNative = platform === 'electron' || navigator.userAgent.toLowerCase().includes('electron');
+            
+            const { url } = await MercadoPagoApi.getOAuthUrl(isNative);
+
+            if (isNative) {
+                // En Electron simulamos un click en un link externo para forzar al sistema operativo 
+                // a abrir el navegador real (Chrome, Edge) en vez de una ventana interna.
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showSuccess("Sigue los pasos en la ventana del navegador. Cuando termines, refresca esta página.");
+            } else {
+                window.location.href = url; // Redirigir al usuario al flujo OAuth (Navegador Web normal)
+            }
         } catch (error) {
             showError("No se pudo obtener la URL de vinculación.");
         }

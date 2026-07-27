@@ -13,7 +13,7 @@ export const AppStyles = {
     contentContainer: "relative z-10 pt-28 pb-10 px-4 w-full flex justify-center",
 
     // LISTAS Y SUGERENCIAS (Buscador)
-    suggestionsList: "absolute z-20 w-full backdrop-blur-xl bg-gray-900/95 border border-white/10 rounded-xl shadow-2xl mt-1 max-h-60 overflow-y-auto overflow-x-hidden thin-scrollbar",
+    suggestionsList: "absolute z-[100] w-full bg-gray-900 border border-white/20 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.8)] mt-1 max-h-60 overflow-y-auto overflow-x-hidden thin-scrollbar",
     suggestionItem: "p-3 hover:bg-green-600/20 cursor-pointer border-b border-white/5 transition-colors flex items-center gap-3 group",
     avatarSmall: "group-hover:scale-110 transition-transform w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border bg-gray-800 text-green-400 border-green-500/30",
 

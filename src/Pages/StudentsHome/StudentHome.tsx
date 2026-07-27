@@ -187,21 +187,19 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                 </div>
 
                                 {/* BOTÓN DE MERCADOPAGO */}
-                                {(estaPorVencer || estaVencido) && (
-                                    <div className="mt-5">
-                                        <button
-                                            onClick={() => handlePagoMP(plan.userPlanId)}
-                                            disabled={loadingMP === plan.userPlanId}
-                                            className="w-full flex items-center justify-center py-2 px-4 rounded-xl text-white bg-[#009EE3] hover:bg-[#008CC9] transition-colors disabled:opacity-50 h-12"
-                                        >
-                                            {loadingMP === plan.userPlanId ? (
-                                                <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                                            ) : (
-                                                <img src={MpLogo} alt="Pagar con MercadoPago" className="h-16" />
-                                            )}
-                                        </button>
-                                    </div>
-                                )}
+                                <div className="mt-5">
+                                    <button
+                                        onClick={() => handlePagoMP(plan.userPlanId)}
+                                        disabled={loadingMP === plan.userPlanId}
+                                        className="w-full flex items-center justify-center py-2 px-4 rounded-xl text-white bg-[#009EE3] hover:bg-[#008CC9] transition-colors disabled:opacity-50 h-12"
+                                    >
+                                        {loadingMP === plan.userPlanId ? (
+                                            <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                                        ) : (
+                                            <img src={MpLogo} alt="Pagar con MercadoPago" className="h-16" />
+                                        )}
+                                    </button>
+                                </div>
                             </div>
                         )
                     })}

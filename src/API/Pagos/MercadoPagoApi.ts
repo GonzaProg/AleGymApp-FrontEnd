@@ -11,8 +11,10 @@ export const MercadoPagoApi = {
         return data;
     },
 
-    getOAuthUrl: async (): Promise<{ url: string }> => {
-        const { data } = await api.get("/mp/oauth/url");
+    getOAuthUrl: async (isNative?: boolean): Promise<{ url: string }> => {
+        const { data } = await api.get("/mp/oauth/url", {
+            params: { isNative }
+        });
         return data;
     }
 };
