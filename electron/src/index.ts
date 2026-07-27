@@ -1,7 +1,7 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import { getCapacitorElectronConfig, setupElectronDeepLinking } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, MenuItem } from 'electron';
+import { app, MenuItem, shell } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
@@ -84,11 +84,20 @@ autoUpdater.on('update-downloaded', (info) => {
   await myCapacitorApp.init();
   // Check for updates if we are in a packaged app.
 
-  // CONFIGURACIÓN DE LA BARRA DE MENÚ
+  // CONFIGURACIÓN DE LA BARRA DE MENÚS
   const win = myCapacitorApp.getMainWindow();
   if (win) {
     win.setAutoHideMenuBar(true); // Oculta la barra pero permite verla con la tecla 'Alt'
     win.setMenuBarVisibility(false); // Asegura que inicie oculta
+    
+    // Interceptar enlaces con target="_blank" para abrirlos en el navegador del sistema operativo
+    win.webContents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith('http') || url.startsWith('https')) {
+        shell.openExternal(url);
+        return { action: 'deny' };
+      }
+      return { action: 'allow' };
+    });
   }
 
   if (!electronIsDev) {

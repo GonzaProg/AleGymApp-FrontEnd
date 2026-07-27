@@ -2,10 +2,9 @@ import { EmpleadosList } from "./EmpleadosList";
 import { EmpleadoDetail } from "./EmpleadoDetail";
 import { EmpleadoForm } from "./EmpleadoForm";
 import { PagoEmpleadoForm } from "./PagoEmpleadoForm";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { AppStyles } from "../../Styles/AppStyles";
-import { Input } from "../../Components/UI/Input";
-import { Button } from "../../Components/UI/Button";
+import { UnlockSection } from "../../Components/Security/UnlockSection";
 import { useEmpleadosManager } from "../../Hooks/Empleados/useEmpleadosManager";
 
 export const EmpleadosManager = () => {
@@ -41,29 +40,13 @@ export const EmpleadosManager = () => {
     return (
         <div className={AppStyles.principalContainer}>
             {!isUnlocked ? (
-                <div className="flex justify-center items-center pt-20">
-                    <div className={`${AppStyles.glassCard} flex flex-col items-center justify-center p-8 border-red-500/30 text-center w-full max-w-md`}>
-                        <Lock className="w-12 h-12 text-red-400 mb-6" />
-                        <h2 className="text-xl font-bold text-white mb-4">Acceso Restringido</h2>
-                        <div className="flex flex-col sm:flex-row gap-3 w-full">
-                            <Input 
-                                type="password" 
-                                placeholder="Contraseña" 
-                                value={passwordInput} 
-                                onChange={(e) => setPasswordInput(e.target.value)} 
-                                className={`${AppStyles.inputDark} text-center tracking-[0.3em] font-mono`}
-                                onKeyDown={(e) => e.key === 'Enter' && handleDesbloquear()}
-                            />
-                            <Button 
-                                onClick={handleDesbloquear} 
-                                disabled={verifying}
-                                className="bg-red-600/50 hover:bg-red-500 text-white font-bold px-6 border-0"
-                            >
-                                {verifying ? "Verificando..." : "Desbloquear"}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+                <UnlockSection 
+                    passwordInput={passwordInput}
+                    setPasswordInput={setPasswordInput}
+                    handleDesbloquear={handleDesbloquear}
+                    verifying={verifying}
+                    className="pt-20"
+                />
             ) : (
                 <>
                     {view === 'list' && (

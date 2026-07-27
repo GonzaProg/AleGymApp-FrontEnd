@@ -3,11 +3,13 @@ import api from "../../API/axios";
 import { useWhatsAppModal } from "../../Context/WhatsAppModalContext";
 import { showConfirmDelete, showSuccess, showError } from "../../Helpers/Alerts";
 import { LogOut } from "lucide-react";
+import { useAuthUser } from "../../Hooks/Auth/useAuthUser";
 
 export const WhatsAppStatus = () => {
   const [status, setStatus] = useState<"connected" | "disconnected" | "loading" | "offline">("loading");
   const [_, setIsIdle] = useState(false);
   const { openModal } = useWhatsAppModal();
+  const { isEntrenador, isLoading } = useAuthUser();
   
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const idleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,6 +77,8 @@ export const WhatsAppStatus = () => {
   }, [checkStatus]);
 
   useEffect(() => {
+    if (isLoading || !isEntrenador) return;
+
     // Arranque inicial
     checkStatus();
     resetIdleTimer();
@@ -90,7 +94,7 @@ export const WhatsAppStatus = () => {
       if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [checkStatus, resetIdleTimer]);
+  }, [checkStatus, resetIdleTimer, isEntrenador, isLoading]);
 
   // --- HANDLERS ---
   const handleVincular = () => openModal();
@@ -114,6 +118,8 @@ export const WhatsAppStatus = () => {
   };
 
   const isServerDown = status === "offline";
+
+  if (isLoading || !isEntrenador) return null;
 
   return (
     <div className="pt-6 px-4 py-2 border-t border-white/5">

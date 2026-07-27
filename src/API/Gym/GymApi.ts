@@ -58,6 +58,11 @@ export const GymApi = {
         return response.data;
     },
 
+    desvincularMercadoPago: async () => {
+        const response = await api.post('/gyms/mp-unlink');
+        return response.data;
+    },
+
     // 4. Actualizar
     update: async (id: number, data: CreateUpdateGymDTO) => {
         const response = await api.put(`/gyms/${id}`, data);
