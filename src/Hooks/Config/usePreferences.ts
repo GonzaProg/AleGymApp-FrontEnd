@@ -159,6 +159,11 @@ export const usePreferences = () => {
     };
 
     const saveConcurrenciaConfig = async () => {
+        if (concurrenciaMediaMax <= concurrenciaBajaMax) {
+            showError("El máximo de concurrencia media debe ser mayor al de concurrencia baja");
+            return;
+        }
+
         setSavingConcurrencia(true);
         try {
             await GymApi.updatePreferences({

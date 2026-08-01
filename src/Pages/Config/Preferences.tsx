@@ -40,7 +40,7 @@ export const Preferences = () => {
 
                 <div className="space-y-6 mt-8 mb-20">
                     
-                    {/* SECCIÓN 1: AUTOMATIZACIONES (Backend) */}
+                    {/* SECCIÓN: AUTOMATIZACIONES (Backend) */}
                     <div className={AppStyles.glassCard}>
                         <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
                             <Bot className="w-6 h-6 text-blue-400" /> Automatizaciones (WhatsApp)
@@ -95,7 +95,7 @@ export const Preferences = () => {
                         </div>
                     </div>
 
-                    {/* SECCIÓN 2: INTERFAZ (Local) */}
+                    {/* SECCIÓN: INTERFAZ (Local) */}
                     <div className={AppStyles.glassCard}>
                         <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
                             <Monitor className="w-6 h-6 text-purple-400" /> Interfaz y Métricas
@@ -108,6 +108,21 @@ export const Preferences = () => {
                                 <p className="text-gray-400 text-sm">Mostrar gráficas de ingresos y métricas en el historial de pagos.</p>
                             </div>
                             <ToggleSwitch checked={showFinancialMetrics} onChange={setShowFinancialMetrics} />
+                        </div>
+                    </div>
+
+                    {/* SECCIÓN: MÓDULOS DEL SISTEMA */}
+                    <div className={AppStyles.glassCard}>
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+                            <Package className="w-6 h-6 text-green-400" /> Módulos del Sistema
+                        </h3>
+
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-white font-bold text-lg">Control de Asistencia</p>
+                                <p className="text-gray-400 text-sm">Habilita el escaneo de códigos QR, concurrencia en vivo y control de accesos.</p>
+                            </div>
+                            <ToggleSwitch checked={moduloAsistencia} onChange={toggleAsistencia} />
                         </div>
                     </div>
 
@@ -172,22 +187,7 @@ export const Preferences = () => {
                         </div>
                     </div>
 
-                    {/* SECCIÓN 3: MÓDULOS DEL SISTEMA */}
-                    <div className={AppStyles.glassCard}>
-                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
-                            <Package className="w-6 h-6 text-green-400" /> Módulos del Sistema
-                        </h3>
-
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-white font-bold text-lg">Control de Asistencia</p>
-                                <p className="text-gray-400 text-sm">Habilita el escaneo de códigos QR, concurrencia en vivo y control de accesos.</p>
-                            </div>
-                            <ToggleSwitch checked={moduloAsistencia} onChange={toggleAsistencia} />
-                        </div>
-                    </div>
-
-                    {/* SECCIÓN 4: CONCURRENCIA */}
+                    {/* SECCIÓN: CONCURRENCIA */}
                     <div className={AppStyles.glassCard}>
                         <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
                             <Users className="w-6 h-6 text-orange-400" /> Configuración de Concurrencia (App Alumnos)
@@ -253,14 +253,14 @@ export const Preferences = () => {
                             <button
                                 onClick={saveConcurrenciaConfig}
                                 disabled={savingConcurrencia}
-                                className="bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+                                className={AppStyles.btnPrimary}
                             >
                                 {savingConcurrencia ? 'Guardando...' : <span className="flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Guardar Concurrencia</span>}
                             </button>
                         </div>
                     </div>
 
-                    {/* SECCIÓN 5: MERCADOPAGO (Visible si cambiarMPAccessToken es true O si ya tiene cuenta vinculada) */}
+                    {/* SECCIÓN: MERCADOPAGO (Visible si cambiarMPAccessToken es true O si ya tiene cuenta vinculada) */}
                     {(cambiarMPAccessToken || tieneMercadoPago) && (
                         <div className={`${AppStyles.glassCard} border-blue-500/30 animate-fade-in-up mb-20`}>
                             <h3 className="text-xl font-bold text-white mb-4 border-b border-white/10 pb-4 flex items-center gap-2">
