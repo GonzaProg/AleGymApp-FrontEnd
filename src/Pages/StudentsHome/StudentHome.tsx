@@ -28,11 +28,18 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
         isScannerOpen, setIsScannerOpen, isAsistenciaHabilitada
     } = useStudentHome(currentUser);
 
-    // Lógica simple para cambiar el texto y color según la cantidad de gente
+    // Lógica para cambiar el texto y color según la cantidad de gente y configuración del Gym
     const getMensajeConcurrencia = (cantidad: number) => {
-        if (cantidad <= 8) return { texto: "Está súper tranquilo. ¡Es el momento perfecto para entrenar!", color: "text-green-400" };
-        if (cantidad > 8 && cantidad <= 20) return { texto: "Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!", color: "text-yellow-400" };
-        return { texto: "Está bastante lleno. ¡Queda a tu elección!", color: "text-orange-400" };
+        const bajaMax = currentUser?.gym?.concurrenciaBajaMax;
+        const mediaMax = currentUser?.gym?.concurrenciaMediaMax;
+
+        const fraseBaja = currentUser?.gym?.fraseConcurrenciaBaja;
+        const fraseMedia = currentUser?.gym?.fraseConcurrenciaMedia;
+        const fraseAlta = currentUser?.gym?.fraseConcurrenciaAlta;
+
+        if (cantidad <= bajaMax) return { texto: fraseBaja, color: "text-green-400" };
+        if (cantidad > bajaMax && cantidad <= mediaMax) return { texto: fraseMedia, color: "text-yellow-400" };
+        return { texto: fraseAlta, color: "text-orange-400" };
     };
 
     const { frase, loading: loadingFrase } = useFraseMotivacional();
@@ -187,19 +194,21 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                                 </div>
 
                                 {/* BOTÓN DE MERCADOPAGO */}
-                                <div className="mt-5">
-                                    <button
-                                        onClick={() => handlePagoMP(plan.userPlanId)}
-                                        disabled={loadingMP === plan.userPlanId}
-                                        className="w-full flex items-center justify-center py-2 px-4 rounded-xl text-white bg-[#009EE3] hover:bg-[#008CC9] transition-colors disabled:opacity-50 h-12"
-                                    >
-                                        {loadingMP === plan.userPlanId ? (
-                                            <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                                        ) : (
-                                            <img src={MpLogo} alt="Pagar con MercadoPago" className="h-16" />
-                                        )}
-                                    </button>
-                                </div>
+                                {currentUser?.gym?.tieneMercadoPago && (
+                                    <div className="mt-5">
+                                        <button
+                                            onClick={() => handlePagoMP(plan.userPlanId)}
+                                            disabled={loadingMP === plan.userPlanId}
+                                            className="w-full flex items-center justify-center py-2 px-4 rounded-xl text-white bg-[#009EE3] hover:bg-[#008CC9] transition-colors disabled:opacity-50 h-12"
+                                        >
+                                            {loadingMP === plan.userPlanId ? (
+                                                <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                                            ) : (
+                                                <img src={MpLogo} alt="Pagar con MercadoPago" className="h-16" />
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )
                     })}

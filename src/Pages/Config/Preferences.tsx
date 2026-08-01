@@ -1,7 +1,7 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
 import { usePreferences } from "../../Hooks/Config/usePreferences";
-import { Settings, Bot, Save, Monitor, Package, Lock, CreditCard } from "lucide-react";
+import { Settings, Bot, Save, Monitor, Package, Lock, CreditCard, Users } from "lucide-react";
 
 export const Preferences = () => {
     const { 
@@ -15,7 +15,13 @@ export const Preferences = () => {
         passwordNew, setPasswordNew,
         passwordConfirm, setPasswordConfirm,
         changingPassword, updateFinanzasPassword,
-        cambiarMPAccessToken, tieneMercadoPago, vincularMercadoPago, desvincularMercadoPago
+        cambiarMPAccessToken, tieneMercadoPago, vincularMercadoPago, desvincularMercadoPago,
+        concurrenciaBajaMax, setConcurrenciaBajaMax,
+        concurrenciaMediaMax, setConcurrenciaMediaMax,
+        fraseConcurrenciaBaja, setFraseConcurrenciaBaja,
+        fraseConcurrenciaMedia, setFraseConcurrenciaMedia,
+        fraseConcurrenciaAlta, setFraseConcurrenciaAlta,
+        saveConcurrenciaConfig, savingConcurrencia
     } = usePreferences();
 
     if (loading) return <div className="text-white text-center pt-20">Cargando preferencias...</div>;
@@ -181,7 +187,80 @@ export const Preferences = () => {
                         </div>
                     </div>
 
-                    {/* SECCIÓN 4: MERCADOPAGO (Visible si cambiarMPAccessToken es true O si ya tiene cuenta vinculada) */}
+                    {/* SECCIÓN 4: CONCURRENCIA */}
+                    <div className={AppStyles.glassCard}>
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4 flex items-center gap-2">
+                            <Users className="w-6 h-6 text-orange-400" /> Configuración de Concurrencia (App Alumnos)
+                        </h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Máximo Concurrencia Baja (verde)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={concurrenciaBajaMax}
+                                    onChange={(e) => setConcurrenciaBajaMax(Number(e.target.value))}
+                                    className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-white/10 focus:border-green-500 transition-all font-mono"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">Si hay hasta {concurrenciaBajaMax} personas.</p>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Máximo Concurrencia Media (amarillo)</label>
+                                <input
+                                    type="number"
+                                    min={concurrenciaBajaMax + 1}
+                                    value={concurrenciaMediaMax}
+                                    onChange={(e) => setConcurrenciaMediaMax(Number(e.target.value))}
+                                    className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-white/10 focus:border-yellow-500 transition-all font-mono"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">Entre {concurrenciaBajaMax + 1} y {concurrenciaMediaMax} personas.</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 mb-6">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Mensaje Concurrencia Baja (Verde)</label>
+                                <input
+                                    type="text"
+                                    value={fraseConcurrenciaBaja}
+                                    onChange={(e) => setFraseConcurrenciaBaja(e.target.value)}
+                                    className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-green-500/30 focus:border-green-500 transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Mensaje Concurrencia Media (Amarillo)</label>
+                                <input
+                                    type="text"
+                                    value={fraseConcurrenciaMedia}
+                                    onChange={(e) => setFraseConcurrenciaMedia(e.target.value)}
+                                    className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-yellow-500/30 focus:border-yellow-500 transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Mensaje Concurrencia Alta (Naranja)</label>
+                                <input
+                                    type="text"
+                                    value={fraseConcurrenciaAlta}
+                                    onChange={(e) => setFraseConcurrenciaAlta(e.target.value)}
+                                    className="w-full bg-gray-900/50 text-white p-3 rounded-lg border border-orange-500/30 focus:border-orange-500 transition-all"
+                                />
+                                <p className="text-xs text-gray-400 mt-1">Se mostrará cuando superen las {concurrenciaMediaMax} personas.</p>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end mt-2">
+                            <button
+                                onClick={saveConcurrenciaConfig}
+                                disabled={savingConcurrencia}
+                                className="bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+                            >
+                                {savingConcurrencia ? 'Guardando...' : <span className="flex items-center justify-center gap-2"><Save className="w-4 h-4" /> Guardar Concurrencia</span>}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* SECCIÓN 5: MERCADOPAGO (Visible si cambiarMPAccessToken es true O si ya tiene cuenta vinculada) */}
                     {(cambiarMPAccessToken || tieneMercadoPago) && (
                         <div className={`${AppStyles.glassCard} border-blue-500/30 animate-fade-in-up mb-20`}>
                             <h3 className="text-xl font-bold text-white mb-4 border-b border-white/10 pb-4 flex items-center gap-2">
