@@ -90,14 +90,22 @@ export const PagosApi = {
         return response.data;
     },
 
-    // NUEVO: Revertir pago
+    exportMatrizExcel: async (year: number): Promise<Blob> => {
+        const response = await api.get(`/pagos/matriz-anual/${year}/export/excel`, { responseType: 'blob' });
+        return response.data;
+    },
+
+    exportMatrizPDF: async (year: number): Promise<Blob> => {
+        const response = await api.get(`/pagos/matriz-anual/${year}/export/pdf`, { responseType: 'blob' });
+        return response.data;
+    },
+
     revertirPago: async (pagoId: number) => {
         const response = await api.post('/pagos/revertir', { pagoId });
         return response.data;
     },
 
     venderCarrito: async (data: { usuarioId: number, metodoPago: string, items: { productoId: number, cantidad: number }[] }) => {
-        // Usamos la misma ruta, pero el body ahora lleva 'items'
         const response = await api.post('/pagos/venta-producto', data);
         return response.data;
     }
