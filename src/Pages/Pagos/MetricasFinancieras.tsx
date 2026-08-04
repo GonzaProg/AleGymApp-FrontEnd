@@ -6,7 +6,7 @@ import { Input } from "../../Components/UI/Input";
 import { Button } from "../../Components/UI/Button";
 import { FinancialDashboard } from "../../Components/Pagos/FinancialDashboard";
 import { ToggleSwitch } from "../../Components/UI/ToggleSwitch";
-import { DollarSign, Search, Undo2 } from "lucide-react";
+import { DollarSign, Search, Undo2, FileText } from "lucide-react";
 import { GymApi } from "../../API/Gym/GymApi";
 import { showError } from "../../Helpers/Alerts";
 import { UnlockSection } from "../../Components/Security/UnlockSection";
@@ -66,12 +66,94 @@ export const MetricasFinancieras = () => {
         });
     };
 
+    const handleExportPDF = async () => {
+        const input = document.getElementById("export-charts");
+        if (!input) return;
+        
+        try {
+            const html2canvas = (await import("html2canvas")).default;
+            const { jsPDF } = await import("jspdf");
+
+            // Extraer textos
+            const metricMonthly = document.getElementById("metric-monthly")?.innerText || "$0";
+            const metricAnnual = document.getElementById("metric-annual")?.innerText || "$0";
+            const metricPreferred = document.getElementById("metric-preferred")?.innerText || "N/A";
+
+            // Fechas
+            const date = new Date();
+            const month = date.toLocaleString('es-AR', { month: 'long' });
+            const capitalizedMonth = month.charAt(0).toUpperCase() + month.slice(1);
+            const year = date.getFullYear();
+
+            // Fondo oscuro para el canvas de graficos
+            const originalBg = input.style.backgroundColor;
+            input.style.backgroundColor = "#111827"; 
+
+            const canvas = await html2canvas(input, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#111827"
+            });
+            
+            input.style.backgroundColor = originalBg;
+
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            
+            // --- DIBUJAR TEXTOS NATIVOS ---
+            pdf.setFillColor(17, 24, 39); // #111827 Fondo
+            pdf.rect(0, 0, pdfWidth, pdf.internal.pageSize.getHeight(), 'F');
+            
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(22);
+            pdf.text("Reporte Financiero", 15, 20);
+            
+            let y = 40;
+            const drawMetric = (label: string, value: string) => {
+                pdf.setFontSize(10);
+                pdf.setFont("helvetica", "normal");
+                pdf.setTextColor(156, 163, 175);
+                pdf.text(label, 15, y);
+                pdf.setFontSize(16);
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFont("helvetica", "bold");
+                pdf.text(value, 15, y + 7);
+                y += 20;
+            };
+
+            drawMetric(`Ingresos Mensuales (${capitalizedMonth})`, metricMonthly);
+            drawMetric(`Ingresos Anuales (${year})`, metricAnnual);
+            drawMetric(`Método de Pago Preferido`, metricPreferred);
+
+            // --- DIBUJAR GRÁFICOS ---
+            const imgData = canvas.toDataURL("image/png");
+            const imgWidth = pdfWidth - 30; // 15mm padding
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
+            pdf.setFontSize(14);
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFont("helvetica", "bold");
+            y += 5;
+            pdf.text("Gráficos de Rendimiento", 15, y);
+            
+            y += 10;
+            pdf.addImage(imgData, 'PNG', 15, y, imgWidth, imgHeight);
+            
+            pdf.save("metricas_financieras.pdf");
+        } catch (error) {
+            showError("Error al generar el PDF");
+        }
+    };
+
     return (
         <div className={AppStyles.principalContainer}>
             <div className="w-full max-w-7xl mx-auto space-y-8">
 
-                {/* --- HEADER SUPERIOR --- */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-8 pb-4">
+                    
+                    {/* --- HEADER SUPERIOR --- */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex items-center gap-3">
                             <DollarSign className="w-8 h-8 text-green-400" />
                             <div>
@@ -80,11 +162,23 @@ export const MetricasFinancieras = () => {
                             </div>
                         </div>
 
-                    <div className="flex items-center gap-4 bg-gray-800/40 p-2 pr-4 rounded-xl border border-white/5 backdrop-blur-sm">
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider pl-2">Métricas</span>
-                        <ToggleSwitch checked={showMetrics} onChange={handleToggle} />
+                        <div className="flex items-center gap-4">
+                            {isUnlocked && showMetrics && (
+                                <button 
+                                    onClick={handleExportPDF}
+                                    title="Exportar a PDF"
+                                    className={`${AppStyles.btnExportRed} h-[42px] px-4`}
+                                >
+                                    <FileText className="w-4 h-4" />
+                                    <p className="pl-2 text-sm font-bold">PDF</p>
+                                </button>
+                            )}
+                            <div className="flex items-center gap-4 bg-gray-800/40 p-2 pr-4 rounded-xl border border-white/5 backdrop-blur-sm h-[42px]">
+                                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider pl-2">Métricas</span>
+                                <ToggleSwitch checked={showMetrics} onChange={handleToggle} />
+                            </div>
+                        </div>
                     </div>
-                </div>
 
                 {/* --- DASHBOARD METRICAS --- */}
                 {showMetrics && (
@@ -101,6 +195,7 @@ export const MetricasFinancieras = () => {
                         )}
                     </div>
                 )}
+                </div>
 
                 {/* --- SECCIÓN DEVOLUCIONES / BÚSQUEDA --- */}
                 <div className={`${AppStyles.glassCard} border-l-4 border-l-yellow-500 overflow-visible relative z-20`}>

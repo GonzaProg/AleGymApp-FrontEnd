@@ -38,6 +38,8 @@ export const AppStyles = {
     btnSecondary: "flex-1 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
     btnSecondaryNotFlex: "bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
     btnDanger: "bg-red-600/80 hover:bg-red-500 text-white shadow-lg shadow-red-900/20 px-20 py-3 rounded-xl border border-red-500/20 font-bold transition-all hover:scale-105",
+    btnExportRed: "flex items-center justify-center p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all border border-red-500/20 hover:scale-105",
+    btnExportGreen: "flex items-center justify-center p-2.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl transition-all border border-emerald-500/20 hover:scale-105",
 
     // Decoración
     gradientDivider: "absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500/50 to-transparent",

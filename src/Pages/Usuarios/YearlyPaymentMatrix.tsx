@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { PagosApi, type MatrizAnualDTO } from "../../API/Pagos/PagosApi";
 import { ArrowLeft, Table, Calendar, Receipt, X, Download, FileText, FileSpreadsheet } from "lucide-react";
 import { CustomSelect } from "../../Components/UI/CustomSelect";
+import { AppStyles } from "../../Styles/AppStyles";
 
 interface YearlyPaymentMatrixProps {
     onBack: () => void;
@@ -164,7 +165,7 @@ export const YearlyPaymentMatrix = ({ onBack, onSelectUserForHistory }: YearlyPa
                     <button 
                         onClick={handleExportPDF}
                         title="Exportar a PDF"
-                        className="flex items-center justify-center p-2.5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all border border-red-500/20 hover:scale-105"
+                        className={AppStyles.btnExportRed}
                     >
                         <FileText className="w-5 h-5" />
                         <p className="pl-2">PDF</p>
@@ -172,7 +173,7 @@ export const YearlyPaymentMatrix = ({ onBack, onSelectUserForHistory }: YearlyPa
                     <button 
                         onClick={handleExportExcel}
                         title="Exportar a Excel"
-                        className="flex items-center justify-center p-2.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white rounded-xl transition-all border border-emerald-500/20 hover:scale-105"
+                        className={AppStyles.btnExportGreen}
                     >
                         <FileSpreadsheet className="w-5 h-5" />
                         <p className="pl-2">Excel</p>
