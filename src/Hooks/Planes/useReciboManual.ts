@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PlansApi } from "../../API/Planes/PlansApi";
+import { PagosApi } from "../../API/Pagos/PagosApi";
 import { showError, showSuccess } from "../../Helpers/Alerts";
 import { useAlumnoSearch } from "../useAlumnoSearch";
 
 export const useManualReceipt = () => {
     // UI
     const [sending, setSending] = useState(false);
+    const [ultimoComprobanteUrl, setUltimoComprobanteUrl] = useState<string | null>(null);
+    const [loadingComprobante, setLoadingComprobante] = useState(false);
 
     // Usamos el hook centralizado para la búsqueda de alumnos
     const {
@@ -16,6 +19,28 @@ export const useManualReceipt = () => {
         handleSelectAlumno,
         clearSelection
     } = useAlumnoSearch({ includePlan: true, initialLoad: true });
+
+    useEffect(() => {
+        if (alumnoSeleccionado) {
+            const fetchPagos = async () => {
+                setLoadingComprobante(true);
+                try {
+                    const pagos = await PagosApi.getHistorialPorUsuario(alumnoSeleccionado.id);
+                    // Asegurar que estén ordenados por fechaPago de forma descendente
+                    const sorted = [...pagos].sort((a, b) => new Date(b.fechaPago).getTime() - new Date(a.fechaPago).getTime());
+                    const lastReceipt = sorted.find(p => p.comprobanteUrl);
+                    setUltimoComprobanteUrl(lastReceipt?.comprobanteUrl || null);
+                } catch (e) {
+                    console.error("Error al obtener pagos para comprobante", e);
+                } finally {
+                    setLoadingComprobante(false);
+                }
+            };
+            fetchPagos();
+        } else {
+            setUltimoComprobanteUrl(null);
+        }
+    }, [alumnoSeleccionado]);
 
     // 4. Acción Enviar
     const enviarRecibo = async () => {
@@ -29,7 +54,7 @@ export const useManualReceipt = () => {
 
         setSending(true);
         try {
-            const response: any = await PlansApi.enviarReciboManual(alumnoSeleccionado.id);
+            const response: any = await PlansApi.enviarReciboManual(alumnoSeleccionado.id, ultimoComprobanteUrl || undefined);
 
             switch (response.estadoEnvio) {
                 case 'ENVIADO': 
@@ -57,6 +82,8 @@ export const useManualReceipt = () => {
         handleSelectAlumno,
         clearSelection,
         enviarRecibo,
-        sending
+        sending,
+        ultimoComprobanteUrl,
+        loadingComprobante
     };
 };
