@@ -28,7 +28,7 @@ export const CreateUser = () => {
                             label="DNI *" type="number" name="dni" value={formData.dni} onChange={handleChange} 
                             className={AppStyles.inputDark} labelClassName={AppStyles.label} placeholder="Sin puntos"
                         />
-                        <span className="text-[10px] text-gray-400 mt-1 block ml-1">Sin puntos, ej: 11222333</span>
+                        <span className="text-[12px] text-gray-400 mt-1 block ml-1">Sin puntos, ej: 11222333</span>
                     </div>
                     <Input 
                         label="Rol Asignado *" as="select" name="rol" value={formData.rol} onChange={handleChange} disabled={!isAdmin}
@@ -54,7 +54,7 @@ export const CreateUser = () => {
                             label="Teléfono" type="tel" name="telefono" value={formData.telefono} onChange={handleChange} 
                             className={AppStyles.inputDark} labelClassName={AppStyles.label}
                         />
-                        <span className="text-[10px] text-gray-400 mt-1 block ml-1">Sin espacios, sin 15, con característica, ej: 3445123456</span>
+                        <span className="text-[12px] text-gray-400 mt-1 block ml-1">Sin espacios, sin 15, con característica, ej: 3445123456</span>
                     </div>
                     <Input 
                         label="Fecha Nacimiento" type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} 

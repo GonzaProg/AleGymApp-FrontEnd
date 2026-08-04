@@ -85,11 +85,11 @@ export const Login = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <Input name="dni" placeholder="DNI" type="number" value={formData.dni} onChange={handleChange} required className={LoginStyles.inputDark} />
-                        <span className="text-[10px] text-gray-400 mt-1 block ml-1">Sin puntos, ej: 11222333</span>
+                        <span className="text-[15px] text-gray-400 mt-1 block ml-1">Sin puntos, ej: 11222333</span>
                     </div>
                     <div>
                         <Input name="telefono" placeholder="Teléfono" type="tel" value={formData.telefono} onChange={handleChange} className={LoginStyles.inputDark} />
-                        <span className="text-[10px] text-gray-400 mt-1 block ml-1">Sin espacios, sin 15, con característica, ej: 3445123456</span>
+                        <span className="text-[15px] text-gray-400 mt-1 block ml-1">Sin espacios, sin 15, con característica, ej: 3445123456</span>
                     </div>
                 </div>
 
