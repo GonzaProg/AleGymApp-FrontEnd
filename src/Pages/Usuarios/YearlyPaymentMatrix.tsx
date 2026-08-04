@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { PagosApi, type MatrizAnualDTO } from "../../API/Pagos/PagosApi";
-import { ArrowLeft, Table, Calendar, Receipt, X, Download } from "lucide-react";
+import { ArrowLeft, Table, Calendar, Receipt, X, Download, FileText, FileSpreadsheet } from "lucide-react";
 import { CustomSelect } from "../../Components/UI/CustomSelect";
+import { AppStyles } from "../../Styles/AppStyles";
 
 interface YearlyPaymentMatrixProps {
     onBack: () => void;
@@ -43,6 +44,38 @@ export const YearlyPaymentMatrix = ({ onBack, onSelectUserForHistory }: YearlyPa
         };
         fetchMatrix();
     }, [year]);
+
+    const handleExportExcel = async () => {
+        try {
+            const blob = await PagosApi.exportMatrizExcel(year);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Matriz_Anual_${year}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("Error al exportar a Excel", error);
+        }
+    };
+
+    const handleExportPDF = async () => {
+        try {
+            const blob = await PagosApi.exportMatrizPDF(year);
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Matriz_Anual_${year}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("Error al exportar a PDF", error);
+        }
+    };
 
     return (
         <div className="w-full max-w-[95%] mx-auto space-y-6 animate-fade-in relative">
@@ -128,14 +161,32 @@ export const YearlyPaymentMatrix = ({ onBack, onSelectUserForHistory }: YearlyPa
                     </div>
                 </div>
 
-                <div className="w-32 z-20">
-                    <CustomSelect 
-                        options={availableYears.map(y => ({ value: y.toString(), label: y.toString() }))}
-                        value={year.toString()}
-                        onChange={(val) => setYear(Number(val))}
-                        icon={<Calendar className="w-4 h-4" />}
-                        className="w-full"
-                    />
+                <div className="flex gap-4 z-20">
+                    <button 
+                        onClick={handleExportPDF}
+                        title="Exportar a PDF"
+                        className={AppStyles.btnExportRed}
+                    >
+                        <FileText className="w-5 h-5" />
+                        <p className="pl-2">PDF</p>
+                    </button>
+                    <button 
+                        onClick={handleExportExcel}
+                        title="Exportar a Excel"
+                        className={AppStyles.btnExportGreen}
+                    >
+                        <FileSpreadsheet className="w-5 h-5" />
+                        <p className="pl-2">Excel</p>
+                    </button>
+                    <div className="w-32">
+                        <CustomSelect 
+                            options={availableYears.map(y => ({ value: y.toString(), label: y.toString() }))}
+                            value={year.toString()}
+                            onChange={(val) => setYear(Number(val))}
+                            icon={<Calendar className="w-4 h-4" />}
+                            className="w-full"
+                        />
+                    </div>
                 </div>
             </div>
 

@@ -18,6 +18,7 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMuscle, setSelectedMuscle] = useState<string | null>(null);
+    const [filterNoMedia, setFilterNoMedia] = useState(false);
     
     const { 
         ejercicios, loading, uploading, editingId, editForm, 
@@ -42,8 +43,11 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                 return e.nombre.toLowerCase().includes(q);
             });
         }
+        if (isAdmin && filterNoMedia) {
+            result = result.filter(e => !e.imagenUrl && !e.urlVideo);
+        }
         return result;
-    }, [ejercicios, searchTerm, editingId, selectedMuscle]);
+    }, [ejercicios, searchTerm, editingId, selectedMuscle, filterNoMedia, isAdmin]);
 
     const handleNewExercise = () => {
         if (onNavigate) {
@@ -59,13 +63,28 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-10">
-                    <div className="w-full md:max-w-xs">
-                        <input
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Buscar ejercicio..."
-                            className={`${AppStyles.inputDark} h-10 text-sm bg-gray-900/60`}
-                        />
+                    <div className="flex flex-col sm:flex-row gap-3 w-full md:max-w-xl">
+                        <div className="w-full sm:max-w-xs">
+                            <input
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Buscar ejercicio..."
+                                className={`${AppStyles.inputDark} h-10 text-sm bg-gray-900/60`}
+                            />
+                        </div>
+                        {isAdmin && (
+                            <button
+                                onClick={() => setFilterNoMedia(!filterNoMedia)}
+                                className={`h-10 px-4 rounded-lg text-sm font-semibold border flex items-center justify-center gap-2 transition-all ${
+                                    filterNoMedia
+                                        ? "bg-red-500/20 text-red-400 border-red-500/50 shadow-md shadow-red-950/20"
+                                        : "bg-gray-900/60 text-gray-400 border-white/10 hover:bg-gray-800 hover:text-white"
+                                }`}
+                                title="Filtrar ejercicios sin imagen ni video"
+                            >
+                                Ejercicios Sin Multimedia
+                            </button>
+                        )}
                     </div>
                     <button 
                         onClick={handleNewExercise} 

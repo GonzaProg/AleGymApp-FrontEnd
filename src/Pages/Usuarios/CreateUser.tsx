@@ -23,10 +23,13 @@ export const CreateUser = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Fila 1 */}
-                    <Input 
-                        label="DNI *" type="number" name="dni" value={formData.dni} onChange={handleChange} 
-                        className={AppStyles.inputDark} labelClassName={AppStyles.label} placeholder="Sin puntos"
-                    />
+                    <div>
+                        <Input 
+                            label="DNI *" type="number" name="dni" value={formData.dni} onChange={handleChange} 
+                            className={AppStyles.inputDark} labelClassName={AppStyles.label} placeholder="Sin puntos"
+                        />
+                        <span className="text-[12px] text-gray-400 mt-1 block ml-1">Sin puntos, ej: 11222333</span>
+                    </div>
                     <Input 
                         label="Rol Asignado *" as="select" name="rol" value={formData.rol} onChange={handleChange} disabled={!isAdmin}
                         className={`${AppStyles.inputDark} appearance-none cursor-pointer`} labelClassName={AppStyles.label}
@@ -46,10 +49,13 @@ export const CreateUser = () => {
                     />
                     
                     {/* Fila 3 */}
-                    <Input 
-                        label="Teléfono" type="tel" name="telefono" value={formData.telefono} onChange={handleChange} 
-                        className={AppStyles.inputDark} labelClassName={AppStyles.label}
-                    />
+                    <div>
+                        <Input 
+                            label="Teléfono" type="tel" name="telefono" value={formData.telefono} onChange={handleChange} 
+                            className={AppStyles.inputDark} labelClassName={AppStyles.label}
+                        />
+                        <span className="text-[12px] text-gray-400 mt-1 block ml-1">Sin espacios, sin 15, con característica, ej: 3445123456</span>
+                    </div>
                     <Input 
                         label="Fecha Nacimiento" type="date" name="fechaNacimiento" value={formData.fechaNacimiento} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}

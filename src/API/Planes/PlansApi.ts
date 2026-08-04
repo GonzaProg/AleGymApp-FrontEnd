@@ -67,8 +67,8 @@ export const PlansApi = {
         return response.data;
     },
 
-    enviarReciboManual: async (userId: number) => {
-        const response = await api.post('/planes/enviar-recibo', { userId });
+    enviarReciboManual: async (userId: number, comprobanteUrl?: string) => {
+        const response = await api.post('/planes/enviar-recibo', { userId, comprobanteUrl });
         return response.data;
     }
 };

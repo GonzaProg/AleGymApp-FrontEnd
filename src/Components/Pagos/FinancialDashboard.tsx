@@ -56,7 +56,7 @@ export const FinancialDashboard = () => {
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 to-green-600"></div>
 
                     <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Facturación Mensual</p>
-                    <h3 className="text-4xl font-black text-white drop-shadow-md mb-2">
+                    <h3 id="metric-monthly" className="text-4xl font-black text-white drop-shadow-md mb-2">
                         {formatMoney(metrics.ingresosMesActual)}
                     </h3>
                     <div className="flex items-center gap-2 text-sm">
@@ -82,7 +82,7 @@ export const FinancialDashboard = () => {
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-500 to-pink-600"></div>
                     
                     <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Acumulado Anual</p>
-                    <h3 className="text-4xl font-black text-white drop-shadow-md mb-2">
+                    <h3 id="metric-annual" className="text-4xl font-black text-white drop-shadow-md mb-2">
                         {formatMoney(metrics.ingresosAnuales)}
                     </h3>
                     <p className="text-gray-500 text-xs">Total facturado este año</p>
@@ -96,7 +96,7 @@ export const FinancialDashboard = () => {
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-indigo-600"></div>
 
                     <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Medio de Pago Preferido (Anual)</p>
-                    <h3 className="text-3xl font-black text-white drop-shadow-md mb-1">
+                    <h3 id="metric-preferred" className="text-3xl font-black text-white drop-shadow-md mb-1">
                         {metrics.metodoPreferido}
                     </h3>
                     
@@ -112,29 +112,31 @@ export const FinancialDashboard = () => {
                 </div>
             </div>
 
-            {/* 2. GRÁFICOS DE TIEMPO (Lineal y Barras) */}
-            {/* Estos siempre se muestran si hay métricas */}
-            <FinancialCharts 
-                dataAnual={metrics.chartAnual} 
-                dataMensual={metrics.chartMensual} 
-            />
-
-            {/* 3. BARRA DE CONTROL PARA DETALLES */}
-            <div className="mt-8 pt-4 border-t border-white/5 flex flex-col md:flex-row justify-end items-center gap-4">
-                <span className="text-xs text-gray-500 uppercase font-bold tracking-widest">
-                    Ver desglose por tipos
-                </span>
-                <ToggleSwitch 
-                    checked={showDetails} 
-                    onChange={handleToggleDetails} // Usamos el nuevo handler
+            {/* 2. GRÁFICOS Y DESGLOSE (CONTENEDOR EXPORTABLE) */}
+            <div id="export-charts" className="pb-4 pt-8 rounded-xl">
+                <FinancialCharts 
+                    dataAnual={metrics.chartAnual} 
+                    dataMensual={metrics.chartMensual} 
                 />
-            </div>
 
-            {/* 4. DESGLOSE POR TIPO (Carga diferida) */}
-            {/* Solo se muestra si el switch está activo */}
-            {showDetails && (
-                <MetricsByType desgloseMensual={metrics.desgloseMensual} desgloseAnual={metrics.desgloseAnual} />
-            )}
+                {/* 3. BARRA DE CONTROL PARA DETALLES (Ignorado en PDF) */}
+                <div data-html2canvas-ignore="true" className="mt-8 pt-4 border-t border-white/5 flex flex-col md:flex-row justify-end items-center gap-4">
+                    <span className="text-xs text-gray-500 uppercase font-bold tracking-widest">
+                        Ver desglose por tipos
+                    </span>
+                    <ToggleSwitch 
+                        checked={showDetails} 
+                        onChange={handleToggleDetails}
+                    />
+                </div>
+
+                {/* 4. DESGLOSE POR TIPO */}
+                {showDetails && (
+                    <div className="mt-6">
+                        <MetricsByType desgloseMensual={metrics.desgloseMensual} desgloseAnual={metrics.desgloseAnual} />
+                    </div>
+                )}
+            </div>
 
         </div>
     );

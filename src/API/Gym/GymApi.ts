@@ -9,6 +9,11 @@ export interface GymDTO {
     logoUrl?: string;
     fondoInicioCelularUrl?: string;
     cambiarMPAccessToken?: boolean;
+    concurrenciaBajaMax?: number;
+    concurrenciaMediaMax?: number;
+    fraseConcurrenciaBaja?: string;
+    fraseConcurrenciaMedia?: string;
+    fraseConcurrenciaAlta?: string;
 }
 
 // Interfaz para ACTUALIZAR datos
@@ -27,6 +32,11 @@ export interface GymPreferencesDTO {
     finanzasPassword?: string;
     mpAccessToken?: string;
     cambiarMPAccessToken?: boolean;
+    concurrenciaBajaMax?: number;
+    concurrenciaMediaMax?: number;
+    fraseConcurrenciaBaja?: string;
+    fraseConcurrenciaMedia?: string;
+    fraseConcurrenciaAlta?: string;
 }
 
 export const GymApi = {
