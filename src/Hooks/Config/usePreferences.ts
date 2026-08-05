@@ -12,6 +12,14 @@ export const usePreferences = () => {
     const [moduloAsistencia, setModuloAsistencia] = useState(true);
     const [cambiarMPAccessToken, setCambiarMPAccessToken] = useState(false);
 
+    // Concurrencia Settings
+    const [concurrenciaBajaMax, setConcurrenciaBajaMax] = useState(8);
+    const [concurrenciaMediaMax, setConcurrenciaMediaMax] = useState(20);
+    const [fraseConcurrenciaBaja, setFraseConcurrenciaBaja] = useState("Está súper tranquilo. ¡Es el momento perfecto para entrenar!");
+    const [fraseConcurrenciaMedia, setFraseConcurrenciaMedia] = useState("Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!");
+    const [fraseConcurrenciaAlta, setFraseConcurrenciaAlta] = useState("Está bastante lleno. ¡Queda a tu elección!");
+    const [savingConcurrencia, setSavingConcurrencia] = useState(false);
+
     // Auth info to check if already linked
     const currentUserStr = localStorage.getItem("user") || sessionStorage.getItem("user");
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
@@ -43,6 +51,11 @@ export const usePreferences = () => {
                 setBirthdayMessage(data.mensajeCumpleanos || "");
                 setModuloAsistencia(data.moduloAsistencia ?? true);
                 setCambiarMPAccessToken(data.cambiarMPAccessToken ?? false);
+                setConcurrenciaBajaMax(data.concurrenciaBajaMax ?? 8);
+                setConcurrenciaMediaMax(data.concurrenciaMediaMax ?? 20);
+                setFraseConcurrenciaBaja(data.fraseConcurrenciaBaja ?? "Está súper tranquilo. ¡Es el momento perfecto para entrenar!");
+                setFraseConcurrenciaMedia(data.fraseConcurrenciaMedia ?? "Hay movimiento, pero no es excusa para no entrenar. ¡Vamos!");
+                setFraseConcurrenciaAlta(data.fraseConcurrenciaAlta ?? "Está bastante lleno. ¡Queda a tu elección!");
             } catch (err) {
                 console.error("Error cargando preferencias", err);
             } finally {
@@ -145,6 +158,45 @@ export const usePreferences = () => {
         }
     };
 
+    const saveConcurrenciaConfig = async () => {
+        if (concurrenciaMediaMax <= concurrenciaBajaMax) {
+            showError("El máximo de concurrencia media debe ser mayor al de concurrencia baja");
+            return;
+        }
+
+        setSavingConcurrencia(true);
+        try {
+            await GymApi.updatePreferences({
+                concurrenciaBajaMax,
+                concurrenciaMediaMax,
+                fraseConcurrenciaBaja,
+                fraseConcurrenciaMedia,
+                fraseConcurrenciaAlta
+            });
+
+            // Actualizamos la memoria local para que StudentHome lo tome de inmediato
+            const storage = localStorage.getItem("user") ? localStorage : sessionStorage;
+            const userStr = storage.getItem("user");
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                if (user.gym) {
+                    user.gym.concurrenciaBajaMax = concurrenciaBajaMax;
+                    user.gym.concurrenciaMediaMax = concurrenciaMediaMax;
+                    user.gym.fraseConcurrenciaBaja = fraseConcurrenciaBaja;
+                    user.gym.fraseConcurrenciaMedia = fraseConcurrenciaMedia;
+                    user.gym.fraseConcurrenciaAlta = fraseConcurrenciaAlta;
+                    storage.setItem("user", JSON.stringify(user));
+                }
+            }
+
+            showSuccess("Configuración de concurrencia actualizada ✅");
+        } catch (error) {
+            showError("No se pudo guardar la configuración de concurrencia");
+        } finally {
+            setSavingConcurrencia(false);
+        }
+    };
+
     const vincularMercadoPago = async () => {
         try {
             const platform = Capacitor.getPlatform();
@@ -240,6 +292,12 @@ export const usePreferences = () => {
         passwordNew, setPasswordNew,
         passwordConfirm, setPasswordConfirm,
         changingPassword, updateFinanzasPassword,
-        cambiarMPAccessToken, tieneMercadoPago, vincularMercadoPago, desvincularMercadoPago
+        cambiarMPAccessToken, tieneMercadoPago, vincularMercadoPago, desvincularMercadoPago,
+        concurrenciaBajaMax, setConcurrenciaBajaMax,
+        concurrenciaMediaMax, setConcurrenciaMediaMax,
+        fraseConcurrenciaBaja, setFraseConcurrenciaBaja,
+        fraseConcurrenciaMedia, setFraseConcurrenciaMedia,
+        fraseConcurrenciaAlta, setFraseConcurrenciaAlta,
+        saveConcurrenciaConfig, savingConcurrencia
     };
 };

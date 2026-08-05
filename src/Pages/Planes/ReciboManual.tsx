@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { AppStyles } from "../../Styles/AppStyles";
 import { useManualReceipt } from "../../Hooks/Planes/useReciboManual";
 import { Card } from "../../Components/UI/Card";
-import { Search, FileText, AlertTriangle, Send } from "lucide-react";
+import { Search, FileText, AlertTriangle, Send, Receipt, X, Download } from "lucide-react";
+
 export const ManualReceipt = () => {
+    const [showReceiptModal, setShowReceiptModal] = useState(false);
+
     const {
         alumnoSeleccionado,
         sugerencias,
@@ -11,7 +15,9 @@ export const ManualReceipt = () => {
         handleSelectAlumno,
         clearSelection,
         enviarRecibo,
-        sending
+        sending,
+        ultimoComprobanteUrl,
+        loadingComprobante
     } = useManualReceipt();
 
     // Verificamos si tiene AL MENOS UNA suscripción activa
@@ -19,6 +25,57 @@ export const ManualReceipt = () => {
 
     return (
         <div className={AppStyles.principalContainer}>
+            {/* Modal de Comprobante */}
+            {showReceiptModal && ultimoComprobanteUrl && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={() => setShowReceiptModal(false)}>
+                    <div className="absolute top-4 right-4 md:top-6 md:right-6 flex items-center gap-3 z-[60]" onClick={e => e.stopPropagation()}>
+                        <button 
+                            onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                    const downloadUrl = ultimoComprobanteUrl.includes('/upload/') 
+                                        ? ultimoComprobanteUrl.replace('/upload/', '/upload/fl_attachment/')
+                                        : ultimoComprobanteUrl;
+                                    const response = await fetch(downloadUrl);
+                                    if (!response.ok) throw new Error("Error al descargar la imagen");
+                                    const blob = await response.blob();
+                                    const url = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = 'comprobante_gymmate.jpg';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                    console.error("Error en la descarga:", error);
+                                    window.open(ultimoComprobanteUrl, '_blank');
+                                }
+                            }}
+                            className="bg-white/10 hover:bg-[#009EE3]/80 p-3 rounded-full transition-colors text-white shadow-lg backdrop-blur-md"
+                            title="Descargar comprobante"
+                        >
+                            <Download className="w-6 h-6" />
+                        </button>
+                        <button 
+                            onClick={() => setShowReceiptModal(false)}
+                            className="bg-red-500/80 hover:bg-red-500 p-3 rounded-full transition-colors text-white shadow-lg backdrop-blur-md"
+                            title="Cerrar"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
+
+                    <div className="relative max-w-2xl w-full flex flex-col items-center" onClick={e => e.stopPropagation()}>
+                        <img 
+                            src={ultimoComprobanteUrl} 
+                            alt="Comprobante" 
+                            className="w-full h-auto max-h-[85vh] object-contain shadow-2xl rounded-xl"
+                        />
+                    </div>
+                </div>
+            )}
+
             <div className="w-full max-w-3xl mx-auto">
                 
                 {/* HEADER */}
@@ -101,15 +158,34 @@ export const ManualReceipt = () => {
                             {tienePlanesActivos ? (
                                 <div className="bg-blue-900/20 rounded-xl p-6 border border-blue-500/20 mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
-                                        <div className="flex items-center justify-center"><FileText className="w-10 h-10 text-blue-400" /></div>
+                                        <div className="flex items-center justify-center">
+                                            {loadingComprobante ? (
+                                                <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+                                            ) : ultimoComprobanteUrl ? (
+                                                <Receipt className="w-10 h-10 text-blue-400" />
+                                            ) : (
+                                                <FileText className="w-10 h-10 text-blue-400" />
+                                            )}
+                                        </div>
                                         <div>
                                             <p className="text-blue-300 text-xs font-bold uppercase tracking-wider">Documento Disponible</p>
                                             <h3 className="text-xl font-bold text-white">Comprobante de Plan</h3>
                                             <p className="text-gray-400 text-sm pt-1">
-                                                (Se enviará el recibo de la última suscripción activa)
+                                                {ultimoComprobanteUrl 
+                                                    ? "(Se enviará el último comprobante guardado)"
+                                                    : "(Se generará un recibo nuevo)"}
                                             </p>
                                         </div>
                                     </div>
+                                    {ultimoComprobanteUrl && (
+                                        <button
+                                            onClick={() => setShowReceiptModal(true)}
+                                            className="px-4 py-2 rounded-xl flex items-center justify-center gap-2 transition-all font-semibold shadow-lg bg-[#009EE3]/10 hover:bg-[#009EE3]/20 border border-[#009EE3]/30 text-[#009EE3] shadow-[#009EE3]/10"
+                                        >
+                                            <Receipt className="w-5 h-5" />
+                                            Ver Comprobante
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="flex items-center justify-center gap-2 bg-red-900/20 rounded-xl p-4 border border-red-500/20 mb-8 text-center text-red-300">
@@ -131,7 +207,7 @@ export const ManualReceipt = () => {
                                 {sending ? (
                                     <>
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        Generando PDF y Enviando...
+                                        {ultimoComprobanteUrl ? "Enviando Comprobante..." : "Generando PDF y Enviando..."}
                                     </>
                                 ) : (
                                     <>

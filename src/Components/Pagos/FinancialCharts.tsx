@@ -61,6 +61,21 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
+                {(() => {
+                    const maxValAnual = Math.max(...safeDataAnual);
+                    const maxMesIndex = safeDataAnual.indexOf(maxValAnual);
+                    const maxMesNombre = labelsAnuales[maxMesIndex];
+                    if (maxValAnual > 0) {
+                        return (
+                            <div className="mt-4 pt-3 border-t border-white/10 text-center">
+                                <p className="text-xs text-gray-400">
+                                    Mes con mayor ingreso: <span className="font-bold text-green-400">{maxMesNombre} (${maxValAnual.toLocaleString('es-AR')})</span>
+                                </p>
+                            </div>
+                        );
+                    }
+                    return null;
+                })()}
             </div>
 
             {/* GRÁFICO 2: BARRAS MENSUAL */}
@@ -101,6 +116,21 @@ export const FinancialCharts = ({ dataAnual, dataMensual }: Props) => {
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
+                {(() => {
+                    const maxValDiario = Math.max(...safeDataMensual);
+                    const maxDiaIndex = safeDataMensual.indexOf(maxValDiario);
+                    const maxDiaNombre = maxDiaIndex + 1;
+                    if (maxValDiario > 0) {
+                        return (
+                            <div className="mt-4 pt-3 border-t border-white/10 text-center">
+                                <p className="text-xs text-gray-400">
+                                    Día con mayor ingreso: <span className="font-bold text-blue-400">Día {maxDiaNombre} (${maxValDiario.toLocaleString('es-AR')})</span>
+                                </p>
+                            </div>
+                        );
+                    }
+                    return null;
+                })()}
             </div>
         </div>
     );

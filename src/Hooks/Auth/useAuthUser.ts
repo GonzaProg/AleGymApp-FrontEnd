@@ -17,6 +17,11 @@ export interface User {
         logoUrl?: string;
         codigoAcceso?: string;
         moduloAsistencia?: boolean;
+        concurrenciaBajaMax?: number;
+        concurrenciaMediaMax?: number;
+        fraseConcurrenciaBaja?: string;
+        fraseConcurrenciaMedia?: string;
+        fraseConcurrenciaAlta?: string;
     };
 }
 
