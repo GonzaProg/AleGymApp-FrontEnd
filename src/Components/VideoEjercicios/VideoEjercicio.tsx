@@ -205,7 +205,9 @@ export const VideoEjercicio = ({ url, fallbackUrl, controls = false, muted = tru
       <style>
         {`
           .hide-video-volume::-webkit-media-controls-mute-button,
-          .hide-video-volume::-webkit-media-controls-volume-slider {
+          .hide-video-volume::-webkit-media-controls-volume-slider,
+          .hide-video-volume::-webkit-media-controls-overlay-play-button,
+          .hide-video-volume::-webkit-media-controls-start-playback-button {
             display: none !important;
           }
         `}
