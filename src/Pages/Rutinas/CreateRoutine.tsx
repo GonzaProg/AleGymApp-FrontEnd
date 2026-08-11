@@ -458,9 +458,12 @@ export const CreateRoutine = ({ isGeneral = false, routineIdToEdit = null, group
       </div>
 
       {previewUrl && createPortal(
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 animate-fade-in" onClick={() => setPreviewUrl(null)}>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 animate-fade-in">
+              <button onClick={() => setPreviewUrl(null)} className="absolute top-4 right-4 md:top-6 md:right-6 z-[10000] p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors border border-white/10 w-10 h-10 flex items-center justify-center">
+                  <X className="w-6 h-6" />
+              </button>
               <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden border border-white/20">
-                  <VideoEjercicio url={previewUrl} />
+                  <VideoEjercicio url={previewUrl} controls={true} muted={true} />
               </div>
           </div>,
           document.body

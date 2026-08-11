@@ -6,7 +6,7 @@ import { AppStyles } from '../../Styles/AppStyles';
 import { VideoEjercicio } from '../../Components/VideoEjercicios/VideoEjercicio';
 import { useAuthUser } from '../../Hooks/Auth/useAuthUser';
 import { TIPOS_AGARRE, MUSCULOS_PERMITIDOS } from '../../API/Ejercicios/EjerciciosApi';
-import { ChevronDown, Play, Dumbbell, Edit2, Trash2, Image as ImageIcon, Video, Hourglass, Save } from 'lucide-react';
+import { ChevronDown, Play, Dumbbell, Edit2, Trash2, Image as ImageIcon, Video, Hourglass, Save, X } from 'lucide-react';
 import { MuscleFilter } from '../../Components/MuscleFilter/MuscleFilter';
 import { CloudinaryApi } from '../../Helpers/Cloudinary/Cloudinary';
 
@@ -130,6 +130,11 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                                         {ej.tipoAgarre && (
                                             <span className={AppStyles.tagGrip}>
                                                 Agarre {ej.tipoAgarre}
+                                            </span>
+                                        )}
+                                        {ej.elementosGym && (
+                                            <span className={AppStyles.tagElements}>
+                                                {ej.elementosGym}
                                             </span>
                                         )}
                                     </div>
@@ -272,9 +277,12 @@ export const EjerciciosGestion = ({ onNavigate }: Props) => {
                 document.body
             )}
             {videoUrl && createPortal(
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4" onClick={() => setVideoUrl(null)}>
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4">
+                    <button onClick={() => setVideoUrl(null)} className="absolute top-4 right-4 md:top-6 md:right-6 z-[10000] p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors border border-white/10 w-10 h-10 flex items-center justify-center">
+                        <X className="w-6 h-6" />
+                    </button>
                     <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden border border-white/20">
-                        <VideoEjercicio url={videoUrl} />
+                        <VideoEjercicio url={videoUrl} controls={true} muted={true} />
                     </div>
                 </div>,
                 document.body

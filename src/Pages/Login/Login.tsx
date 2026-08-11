@@ -13,6 +13,7 @@ import { GymCodeModal } from "../../Components/GymCodeModal/GymCodeModal";
 import { useGymConfig } from "../../Context/GymConfigContext";
 import { Rocket, AlertTriangle, Dumbbell } from "lucide-react";
 import logoPlayStore from "../../assets/LogoDescargaPlayStore.png";
+import { Capacitor } from "@capacitor/core";
 
 export const Login = () => {
   // Estado para alternar vistas
@@ -201,20 +202,22 @@ export const Login = () => {
                     </div>
 
                     {/* LINK DE DESCARGA PLAY STORE */}
-                    <div className="flex justify-center animate-fade-in">
-                        <a 
-                        href="https://play.google.com/store/apps/details?id=com.GymMate.app&hl=es_AR" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="hover:scale-110 transition-transform duration-300"
-                        >
-                        <img 
-                            src={logoPlayStore} 
-                            alt="Descargar en Play Store" 
-                            className="h-32 w-auto drop-shadow-xl" 
-                        />
-                        </a>
-                    </div>
+                    {!Capacitor.isNativePlatform() && (
+                        <div className="flex justify-center animate-fade-in">
+                            <a 
+                            href="https://play.google.com/store/apps/details?id=com.GymMate.app&hl=es_AR" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hover:scale-110 transition-transform duration-300"
+                            >
+                            <img 
+                                src={logoPlayStore} 
+                                alt="Descargar en Play Store" 
+                                className="h-32 w-auto drop-shadow-xl" 
+                            />
+                            </a>
+                        </div>
+                    )}
                 </div>
             </form>
         )}

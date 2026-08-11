@@ -544,12 +544,12 @@ export const MyRoutines = () => {
         {/* VIDEO MODAL (Aún necesario para mostrar el video por encima de todo) */}
         {videoUrl && (
             typeof document !== "undefined" ? createPortal(
-              <div className={MyRoutinesStyles.videoContainer} onClick={closeVideo}>
+              <div className={MyRoutinesStyles.videoContainer}>
                   <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
                     <span className="text-2xl font-bold">&times;</span>
                   </button>
-                  <div className="w-full max-w-4xl aspect-video px-4" onClick={(e) => e.stopPropagation()}>
-                    <VideoEjercicio url={videoUrl} fallbackUrl={videoFallbackUrl || undefined} />
+                  <div className="w-full max-w-4xl aspect-video px-4">
+                    <VideoEjercicio url={videoUrl} fallbackUrl={videoFallbackUrl || undefined} controls={true} muted={true} />
                   </div>
               </div>,
               document.body
@@ -695,12 +695,12 @@ export const MyRoutines = () => {
       {/* VIDEO MODAL */}
       {videoUrl && (
           typeof document !== "undefined" ? createPortal(
-            <div className={MyRoutinesStyles.videoContainer} onClick={closeVideo}>
+            <div className={MyRoutinesStyles.videoContainer}>
                 <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
                   <span className="text-2xl font-bold">&times;</span>
                 </button>
-                <div className="w-full max-w-4xl aspect-video px-4" onClick={(e) => e.stopPropagation()}>
-                  <VideoEjercicio url={videoUrl} fallbackUrl={videoFallbackUrl || undefined} />
+                <div className="w-full max-w-4xl aspect-video px-4">
+                  <VideoEjercicio url={videoUrl} fallbackUrl={videoFallbackUrl || undefined} controls={true} muted={true} />
                 </div>
             </div>,
             document.body
