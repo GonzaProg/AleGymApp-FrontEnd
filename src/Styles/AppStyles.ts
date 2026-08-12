@@ -75,4 +75,5 @@ export const AppStyles = {
     // ETIQUETAS DE EJERCICIOS
     tagMuscle: "flex items-center gap-1 text-[10px] md:text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30",
     tagGrip: "flex items-center gap-1 text-[10px] md:text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded border border-orange-500/30",
+    tagElements: "flex items-center gap-1 text-[10px] md:text-xs bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30",
 };

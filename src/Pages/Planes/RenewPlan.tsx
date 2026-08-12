@@ -35,7 +35,7 @@ export const RenewPlan = () => {
   };
 
   const ultimoPlan = alumnoSeleccionado?.userPlans
-    ?.filter((p: any) => !p.activo)
+    ?.filter((p: any) => !p.activo && p.plan?.nombre !== "Plan de Prueba")
     ?.sort((a: any, b: any) => new Date(b.fechaVencimiento).getTime() - new Date(a.fechaVencimiento).getTime())[0];
 
   return (
@@ -246,12 +246,12 @@ export const RenewPlan = () => {
                                           />
                                       </div>
                                       <button 
-                                          onClick={() => renovarPlan(ultimoPlan.id, true)} 
+                                          onClick={() => renovarPlan(ultimoPlan.id, false)} 
                                           disabled={loadingAction}
                                           className="bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded-lg transition shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 w-full sm:w-auto"
-                                          title="Renovar desde fecha de vencimiento"
+                                          title="Renovar desde Hoy"
                                       >
-                                          {loadingAction ? '...' : <><RefreshCcw className="w-4 h-4" /> Renovar desde Vencimiento</>}
+                                          {loadingAction ? '...' : <><RefreshCcw className="w-4 h-4" /> Renovar desde Hoy</>}
                                       </button>
                                   </div>
                               </div>

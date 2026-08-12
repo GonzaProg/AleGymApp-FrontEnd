@@ -72,6 +72,12 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const { localLogoUrl: gymLogo, localFondoUrl: fondoGymUrl } = useGymCachedImages(gymLogoData, fondoGymUrlData);
 
     const handlePagoMP = async (userPlanId: number) => {
+        const planToPay = activePlans.find(p => p.userPlanId === userPlanId);
+        if (planToPay?.nombre === "Plan de Prueba") {
+            showError("No tienes ningún plan asignado.");
+            return;
+        }
+
         if (currentUser?.gym && currentUser.gym.tieneMercadoPago === false) {
             showError("El gimnasio no tiene MercadoPago configurado.");
             return;

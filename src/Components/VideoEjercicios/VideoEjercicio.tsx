@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Maximize, Minimize } from 'lucide-react';
 
 interface VideoProps {
   url: string;
@@ -43,7 +44,27 @@ const readLocalFile = async (path: string): Promise<string | null> => {
 
 export const VideoEjercicio = ({ url, fallbackUrl, controls = false, muted = true, loop = true }: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [videoSrc, setVideoSrc] = useState<string>('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      wrapperRef.current?.requestFullscreen().catch(err => {
+        console.error("Error attempting to enable fullscreen:", err);
+      });
+    } else {
+      document.exitFullscreen().catch(err => console.error(err));
+    }
+  };
 
   useEffect(() => {
     let objectUrl: string | null = null;
@@ -136,22 +157,93 @@ export const VideoEjercicio = ({ url, fallbackUrl, controls = false, muted = tru
     }
   }, [videoSrc]);
 
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  };
+
+  const lastTapRef = useRef<number>(0);
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+    
+    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+      // Double tap
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const isRightHalf = x > rect.width / 2;
+      
+      if (videoRef.current) {
+        if (isRightHalf) {
+          videoRef.current.currentTime += 5;
+        } else {
+          videoRef.current.currentTime -= 5;
+        }
+      }
+      lastTapRef.current = 0;
+    } else {
+      // Single tap
+      lastTapRef.current = now;
+      setTimeout(() => {
+        if (lastTapRef.current === now) {
+          togglePlay();
+          lastTapRef.current = 0;
+        }
+      }, DOUBLE_TAP_DELAY);
+    }
+  };
+
   return (
-    <div className="w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative flex items-center justify-center">
+    <div ref={wrapperRef} className="w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative flex items-center justify-center">
+      <style>
+        {`
+          .hide-video-volume::-webkit-media-controls-mute-button,
+          .hide-video-volume::-webkit-media-controls-volume-slider,
+          .hide-video-volume::-webkit-media-controls-overlay-play-button,
+          .hide-video-volume::-webkit-media-controls-start-playback-button {
+            display: none !important;
+          }
+        `}
+      </style>
       {videoSrc && (
-          <video
-            ref={videoRef}
-            src={videoSrc}
-            className="w-full h-full object-contain" 
-            autoPlay
-            loop={loop}
-            muted={muted}
-            playsInline
-            controls={controls}
-            disablePictureInPicture={!controls}
-            disableRemotePlayback={!controls}
-            style={{ pointerEvents: controls ? 'auto' : 'none' }}
-          />
+          <>
+              <video
+                ref={videoRef}
+                src={videoSrc}
+                className="w-full h-full object-contain hide-video-volume" 
+                autoPlay
+                loop={loop}
+                muted={muted}
+                playsInline
+                controls={controls}
+                controlsList="nodownload noplaybackrate nofullscreen"
+                disablePictureInPicture={true}
+                disableRemotePlayback={true}
+                style={{ pointerEvents: controls ? 'auto' : 'none' }}
+              />
+              {controls && (
+                  <>
+                      <div 
+                          className="absolute inset-0 bottom-16 z-10 cursor-pointer touch-manipulation" 
+                          onClick={handleOverlayClick}
+                      />
+                      <button 
+                          onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
+                          className="absolute top-4 left-4 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white transition-colors border border-white/10 flex items-center justify-center"
+                          title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+                      >
+                          {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
+                      </button>
+                  </>
+              )}
+          </>
       )}
     </div>
   );

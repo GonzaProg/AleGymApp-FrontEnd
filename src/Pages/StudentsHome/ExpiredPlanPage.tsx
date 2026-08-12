@@ -32,6 +32,11 @@ export const ExpiredPlanPage = ({ currentUser, expiredPlan }: ExpiredPlanPagePro
     };
 
     const handlePagoMP = async () => {
+        if (expiredPlan?.nombre === "Plan de Prueba") {
+            showError("No tienes ningún plan asignado.");
+            return;
+        }
+
         try {
             setLoadingMP(true);
             if (!expiredPlan?.userPlanId) {
