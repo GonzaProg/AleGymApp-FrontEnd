@@ -81,5 +81,11 @@ export const UsuarioApi = {
     changePassword: async (id: number, data: ChangePasswordDTO) => {
         const response = await api.patch(`/users/${id}/password`, data);
         return response.data;
+    },
+
+    // Guardar FCM Token
+    saveFcmToken: async (token: string) => {
+        const response = await api.post(`/users/fcm-token`, { token });
+        return response.data;
     }
 };
