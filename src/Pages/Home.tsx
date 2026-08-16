@@ -11,6 +11,7 @@ import "swiper/css/pagination";
 // Hooks y Componentes
 import { useOptimizedHome } from "../Hooks/Home/useOptimizedHome";
 import { useAlertasRecepcion } from "../Hooks/Asistencias/useAlertasRecepcion";
+import { usePushNotifications } from "../Hooks/Notificaciones/usePushNotifications";
 import { MobileNavbar } from "../Components/Mobile/MobileNavbar"; 
 import { WhatsAppModal } from "../Components/WhatsApp/WhatsAppModal";
 import { WhatsAppStatus } from "../Components/WhatsApp/WhatsAppStatus"; 
@@ -85,6 +86,9 @@ const LazySlideContent = ({ children, index, activeIndex, visited }: { children:
 
 export const Home = () => {
   const { currentUser, isEntrenador, isAdmin, isLoading, metrics, logout } = useOptimizedHome();  
+
+  // Registrar Push Notifications (si estamos en celular y hay usuario)
+  usePushNotifications(currentUser);
 
   // ESTADOS ADMIN
   const [activeTab, setActiveTab] = useState("Inicio");
