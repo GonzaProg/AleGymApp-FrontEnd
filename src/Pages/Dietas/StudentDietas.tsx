@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
 import { useStudentDietas } from "../../Hooks/Dietas/useStudentDietas";
 import { AppStyles } from "../../Styles/AppStyles";
-import { Flame, Beef, Droplet, Wheat, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Info } from "lucide-react";
+import { Flame, Beef, Droplet, Wheat, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Info, Edit2, Trash2, List } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
-import { showError, showSuccess } from "../../Helpers/Alerts";
+import { showError, showSuccess, showConfirmDelete } from "../../Helpers/Alerts";
 
 const ORDEN_COMIDAS = ["Desayuno", "Media mañana", "Almuerzo", "Media tarde", "Merienda", "Pre-Cena", "Cena", "Media noche"];
 const sortComidasByTime = (a: any, b: any) => {
@@ -21,10 +21,14 @@ export const StudentDietas = () => {
         dietaAsignada, 
         registroHoy, 
         historial, 
+        comidasPredefinidas,
         loadingDietas, 
         registrarComida, 
         registrarAgua, 
-        borrarComida 
+        borrarComida,
+        crearPredefinida,
+        actualizarPredefinida,
+        eliminarPredefinida
     } = useStudentDietas();
     
     const navigate = useNavigate();
@@ -33,16 +37,28 @@ export const StudentDietas = () => {
     const [selectedDayPlan, setSelectedDayPlan] = useState('Lunes');
     const [selectedDayHist, setSelectedDayHist] = useState('Lunes');
     
-    // Modal states
+    // Modal states para Registro de Comida
     const [showAddModal, setShowAddModal] = useState(false);
     const [addTipo, setAddTipo] = useState("");
-    const [addDescripcion, setAddDescripcion] = useState("");
+    const [addNombre, setAddNombre] = useState("");
+    const [addCantidad, setAddCantidad] = useState("");
     const [addCals, setAddCals] = useState<number | "">("");
     const [addProts, setAddProts] = useState<number | "">("");
     const [addCarbs, setAddCarbs] = useState<number | "">("");
     const [addGrasas, setAddGrasas] = useState<number | "">("");
-    // Historial agrupado por semana real
-    const [weekOffset, setWeekOffset] = useState(0); // 0 = esta semana, 1 = semana pasada, etc.
+    const [cart, setCart] = useState<any[]>([]);
+
+    // Modal states para Comidas Predefinidas
+    const [showPredefModal, setShowPredefModal] = useState(false);
+    const [editingPredef, setEditingPredef] = useState<any>(null);
+    const [predefNombre, setPredefNombre] = useState("");
+    const [predefCantidad, setPredefCantidad] = useState("");
+    const [predefCals, setPredefCals] = useState<number | "">("");
+    const [predefProts, setPredefProts] = useState<number | "">("");
+    const [predefCarbs, setPredefCarbs] = useState<number | "">("");
+    const [predefGrasas, setPredefGrasas] = useState<number | "">("");
+
+    const [weekOffset, setWeekOffset] = useState(0); 
     
     const getLocalDate = (d: Date) => {
         const formatter = new Intl.DateTimeFormat('en-CA', { 
@@ -74,31 +90,122 @@ export const StudentDietas = () => {
         return historial.find((h: any) => h.fecha === targetDateStr) || { fecha: targetDateStr, isEmpty: true };
     }, [historial, weekOffset, selectedDayHist, diasSemana]);
 
-    const handleSaveComida = async () => {
-        if (!addDescripcion.trim()) return showError("Agrega una descripción");
-        if (
-            (addCals !== '' && addCals < 0) ||
-            (addProts !== '' && addProts < 0) ||
-            (addCarbs !== '' && addCarbs < 0) ||
-            (addGrasas !== '' && addGrasas < 0)
-        ) {
-            return showError("No se pueden ingresar valores negativos en los macros.");
-        }
+    // LÓGICA DE CARRITO
+    const handleAddToCart = () => {
+        if (!addNombre.trim()) return showError("Ingresa el nombre de la comida");
+        if (!addCantidad.trim()) return showError("Ingresa la cantidad");
         
-        const success = await registrarComida({
+        const item = {
+            idTemp: Date.now(),
             tipo: addTipo,
-            descripcion: addDescripcion,
+            nombre: addNombre,
+            cantidad: addCantidad,
             calorias: addCals || 0,
             proteinas: addProts || 0,
             carbohidratos: addCarbs || 0,
             grasas: addGrasas || 0
+        };
+        setCart([...cart, item]);
+        
+        // Reset form inputs
+        setAddNombre(""); setAddCantidad(""); setAddCals(""); setAddProts(""); setAddCarbs(""); setAddGrasas("");
+    };
+
+    const handleRemoveFromCart = (idTemp: number) => {
+        setCart(cart.filter(item => item.idTemp !== idTemp));
+    };
+
+    const handleSaveRegistro = async () => {
+        if (cart.length === 0) return showError("Agrega al menos un alimento a la lista");
+        
+        const descripcionCombinada = cart.map(c => `${c.nombre} ${c.cantidad}`).join('\n');
+        
+        const totalCals = cart.reduce((sum, c) => sum + (c.calorias || 0), 0);
+        const totalProts = cart.reduce((sum, c) => sum + (c.proteinas || 0), 0);
+        const totalCarbs = cart.reduce((sum, c) => sum + (c.carbohidratos || 0), 0);
+        const totalGrasas = cart.reduce((sum, c) => sum + (c.grasas || 0), 0);
+
+        const success = await registrarComida({
+            tipo: addTipo,
+            descripcion: descripcionCombinada,
+            calorias: totalCals,
+            proteinas: totalProts,
+            carbohidratos: totalCarbs,
+            grasas: totalGrasas
         });
         
         if (success) {
-            showSuccess("Comida guardada");
+            showSuccess("Registro guardado");
             setShowAddModal(false);
-            setAddDescripcion(""); setAddCals(""); setAddProts(""); setAddCarbs(""); setAddGrasas("");
+            setCart([]);
+            setAddTipo("");
         }
+    };
+
+    const totalCartMacros = useMemo(() => {
+        return cart.reduce((acc, curr) => ({
+            calorias: acc.calorias + (curr.calorias || 0),
+            proteinas: acc.proteinas + (curr.proteinas || 0),
+            carbohidratos: acc.carbohidratos + (curr.carbohidratos || 0),
+            grasas: acc.grasas + (curr.grasas || 0),
+        }), { calorias: 0, proteinas: 0, carbohidratos: 0, grasas: 0 });
+    }, [cart]);
+
+    const handleSelectPredefinida = (p: any) => {
+        setAddNombre(p.nombre);
+        setAddCantidad(p.cantidad);
+        setAddCals(p.calorias || "");
+        setAddProts(p.proteinas || "");
+        setAddCarbs(p.carbohidratos || "");
+        setAddGrasas(p.grasas || "");
+    };
+
+    // LÓGICA PREDEFINIDAS
+    const handleSavePredef = async () => {
+        if (!predefNombre.trim() || !predefCantidad.trim()) return showError("Nombre y cantidad son obligatorios");
+
+        const data = {
+            nombre: predefNombre,
+            cantidad: predefCantidad,
+            calorias: predefCals || 0,
+            proteinas: predefProts || 0,
+            carbohidratos: predefCarbs || 0,
+            grasas: predefGrasas || 0
+        };
+
+        let success;
+        if (editingPredef) {
+            success = await actualizarPredefinida(editingPredef.id, data);
+        } else {
+            success = await crearPredefinida(data);
+        }
+
+        if (success) {
+            showSuccess("Comida predefinida guardada");
+            resetPredefForm();
+        }
+    };
+
+    const handleDeletePredef = async (id: number) => {
+        const confirmed = await showConfirmDelete("¿Eliminar esta comida de tu lista?", "Esta accion no se puede deshacer");
+        if (confirmed) {
+            await eliminarPredefinida(id);
+        }
+    };
+
+    const resetPredefForm = () => {
+        setEditingPredef(null);
+        setPredefNombre(""); setPredefCantidad(""); setPredefCals(""); setPredefProts(""); setPredefCarbs(""); setPredefGrasas("");
+    };
+
+    const openEditPredef = (p: any) => {
+        setEditingPredef(p);
+        setPredefNombre(p.nombre);
+        setPredefCantidad(p.cantidad);
+        setPredefCals(p.calorias);
+        setPredefProts(p.proteinas);
+        setPredefCarbs(p.carbohidratos);
+        setPredefGrasas(p.grasas);
     };
 
     if (loadingDietas && !registroHoy) {
@@ -130,7 +237,6 @@ export const StudentDietas = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 pb-24 text-white">
-            {/* Header Módulo */}
             <div className="sticky top-0 z-20 bg-[#121212]/90 backdrop-blur-lg border-b border-white/10 px-4 py-4 flex items-center gap-3">
                 <button onClick={() => navigate('/home')} className="p-2 hover:bg-white/10 rounded-full transition-colors">
                     <ArrowLeft className="w-6 h-6" />
@@ -138,7 +244,6 @@ export const StudentDietas = () => {
                 <h1 className="text-xl font-bold">Mi Nutrición</h1>
             </div>
 
-            {/* Selector de Vistas */}
             <div className="flex gap-2 p-4 overflow-x-auto scrollbar-none border-b border-white/5">
                 {['HOY', 'HISTORIAL', 'DIETA'].map(v => (
                     <button
@@ -157,7 +262,6 @@ export const StudentDietas = () => {
             {view === 'HOY' && (
                 <div className="p-4 space-y-6 animate-fade-in">
                     
-                    {/* Resumen de Macros */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="col-span-2">
                             <MetaMacro 
@@ -171,17 +275,20 @@ export const StudentDietas = () => {
                         <MetaMacro icon={Droplet} color={{ bg: 'bg-blue-500/20', text: 'text-blue-400', bgSolid: 'bg-blue-500' }} title="Agua" value={registroHoy?.totalAgua || 0} max={dietaAsignada?.litrosAguaDiarios} unit="L" />
                     </div>
 
-                    {/* Botones de acción rápida */}
-                    <div className="flex gap-3">
-                        <Button onClick={() => setShowAddModal(true)} className="flex-1 bg-orange-500 text-white font-bold py-3 hover:bg-orange-600">
-                            <Plus className="w-5 h-5 mr-2" /> Agregar Comida
-                        </Button>
-                        <Button onClick={() => registrarAgua(0.25)} className="flex-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30">
-                            <Droplet className="w-5 h-5 mr-2" /> + 250ml
-                        </Button>
+                    <div className="flex flex-col gap-3">
+                        <div className="flex gap-3">
+                            <Button onClick={() => setShowAddModal(true)} className="flex-1 bg-orange-500 text-white font-bold py-3 hover:bg-orange-600">
+                                <Plus className="w-5 h-5 mr-2" /> Agregar Comida
+                            </Button>
+                            <Button onClick={() => registrarAgua(0.25)} className="flex-none bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 px-4">
+                                <Droplet className="w-5 h-5" /> + 250ml
+                            </Button>
+                        </div>
+                        <button onClick={() => setShowPredefModal(true)} className="text-sm font-bold text-orange-400 bg-orange-500/10 hover:bg-orange-500/20 py-2 rounded-xl flex items-center justify-center transition-colors">
+                            <List className="w-4 h-4 mr-2" /> Mis Comidas Predefinidas
+                        </button>
                     </div>
 
-                    {/* Comidas del Día */}
                     <div>
                         <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-200">
                             Registro de Hoy
@@ -197,6 +304,7 @@ export const StudentDietas = () => {
                                         <div className="z-10 relative flex-1">
                                             <span className="text-orange-400 text-xs font-bold uppercase tracking-wider">{comida.tipo}</span>
                                             <h4 className="font-bold text-white mt-1 whitespace-pre-line">{comida.descripcion}</h4>
+                                            
                                             <div className="flex gap-3 mt-2">
                                                 {comida.calorias > 0 && <span className="text-xs text-gray-500"><b className="text-white">{comida.calorias}</b> kcal</span>}
                                                 {comida.proteinas > 0 && <span className="text-xs text-gray-500"><b className="text-white">{comida.proteinas}</b>g P</span>}
@@ -222,30 +330,18 @@ export const StudentDietas = () => {
             {view === 'HISTORIAL' && (
                 <div className="p-3 animate-fade-in space-y-4">
                     <div className="flex items-center justify-between bg-black/30 p-3 rounded-2xl border border-white/5">
-                        <button 
-                            disabled={weekOffset >= 3}
-                            onClick={() => setWeekOffset(prev => prev + 1)}
-                            className="p-2 text-gray-400 disabled:opacity-30 hover:text-white transition-colors"
-                        >
+                        <button disabled={weekOffset >= 3} onClick={() => setWeekOffset(prev => prev + 1)} className="p-2 text-gray-400 disabled:opacity-30 hover:text-white transition-colors">
                             <ChevronLeft className="w-6 h-6" />
                         </button>
                         <span className="font-bold text-orange-400">
                             {weekOffset === 0 ? "Esta Semana" : `Hace ${weekOffset} semana${weekOffset > 1 ? 's' : ''}`}
                         </span>
-                        <button 
-                            disabled={weekOffset === 0} 
-                            onClick={() => setWeekOffset(prev => prev - 1)}
-                            className="p-2 text-gray-400 disabled:opacity-30 hover:text-white transition-colors"
-                        >
+                        <button disabled={weekOffset === 0} onClick={() => setWeekOffset(prev => prev - 1)} className="p-2 text-gray-400 disabled:opacity-30 hover:text-white transition-colors">
                             <ChevronRight className="w-6 h-6" />
                         </button>
                     </div>
 
-                    <div 
-                        className="flex gap-2 overflow-x-auto scrollbar-none py-2 border-b border-white/5 mb-4"
-                        onTouchStart={(e) => e.stopPropagation()}
-                        onTouchMove={(e) => e.stopPropagation()}
-                    >
+                    <div className="flex gap-2 overflow-x-auto scrollbar-none py-2 border-b border-white/5 mb-4">
                         {diasSemana.map(dia => (
                             <button
                                 key={dia}
@@ -264,11 +360,9 @@ export const StudentDietas = () => {
                     ) : (
                         <div className="space-y-4">
                             <div className="bg-white/5 rounded-2xl border border-white/5 p-3 transition-colors">
-                                <div className="flex justify-between items-center mb-3">
-                                    <h4 className="font-bold text-white flex items-center gap-2">
-                                        {new Date(`${historialDiaSeleccionado.fecha}T12:00:00Z`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' })}
-                                    </h4>
-                                </div>
+                                <h4 className="font-bold text-white flex items-center gap-2 mb-3">
+                                    {new Date(`${historialDiaSeleccionado.fecha}T12:00:00Z`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' }) + " " + historialDiaSeleccionado.fecha.split('-')[0]}
+                                </h4>
                                 <div className="grid grid-cols-8 gap-2 text-center text-xs mb-4">
                                     <div className="col-span-2 bg-black/40 p-2 rounded-xl">
                                         <Flame className="w-4 h-4 mx-auto text-orange-400 mb-1" />
@@ -319,7 +413,7 @@ export const StudentDietas = () => {
                 </div>
             )}
 
-            {/* VISTA: DIETA ASIGNADA */}
+            {/* VISTA: DIETA ASIGNADA (SIN CAMBIOS) */}
             {view === 'DIETA' && (
                 <div className="p-4 animate-fade-in space-y-6">
                     {!dietaAsignada ? (
@@ -380,58 +474,171 @@ export const StudentDietas = () => {
             )}
 
 
-            {/* Modal: Agregar Comida */}
+            {/* Modal: Agregar Comida (Con Carrito) */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center animate-fade-in">
-                    <div className="bg-[#1a1a1a] w-full sm:w-96 p-6 rounded-t-3xl sm:rounded-3xl animate-slide-up sm:animate-fade-in">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold">Registrar Alimento</h3>
+                    <div className="bg-[#1a1a1a] w-full sm:w-[450px] p-6 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[90vh]">
+                        <div className="flex justify-between items-center mb-4 flex-shrink-0">
+                            <h3 className="text-xl font-bold">Registrar Comidas</h3>
                             <button onClick={() => setShowAddModal(false)} className="p-2 bg-white/5 rounded-full"><X className="w-5 h-5" /></button>
                         </div>
                         
-                        <div className="space-y-4 max-h-[70vh] overflow-y-auto scrollbar-none pb-4">
-                            <div>
-                                <label className={AppStyles.label}>Momento del día</label>
-                                <select 
-                                    value={addTipo} 
-                                    onChange={(e) => setAddTipo(e.target.value)} 
-                                    className={AppStyles.inputDark}
-                                >
-                                    <option value="" disabled className="bg-gray-900 text-white">Seleccione un horario</option>
-                                    <option value="Desayuno" className="bg-gray-900 text-white">Desayuno</option>
-                                    <option value="Media mañana" className="bg-gray-900 text-white">Media mañana</option>
-                                    <option value="Almuerzo" className="bg-gray-900 text-white">Almuerzo</option>
-                                    <option value="Media tarde" className="bg-gray-900 text-white">Media tarde</option>
-                                    <option value="Merienda" className="bg-gray-900 text-white">Merienda</option>
-                                    <option value="Pre-Cena" className="bg-gray-900 text-white">Pre-Cena</option>
-                                    <option value="Cena" className="bg-gray-900 text-white">Cena</option>
-                                    <option value="Media noche" className="bg-gray-900 text-white">Media noche</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className={AppStyles.label}>¿Qué comiste?</label>
-                                <textarea 
-                                    placeholder={`Ej: Pollo 200gr\n2 huevos\nPan 50gr`}
-                                    value={addDescripcion} 
-                                    onChange={(e) => setAddDescripcion(e.target.value)} 
-                                    className={`${AppStyles.inputDark} w-full resize-y overflow-hidden`}
-                                    rows={Math.max(3, addDescripcion.split('\n').length)}
-                                />
-                            </div>
+                        <div className="overflow-y-auto scrollbar-none flex-1 pb-4">
+                            {!addTipo ? (
+                                <div className="space-y-3">
+                                    <h4 className="text-gray-400 text-sm font-bold uppercase mb-2">Selecciona el momento</h4>
+                                    {ORDEN_COMIDAS.map(tipo => (
+                                        <button 
+                                            key={tipo}
+                                            onClick={() => setAddTipo(tipo)}
+                                            className="w-full text-left p-4 rounded-2xl border border-white/10 hover:border-orange-500/50 hover:bg-orange-500/10 transition-all font-bold"
+                                        >
+                                            {tipo}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    <div className="flex justify-between items-center bg-orange-500/20 p-3 rounded-xl border border-orange-500/30">
+                                        <span className="font-bold text-orange-400">{addTipo}</span>
+                                        <button onClick={() => setAddTipo("")} className="text-xs text-orange-300 underline">Cambiar</button>
+                                    </div>
 
-                            <div className="pt-4 border-t border-white/10">
-                                <label className="text-xs text-orange-400 font-bold mb-2 block uppercase">Macros (Opcional)</label>
+                                    {/* Zona de Carrito */}
+                                    {cart.length > 0 && (
+                                        <div className="bg-black/40 p-4 rounded-2xl border border-white/10 space-y-3">
+                                            <h4 className="text-xs text-gray-400 font-bold uppercase">Comidas a registrar</h4>
+                                            {cart.map(c => (
+                                                <div key={c.idTemp} className="flex justify-between items-center bg-white/5 p-3 rounded-xl">
+                                                    <div>
+                                                        <p className="font-bold text-sm">{c.nombre} <span className="text-gray-500 font-normal">({c.cantidad})</span></p>
+                                                        <p className="text-xs text-gray-400">{c.calorias} kcal | {c.proteinas}g P | {c.carbohidratos}g C | {c.grasas}g G</p>
+                                                    </div>
+                                                    <button onClick={() => handleRemoveFromCart(c.idTemp)} className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            
+                                            <div className="pt-3 border-t border-white/10 flex justify-between items-center font-bold text-sm">
+                                                <span className="text-gray-300">Totales:</span>
+                                                <span className="text-orange-400">{totalCartMacros.calorias} kcal</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Formulario de Agregar Item */}
+                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
+                                        <h4 className="text-sm font-bold text-gray-300">Añadir alimento</h4>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="col-span-2">
+                                                <Input placeholder="Nombre (Ej: Pollo)" value={addNombre} onChange={(e) => setAddNombre(e.target.value)} className={AppStyles.inputDark} />
+                                            </div>
+                                            <div className="col-span-2">
+                                                <Input placeholder="Cantidad (Ej: 200g, 1 taza)" value={addCantidad} onChange={(e) => setAddCantidad(e.target.value)} className={AppStyles.inputDark} />
+                                            </div>
+                                            <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                            <Input type="number" min="0" placeholder="Prot (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                            <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                            <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                            
+                                            <Button onClick={handleAddToCart} className="col-span-2 bg-white/10 text-white border border-white/20 hover:bg-white/20 py-3 mt-2">
+                                                <Plus className="w-5 h-5 mr-2" /> Añadir a la lista
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Opciones Rápidas */}
+                                    {comidasPredefinidas.length > 0 && (
+                                        <div className="space-y-3">
+                                            <h4 className="text-xs text-gray-400 font-bold uppercase">Predefinidas (Autocompletar)</h4>
+                                            <div className="flex gap-2 overflow-x-auto scrollbar-none pb-2">
+                                                {comidasPredefinidas.map(p => (
+                                                    <button 
+                                                        key={p.id} 
+                                                        onClick={() => handleSelectPredefinida(p)}
+                                                        className="flex-none bg-orange-500/10 border border-orange-500/20 text-orange-400 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap hover:bg-orange-500/20"
+                                                    >
+                                                        {p.nombre}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Botón Guardar Todo */}
+                        {addTipo && (
+                            <div className="pt-4 mt-auto border-t border-white/10 flex-shrink-0">
+                                <Button onClick={handleSaveRegistro} disabled={cart.length === 0} className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-700 disabled:text-gray-500 font-bold py-4">
+                                    Guardar Registro Completo
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Modal: Comidas Predefinidas */}
+            {showPredefModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center animate-fade-in">
+                    <div className="bg-[#1a1a1a] w-full sm:w-[450px] p-6 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[90vh]">
+                        <div className="flex justify-between items-center mb-2 flex-shrink-0">
+                            <h3 className="text-xl font-bold">Comidas Predefinidas</h3>
+                            <button onClick={() => setShowPredefModal(false)} className="p-2 bg-white/5 rounded-full"><X className="w-5 h-5" /></button>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-6 flex-shrink-0">Crea alimentos con sus macros para reutilizarlos rápidamente en tu registro diario.</p>
+
+                        <div className="overflow-y-auto scrollbar-none flex-1 space-y-6 pb-4">
+                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
+                                <h4 className="text-sm font-bold text-orange-400">{editingPredef ? 'Editar Comida' : 'Nueva Comida'}</h4>
                                 <div className="grid grid-cols-2 gap-3">
-                                    <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" min="0" placeholder="Proteínas (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <div className="col-span-2">
+                                        <Input placeholder="Nombre (Ej: Pechuga de Pollo)" value={predefNombre} onChange={(e) => setPredefNombre(e.target.value)} className={AppStyles.inputDark} />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <Input placeholder="Cantidad base (Ej: 100g)" value={predefCantidad} onChange={(e) => setPredefCantidad(e.target.value)} className={AppStyles.inputDark} />
+                                    </div>
+                                    <Input type="number" min="0" placeholder="Kcal" value={predefCals} onChange={(e) => setPredefCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Prot (g)" value={predefProts} onChange={(e) => setPredefProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Carbos (g)" value={predefCarbs} onChange={(e) => setPredefCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Grasas (g)" value={predefGrasas} onChange={(e) => setPredefGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                </div>
+                                <div className="flex gap-2 pt-2">
+                                    {editingPredef && (
+                                        <Button onClick={resetPredefForm} className="flex-1 bg-white/10 text-white">Cancelar</Button>
+                                    )}
+                                    <Button onClick={handleSavePredef} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold">
+                                        {editingPredef ? 'Actualizar' : 'Crear'}
+                                    </Button>
                                 </div>
                             </div>
 
-                            <Button onClick={handleSaveComida} className="w-full bg-orange-500 hover:bg-orange-600 font-bold py-4 mt-6">
-                                Guardar Registro
-                            </Button>
+                            <div className="space-y-3">
+                                <h4 className="text-xs text-gray-400 font-bold uppercase">Tus comidas guardadas</h4>
+                                {comidasPredefinidas.length === 0 ? (
+                                    <p className="text-sm text-gray-500 text-center py-4 bg-black/30 rounded-xl border border-white/5">No tienes comidas guardadas.</p>
+                                ) : (
+                                    comidasPredefinidas.map(p => (
+                                        <div key={p.id} className="bg-black/40 p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                                            <div>
+                                                <p className="font-bold text-white text-sm">{p.nombre} <span className="text-gray-500 font-normal">({p.cantidad})</span></p>
+                                                <p className="text-xs text-gray-400 mt-1">{p.calorias} kcal | {p.proteinas}g P | {p.carbohidratos}g C | {p.grasas}g G</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => openEditPredef(p)} className="p-2 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors">
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => handleDeletePredef(p.id)} className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

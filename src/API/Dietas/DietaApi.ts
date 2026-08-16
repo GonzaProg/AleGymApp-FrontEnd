@@ -48,5 +48,27 @@ export const DietaApi = {
     eliminarComidaConsumida: async (comidaId: number) => {
         const response = await api.delete(`/dietas/registros/comida/${comidaId}`);
         return response.data;
+    },
+
+    // COMIDAS PREDEFINIDAS
+    obtenerComidasPredefinidas: async () => {
+        const response = await api.get('/dietas/predefinidas');
+        return response.data;
+    },
+
+    crearComidaPredefinida: async (datos: any) => {
+        const response = await api.post('/dietas/predefinidas', datos);
+        return response.data;
+    },
+
+    actualizarComidaPredefinida: async (id: number, datos: any) => {
+        const response = await api.put(`/dietas/predefinidas/${id}`, datos);
+        return response.data;
+    },
+
+    eliminarComidaPredefinida: async (id: number) => {
+        const response = await api.delete(`/dietas/predefinidas/${id}`);
+        return response.data;
     }
+
 };
