@@ -32,6 +32,8 @@ export const AppStyles = {
     // Inputs
     inputDark: "w-full bg-black/30 border border-white/10 text-white focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
     inputDarkBorderOrange: "w-full bg-black/30 border border-orange-700 text-white focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
+    inputDarkBorderBlue: "w-full bg-black/30 border border-blue-700 text-white focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
+    inputDarkBorderPurple: "w-full bg-black/30 border border-purple-700 text-white focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
     label: "block text-gray-400 text-xs uppercase font-bold tracking-wider mb-2",
 
     // Botones

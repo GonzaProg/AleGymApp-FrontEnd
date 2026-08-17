@@ -61,13 +61,34 @@ export const DietaApi = {
         return response.data;
     },
 
-    actualizarComidaPredefinida: async (id: number, datos: any) => {
-        const response = await api.put(`/dietas/predefinidas/${id}`, datos);
+    actualizarComidaPredefinida: async (id: number, comida: any) => {
+        const response = await api.put(`/dietas/predefinidas/${id}`, comida);
         return response.data;
     },
 
     eliminarComidaPredefinida: async (id: number) => {
         const response = await api.delete(`/dietas/predefinidas/${id}`);
+        return response.data;
+    },
+
+    // PLATOS FAVORITOS
+    obtenerPlatosFavoritos: async () => {
+        const response = await api.get('/dietas/platos-favoritos');
+        return response.data;
+    },
+
+    crearPlatoFavorito: async (plato: any) => {
+        const response = await api.post('/dietas/platos-favoritos', plato);
+        return response.data;
+    },
+
+    actualizarPlatoFavorito: async (id: number, plato: any) => {
+        const response = await api.put(`/dietas/platos-favoritos/${id}`, plato);
+        return response.data;
+    },
+
+    eliminarPlatoFavorito: async (id: number) => {
+        const response = await api.delete(`/dietas/platos-favoritos/${id}`);
         return response.data;
     }
 

@@ -11,6 +11,7 @@ export const useStudentDietas = () => {
     const [registroHoy, setRegistroHoy] = useState<any>(null);
     const [historial, setHistorial] = useState<any[]>([]);
     const [comidasPredefinidas, setComidasPredefinidas] = useState<any[]>([]);
+    const [platosFavoritos, setPlatosFavoritos] = useState<any[]>([]);
 
     useEffect(() => {
         if (user?.id) {
@@ -23,16 +24,18 @@ export const useStudentDietas = () => {
 
         setLoadingDietas(true);
         try {
-            const [dieta, registro, hist, predefinidas] = await Promise.all([
+            const [dieta, registro, hist, predefinidas, platos] = await Promise.all([
                 DietaApi.obtenerDietaDeAlumno(user.id),
                 DietaApi.obtenerRegistroHoy(),
                 DietaApi.obtenerHistorialRegistros(30), // Traemos últimos 30 días para armar semanas
-                DietaApi.obtenerComidasPredefinidas()
+                DietaApi.obtenerComidasPredefinidas(),
+                DietaApi.obtenerPlatosFavoritos()
             ]);
             setDietaAsignada(dieta);
             setRegistroHoy(registro);
             setHistorial(hist);
             setComidasPredefinidas(predefinidas);
+            setPlatosFavoritos(platos);
         } catch (e) {
             console.error("Error al cargar datos de dieta del alumno", e);
         } finally {
@@ -130,17 +133,66 @@ export const useStudentDietas = () => {
         }
     };
 
+    const crearPlatoFavorito = async (datos: any) => {
+        setLoadingDietas(true);
+        try {
+            await DietaApi.crearPlatoFavorito(datos);
+            await cargarDatos();
+            return true;
+        } catch (error) {
+            console.error(error);
+            showError("No se pudo guardar el plato favorito");
+            return false;
+        } finally {
+            setLoadingDietas(false);
+        }
+    };
+
+    const actualizarPlatoFavorito = async (id: number, datos: any) => {
+        setLoadingDietas(true);
+        try {
+            await DietaApi.actualizarPlatoFavorito(id, datos);
+            await cargarDatos();
+            return true;
+        } catch (error) {
+            console.error(error);
+            showError("No se pudo actualizar el plato favorito");
+            return false;
+        } finally {
+            setLoadingDietas(false);
+        }
+    };
+
+    const eliminarPlatoFavorito = async (id: number) => {
+        setLoadingDietas(true);
+        try {
+            await DietaApi.eliminarPlatoFavorito(id);
+            await cargarDatos();
+            return true;
+        } catch (error) {
+            console.error(error);
+            showError("No se pudo eliminar el plato favorito");
+            return false;
+        } finally {
+            setLoadingDietas(false);
+        }
+    };
+
     return {
         dietaAsignada,
         registroHoy,
         historial,
         comidasPredefinidas,
+        platosFavoritos,
         loadingDietas,
         registrarComida,
         registrarAgua,
         borrarComida,
         crearPredefinida,
         actualizarPredefinida,
-        eliminarPredefinida
+        eliminarPredefinida,
+        crearPlatoFavorito,
+        actualizarPlatoFavorito,
+        eliminarPlatoFavorito
     };
 };
