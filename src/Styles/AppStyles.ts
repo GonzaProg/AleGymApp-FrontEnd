@@ -72,6 +72,11 @@ export const AppStyles = {
     btnEdit: "p-2 rounded-lg transition-all border bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black border-yellow-500/20",
     btnDelete: "p-2 rounded-lg transition-all border bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-black border-red-500/20",
 
+    // Dietas, Iconos de acción en listas (Editar/Borrar)
+    iconButtonEditBlue: "p-2 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors",
+    iconButtonEditPurple: "p-2 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-colors",
+    iconButtonDelete: "p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors",
+
     // SCROLLBAR PERSONALIZADO OSCURO (reutilizable)
     customScrollbar: "overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20",
 
