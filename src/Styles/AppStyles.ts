@@ -25,14 +25,15 @@ export const AppStyles = {
     title: "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 drop-shadow-lg",
     subtitle: "text-gray-200 mt-2 text-lg",
     highlight: "text-green-500",
-    
+
     // COMPONENTES UI COMPARTIDOS 
     glassCard: "w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-8 relative overflow-hidden",
-    
+
     // Inputs
     inputDark: "w-full bg-black/30 border border-white/10 text-white focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
+    inputDarkBorderOrange: "w-full bg-black/30 border border-orange-700 text-white focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
     label: "block text-gray-400 text-xs uppercase font-bold tracking-wider mb-2",
-    
+
     // Botones
     btnPrimary: "bg-green-600/60 hover:bg-green-500 text-white font-bold px-14 py-3 rounded-xl shadow-lg shadow-green-900/20 border border-green-500 transition-all hover:scale-105",
     btnSecondary: "flex-1 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
@@ -45,7 +46,7 @@ export const AppStyles = {
     gradientDivider: "absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500/50 to-transparent",
     sectionTitle: "text-xl font-bold text-white border-b border-white/10 pb-4 mb-6 flex items-center gap-2",
     numberBadge: "bg-green-600/20 text-green-500 py-1 px-3 rounded-lg text-sm",
-    
+
     // TABLAS (Resumen Rutina)
     tableHeader: "bg-black/40 text-gray-300 uppercase text-xs font-bold tracking-wider",
     tableRow: "hover:bg-white/5 transition-colors border-b border-white/5 last:border-0",
@@ -60,11 +61,11 @@ export const AppStyles = {
 
     // Botones de acción en listas (Editar/Borrar/Guardar/Cancelar pequeños)
     actionBtnBase: "px-3 py-1 rounded-lg text-sm transition-all border",
-    
+
     btnSave: "bg-green-600/20 text-green-500 hover:bg-green-600 hover:text-white border-green-500/30",
     btnCancel: "bg-gray-700 text-gray-300 hover:bg-gray-600 border-transparent",
     btnBack: "text-gray-400 hover:text-white flex items-center gap-2 transition-colors text-sm font-bold uppercase tracking-widest cursor-pointer",
-    
+
     btnIconBase: "p-2 rounded-lg transition-all border",
     btnEdit: "p-2 rounded-lg transition-all border bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black border-yellow-500/20",
     btnDelete: "p-2 rounded-lg transition-all border bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-black border-red-500/20",

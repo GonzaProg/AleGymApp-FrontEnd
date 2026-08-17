@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useStudentDietas } from "../../Hooks/Dietas/useStudentDietas";
 import { AppStyles } from "../../Styles/AppStyles";
 import { Flame, Beef, Droplet, Wheat, Plus, ArrowLeft, ChevronLeft, ChevronRight, X, Info, Edit2, Trash2, List } from "lucide-react";
@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../Components/UI/Button";
 import { Input } from "../../Components/UI/Input";
 import { showError, showSuccess, showConfirmDelete } from "../../Helpers/Alerts";
+
 
 const ORDEN_COMIDAS = ["Desayuno", "Media mañana", "Almuerzo", "Media tarde", "Merienda", "Pre-Cena", "Cena", "Media noche"];
 const sortComidasByTime = (a: any, b: any) => {
@@ -59,6 +60,16 @@ export const StudentDietas = () => {
     const [predefGrasas, setPredefGrasas] = useState<number | "">("");
 
     const [weekOffset, setWeekOffset] = useState(0); 
+    
+    // Bloquear scroll de fondo cuando hay un modal abierto
+    useEffect(() => {
+        if (showAddModal || showPredefModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => { document.body.style.overflow = 'unset'; };
+    }, [showAddModal, showPredefModal]);
     
     const getLocalDate = (d: Date) => {
         const formatter = new Intl.DateTimeFormat('en-CA', { 
@@ -285,7 +296,7 @@ export const StudentDietas = () => {
                             </Button>
                         </div>
                         <button onClick={() => setShowPredefModal(true)} className="text-sm font-bold text-orange-400 bg-orange-500/10 hover:bg-orange-500/20 py-2 rounded-xl flex items-center justify-center transition-colors">
-                            <List className="w-4 h-4 mr-2" /> Mis Comidas Predefinidas
+                            <List className="w-4 h-4 mr-2" /> Mis Comidas
                         </button>
                     </div>
 
@@ -512,7 +523,12 @@ export const StudentDietas = () => {
                                                 <div key={c.idTemp} className="flex justify-between items-center bg-white/5 p-3 rounded-xl">
                                                     <div>
                                                         <p className="font-bold text-sm">{c.nombre} <span className="text-gray-500 font-normal">({c.cantidad})</span></p>
-                                                        <p className="text-xs text-gray-400">{c.calorias} kcal | {c.proteinas}g P | {c.carbohidratos}g C | {c.grasas}g G</p>
+                                                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                                                            {c.calorias > 0 && <span className="flex items-center gap-1 text-[10px] text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded"><Flame className="w-3 h-3"/> {c.calorias}</span>}
+                                                            {c.proteinas > 0 && <span className="flex items-center gap-1 text-[10px] text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded"><Beef className="w-3 h-3"/> {c.proteinas}g</span>}
+                                                            {c.carbohidratos > 0 && <span className="flex items-center gap-1 text-[10px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded"><Wheat className="w-3 h-3"/> {c.carbohidratos}g</span>}
+                                                            {c.grasas > 0 && <span className="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded"><Flame className="w-3 h-3"/> {c.grasas}g</span>}
+                                                        </div>
                                                     </div>
                                                     <button onClick={() => handleRemoveFromCart(c.idTemp)} className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg">
                                                         <Trash2 className="w-4 h-4" />
@@ -520,29 +536,34 @@ export const StudentDietas = () => {
                                                 </div>
                                             ))}
                                             
-                                            <div className="pt-3 border-t border-white/10 flex justify-between items-center font-bold text-sm">
-                                                <span className="text-gray-300">Totales:</span>
-                                                <span className="text-orange-400">{totalCartMacros.calorias} kcal</span>
+                                            <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+                                                <span className="text-gray-400 font-bold text-xs uppercase tracking-wider">Totales de la lista</span>
+                                                <div className="flex flex-wrap gap-2">
+                                                    <span className="flex items-center gap-1 text-xs text-orange-400 bg-orange-500/10 px-2 py-1 rounded font-bold"><Flame className="w-3 h-3"/> {totalCartMacros.calorias}</span>
+                                                    <span className="flex items-center gap-1 text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded font-bold"><Beef className="w-3 h-3"/> {totalCartMacros.proteinas}g</span>
+                                                    <span className="flex items-center gap-1 text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded font-bold"><Wheat className="w-3 h-3"/> {totalCartMacros.carbohidratos}g</span>
+                                                    <span className="flex items-center gap-1 text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded font-bold"><Flame className="w-3 h-3"/> {totalCartMacros.grasas}g</span>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
 
                                     {/* Formulario de Agregar Item */}
                                     <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
-                                        <h4 className="text-sm font-bold text-gray-300">Añadir alimento</h4>
+                                        <h4 className="text-sm font-bold text-gray-300">Añadir Alimento</h4>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="col-span-2">
-                                                <Input placeholder="Nombre (Ej: Pollo)" value={addNombre} onChange={(e) => setAddNombre(e.target.value)} className={AppStyles.inputDark} />
+                                                <Input placeholder="Nombre (Ej: Pollo)" value={addNombre} onChange={(e) => setAddNombre(e.target.value)} className={AppStyles.inputDarkBorderOrange} />
                                             </div>
                                             <div className="col-span-2">
-                                                <Input placeholder="Cantidad (Ej: 200g, 1 taza)" value={addCantidad} onChange={(e) => setAddCantidad(e.target.value)} className={AppStyles.inputDark} />
+                                                <Input placeholder="Cantidad (Ej: 200g, 1 taza)" value={addCantidad} onChange={(e) => setAddCantidad(e.target.value)} className={AppStyles.inputDarkBorderOrange} />
                                             </div>
-                                            <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                            <Input type="number" min="0" placeholder="Prot (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                            <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                            <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                            <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                            <Input type="number" min="0" placeholder="Prot (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                            <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                            <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
                                             
-                                            <Button onClick={handleAddToCart} className="col-span-2 bg-white/10 text-white border border-white/20 hover:bg-white/20 py-3 mt-2">
+                                            <Button onClick={handleAddToCart} className="col-span-2 bg-orange-700 text-white border border-orange-500 hover:bg-orange-500/50 py-3 mt-2">
                                                 <Plus className="w-5 h-5 mr-2" /> Añadir a la lista
                                             </Button>
                                         </div>
@@ -552,14 +573,15 @@ export const StudentDietas = () => {
                                     {comidasPredefinidas.length > 0 && (
                                         <div className="space-y-3">
                                             <h4 className="text-xs text-gray-400 font-bold uppercase">Predefinidas (Autocompletar)</h4>
-                                            <div className="flex gap-2 overflow-x-auto scrollbar-none pb-2">
+                                            <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto scrollbar-none pb-2">
                                                 {comidasPredefinidas.map(p => (
                                                     <button 
                                                         key={p.id} 
                                                         onClick={() => handleSelectPredefinida(p)}
-                                                        className="flex-none bg-orange-500/10 border border-orange-500/20 text-orange-400 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap hover:bg-orange-500/20"
+                                                        className="bg-black/30 border border-white/10 hover:border-orange-500/50 hover:bg-orange-500/10 text-gray-300 px-3 py-2 rounded-lg text-base font-bold transition-all text-left flex flex-col gap-1 w-[calc(50%-0.25rem)] h-auto justify-start"
                                                     >
-                                                        {p.nombre}
+                                                        <span className="w-full text-orange-400 whitespace-normal leading-tight">{p.nombre}</span>
+                                                        <span className="text-sm text-gray-500 font-normal mt-auto">{p.cantidad} • {p.calorias} kcal</span>
                                                     </button>
                                                 ))}
                                             </div>
@@ -586,7 +608,7 @@ export const StudentDietas = () => {
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center animate-fade-in">
                     <div className="bg-[#1a1a1a] w-full sm:w-[450px] p-6 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center mb-2 flex-shrink-0">
-                            <h3 className="text-xl font-bold">Comidas Predefinidas</h3>
+                            <h3 className="text-xl font-bold">Crear Comida</h3>
                             <button onClick={() => setShowPredefModal(false)} className="p-2 bg-white/5 rounded-full"><X className="w-5 h-5" /></button>
                         </div>
                         <p className="text-sm text-gray-400 mb-6 flex-shrink-0">Crea alimentos con sus macros para reutilizarlos rápidamente en tu registro diario.</p>
@@ -596,15 +618,15 @@ export const StudentDietas = () => {
                                 <h4 className="text-sm font-bold text-orange-400">{editingPredef ? 'Editar Comida' : 'Nueva Comida'}</h4>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="col-span-2">
-                                        <Input placeholder="Nombre (Ej: Pechuga de Pollo)" value={predefNombre} onChange={(e) => setPredefNombre(e.target.value)} className={AppStyles.inputDark} />
+                                        <Input placeholder="Nombre (Ej: Pechuga de Pollo)" value={predefNombre} onChange={(e) => setPredefNombre(e.target.value)} className={AppStyles.inputDarkBorderOrange} />
                                     </div>
                                     <div className="col-span-2">
-                                        <Input placeholder="Cantidad base (Ej: 100g)" value={predefCantidad} onChange={(e) => setPredefCantidad(e.target.value)} className={AppStyles.inputDark} />
+                                        <Input placeholder="Cantidad (Ej: 100g)" value={predefCantidad} onChange={(e) => setPredefCantidad(e.target.value)} className={AppStyles.inputDarkBorderOrange} />
                                     </div>
-                                    <Input type="number" min="0" placeholder="Kcal" value={predefCals} onChange={(e) => setPredefCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" min="0" placeholder="Prot (g)" value={predefProts} onChange={(e) => setPredefProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" min="0" placeholder="Carbos (g)" value={predefCarbs} onChange={(e) => setPredefCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
-                                    <Input type="number" min="0" placeholder="Grasas (g)" value={predefGrasas} onChange={(e) => setPredefGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDark} />
+                                    <Input type="number" min="0" placeholder="Kcal" value={predefCals} onChange={(e) => setPredefCals(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                    <Input type="number" min="0" placeholder="Prot (g)" value={predefProts} onChange={(e) => setPredefProts(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                    <Input type="number" min="0" placeholder="Carbos (g)" value={predefCarbs} onChange={(e) => setPredefCarbs(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                    <Input type="number" min="0" placeholder="Grasas (g)" value={predefGrasas} onChange={(e) => setPredefGrasas(e.target.value ? Number(e.target.value) : '')} className={AppStyles.inputDarkBorderOrange} />
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                     {editingPredef && (
@@ -625,7 +647,12 @@ export const StudentDietas = () => {
                                         <div key={p.id} className="bg-black/40 p-4 rounded-xl border border-white/5 flex justify-between items-center">
                                             <div>
                                                 <p className="font-bold text-white text-sm">{p.nombre} <span className="text-gray-500 font-normal">({p.cantidad})</span></p>
-                                                <p className="text-xs text-gray-400 mt-1">{p.calorias} kcal | {p.proteinas}g P | {p.carbohidratos}g C | {p.grasas}g G</p>
+                                                <div className="flex flex-wrap gap-1.5 mt-3">
+                                                    {p.calorias > 0 && <span className="flex items-center gap-1 text-[10px] text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded"><Flame className="w-3 h-3"/> {p.calorias}</span>}
+                                                    {p.proteinas > 0 && <span className="flex items-center gap-1 text-[10px] text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded"><Beef className="w-3 h-3"/> {p.proteinas}g</span>}
+                                                    {p.carbohidratos > 0 && <span className="flex items-center gap-1 text-[10px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded"><Wheat className="w-3 h-3"/> {p.carbohidratos}g</span>}
+                                                    {p.grasas > 0 && <span className="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded"><Flame className="w-3 h-3"/> {p.grasas}g</span>}
+                                                </div>
                                             </div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => openEditPredef(p)} className="p-2 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors">

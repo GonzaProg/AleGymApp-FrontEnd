@@ -58,7 +58,7 @@ export const useStudentDietas = () => {
     const registrarAgua = async (litros: number) => {
         setLoadingDietas(true);
         try {
-            await DietaApi.agregarComidaConsumida([], litros);
+            await DietaApi.agregarComidaConsumida(null, litros);
             await cargarDatos(); // Recargar para actualizar los totales
             return true;
         } catch (error) {
