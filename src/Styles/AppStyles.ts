@@ -25,14 +25,17 @@ export const AppStyles = {
     title: "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400 drop-shadow-lg",
     subtitle: "text-gray-200 mt-2 text-lg",
     highlight: "text-green-500",
-    
+
     // COMPONENTES UI COMPARTIDOS 
     glassCard: "w-full backdrop-blur-xl bg-gray-900/80 border border-white/10 rounded-2xl shadow-xl p-8 relative overflow-hidden",
-    
+
     // Inputs
     inputDark: "w-full bg-black/30 border border-white/10 text-white focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
+    inputDarkBorderOrange: "w-full bg-black/30 border border-orange-700 text-white focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
+    inputDarkBorderBlue: "w-full bg-black/30 border border-blue-700 text-white focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
+    inputDarkBorderPurple: "w-full bg-black/30 border border-purple-700 text-white focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 p-3 rounded-lg outline-none transition-all placeholder-gray-500 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert",
     label: "block text-gray-400 text-xs uppercase font-bold tracking-wider mb-2",
-    
+
     // Botones
     btnPrimary: "bg-green-600/60 hover:bg-green-500 text-white font-bold px-14 py-3 rounded-xl shadow-lg shadow-green-900/20 border border-green-500 transition-all hover:scale-105",
     btnSecondary: "flex-1 bg-transparent border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300 font-semibold py-3 px-6 rounded-xl transition-all",
@@ -45,7 +48,7 @@ export const AppStyles = {
     gradientDivider: "absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500/50 to-transparent",
     sectionTitle: "text-xl font-bold text-white border-b border-white/10 pb-4 mb-6 flex items-center gap-2",
     numberBadge: "bg-green-600/20 text-green-500 py-1 px-3 rounded-lg text-sm",
-    
+
     // TABLAS (Resumen Rutina)
     tableHeader: "bg-black/40 text-gray-300 uppercase text-xs font-bold tracking-wider",
     tableRow: "hover:bg-white/5 transition-colors border-b border-white/5 last:border-0",
@@ -60,20 +63,28 @@ export const AppStyles = {
 
     // Botones de acción en listas (Editar/Borrar/Guardar/Cancelar pequeños)
     actionBtnBase: "px-3 py-1 rounded-lg text-sm transition-all border",
-    
+
     btnSave: "bg-green-600/20 text-green-500 hover:bg-green-600 hover:text-white border-green-500/30",
     btnCancel: "bg-gray-700 text-gray-300 hover:bg-gray-600 border-transparent",
     btnBack: "text-gray-400 hover:text-white flex items-center gap-2 transition-colors text-sm font-bold uppercase tracking-widest cursor-pointer",
-    
+
     btnIconBase: "p-2 rounded-lg transition-all border",
     btnEdit: "p-2 rounded-lg transition-all border bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-black border-yellow-500/20",
     btnDelete: "p-2 rounded-lg transition-all border bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-black border-red-500/20",
 
-    // SCROLLBAR PERSONALIZADO OSCURO (reutilizable)
+    // Dietas, Iconos de acción en listas (Editar/Borrar)
+    iconButtonEditBlue: "p-2 text-blue-400 hover:bg-blue-500/20 rounded-lg transition-colors",
+    iconButtonEditPurple: "p-2 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-colors",
+    iconButtonDelete: "p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors",
+
+    // SCROLLBAR PERSONALIZADO OSCURO
     customScrollbar: "overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20",
 
     // ETIQUETAS DE EJERCICIOS
     tagMuscle: "flex items-center gap-1 text-[10px] md:text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30",
     tagGrip: "flex items-center gap-1 text-[10px] md:text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded border border-orange-500/30",
     tagElements: "flex items-center gap-1 text-[10px] md:text-xs bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30",
+
+    // X Para Cerrar Modal en Dietas Celular
+    iconClose: "p-2 bg-black/40 rounded-full",
 };
