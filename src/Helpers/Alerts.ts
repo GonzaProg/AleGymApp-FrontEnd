@@ -5,63 +5,79 @@ const commonCustomClass = {
     container: 'z-[10000]' // Asegura que las alertas estén por encima de otros elementos
 };
 
-// Configuración base para alertas tipo Toast/Info
-const toastMixin = Swal.mixin({
-    background: '#1f2937', // bg-gray-800
-    color: '#ffffff',      // Texto blanco
-    confirmButtonColor: '#22c55e', // green-500
-    cancelButtonColor: '#ef4444',  // red-500
-    customClass: commonCustomClass
+const baseMixin = Swal.mixin({
+    background: '#1f2937',
+    color: '#e5e7eb',
+    customClass: commonCustomClass,
+    buttonsStyling: false
 });
 
 export const showSuccess = (message: string) => {
-    return toastMixin.fire({
+    return baseMixin.fire({
         icon: 'success',
         title: '¡Éxito!',
         text: message,
-        confirmButtonText: 'Aceptar'
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            ...commonCustomClass,
+            confirmButton: 'bg-green-500/20 text-green-400 border border-green-500/80 hover:bg-green-500/30 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm'
+        }
     });
 };
 
 export const showError = (message: string) => {
-    return toastMixin.fire({
+    return baseMixin.fire({
         icon: 'error',
         title: 'Ocurrió un error',
         text: message,
-        confirmButtonText: 'Entendido'
+        confirmButtonText: 'Entendido',
+        customClass: {
+            ...commonCustomClass,
+            confirmButton: 'bg-red-500/20 text-red-400 border border-red-500/80 hover:bg-red-500/30 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm'
+        }
     });
 };
 
-export const showConfirmDelete = (title: string, text: string) => {
-    return Swal.fire({
+export const showConfirmDelete = async (title: string, text: string) => {
+    const result = await Swal.fire({
         title: title,
         text: text,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#ef4444', // Rojo
-        cancelButtonColor: '#6b7280',  // Gris
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',
         background: '#1f2937',
         color: '#e5e7eb',
-        customClass: commonCustomClass // Aplicamos el z-index alto
+        customClass: {
+            ...commonCustomClass,
+            actions: 'flex gap-4',
+            confirmButton: 'bg-red-500/20 text-red-400 border border-red-500/80 hover:bg-red-500/30 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm',
+            cancelButton: 'bg-[#1a1a1a] text-white hover:bg-white/10 border border-white/10 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm'
+        },
+        buttonsStyling: false
     });
+    return result;
 };
 
-export const showConfirmSuccess = (title: string, text: string) => {
-    return Swal.fire({
+export const showConfirmSuccess = async (title: string, text: string) => {
+    const result = await Swal.fire({
         title: title,
         text: text,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#22c55e', // Verde
-        cancelButtonColor: '#6b7280',  // Gris
         confirmButtonText: 'Sí, Confirmar',
         cancelButtonText: 'Cancelar',
         background: '#1f2937',
         color: '#e5e7eb',
-        customClass: commonCustomClass // Aplicamos el z-index alto
+        customClass: {
+            ...commonCustomClass,
+            actions: 'flex gap-4',
+            confirmButton: 'bg-green-500/20 text-green-400 border border-green-500/80 hover:bg-green-500/30 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm',
+            cancelButton: 'bg-[#1a1a1a] text-white hover:bg-white/10 border border-white/10 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm'
+        },
+        buttonsStyling: false
     });
+    return result;
 };
 
 export const showPasswordPrompt = async (title: string, text: string) => {
@@ -77,11 +93,16 @@ export const showPasswordPrompt = async (title: string, text: string) => {
         showCancelButton: true,
         confirmButtonText: 'Confirmar',
         cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#3b82f6',
-        cancelButtonColor: '#6b7280',
         background: '#1f2937',
         color: '#e5e7eb',
-        customClass: commonCustomClass,
+        customClass: {
+            ...commonCustomClass,
+            actions: 'flex gap-4',
+            confirmButton: 'bg-blue-500/20 text-blue-400 border border-blue-500/80 hover:bg-blue-500/30 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm',
+            cancelButton: 'bg-[#1a1a1a] text-white hover:bg-white/10 border border-white/10 font-bold py-3 px-6 rounded-xl transition-colors shadow-sm',
+            input: 'bg-black/40 border border-white/10 text-white rounded-xl focus:border-blue-500/50 transition-colors px-4 py-3 text-center !w-3/4 mx-auto'
+        },
+        buttonsStyling: false,
         inputValidator: (value) => {
             if (!value) {
                 return '¡Necesitas escribir la contraseña!';

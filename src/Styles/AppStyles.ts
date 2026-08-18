@@ -77,11 +77,14 @@ export const AppStyles = {
     iconButtonEditPurple: "p-2 text-purple-400 hover:bg-purple-500/20 rounded-lg transition-colors",
     iconButtonDelete: "p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors",
 
-    // SCROLLBAR PERSONALIZADO OSCURO (reutilizable)
+    // SCROLLBAR PERSONALIZADO OSCURO
     customScrollbar: "overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20",
 
     // ETIQUETAS DE EJERCICIOS
     tagMuscle: "flex items-center gap-1 text-[10px] md:text-xs bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30",
     tagGrip: "flex items-center gap-1 text-[10px] md:text-xs bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded border border-orange-500/30",
     tagElements: "flex items-center gap-1 text-[10px] md:text-xs bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30",
+
+    // X Para Cerrar Modal en Dietas Celular
+    iconClose: "p-2 bg-black/40 rounded-full",
 };

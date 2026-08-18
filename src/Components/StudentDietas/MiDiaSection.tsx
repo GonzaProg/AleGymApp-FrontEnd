@@ -230,7 +230,7 @@ export const MiDiaSection = ({
 
     const handleDeletePredef = async (id: number) => {
         const confirmed = await showConfirmDelete("¿Eliminar esta comida de tu lista?", "Esta accion no se puede deshacer");
-        if (confirmed) {
+        if (confirmed.isConfirmed) {
             await eliminarPredefinida(id);
         }
     };
@@ -256,9 +256,12 @@ export const MiDiaSection = ({
         if (cartPlato.length === 0) return showError("Agrega al menos un alimento al plato");
 
         const descripcionCombinada = cartPlato.map(c => `${c.nombre} ${c.cantidad}`).join('\n');
+        const macrosCombinadas = cartPlato.map(c => `${c.calorias || 0},${c.proteinas || 0},${c.carbohidratos || 0},${c.grasas || 0}`).join(',');
+        
         const data = {
             nombre: platoNombre,
             descripcion: descripcionCombinada,
+            macros: macrosCombinadas,
             calorias: totalCartPlatoMacros.calorias,
             proteinas: totalCartPlatoMacros.proteinas,
             carbohidratos: totalCartPlatoMacros.carbohidratos,
@@ -279,7 +282,7 @@ export const MiDiaSection = ({
 
     const handleDeletePlato = async (id: number) => {
         const confirmed = await showConfirmDelete("¿Eliminar este plato?", "Esta accion no se puede deshacer");
-        if (confirmed) {
+        if (confirmed.isConfirmed) {
             await eliminarPlatoFavorito(id);
         }
     };
@@ -289,16 +292,18 @@ export const MiDiaSection = ({
         setPlatoNombre(plato.nombre);
         // Reconstruir carrito desde la descripcion
         const lines = plato.descripcion.split('\n');
+        const macroValues = plato.macros ? plato.macros.split(',') : [];
         const newCart = lines.map((l: string, i: number) => {
             const lastSpaceIndex = l.lastIndexOf(' ');
+            const baseIndex = i * 4;
             return {
                 idTemp: Date.now() + i,
                 nombre: l.substring(0, lastSpaceIndex),
                 cantidad: l.substring(lastSpaceIndex + 1),
-                calorias: i === 0 ? plato.calorias : 0,
-                proteinas: i === 0 ? plato.proteinas : 0,
-                carbohidratos: i === 0 ? plato.carbohidratos : 0,
-                grasas: i === 0 ? plato.grasas : 0,
+                calorias: macroValues[baseIndex] ? Number(macroValues[baseIndex]) : 0,
+                proteinas: macroValues[baseIndex + 1] ? Number(macroValues[baseIndex + 1]) : 0,
+                carbohidratos: macroValues[baseIndex + 2] ? Number(macroValues[baseIndex + 2]) : 0,
+                grasas: macroValues[baseIndex + 3] ? Number(macroValues[baseIndex + 3]) : 0,
             };
         });
         setCartPlato(newCart);
@@ -403,7 +408,7 @@ export const MiDiaSection = ({
                     <div className="bg-[#1a1a1a] w-full sm:w-[450px] p-6 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center mb-4 flex-shrink-0">
                             <h3 className="text-xl font-bold">Registrar Comidas</h3>
-                            <button onClick={() => setShowAddModal(false)} className="p-2 bg-white/5 rounded-full"><X className="w-5 h-5" /></button>
+                            <button onClick={() => setShowAddModal(false)} className={AppStyles.iconClose}><X className="w-5 h-5" /></button>
                         </div>
                         
                         <div className="overflow-y-auto scrollbar-none flex-1 pb-4">
@@ -414,7 +419,7 @@ export const MiDiaSection = ({
                                         <button 
                                             key={tipo}
                                             onClick={() => setAddTipo(tipo)}
-                                            className="w-full text-left p-4 rounded-2xl border border-white/10 hover:border-orange-500/50 hover:bg-orange-500/10 transition-all font-bold"
+                                            className="w-full text-left p-4 rounded-2xl bg-black/40 border border-white/10 hover:border-orange-500/50 hover:bg-orange-500/10 transition-all font-bold"
                                         >
                                             {tipo}
                                         </button>
@@ -459,7 +464,7 @@ export const MiDiaSection = ({
                                         </div>
                                     )}
 
-                                    <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
+                                    <div className="bg-black/20 p-4 rounded-2xl border border-white/10 space-y-4">
                                         <h4 className="text-sm font-bold text-gray-300">Añadir Alimento</h4>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="col-span-2">
@@ -468,10 +473,22 @@ export const MiDiaSection = ({
                                             <div className="col-span-2">
                                                 <Input placeholder="Cantidad (Ej: 200g, 1 taza)" value={addCantidad} onChange={(e) => setAddCantidad(e.target.value)} className={AppStyles.inputDarkBorderOrange} />
                                             </div>
-                                            <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
-                                            <Input type="number" min="0" placeholder="Prot (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
-                                            <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
-                                            <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                            <div className="relative">
+                                                <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                                <Flame className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500/50" />
+                                            </div>
+                                            <div className="relative">
+                                                <Input type="number" min="0" placeholder="Prot (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                                <Beef className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500/50" />
+                                            </div>
+                                            <div className="relative">
+                                                <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                                <Wheat className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-500/50" />
+                                            </div>
+                                            <div className="relative">
+                                                <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                                <Droplet className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500/50" />
+                                            </div>
                                             
                                             <Button variant="orange" onClick={handleAddToCart} className="col-span-2 py-3 mt-2">
                                                 <Plus className="w-5 h-5 mr-2" /> Añadir a la lista
@@ -517,12 +534,12 @@ export const MiDiaSection = ({
                     <div className="bg-[#1a1a1a] w-full sm:w-[450px] p-6 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center mb-2 flex-shrink-0">
                             <h3 className="text-xl font-bold">Crear Comida</h3>
-                            <button onClick={() => setShowPredefModal(false)} className="p-2 bg-white/5 rounded-full"><X className="w-5 h-5" /></button>
+                            <button onClick={() => setShowPredefModal(false)} className={AppStyles.iconClose}><X className="w-5 h-5" /></button>
                         </div>
                         <p className="text-sm text-gray-400 mb-6 flex-shrink-0">Crea alimentos con sus macros para reutilizarlos rápidamente en tu registro diario.</p>
 
                         <div className="overflow-y-auto scrollbar-none flex-1 space-y-6 pb-4">
-                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
+                            <div className="bg-black/20 p-4 rounded-2xl border border-white/10 space-y-4">
                                 <h4 className="text-sm font-bold text-orange-400">{editingPredef ? 'Editar Comida' : 'Nueva Comida'}</h4>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="col-span-2">
@@ -531,14 +548,26 @@ export const MiDiaSection = ({
                                     <div className="col-span-2">
                                         <Input placeholder="Cantidad (Ej: 100g)" value={predefCantidad} onChange={(e) => setPredefCantidad(e.target.value)} className={AppStyles.inputDarkBorderOrange} />
                                     </div>
-                                    <Input type="number" min="0" placeholder="Kcal" value={predefCals} onChange={(e) => setPredefCals(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
-                                    <Input type="number" min="0" placeholder="Prot (g)" value={predefProts} onChange={(e) => setPredefProts(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
-                                    <Input type="number" min="0" placeholder="Carbos (g)" value={predefCarbs} onChange={(e) => setPredefCarbs(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
-                                    <Input type="number" min="0" placeholder="Grasas (g)" value={predefGrasas} onChange={(e) => setPredefGrasas(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderOrange} />
+                                    <div className="relative">
+                                        <Input type="number" min="0" placeholder="Kcal" value={predefCals} onChange={(e) => setPredefCals(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                        <Flame className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500/50" />
+                                    </div>
+                                    <div className="relative">
+                                        <Input type="number" min="0" placeholder="Prot (g)" value={predefProts} onChange={(e) => setPredefProts(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                        <Beef className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500/50" />
+                                    </div>
+                                    <div className="relative">
+                                        <Input type="number" min="0" placeholder="Carbos (g)" value={predefCarbs} onChange={(e) => setPredefCarbs(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                        <Wheat className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-500/50" />
+                                    </div>
+                                    <div className="relative">
+                                        <Input type="number" min="0" placeholder="Grasas (g)" value={predefGrasas} onChange={(e) => setPredefGrasas(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderOrange} pr-10`} />
+                                        <Droplet className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500/50" />
+                                    </div>
                                 </div>
                                 <div className="flex gap-2 pt-2">
                                     {editingPredef && (
-                                        <Button onClick={resetPredefForm} className="flex-1 bg-white/10 text-white">Cancelar</Button>
+                                        <Button variant="cancelar" onClick={resetPredefForm} className="flex-1">Cancelar</Button>
                                     )}
                                     <Button variant="orange" onClick={handleSavePredef} className="flex-1">
                                         {editingPredef ? 'Actualizar' : 'Guardar Comida'}
@@ -585,12 +614,12 @@ export const MiDiaSection = ({
                     <div className="bg-[#1a1a1a] w-full sm:w-[450px] p-6 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center mb-2 flex-shrink-0">
                             <h3 className="text-xl font-bold text-purple-400">Mis Platos Favoritos</h3>
-                            <button onClick={() => setShowPlatosModal(false)} className="p-2 bg-white/5 rounded-full"><X className="w-5 h-5" /></button>
+                            <button onClick={() => setShowPlatosModal(false)} className={AppStyles.iconClose}><X className="w-5 h-5" /></button>
                         </div>
                         <p className="text-sm text-gray-400 mb-6 flex-shrink-0">Arma un plato con múltiples alimentos para registrarlo todo junto de forma rápida.</p>
 
                         <div className="overflow-y-auto scrollbar-none flex-1 space-y-6 pb-4">
-                            <div className="bg-white/5 p-4 rounded-2xl border border-white/10 space-y-4">
+                            <div className="bg-black/20 p-4 rounded-2xl border border-white/10 space-y-4">
                                 <h4 className="text-sm font-bold text-purple-400">{editingPlato ? 'Editar Plato' : 'Nuevo Plato'}</h4>
                                 <Input placeholder="Nombre del Plato (Ej: Arroz con Pollo)" value={platoNombre} onChange={(e) => setPlatoNombre(e.target.value)} className={AppStyles.inputDarkBorderPurple} />
                                 
@@ -600,6 +629,12 @@ export const MiDiaSection = ({
                                             <div key={c.idTemp} className="flex justify-between items-center bg-white/5 p-3 rounded-lg">
                                                 <div>
                                                     <p className="font-bold text-sm">{c.nombre} <span className="text-gray-500 font-normal">({c.cantidad})</span></p>
+                                                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                                                        {c.calorias > 0 && <span className="flex items-center gap-1 text-[10px] text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded"><Flame className="w-3 h-3"/> {c.calorias}</span>}
+                                                        {c.proteinas > 0 && <span className="flex items-center gap-1 text-[10px] text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded"><Beef className="w-3 h-3"/> {c.proteinas}g</span>}
+                                                        {c.carbohidratos > 0 && <span className="flex items-center gap-1 text-[10px] text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded"><Wheat className="w-3 h-3"/> {c.carbohidratos}g</span>}
+                                                        {c.grasas > 0 && <span className="flex items-center gap-1 text-[10px] text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded"><Droplet className="w-3 h-3"/> {c.grasas}g</span>}
+                                                    </div>
                                                 </div>
                                                 <button onClick={() => handleRemoveFromCartPlato(c.idTemp)} className={AppStyles.iconButtonDelete}>
                                                     <Trash2 className="w-4 h-4" />
@@ -627,10 +662,22 @@ export const MiDiaSection = ({
                                         <div className="col-span-2">
                                             <Input placeholder="Cantidad" value={addCantidad} onChange={(e) => setAddCantidad(e.target.value)} className={AppStyles.inputDarkBorderPurple} />
                                         </div>
-                                        <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderPurple} />
-                                        <Input type="number" min="0" placeholder="Prot (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderPurple} />
-                                        <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderPurple} />
-                                        <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={AppStyles.inputDarkBorderPurple} />
+                                        <div className="relative">
+                                            <Input type="number" min="0" placeholder="Kcal" value={addCals} onChange={(e) => setAddCals(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderPurple} pr-10`} />
+                                            <Flame className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-500/50" />
+                                        </div>
+                                        <div className="relative">
+                                            <Input type="number" min="0" placeholder="Prot (g)" value={addProts} onChange={(e) => setAddProts(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderPurple} pr-10`} />
+                                            <Beef className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-500/50" />
+                                        </div>
+                                        <div className="relative">
+                                            <Input type="number" min="0" placeholder="Carbos (g)" value={addCarbs} onChange={(e) => setAddCarbs(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderPurple} pr-10`} />
+                                            <Wheat className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-500/50" />
+                                        </div>
+                                        <div className="relative">
+                                            <Input type="number" min="0" placeholder="Grasas (g)" value={addGrasas} onChange={(e) => setAddGrasas(e.target.value ? Math.max(0, Number(e.target.value)) : '')} className={`${AppStyles.inputDarkBorderPurple} pr-10`} />
+                                            <Droplet className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500/50" />
+                                        </div>
                                         <Button variant="purple" onClick={handleAddToCartPlato} className="col-span-2 border py-3 mt-2">
                                             <Plus className="w-5 h-5 mr-2" /> Añadir al Plato
                                         </Button>
@@ -689,7 +736,7 @@ export const MiDiaSection = ({
 
                         <div className="pt-4 mt-auto border-t border-white/10 flex-shrink-0 flex gap-2">
                             {editingPlato && (
-                                <Button onClick={() => { setEditingPlato(null); setPlatoNombre(""); setCartPlato([]); }} className="flex-1 bg-white/10 text-white font-bold py-4">Cancelar</Button>
+                                <Button variant="cancelar" onClick={() => { setEditingPlato(null); setPlatoNombre(""); setCartPlato([]); }} className="flex-1 py-4">Cancelar</Button>
                             )}
                             <Button onClick={handleSavePlato} disabled={cartPlato.length === 0} className="flex-1 bg-purple-500 hover:bg-purple-600 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold py-4">
                                 {editingPlato ? 'Actualizar Plato' : 'Guardar Plato'}
@@ -705,7 +752,7 @@ export const MiDiaSection = ({
                     <div className="bg-[#1a1a1a] w-full sm:w-[450px] p-6 rounded-t-3xl sm:rounded-3xl flex flex-col max-h-[90vh]">
                         <div className="flex justify-between items-center mb-4 flex-shrink-0">
                             <h3 className="text-xl font-bold text-purple-400">Registrar Plato</h3>
-                            <button onClick={() => setShowAddPlatoModal(false)} className="p-2 bg-white/5 rounded-full"><X className="w-5 h-5" /></button>
+                            <button onClick={() => setShowAddPlatoModal(false)} className={AppStyles.iconClose}><X className="w-5 h-5" /></button>
                         </div>
                         
                         <div className="overflow-y-auto scrollbar-none flex-1 pb-4">
@@ -716,7 +763,7 @@ export const MiDiaSection = ({
                                         <button 
                                             key={tipo}
                                             onClick={() => setAddPlatoTipo(tipo)}
-                                            className="w-full text-left p-4 rounded-2xl border border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all font-bold"
+                                            className="w-full text-left p-4 rounded-2xl bg-black/40 border border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all font-bold"
                                         >
                                             {tipo}
                                         </button>
