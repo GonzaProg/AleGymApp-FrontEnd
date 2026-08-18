@@ -18,7 +18,8 @@ export const Input = ({
 }: InputProps) => {
 
   // Estilos base compartidos
-  const baseClasses = `w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all ${className}`;
+  const hasRing = className.includes("focus:ring-");
+  const baseClasses = `w-full px-3 py-2 border rounded-lg focus:outline-none transition-all ${hasRing ? '' : 'focus:ring-2 focus:ring-green-500'} ${className}`;
 
   return (
     <div className="w-full">
