@@ -102,9 +102,15 @@ export const SendRoutinePDF = () => {
                     </div>
                 ) : (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-                        {rutinas.map((rutina) => (
+                        {rutinas.map((rutina) => {
+                            const uniqueId = rutina.esGrupo ? rutina.grupoId : rutina.id;
+                            const numEjercicios = rutina.esGrupo 
+                                ? rutina.dias?.reduce((acc: number, d: any) => acc + (d.detalles?.length || 0), 0)
+                                : (rutina.detalles?.length || 0);
+
+                            return (
                             <div 
-                                key={rutina.id} 
+                                key={uniqueId} 
                                 className="w-full backdrop-blur-lg bg-gray-900/60 border border-white/10 hover:border-green-500/30 hover:bg-gray-900/80 rounded-xl shadow-md p-5 flex justify-between items-center transition-all group relative overflow-hidden"
                             >
                                 {/* Decoración Lateral */}
@@ -120,7 +126,7 @@ export const SendRoutinePDF = () => {
                                             <Calendar className="w-4 h-4 text-gray-500" /> {new Date(rutina.fechaCreacion).toLocaleDateString()}
                                         </span>
                                         <span className="flex items-center gap-1">
-                                            <Dumbbell className="w-4 h-4 text-purple-400" /> {rutina.detalles?.length || 0} Ejercicios
+                                            <Dumbbell className="w-4 h-4 text-purple-400" /> {numEjercicios} Ejercicios {rutina.esGrupo && `(${rutina.dias?.length || 0} Días)`}
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <User className="w-4 h-4 text-blue-400" /> {rutina.entrenador || "Profe"}
@@ -130,17 +136,17 @@ export const SendRoutinePDF = () => {
 
                                 {/* Botón Acción */}
                                 <Button
-                                    onClick={() => handleSendPDF(rutina.id, rutina.nombreRutina)}
-                                    disabled={sendingId === rutina.id}
+                                    onClick={() => handleSendPDF(uniqueId, rutina.nombreRutina, !!rutina.esGrupo)}
+                                    disabled={sendingId === uniqueId}
                                     className={`
                                         whitespace-nowrap px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 w-full md:w-auto justify-center
-                                        ${sendingId === rutina.id 
+                                        ${sendingId === uniqueId 
                                             ? "bg-green-900/30 text-green-600 border border-green-900/50 cursor-wait" 
                                             : "bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/20 hover:shadow-green-500/30 hover:scale-105"
                                         }
                                     `}
                                 >
-                                    {sendingId === rutina.id ? (
+                                    {sendingId === uniqueId ? (
                                         <>
                                             <span className="animate-spin h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full"></span>
                                             Enviando...
@@ -153,7 +159,7 @@ export const SendRoutinePDF = () => {
                                     )}
                                 </Button>
                             </div>
-                        ))}
+                        )})}
                     </div>
                 )}
             </div>

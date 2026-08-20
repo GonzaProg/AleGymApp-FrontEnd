@@ -10,7 +10,7 @@ export const useSendRoutinePDF = () => {
   const [loading, setLoading] = useState(false); 
   
   // Estado específico para saber qué rutina se está enviando (spinner individual)
-  const [sendingId, setSendingId] = useState<number | null>(null);
+  const [sendingId, setSendingId] = useState<number | string | null>(null);
 
   // Usamos el hook centralizado para la búsqueda de alumnos
   const {
@@ -43,7 +43,7 @@ export const useSendRoutinePDF = () => {
   };
 
   // 4. Acción Principal: Enviar PDF
-  const handleSendPDF = async (rutinaId: number, nombreRutina: string) => {
+  const handleSendPDF = async (rutinaId: number | string, nombreRutina: string, esGrupo: boolean) => {
 
     const result = await showConfirmSuccess( 
                 "Generar y Enviar PDF",
@@ -57,8 +57,13 @@ export const useSendRoutinePDF = () => {
       // Enviamos el ID del alumno seleccionado para rutinas generales
       const payload = alumnoSeleccionado ? { alumnoId: alumnoSeleccionado.id } : {};
       
-      // Llamamos al endpoint específico con el payload
-      await api.post(`/rutinas/${rutinaId}/enviar-whatsapp`, payload);
+      if (esGrupo) {
+        // Llamamos al endpoint específico de grupos
+        await api.post(`/rutinas/grupo/${rutinaId}/enviar-whatsapp`, payload);
+      } else {
+        // Llamamos al endpoint específico de rutinas individuales
+        await api.post(`/rutinas/${rutinaId}/enviar-whatsapp`, payload);
+      }
       
       showSuccess("PDF enviado correctamente 📤");
     } catch (error: any) {
