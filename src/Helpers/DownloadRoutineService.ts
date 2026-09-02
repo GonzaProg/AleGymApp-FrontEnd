@@ -131,23 +131,43 @@ export const DownloadRoutineService = {
     deleteOfflineRoutine: async (rutina: any) => {
         if (rutina.detalles) {
             for (const d of rutina.detalles) {
-                // Borrar video local
-                if (d.ejercicio.localVideoPath) {
-                    try {
-                        const fileName = d.ejercicio.localVideoPath.split('/').pop();
-                        await Filesystem.deleteFile({ path: fileName, directory: Directory.Data });
-                    } catch (e) { console.warn("Archivo video ya borrado"); }
-                }
-                // Borrar miniatura local
-                if (d.ejercicio.localThumbnailPath) {
-                    try {
-                        const fileName = d.ejercicio.localThumbnailPath.split('/').pop();
-                        await Filesystem.deleteFile({ path: fileName, directory: Directory.Data });
-                    } catch (e) { console.warn("Archivo miniatura ya borrado"); }
-                }
+                await DownloadRoutineService.deleteOfflineExerciseMedia(d.ejercicio);
             }
         }
         await Preferences.remove({ key: `${ROUTINE_KEY_PREFIX}${rutina.id}` });
+    },
+
+    deleteOfflineExerciseMedia: async (ejercicio: any) => {
+        if (ejercicio.localVideoPath) {
+            try {
+                const fileName = ejercicio.localVideoPath.split('/').pop();
+                await Filesystem.deleteFile({ path: fileName, directory: Directory.Data });
+            } catch (e) { console.warn("Archivo video ya borrado"); }
+        }
+        if (ejercicio.localThumbnailPath) {
+            try {
+                const fileName = ejercicio.localThumbnailPath.split('/').pop();
+                await Filesystem.deleteFile({ path: fileName, directory: Directory.Data });
+            } catch (e) { console.warn("Archivo miniatura ya borrado"); }
+        }
+    },
+
+    downloadOfflineExerciseMedia: async (ejercicio: any) => {
+        const thumbUrl = DownloadRoutineService.getThumbnailUrl(ejercicio);
+        if (thumbUrl) {
+            const thumbFileName = `thumb_${ejercicio.id}_${Date.now()}.jpg`;
+            const savedThumb = await DownloadRoutineService.downloadAndSaveFile(thumbUrl, thumbFileName);
+            if (savedThumb) {
+                ejercicio.localThumbnailPath = savedThumb;
+            }
+        }
+        if (ejercicio.urlVideo) {
+            const fileName = `vid_${ejercicio.id}_${Date.now()}.mp4`;
+            const savedPath = await DownloadRoutineService.downloadAndSaveFile(ejercicio.urlVideo, fileName);
+            if (savedPath) {
+                ejercicio.localVideoPath = savedPath;
+            }
+        }
     },
 
     // 6. VERIFICAR SI ESTÁ DESCARGADA
