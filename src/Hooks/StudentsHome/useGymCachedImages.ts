@@ -34,7 +34,7 @@ export const useGymCachedImages = (logoUrlOnline: string | null | undefined, fon
                         // Already downloaded this exact URL, loading from cache
                         try {
                             const file = await Filesystem.getUri({ directory: Directory.Data, path: LOGO_FILENAME });
-                            finalLogo = Capacitor.convertFileSrc(file.uri);
+                            finalLogo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(logoUrlOnline)}`;
                         } catch {
                             // File not found physically
                             finalLogo = logoUrlOnline;
@@ -51,7 +51,7 @@ export const useGymCachedImages = (logoUrlOnline: string | null | undefined, fon
                             });
                             
                             const file = await Filesystem.getUri({ directory: Directory.Data, path: LOGO_FILENAME });
-                            finalLogo = Capacitor.convertFileSrc(file.uri);
+                            finalLogo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(logoUrlOnline)}`;
                             await Preferences.set({ key: KEY_LAST_LOGO_URL, value: logoUrlOnline });
                         } catch (error) {
                             console.error("Error downloading logo", error);
@@ -74,7 +74,8 @@ export const useGymCachedImages = (logoUrlOnline: string | null | undefined, fon
                     if (lastFondoUrl === fondoUrlOnline) {
                         try {
                             const file = await Filesystem.getUri({ directory: Directory.Data, path: FONDO_FILENAME });
-                            finalFondo = Capacitor.convertFileSrc(file.uri);
+                            // Agregamos un cache-buster para evitar que el WebView use la versión vieja cacheada
+                            finalFondo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(fondoUrlOnline)}`;
                         } catch {
                             finalFondo = fondoUrlOnline;
                         }
@@ -89,7 +90,7 @@ export const useGymCachedImages = (logoUrlOnline: string | null | undefined, fon
                             });
                             
                             const file = await Filesystem.getUri({ directory: Directory.Data, path: FONDO_FILENAME });
-                            finalFondo = Capacitor.convertFileSrc(file.uri);
+                            finalFondo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(fondoUrlOnline)}`;
                             await Preferences.set({ key: KEY_LAST_FONDO_URL, value: fondoUrlOnline });
                         } catch (error) {
                             console.error("Error downloading fondo", error);
