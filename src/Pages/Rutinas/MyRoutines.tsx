@@ -119,8 +119,8 @@ export const MyRoutines = () => {
       setVariantesState({ detalleId, originalData, musculo });
       setLoadingVariantes(true);
       try {
-          const todos = await EjerciciosApi.getAll();
-          const variantes = todos.filter(e => e.musculoTrabajado === musculo && e.id !== originalData.ejercicio.id);
+          // Usamos la ruta optimizada por músculo excluyendo el ejercicio actual
+          const variantes = await EjerciciosApi.getByMusculo(musculo, originalData.ejercicio.id);
           setEjerciciosVariantes(variantes);
       } catch (e) {
           showError("Error al cargar variantes");
