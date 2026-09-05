@@ -16,6 +16,7 @@ export const useCreateUser = () => {
     apellido: "",
     contraseña: "",
     telefono: "",         
+    gmail: "",
     fechaNacimiento: "",  
     rol: "Alumno"
   });
@@ -62,6 +63,11 @@ export const useCreateUser = () => {
       // No enviar telefono si está vacío
       if (!dataToSend.telefono) {
           delete dataToSend.telefono;
+      }
+
+      // No enviar gmail si está vacío
+      if (!dataToSend.gmail) {
+          delete dataToSend.gmail;
       }
 
       await AuthApi.createUser(dataToSend);

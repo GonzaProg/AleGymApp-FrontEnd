@@ -111,6 +111,16 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
                             />
                         </div>
                         <div>
+                            <label className={AppStyles.label}>Gmail</label>
+                            <Input 
+                                value={editForm.gmail || ""} 
+                                onChange={e => handleEditChange('gmail', e.target.value)} 
+                                className={AppStyles.inputDark} 
+                                labelClassName={AppStyles.label}
+                                placeholder="Ej: usuario@gmail.com"
+                            />
+                        </div>
+                        <div>
                             <label className={AppStyles.label}>Fecha Nacimiento</label>
                             <Input 
                                 type="date" 
@@ -159,6 +169,13 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
                             <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl flex flex-col justify-center items-center w-full md:w-auto md:min-w-[140px]">
                                 <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-1">Teléfono</span>
                                 <span className="text-white font-medium">{userData.telefono}</span>
+                            </div>
+                        )}
+
+                        {userData.gmail && (
+                            <div className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl flex flex-col justify-center items-center w-full md:w-auto md:min-w-[140px]">
+                                <span className="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-1">Gmail</span>
+                                <span className="text-white font-medium break-all text-center">{userData.gmail}</span>
                             </div>
                         )}
 
