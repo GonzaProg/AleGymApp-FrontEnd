@@ -21,6 +21,7 @@ export interface AlumnoDTO {
     nombre: string;
     apellido: string;
     telefono?: string;      
+    gmail?: string;
     fechaNacimiento?: string; 
     fotoPerfil?: string;
     fechaCreacion?: string;
@@ -41,6 +42,7 @@ export interface UpdateProfileDTO {
     apellido: string;
     fotoPerfil: string;
     telefono?: string;       
+    gmail?: string;
     fechaNacimiento?: string; 
 }
 

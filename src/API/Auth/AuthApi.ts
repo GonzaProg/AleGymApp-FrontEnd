@@ -7,6 +7,7 @@ export interface CreateUserDTO {
     apellido: string;
     contraseña: string;
     telefono?: string;    
+    gmail?: string;
     fechaNacimiento?: string;
     rol: string;
     codigoGym?: string; // Para vincular el usuario al gym local
@@ -29,6 +30,7 @@ export interface LoginResponse {
         nombre: string;
         apellido: string;
         rol: string;
+        gmail?: string;
         fotoPerfil?: string;
         gym?: { // <--- Info del gym
             id: number;
@@ -61,8 +63,8 @@ export const AuthApi = {
     },
 
     // Solicitar recuperación
-    forgotPassword: async (dni: string) => {
-        const response = await api.post('/auth/forgot-password', { dni });
+    forgotPassword: async (dni: string, metodo: 'whatsapp' | 'email') => {
+        const response = await api.post('/auth/forgot-password', { dni, metodo });
         return response.data;
     },
 

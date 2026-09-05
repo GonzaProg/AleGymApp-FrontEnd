@@ -62,6 +62,15 @@ export const CreateUser = () => {
                     />
 
                     {/* Fila 4 */}
+                    <div>
+                        <Input 
+                            label="Gmail" type="email" name="gmail" value={formData.gmail} onChange={handleChange} 
+                            className={AppStyles.inputDark} labelClassName={AppStyles.label} placeholder="usuario@gmail.com"
+                        />
+                        <span className="text-[12px] text-gray-400 mt-1 block ml-1">Opcional, para recuperar contraseña</span>
+                    </div>
+
+                    {/* Fila 5 */}
                     <Input 
                         label="Contraseña *" type="password" name="contraseña" value={formData.contraseña} onChange={handleChange} 
                         className={AppStyles.inputDark} labelClassName={AppStyles.label}

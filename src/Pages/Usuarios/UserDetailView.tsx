@@ -37,6 +37,7 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                         <div className="w-full space-y-4 border-t border-white/5 pt-6">
                             <div className="flex justify-between text-sm"><span className="text-gray-500">DNI</span><span className="text-white font-mono text-base">{user.dni}</span></div>
                             <div className="flex justify-between text-sm"><span className="text-gray-500">Teléfono</span><span className="text-white text-base">{user.telefono || '-'}</span></div>
+                            <div className="flex justify-between text-sm"><span className="text-gray-500">Gmail</span><span className="text-white text-base">{user.gmail || '-'}</span></div>
                         </div>
 
                         <button 

@@ -8,6 +8,7 @@ export interface User {
     telefono?: string;
     fechaNacimiento?: string;
     email?: string;
+    gmail?: string;
     fotoPerfil?: string;
     rol: string; 
     token?: string;
