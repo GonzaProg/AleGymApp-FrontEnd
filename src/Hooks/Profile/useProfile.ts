@@ -24,6 +24,7 @@ export const useProfile = () => {
     apellido: "",
     fotoPerfil: "",
     telefono: "",         
+    gmail: "",
     fechaNacimiento: ""   
   });
 
@@ -50,6 +51,7 @@ export const useProfile = () => {
         apellido: displayUser.apellido || "", 
         fotoPerfil: displayUser.fotoPerfil || "",
         telefono: displayUser.telefono || "",           
+        gmail: displayUser.gmail || "",
         fechaNacimiento: fechaFormateada            
       });
     }
@@ -73,6 +75,10 @@ export const useProfile = () => {
 
   const handleSaveProfile = async () => {
     if (!localId) return;
+
+    if (editForm.gmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.gmail)) {
+        return showError("⚠️ El correo electrónico no tiene un formato válido.");
+    }
 
     setLoading(true);
 

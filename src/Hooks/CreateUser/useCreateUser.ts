@@ -1,23 +1,23 @@
 import { useState } from "react";
-import { useAuthUser } from "../Auth/useAuthUser"; 
-import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi"; 
+import { useAuthUser } from "../Auth/useAuthUser";
+import { AuthApi, type CreateUserDTO } from "../../API/Auth/AuthApi";
 import { showSuccess, showError } from "../../Helpers/Alerts";
-import { useGymConfig } from "../../Context/GymConfigContext"; 
+import { useGymConfig } from "../../Context/GymConfigContext";
 
 export const useCreateUser = () => {
-  
+
   const { isAdmin } = useAuthUser();
   const { gymCode } = useGymConfig(); // OBTENER CÓDIGO LOCAL
 
   // ESTADOS DEL FORMULARIO 
   const [formData, setFormData] = useState<CreateUserDTO>({
-    dni: "",              
+    dni: "",
     nombre: "",
     apellido: "",
     contraseña: "",
-    telefono: "",         
+    telefono: "",
     gmail: "",
-    fechaNacimiento: "",  
+    fechaNacimiento: "",
     rol: "Alumno"
   });
 
@@ -38,12 +38,17 @@ export const useCreateUser = () => {
 
     // Validar formato DNI
     if (!/^\d+$/.test(formData.dni)) {
-        return showError("⚠️ El DNI debe contener solo números.");
+      return showError("El DNI debe contener solo números.");
+    }
+
+    // Validar formato Gmail
+    if (formData.gmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.gmail)) {
+      return showError("El correo electrónico no tiene un formato válido.");
     }
 
     // Seguridad
     if (formData.rol === "Entrenador" && !isAdmin) {
-        return showError("No tienes permisos para crear un Entrenador.");
+      return showError("No tienes permisos para crear un Entrenador.");
     }
 
     setLoading(true);
@@ -51,23 +56,23 @@ export const useCreateUser = () => {
     try {
       // INYECTAR EL CÓDIGO DEL GIMNASIO AL CREAR
       const dataToSend: any = {
-          ...formData,
-          codigoGym: gymCode || undefined
+        ...formData,
+        codigoGym: gymCode || undefined
       };
 
       // No enviar fechaNacimiento si está vacío
       if (!dataToSend.fechaNacimiento) {
-          delete dataToSend.fechaNacimiento;
+        delete dataToSend.fechaNacimiento;
       }
 
       // No enviar telefono si está vacío
       if (!dataToSend.telefono) {
-          delete dataToSend.telefono;
+        delete dataToSend.telefono;
       }
 
       // No enviar gmail si está vacío
       if (!dataToSend.gmail) {
-          delete dataToSend.gmail;
+        delete dataToSend.gmail;
       }
 
       await AuthApi.createUser(dataToSend);

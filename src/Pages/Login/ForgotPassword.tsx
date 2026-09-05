@@ -43,18 +43,12 @@ export const ForgotPassword = () => {
              // PASO 1: SELECCIONAR METODO
              <div className="space-y-4">
                <Button onClick={() => handleSelectMethod('whatsapp')} className={`${AppStyles.btnPrimary} w-full flex items-center justify-center gap-2`}>
-                  Recibir código por WhatsApp
+                  WhatsApp
                </Button>
-               <Button onClick={() => handleSelectMethod('email')} className={`bg-gray-800 text-white hover:bg-gray-700 transition font-bold py-3 px-4 rounded-xl w-full border border-gray-600 flex items-center justify-center gap-2`}>
-                  Recibir código por Email
+               <Button onClick={() => handleSelectMethod('email')} className={`${AppStyles.btnPrimary} w-full flex items-center justify-center gap-2`}>
+                  Email
                </Button>
-               
-               <div className="text-center mt-6">
-                    <Link to="/login" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
-                        Volver al login
-                    </Link>
-               </div>
-             </div>
+            </div>
           ) : step === 2 ? (
             //  PASO 2: FORMULARIO DNI 
             <form onSubmit={handleSendCode} className="space-y-6 animate-fade-in">

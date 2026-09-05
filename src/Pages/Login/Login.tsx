@@ -19,6 +19,7 @@ export const Login = () => {
   // Estado para alternar vistas
   const [isRegistering, setIsRegistering] = useState(false);
   const [showGymCodeModal, setShowGymCodeModal] = useState(false);
+  const [isDateFocused, setIsDateFocused] = useState(false);
   const navigate = useNavigate();
 
   // --- HOOK LOGIN ---
@@ -93,9 +94,35 @@ export const Login = () => {
                         <span className="text-[15px] text-gray-400 mt-1 block ml-1">Sin espacios, sin 15, con característica, ej: 3445123456</span>
                     </div>
                 </div>
+                
+                <Input 
+                    name="gmail" 
+                    placeholder="Gmail" 
+                    type="email" 
+                    value={formData.gmail} 
+                    onChange={handleChange} 
+                    className={`${LoginStyles.inputDark} text-gray-400`} 
+                    labelClassName={LoginStyles.label}
+                />
 
-                <Input name="fechaNacimiento" placeholder="Fecha de Nacimiento" type="date" value={formData.fechaNacimiento} onChange={handleChange} className={`${LoginStyles.inputDark} text-gray-400`} labelClassName={LoginStyles.label}
-                    />
+                <Input 
+                    name="fechaNacimiento" 
+                    placeholder="Fecha de Nacimiento" 
+                    type={isDateFocused || formData.fechaNacimiento ? "date" : "text"} 
+                    value={formData.fechaNacimiento} 
+                    onChange={handleChange} 
+                    onFocus={(e) => {
+                        setIsDateFocused(true);
+                        if ("showPicker" in e.target) {
+                            try {
+                                (e.target as HTMLInputElement).showPicker();
+                            } catch {}
+                        }
+                    }}
+                    onBlur={() => setIsDateFocused(false)}
+                    className={`${LoginStyles.inputDark} text-gray-400`} 
+                    labelClassName={LoginStyles.label}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input name="contraseña" placeholder="Contraseña" type="password" value={formData.contraseña} onChange={handleChange} required className={LoginStyles.inputDark} />
