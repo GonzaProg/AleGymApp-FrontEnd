@@ -7,6 +7,7 @@ import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
 import { DetallesEjerciciosApi } from "../../API/Rutinas/DetallesEjerciciosApi";
 import { RutinasApi } from "../../API/Rutinas/RutinasApi";
 import { showSuccess, showError } from "../../Helpers/Alerts";
+import { EjerciciosApi, type Ejercicio } from "../../API/Ejercicios/EjerciciosApi";
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
@@ -86,6 +87,9 @@ export const MyRoutines = () => {
   const [checkedExercises, setCheckedExercises] = useState<Record<string, boolean>>({});
   const [editValues, setEditValues] = useState<Record<number, { series: number | string, repeticiones: string | number, peso: string | number }>>({});
   const [isRoutineEditMode, setIsRoutineEditMode] = useState(false);
+  const [variantesState, setVariantesState] = useState<{ detalleId: number, originalData: any, musculo: string } | null>(null);
+  const [ejerciciosVariantes, setEjerciciosVariantes] = useState<Ejercicio[]>([]);
+  const [loadingVariantes, setLoadingVariantes] = useState(false);
 
   const handleEditRoutine = (e: React.MouseEvent, rutina: any) => {
       e.stopPropagation();
@@ -104,6 +108,95 @@ export const MyRoutines = () => {
               [field]: value
           }
       }));
+  };
+
+  const handleOpenVariantes = async (detalleId: number, originalData: any) => {
+      const musculo = originalData.ejercicio.musculoTrabajado;
+      if (!musculo) {
+          showError("Este ejercicio no tiene un músculo asignado para buscar variantes.");
+          return;
+      }
+      setVariantesState({ detalleId, originalData, musculo });
+      setLoadingVariantes(true);
+      try {
+          // Usamos la ruta optimizada por músculo excluyendo el ejercicio actual
+          const variantes = await EjerciciosApi.getByMusculo(musculo, originalData.ejercicio.id);
+          setEjerciciosVariantes(variantes);
+      } catch (e) {
+          showError("Error al cargar variantes");
+      } finally {
+          setLoadingVariantes(false);
+      }
+  };
+
+  const handleReplaceExercise = async (nuevoEjercicioId: number) => {
+      if (!variantesState) return;
+      if (!navigator.onLine) {
+          showError("Debes tener conexión para poder editar la rutina");
+          return;
+      }
+
+      const { detalleId, originalData } = variantesState;
+      
+      try {
+          let currentDetalleId = detalleId;
+          let routineToUpdate = selectedRoutine;
+
+          if (selectedRoutine.esGeneral) {
+              showSuccess("Personalizando rutina para ti...");
+              const reqData = selectedRoutine.esGrupo 
+                  ? { grupoId: selectedRoutine.grupoId }
+                  : { rutinaId: selectedRoutine.id };
+                  
+              routineToUpdate = await RutinasApi.personalizar(reqData);
+              
+              let newDetalle;
+              const matchDetalle = (det: any) => det.ejercicio.id === originalData.ejercicio.id && det.orden === originalData.orden && det.grupoSuperserie === originalData.grupoSuperserie;
+              
+              if (routineToUpdate.esGrupo) {
+                  for (const dia of routineToUpdate.dias) {
+                      const found = dia.detalles.find(matchDetalle);
+                      if (found) { newDetalle = found; break; }
+                  }
+              } else {
+                  newDetalle = routineToUpdate.detalles.find(matchDetalle);
+              }
+              
+              if (!newDetalle) {
+                  showError("Error al encontrar el ejercicio en la nueva rutina");
+                  return;
+              }
+              currentDetalleId = newDetalle.id;
+          }
+
+          await DetallesEjerciciosApi.update(currentDetalleId, { ejercicioId: nuevoEjercicioId });
+          
+          const newRoutines = await fetchRoutines();
+          
+          let finalRoutine = routineToUpdate;
+          if (newRoutines && Array.isArray(newRoutines)) {
+              if (routineToUpdate.esGrupo) {
+                  const foundGroup = newRoutines.find((r: any) => r.esGrupo && r.grupoId === routineToUpdate.grupoId);
+                  if (foundGroup) finalRoutine = foundGroup;
+              } else {
+                  const foundRoutine = newRoutines.find((r: any) => !r.esGrupo && r.id === routineToUpdate.id);
+                  if (foundRoutine) finalRoutine = foundRoutine;
+              }
+          }
+
+          await syncOfflineRoutineUpdate(selectedRoutine, finalRoutine);
+          updateSelectedRoutine(finalRoutine);
+          
+          showSuccess("Ejercicio reemplazado con éxito");
+          setVariantesState(null);
+      } catch (e: any) {
+          console.error(e);
+          if (!navigator.onLine || e.message === "Network Error") {
+              showError("Debes tener conexión para poder editar la rutina");
+          } else {
+              showError("Error al reemplazar el ejercicio");
+          }
+      }
   };
 
   const handleSaveExercise = async (detalleId: number, originalData: any) => {
@@ -151,13 +244,15 @@ export const MyRoutines = () => {
               
               // Buscar el nuevo detalle correspondiente
               let newDetalle;
+              const matchDetalle = (det: any) => det.ejercicio.id === originalData.ejercicio.id && det.orden === originalData.orden && det.grupoSuperserie === originalData.grupoSuperserie;
+              
               if (routineToUpdate.esGrupo) {
                   for (const dia of routineToUpdate.dias) {
-                      const found = dia.detalles.find((det: any) => det.ejercicio.id === originalData.ejercicio.id);
+                      const found = dia.detalles.find(matchDetalle);
                       if (found) { newDetalle = found; break; }
                   }
               } else {
-                  newDetalle = routineToUpdate.detalles.find((det: any) => det.ejercicio.id === originalData.ejercicio.id);
+                  newDetalle = routineToUpdate.detalles.find(matchDetalle);
               }
               
               if (!newDetalle) {
@@ -249,6 +344,113 @@ export const MyRoutines = () => {
       return newState;
     });
   };
+
+  const renderModals = () => (
+    <>
+      {/* VIDEO MODAL */}
+      {videoUrl && (
+          typeof document !== "undefined" ? createPortal(
+            <div className={MyRoutinesStyles.videoContainer}>
+                <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
+                  <span className="text-2xl font-bold">&times;</span>
+                </button>
+                <div className="w-full max-w-4xl aspect-video px-4">
+                  <VideoEjercicio url={videoUrl} fallbackUrl={videoFallbackUrl || undefined} controls={true} muted={true} />
+                </div>
+            </div>,
+            document.body
+          ) : null
+      )}
+
+      {/* VARIANTES MODAL */}
+      {variantesState && (
+          typeof document !== "undefined" ? createPortal(
+              <div className="fixed inset-0 z-[1000] flex flex-col bg-black/95 backdrop-blur-md animate-fade-in">
+                  <div className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur-xl border-b border-white/10 px-4 py-4 shrink-0 shadow-lg">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-purple-900"></div>
+                      <div className="flex items-center gap-4 mt-2">
+                          <button 
+                              onClick={() => setVariantesState(null)} 
+                              className="w-10 h-10 flex items-center justify-center rounded-full bg-black/40 border border-white/10 text-white hover:bg-white/10 transition-colors shadow-sm"
+                          >
+                              <ArrowLeft className="w-5 h-5" />
+                          </button>
+                          <div className="flex-1 min-w-0">
+                              <h2 className="text-xl md:text-2xl font-black text-white flex items-center gap-2 truncate">
+                                  Variantes de {variantesState.musculo}
+                              </h2>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-black/50">
+                      {loadingVariantes ? (
+                          <div className="flex justify-center items-center py-20">
+                              <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                      ) : ejerciciosVariantes.length === 0 ? (
+                          <div className="text-center py-20 opacity-50">
+                              <Dumbbell className="w-12 h-12 mx-auto mb-3 text-white" />
+                              <p className="text-white">No hay variantes para este músculo.</p>
+                          </div>
+                      ) : (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                              {ejerciciosVariantes.map((ej) => {
+                                  const thumbUrl = CloudinaryApi.getThumbnail(ej.imagenUrl, ej.urlVideo);
+                                  return (
+                                      <div 
+                                          key={ej.id} 
+                                          className="relative group rounded-xl overflow-hidden border border-white/10 bg-gray-900 shadow-xl flex flex-col"
+                                      >
+                                          <div className="relative aspect-square bg-black w-full" onClick={() => ej.urlVideo && handleOpenVideo(ej.urlVideo, ej.urlVideo)}>
+                                              {thumbUrl ? (
+                                                  <img src={thumbUrl} alt={ej.nombre} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity cursor-pointer" />
+                                              ) : (
+                                                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 bg-gray-800/50 cursor-pointer">
+                                                      <Dumbbell className="w-10 h-10 opacity-50 text-white" />
+                                                  </div>
+                                              )}
+                                              
+                                              {/* Play Button */}
+                                              {ej.urlVideo && (
+                                                  <button 
+                                                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-green-500/80 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:bg-green-400 shadow-lg z-20 pointer-events-none"
+                                                  >
+                                                      <Play size={16} className="fill-white text-white ml-1" />
+                                                  </button>
+                                              )}
+
+                                              {/* Tags on top */}
+                                              <div className="absolute top-0 inset-x-0 p-2 bg-gradient-to-b from-black/90 to-transparent z-10 pointer-events-none">
+                                                  <div className="flex flex-wrap gap-1">
+                                                      {ej.tipoAgarre && <span className="text-[9px] bg-yellow-500/20 text-yellow-300 px-1.5 py-0.5 rounded border border-yellow-500/30">Agarre {ej.tipoAgarre}</span>}
+                                                      {ej.elementosGym && <span className="text-[9px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded border border-blue-500/30">{ej.elementosGym}</span>}
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          
+                                          <div className="p-3 flex-1 flex flex-col justify-between">
+                                              <p className="text-white text-sm font-bold leading-tight mb-3 text-center">{ej.nombre}</p>
+                                              
+                                              <button 
+                                                  onClick={() => handleReplaceExercise(ej.id)}
+                                                  className="w-full py-1.5 bg-green-500/20 hover:bg-green-500 text-green-400 hover:text-black border border-green-500/50 rounded-lg text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1 mt-auto shadow-[0_0_10px_rgba(34,197,94,0.15)]"
+                                              >
+                                                  <CheckCircle className="w-3.5 h-3.5" /> Reemplazar
+                                              </button>
+                                          </div>
+                                      </div>
+                                  );
+                              })}
+                          </div>
+                      )}
+                  </div>
+              </div>,
+              document.body
+          ) : null
+      )}
+    </>
+  );
 
   // === VISTA DETALLE DE RUTINA SELECCIONADA ===
   if (selectedRoutine) {
@@ -532,6 +734,18 @@ export const MyRoutines = () => {
                                       </button>
                                   </div>
                               )}
+                              
+                              {/* --- NUEVO BOTÓN DE VARIANTES --- */}
+                              {isRoutineEditMode && !isChecked && !!d.ejercicio.musculoTrabajado && (
+                                  <div className="w-full mt-4 border-t border-white/5 pt-3">
+                                      <button
+                                          onClick={(e) => { e.stopPropagation(); handleOpenVariantes(d.id, d); }}
+                                          className="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_0_10px_rgba(168,85,247,0.1)]"
+                                      >
+                                          <Activity className="w-4 h-4" /> Variantes
+                                      </button>
+                                  </div>
+                              )}
                           </div>
                       </div>
                   </div>
@@ -541,22 +755,9 @@ export const MyRoutines = () => {
             })()}
         </div>
         
-        {/* VIDEO MODAL (Aún necesario para mostrar el video por encima de todo) */}
-        {videoUrl && (
-            typeof document !== "undefined" ? createPortal(
-              <div className={MyRoutinesStyles.videoContainer}>
-                  <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
-                    <span className="text-2xl font-bold">&times;</span>
-                  </button>
-                  <div className="w-full max-w-4xl aspect-video px-4">
-                    <VideoEjercicio url={videoUrl} fallbackUrl={videoFallbackUrl || undefined} controls={true} muted={true} />
-                  </div>
-              </div>,
-              document.body
-            ) : null
-        )}
-      </div>
-    );
+      {renderModals()}
+    </div>
+  );
   }
 
   return (
@@ -692,20 +893,7 @@ export const MyRoutines = () => {
           )}
       </div>
 
-      {/* VIDEO MODAL */}
-      {videoUrl && (
-          typeof document !== "undefined" ? createPortal(
-            <div className={MyRoutinesStyles.videoContainer}>
-                <button onClick={closeVideo} className={MyRoutinesStyles.closeVideoBtn}>
-                  <span className="text-2xl font-bold">&times;</span>
-                </button>
-                <div className="w-full max-w-4xl aspect-video px-4">
-                  <VideoEjercicio url={videoUrl} fallbackUrl={videoFallbackUrl || undefined} controls={true} muted={true} />
-                </div>
-            </div>,
-            document.body
-          ) : null
-      )}
+      {renderModals()}
     </>
   );
 };

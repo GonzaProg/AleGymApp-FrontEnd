@@ -37,6 +37,13 @@ export const EjerciciosApi = {
         return response.data;
     },
 
+    // 1.5 Obtener por músculo
+    getByMusculo: async (musculo: string, excludeId?: number): Promise<Ejercicio[]> => {
+        const query = excludeId ? `?musculo=${encodeURIComponent(musculo)}&excludeId=${excludeId}` : `?musculo=${encodeURIComponent(musculo)}`;
+        const response = await api.get(`/ejercicios/musculo${query}`);
+        return response.data;
+    },
+
     // 2. Crear (completo - solo admin)
     create: async (data: EjercicioDTO): Promise<Ejercicio> => {
         const response = await api.post('/ejercicios', data);

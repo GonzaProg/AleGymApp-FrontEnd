@@ -206,70 +206,103 @@ export const useMyRoutines = () => {
 
         if (!oldRutinaWasDownloaded) return;
 
+        // 1. Extraer todos los ejercicios viejos y nuevos
+        const oldExercises = new Map<number, any>();
+        const newExercises = new Map<number, any>();
+        
+        const extractExercises = (routine: any, map: Map<number, any>) => {
+            if (routine.esGrupo) {
+                routine.dias?.forEach((dia: any) => {
+                    dia.detalles?.forEach((d: any) => map.set(d.ejercicio.id, d.ejercicio));
+                });
+            } else {
+                routine.detalles?.forEach((d: any) => map.set(d.ejercicio.id, d.ejercicio));
+            }
+        };
+
+        // Obtener la data vieja con paths locales
+        let oldOfflineData = null;
+        if (oldRoutine.esGrupo) {
+            oldOfflineData = await DownloadRoutineService.getOfflineGroup(oldRoutine);
+        } else {
+            oldOfflineData = await DownloadRoutineService.getOfflineRoutine(oldRoutine.id);
+        }
+
+        if (oldOfflineData) {
+            extractExercises(oldOfflineData, oldExercises);
+        }
+        extractExercises(newRoutine, newExercises);
+
+        // 2. Copiar los paths locales a los ejercicios de la nueva rutina
+        const copyPaths = (routine: any) => {
+            const list = routine.esGrupo ? routine.dias.flatMap((d: any) => d.detalles) : routine.detalles;
+            list?.forEach((d: any) => {
+                const oldEj = oldExercises.get(d.ejercicio.id);
+                if (oldEj) {
+                    d.ejercicio.localVideoPath = oldEj.localVideoPath;
+                    d.ejercicio.localThumbnailPath = oldEj.localThumbnailPath;
+                }
+            });
+        };
+        copyPaths(newRoutine);
+
+        // 3. Guardar la nueva rutina para reflejar los cambios enseguida en UI
+        const saveRoutine = async (routine: any) => {
+            if (routine.esGrupo) {
+                for (const dia of routine.dias) {
+                    await Preferences.set({ key: `offline_routine_${dia.id}`, value: JSON.stringify(dia) });
+                }
+            } else {
+                await Preferences.set({ key: `offline_routine_${routine.id}`, value: JSON.stringify(routine) });
+            }
+        };
+        await saveRoutine(newRoutine);
+
+        // 4. Si la rutina era general (se personalizó) cambiar los IDs guardados offline
         if (oldRoutine.esGeneral) {
             if (oldRoutine.esGrupo) {
-                const oldOfflineGroup = await DownloadRoutineService.getOfflineGroup(oldRoutine);
-                newRoutine.dias.forEach((newDia: any, diaIndex: number) => {
-                    const oldDia = oldOfflineGroup.dias[diaIndex];
-                    if (oldDia) {
-                        newDia.detalles.forEach((newDet: any) => {
-                            const oldDet = oldDia.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
-                            if (oldDet) {
-                                newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
-                                newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
-                            }
-                        });
-                    }
-                    Preferences.set({ key: `offline_routine_${newDia.id}`, value: JSON.stringify(newDia) });
-                });
-                await DownloadRoutineService.deleteOfflineGroup(oldRoutine);
-                
+                for (const dia of oldRoutine.dias) {
+                    await Preferences.remove({ key: `offline_routine_${dia.id}` });
+                }
                 setDownloadedGroupIds(prev => prev.filter(id => id !== oldRoutine.grupoId).concat(newRoutine.grupoId));
-                const oldDiaIds = oldRoutine.dias.map((d:any) => d.id);
-                const newDiaIds = newRoutine.dias.map((d:any) => d.id);
+                const oldDiaIds = oldRoutine.dias.map((d: any) => d.id);
+                const newDiaIds = newRoutine.dias.map((d: any) => d.id);
                 setDownloadedIds(prev => prev.filter(id => !oldDiaIds.includes(id)).concat(newDiaIds));
             } else {
-                const oldOfflineRoutine = await DownloadRoutineService.getOfflineRoutine(oldRoutine.id);
-                newRoutine.detalles.forEach((newDet: any) => {
-                    const oldDet = oldOfflineRoutine?.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
-                    if (oldDet) {
-                        newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
-                        newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
-                    }
-                });
-                await Preferences.set({ key: `offline_routine_${newRoutine.id}`, value: JSON.stringify(newRoutine) });
-                await DownloadRoutineService.deleteOfflineRoutine(oldRoutine);
-                
+                await Preferences.remove({ key: `offline_routine_${oldRoutine.id}` });
                 setDownloadedIds(prev => prev.filter(id => id !== oldRoutine.id).concat(newRoutine.id));
             }
-        } else {
-            if (oldRoutine.esGrupo) {
-                const offlineGroup = await DownloadRoutineService.getOfflineGroup(oldRoutine);
-                newRoutine.dias.forEach((newDia: any, diaIndex: number) => {
-                    const offDia = offlineGroup.dias[diaIndex];
-                    if (offDia) {
-                        newDia.detalles.forEach((newDet: any) => {
-                            const oldDet = offDia.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
-                            if (oldDet) {
-                                newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
-                                newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
-                            }
-                        });
-                    }
-                    Preferences.set({ key: `offline_routine_${newDia.id}`, value: JSON.stringify(newDia) });
-                });
-            } else {
-                const offlineRoutine = await DownloadRoutineService.getOfflineRoutine(oldRoutine.id);
-                newRoutine.detalles.forEach((newDet: any) => {
-                    const oldDet = offlineRoutine?.detalles?.find((d: any) => d.ejercicio.id === newDet.ejercicio.id);
-                    if (oldDet) {
-                        newDet.ejercicio.localVideoPath = oldDet.ejercicio.localVideoPath;
-                        newDet.ejercicio.localThumbnailPath = oldDet.ejercicio.localThumbnailPath;
-                    }
-                });
-                await Preferences.set({ key: `offline_routine_${newRoutine.id}`, value: JSON.stringify(newRoutine) });
-            }
         }
+
+        // 5. Descargar videos faltantes y eliminar los borrados en BACKGROUND
+        const processMediaInBackground = async () => {
+            try {
+                // Eliminar archivos viejos que ya no están en la rutina
+                for (const [id, oldEj] of oldExercises.entries()) {
+                    if (!newExercises.has(id)) {
+                        await DownloadRoutineService.deleteOfflineExerciseMedia(oldEj);
+                    }
+                }
+
+                // Descargar archivos nuevos
+                let hasChanges = false;
+                for (const [id, newEj] of newExercises.entries()) {
+                    if (!oldExercises.has(id)) {
+                        await DownloadRoutineService.downloadOfflineExerciseMedia(newEj);
+                        hasChanges = true;
+                    }
+                }
+
+                // Actualizar la rutina offline con los paths descargados
+                if (hasChanges) {
+                    await saveRoutine(newRoutine);
+                }
+            } catch (e) {
+                console.error("Error al sincronizar multimedia de ejercicios offline en 2do plano", e);
+            }
+        };
+        
+        processMediaInBackground(); // No hacemos await para que no bloquee UI
     };
 
     return {

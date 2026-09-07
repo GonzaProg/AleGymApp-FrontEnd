@@ -10,12 +10,12 @@ import { LoginStyles } from "../../Styles/LoginStyles";
 
 export const ForgotPassword = () => {
   const { 
-    step, loading, error, 
+    step, setStep, loading, error, metodo, handleSelectMethod,
     dni, setDni, 
     code, setCode, 
     newPassword, setNewPassword, 
     confirmPassword, setConfirmPassword,
-    telefonoDestino, 
+    destinoRecuperacion, 
     handleSendCode, handleChangePassword 
   } = useRecoverPassword();
 
@@ -26,20 +26,32 @@ export const ForgotPassword = () => {
           
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-white drop-shadow-md mb-2">
-                {step === 1 ? "Recuperar Acceso" : "Verificar Código"}
+                {step === 1 ? "Método de Recuperación" : step === 2 ? "Recuperar Acceso" : "Verificar Código"}
             </h2>
             <p className="text-gray-300 text-sm px-4">
               {step === 1 
-                ? "Ingresa tu DNI para recibir un código por WhatsApp." 
-                : <span>Hemos enviado un código al WhatsApp <b className="text-green-400">{telefonoDestino}</b>.</span>
+                ? "¿Por dónde deseas recibir el código?" 
+                : step === 2
+                ? `Ingresa tu DNI para recibir un código por ${metodo === 'whatsapp' ? 'WhatsApp' : 'Correo'}.`
+                : <span>Hemos enviado un código al destino <b className="text-green-400">{destinoRecuperacion}</b>.</span>
               }
             </p>
           </div>
 
           {/* Renderizado condicional según el paso */}
           {step === 1 ? (
-            //  PASO 1: FORMULARIO DNI 
-            <form onSubmit={handleSendCode} className="space-y-6">
+             // PASO 1: SELECCIONAR METODO
+             <div className="space-y-4">
+               <Button onClick={() => handleSelectMethod('whatsapp')} className={`${AppStyles.btnPrimary} w-full flex items-center justify-center gap-2`}>
+                  WhatsApp
+               </Button>
+               <Button onClick={() => handleSelectMethod('email')} className={`${AppStyles.btnPrimary} w-full flex items-center justify-center gap-2`}>
+                  Email
+               </Button>
+            </div>
+          ) : step === 2 ? (
+            //  PASO 2: FORMULARIO DNI 
+            <form onSubmit={handleSendCode} className="space-y-6 animate-fade-in">
               <div>
                 <label className={AppStyles.label}>DNI</label>
                 <Input
@@ -59,6 +71,12 @@ export const ForgotPassword = () => {
               <Button type="submit" disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
                 {loading ? "ENVIANDO..." : "ENVIAR CÓDIGO"}
               </Button>
+              
+              <div className="text-center">
+                  <button type="button" onClick={() => setStep(1)} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+                      Elegir otro método
+                  </button>
+              </div>
             </form>
           ) : (
             //  PASO 2: FORMULARIO CÓDIGO + NUEVA CLAVE 

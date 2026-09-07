@@ -15,6 +15,7 @@ export const useRegister = (onSuccess: () => void) => {
         contraseña: "",
         confirmarContrasena: "",
         telefono: "",
+        gmail: "",
         fechaNacimiento: ""
     });
 
@@ -35,6 +36,9 @@ export const useRegister = (onSuccess: () => void) => {
         }
         if (!formData.telefono) {
             return showError("⚠️ Falta completar el número de teléfono.");
+        }
+        if (formData.gmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.gmail)) {
+            return showError("⚠️ El correo electrónico no tiene un formato válido.");
         }
         
         setLoading(true);

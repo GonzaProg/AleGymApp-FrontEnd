@@ -130,7 +130,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 {/* Capa de Fondo */}
                 {fondoGymUrl && (
                     <div 
-                        className="absolute inset-0 z-0 pointer-events-none bg-transparent bg-no-repeat bg-[length:100%_auto] bg-[35%_10%]"
+                        className={`absolute inset-0 z-0 pointer-events-none bg-transparent bg-no-repeat bg-[length:100%_auto] ${currentUser?.gym?.tieneMercadoPago ? 'bg-[35%_20%]' : 'bg-[35%_10%]'}`}
                         style={{ 
                             backgroundImage: `url(${fondoGymUrl})`,
                             WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 5%, black 90%, transparent)',
@@ -148,7 +148,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 <div className="relative z-10 space-y-6">
                     <div className="mb-4 px-2">
                         <h1 className="text-3xl font-black text-white mb-2 tracking-tight">
-                    Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">{currentUser?.nombre}</span> 👋
+                    Hola, <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">{currentUser?.nombre}</span>
                 </h1>
                 <p className="text-gray-400 text-lg font-medium">¿Qué vamos a entrenar hoy?</p>
             </div>
@@ -224,7 +224,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             {!isUserExpired && (
                 <>
                     {/* ESPACIADOR PARA VER EL TEXTO DEL FONDO */}
-                    {fondoGymUrl && <div className="h-20 md:h-40 pointer-events-none"></div>}
+                    {fondoGymUrl && <div className="h-40 md:h-40 pointer-events-none"></div>}
 
                     {/* NUTRICIÓN */}
                     <div 
