@@ -24,4 +24,9 @@ export const NotificacionesApi = {
   broadcast: async (titulo: string, mensaje: string): Promise<void> => {
     await api.post("/notificaciones/broadcast", { titulo, mensaje });
   },
+
+  // 4. Crear notificación global (Solo admin - Todos los usuarios de la plataforma)
+  broadcastGlobal: async (titulo: string, mensaje: string): Promise<void> => {
+    await api.post("/notificaciones/broadcast-global", { titulo, mensaje });
+  },
 };
