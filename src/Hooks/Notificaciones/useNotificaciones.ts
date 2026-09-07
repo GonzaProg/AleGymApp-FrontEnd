@@ -40,9 +40,26 @@ export const useNotificaciones = () => {
     setLoading(true);
     try {
       await NotificacionesApi.broadcast(titulo, mensaje);
-      showSuccess("✅ Notificación enviada a todos los usuarios.");
+      showSuccess("✅ Notificación enviada a los usuarios del gimnasio.");
+      return true;
     } catch (error: any) {
       showError("❌ Error al enviar: " + (error.response?.data?.error || "Desconocido"));
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Crear notificación global (Broadcast Global - Solo Admin)
+  const sendBroadcastGlobal = async (titulo: string, mensaje: string) => {
+    setLoading(true);
+    try {
+      await NotificacionesApi.broadcastGlobal(titulo, mensaje);
+      showSuccess("✅ Notificación global enviada a todos los usuarios de la plataforma.");
+      return true;
+    } catch (error: any) {
+      showError("❌ Error al enviar global: " + (error.response?.data?.error || "Desconocido"));
+      return false;
     } finally {
       setLoading(false);
     }
@@ -60,6 +77,7 @@ export const useNotificaciones = () => {
     loading,
     markAsRead,
     sendBroadcast,
+    sendBroadcastGlobal,
     refresh: fetchNotificaciones,
   };
 };
