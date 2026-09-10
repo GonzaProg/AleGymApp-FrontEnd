@@ -44,6 +44,11 @@ jobs:
           echo -n "$BUILD_CERTIFICATE_BASE64" | tr -d '\n\r ' | base64 --decode -o $CERTIFICATE_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | tr -d '\n\r ' | base64 --decode -o $PP_PATH
 
+          # SOLUCION DEFINITIVA AL ERROR DE MAC VERIFICATION:
+          # Convertimos el .p12 de OpenSSL 3 (Windows) al formato Legacy (TripleDES) que exige macOS
+          openssl pkcs12 -in $CERTIFICATE_PATH -out $RUNNER_TEMP/temp.pem -nodes -passin pass:"$P12_PASSWORD"
+          openssl pkcs12 -export -in $RUNNER_TEMP/temp.pem -out $CERTIFICATE_PATH -passout pass:"$P12_PASSWORD" -keypbe PBE-SHA1-3DES -certpbe PBE-SHA1-3DES -macalg SHA1
+
           # Crear un llavero temporal
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 3600 $KEYCHAIN_PATH
