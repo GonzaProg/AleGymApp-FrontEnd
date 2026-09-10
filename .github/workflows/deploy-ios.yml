@@ -64,20 +64,70 @@ jobs:
 
       - name: Build iOS Archive & Export IPA
         run: |
+          # 1. Extraer información vital del Provisioning Profile
+          PP_PATH=$RUNNER_TEMP/app_store.mobileprovision
+          TEAM_ID=$(/usr/libexec/PlistBuddy -c "Print TeamIdentifier:0" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          APP_ID=$(/usr/libexec/PlistBuddy -c "Print Entitlements:application-identifier" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          BUNDLE_ID=${APP_ID#*.} # Remueve el prefijo del TEAM_ID
+
+          echo "Team ID: $TEAM_ID"
+          echo "Profile UUID: $PROFILE_UUID"
+          echo "Bundle ID: $BUNDLE_ID"
+
+          # 2. Crear archivo ExportOptions.plist dinámicamente
+          cat <<EOF > $RUNNER_TEMP/ExportOptions.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>$PROFILE_UUID</string>
+              </dict>
+              <key>signingStyle</key>
+              <string>manual</string>
+          </dict>
+          </plist>
+          EOF
+
+          # 2.5 Generar Entitlements para Push Notifications (Evita el rechazo de Apple)
+          cat <<EOF > $RUNNER_TEMP/App.entitlements
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>aps-environment</key>
+              <string>production</string>
+          </dict>
+          </plist>
+          EOF
+
           cd ios/App
+          
+          # 3. Compilar el Archivo (.xcarchive) forzando la firma manual con nuestros datos
           xcodebuild -project App.xcodeproj \
                      -scheme App \
                      -sdk iphoneos \
                      -configuration Release \
                      -archivePath $RUNNER_TEMP/App.xcarchive \
                      archive \
-                     CODE_SIGN_STYLE=Automatic
+                     CODE_SIGN_STYLE=Manual \
+                     DEVELOPMENT_TEAM=$TEAM_ID \
+                     PROVISIONING_PROFILE_SPECIFIER=$PROFILE_UUID \
+                     CODE_SIGN_IDENTITY="Apple Distribution" \
+                     CODE_SIGN_ENTITLEMENTS=$RUNNER_TEMP/App.entitlements
 
+          # 4. Exportar a .IPA usando nuestro ExportOptions generado
           xcodebuild -exportArchive \
                      -archivePath $RUNNER_TEMP/App.xcarchive \
-                     -exportOptionsPlist App/ExportOptions.plist \
-                     -exportPath $RUNNER_TEMP/build \
-                     -allowProvisioningUpdates
+                     -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
+                     -exportPath $RUNNER_TEMP/build
 
       - name: Upload App to App Store Connect via Fastlane / ALTool
         env:
