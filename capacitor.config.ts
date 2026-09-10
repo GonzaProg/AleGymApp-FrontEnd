@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.GymMate.app',
+  appId: 'com.GMate.app',
   appName: 'GymMate',
   webDir: 'dist',
 
