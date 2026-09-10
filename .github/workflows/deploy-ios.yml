@@ -24,7 +24,6 @@ jobs:
 
       - name: Install Capacitor CLI & Sync iOS
         run: |
-          npm install @capacitor/ios
           npx cap add ios || true
           npx cap sync ios
 
