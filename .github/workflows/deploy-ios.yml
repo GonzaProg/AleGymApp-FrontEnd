@@ -109,6 +109,12 @@ jobs:
 
           cd ios/App
           
+          # 2.8 Configurar Info.plist para evitar la molesta pregunta de encriptación de Apple
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" App/Info.plist || /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" App/Info.plist
+          
+          # 2.9 Auto-incrementar el Build Number usando el número de ejecución de GitHub para que Apple no rechace actualizaciones
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${{ github.run_number }}" App/Info.plist || true
+          
           # 3. Compilar el Archivo (.xcarchive) forzando la firma manual con nuestros datos
           xcodebuild -project App.xcodeproj \
                      -scheme App \
