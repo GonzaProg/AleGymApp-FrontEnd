@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CAPACITOR_DEBUG</key>
+	<string>$(CAPACITOR_DEBUG)</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+        <string>GymMate</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+
+	<!-- Permiso para usar la Cámara (Escáner QR y fotos) -->
+	<key>NSCameraUsageDescription</key>
+	<string>GymMate necesita acceso a tu cámara para escanear códigos QR de ingreso y tomar fotos para tu perfil o ejercicios.</string>
+
+	<!-- Permiso para acceder a la Galería de Fotos (Subir fotos de perfil/evolución) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>GymMate necesita acceso a tu galería para que puedas seleccionar fotos de perfil y registrar tus fotos de evolución corporal.</string>
+
+	<!-- Permiso para guardar imágenes en la Galería (Descarga de rutinas) -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>GymMate necesita permiso para guardar imágenes y reportes de rutinas en tu galería de fotos.</string>
+
+	<!-- Permiso para el Micrófono (Al grabar o subir videos de ejercicios) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>GymMate necesita acceso a tu micrófono si deseas grabar videos para tus registros personales de ejercicios.</string>
+
+	<!-- Configuración de Notificaciones en Segundo Plano -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+
+</dict>
+</plist>
