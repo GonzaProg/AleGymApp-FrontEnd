@@ -1,0 +1,155 @@
+name: Deploy iOS to App Store Connect
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Web App
+        run: npm run build
+
+      - name: Install Capacitor CLI & Sync iOS
+        run: |
+          npx cap add ios || true
+          npx cap sync ios
+
+      - name: Setup Provisioning Profiles and Certificates
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Crear variables y rutas temporales
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/app_store.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Decodificar el certificado .p12 y perfil de provisión
+          echo -n "$BUILD_CERTIFICATE_BASE64" | tr -d '\n\r ' | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | tr -d '\n\r ' | base64 --decode -o $PP_PATH
+
+          # SOLUCION DEFINITIVA AL ERROR DE MAC VERIFICATION:
+          # Convertimos el .p12 de OpenSSL 3 (Windows) al formato Legacy (TripleDES) que exige macOS
+          openssl pkcs12 -in $CERTIFICATE_PATH -out $RUNNER_TEMP/temp.pem -nodes -passin pass:"$P12_PASSWORD"
+          openssl pkcs12 -export -in $RUNNER_TEMP/temp.pem -out $CERTIFICATE_PATH -passout pass:"$P12_PASSWORD" -keypbe PBE-SHA1-3DES -certpbe PBE-SHA1-3DES -macalg SHA1
+
+          # Crear un llavero temporal
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 3600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Importar certificado al llavero
+          security import $CERTIFICATE_PATH -k $KEYCHAIN_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -T /usr/bin/codesign
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+          # Instalar perfil de provisión
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Build iOS Archive & Export IPA
+        run: |
+          # 1. Extraer información vital del Provisioning Profile
+          PP_PATH=$RUNNER_TEMP/app_store.mobileprovision
+          TEAM_ID=$(/usr/libexec/PlistBuddy -c "Print TeamIdentifier:0" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          APP_ID=$(/usr/libexec/PlistBuddy -c "Print Entitlements:application-identifier" /dev/stdin <<< $(security cms -D -i $PP_PATH))
+          BUNDLE_ID=${APP_ID#*.} # Remueve el prefijo del TEAM_ID
+
+          echo "Team ID: $TEAM_ID"
+          echo "Profile UUID: $PROFILE_UUID"
+          echo "Bundle ID: $BUNDLE_ID"
+
+          # 2. Crear archivo ExportOptions.plist dinámicamente
+          cat <<EOF > $RUNNER_TEMP/ExportOptions.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>$BUNDLE_ID</key>
+                  <string>$PROFILE_UUID</string>
+              </dict>
+              <key>signingStyle</key>
+              <string>manual</string>
+          </dict>
+          </plist>
+          EOF
+
+          # 2.5 Generar Entitlements para Push Notifications (Evita el rechazo de Apple)
+          cat <<EOF > $RUNNER_TEMP/App.entitlements
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>aps-environment</key>
+              <string>production</string>
+          </dict>
+          </plist>
+          EOF
+
+          cd ios/App
+          
+          # 2.8 Configurar Info.plist para evitar la molesta pregunta de encriptación de Apple
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" App/Info.plist || /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" App/Info.plist
+          
+          # 2.9 Auto-incrementar el Build Number usando el número de ejecución de GitHub para que Apple no rechace actualizaciones
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${{ github.run_number }}" App/Info.plist || true
+          
+          # 3. Compilar el Archivo (.xcarchive) forzando la firma manual con nuestros datos
+          xcodebuild -project App.xcodeproj \
+                     -scheme App \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -archivePath $RUNNER_TEMP/App.xcarchive \
+                     archive \
+                     CODE_SIGN_STYLE=Manual \
+                     DEVELOPMENT_TEAM=$TEAM_ID \
+                     PROVISIONING_PROFILE_SPECIFIER=$PROFILE_UUID \
+                     CODE_SIGN_IDENTITY="Apple Distribution" \
+                     CODE_SIGN_ENTITLEMENTS=$RUNNER_TEMP/App.entitlements \
+                     PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID
+
+          # 4. Exportar a .IPA usando nuestro ExportOptions generado
+          xcodebuild -exportArchive \
+                     -archivePath $RUNNER_TEMP/App.xcarchive \
+                     -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
+                     -exportPath $RUNNER_TEMP/build
+
+      - name: Upload App to App Store Connect via Fastlane / ALTool
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+        run: |
+          # Crear directorio requerido por altool
+          mkdir -p ~/.private_keys
+          
+          # Escribir la llave privada en el archivo esperado: AuthKey_<ApiKey>.p8
+          echo "$APP_STORE_CONNECT_API_KEY_KEY" > ~/.private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_KEY_ID}.p8
+          
+          # Subir la app a TestFlight/App Store Connect
+          xcrun altool --upload-app \
+                       --type ios \
+                       --file $RUNNER_TEMP/build/App.ipa \
+                       --apiKey "$APP_STORE_CONNECT_API_KEY_KEY_ID" \
+                       --apiIssuer "$APP_STORE_CONNECT_API_KEY_ISSUER_ID"

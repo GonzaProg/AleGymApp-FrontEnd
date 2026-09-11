@@ -19,7 +19,7 @@ export const Login = () => {
   // Estado para alternar vistas
   const [isRegistering, setIsRegistering] = useState(false);
   const [showGymCodeModal, setShowGymCodeModal] = useState(false);
-  const [isDateFocused, setIsDateFocused] = useState(false);
+  const [_, setIsDateFocused] = useState(false);
   const navigate = useNavigate();
 
   // --- HOOK LOGIN ---
@@ -107,8 +107,7 @@ export const Login = () => {
 
                 <Input 
                     name="fechaNacimiento" 
-                    placeholder="Fecha de Nacimiento" 
-                    type={isDateFocused || formData.fechaNacimiento ? "date" : "text"} 
+                    type="date" 
                     value={formData.fechaNacimiento} 
                     onChange={handleChange} 
                     onFocus={(e) => {
@@ -121,7 +120,6 @@ export const Login = () => {
                     }}
                     onBlur={() => setIsDateFocused(false)}
                     className={`${LoginStyles.inputDark} text-gray-400`} 
-                    labelClassName={LoginStyles.label}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
