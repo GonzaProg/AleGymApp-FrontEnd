@@ -19,7 +19,6 @@ export const Login = () => {
   // Estado para alternar vistas
   const [isRegistering, setIsRegistering] = useState(false);
   const [showGymCodeModal, setShowGymCodeModal] = useState(false);
-  const [isDateFocused, setIsDateFocused] = useState(false);
   const navigate = useNavigate();
 
   // --- HOOK LOGIN ---
@@ -76,7 +75,7 @@ export const Login = () => {
 
         {/* --- FORMULARIO DE REGISTRO --- */}
         {isRegistering ? (
-            <form onSubmit={handleRegister} className="space-y-4 animate-fade-in mx-center">
+            <form onSubmit={(e) => { e.preventDefault(); handleRegister(e); }} action="javascript:void(0);" className="space-y-4 animate-fade-in mx-center">
                 
                 {/* Nombre y Apellido (Responsive) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -107,21 +106,10 @@ export const Login = () => {
 
                 <Input 
                     name="fechaNacimiento" 
-                    placeholder="Fecha de Nacimiento" 
-                    type={isDateFocused || formData.fechaNacimiento ? "date" : "text"} 
+                    type="date" 
                     value={formData.fechaNacimiento} 
                     onChange={handleChange} 
-                    onFocus={(e) => {
-                        setIsDateFocused(true);
-                        if ("showPicker" in e.target) {
-                            try {
-                                (e.target as HTMLInputElement).showPicker();
-                            } catch {}
-                        }
-                    }}
-                    onBlur={() => setIsDateFocused(false)}
                     className={`${LoginStyles.inputDark} text-gray-400`} 
-                    labelClassName={LoginStyles.label}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -129,7 +117,7 @@ export const Login = () => {
                     <Input name="confirmarContrasena" placeholder="Repetir Contraseña" type="password" value={formData.confirmarContrasena} onChange={handleChange} required className={LoginStyles.inputDark} />
                 </div>
 
-                <Button type="submit" className={LoginStyles.btnPrimary} fullWidth disabled={registerLoading}>
+                <Button type="button" onClick={handleRegister} className={LoginStyles.btnPrimary} fullWidth disabled={registerLoading}>
                     <span className="flex items-center justify-center gap-2">
                         {registerLoading ? "CREANDO CUENTA..." : <>REGISTRARME <Rocket className="w-5 h-5" /></>}
                     </span>
@@ -149,7 +137,7 @@ export const Login = () => {
         ) : (
             
         /* --- FORMULARIO DE LOGIN --- */
-            <form onSubmit={handleLogin} className="space-y-6 animate-fade-in">
+            <form onSubmit={(e) => { e.preventDefault(); handleLogin(e); }} action="javascript:void(0);" className="space-y-6 animate-fade-in">
                 <div>
                     <label className={LoginStyles.label}>DNI</label> 
                     <Input 
@@ -195,7 +183,7 @@ export const Login = () => {
                     </div>
                 )}
 
-                <Button type="submit" className={LoginStyles.btnPrimary} disabled={loginLoading}>
+                <Button type="button" onClick={handleLogin} className={LoginStyles.btnPrimary} disabled={loginLoading}>
                     {loginLoading ? "INGRESANDO..." : "INGRESAR"}
                 </Button>
                 

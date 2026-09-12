@@ -51,7 +51,7 @@ export const ForgotPassword = () => {
             </div>
           ) : step === 2 ? (
             //  PASO 2: FORMULARIO DNI 
-            <form onSubmit={handleSendCode} className="space-y-6 animate-fade-in">
+            <form onSubmit={(e) => { e.preventDefault(); handleSendCode(e); }} action="javascript:void(0);" className="space-y-6 animate-fade-in">
               <div>
                 <label className={AppStyles.label}>DNI</label>
                 <Input
@@ -68,7 +68,7 @@ export const ForgotPassword = () => {
               
               {error && <div className={AppStyles.errorBox}>{error}</div>}
 
-              <Button type="submit" disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
+              <Button type="button" onClick={handleSendCode} disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
                 {loading ? "ENVIANDO..." : "ENVIAR CÓDIGO"}
               </Button>
               
@@ -80,7 +80,7 @@ export const ForgotPassword = () => {
             </form>
           ) : (
             //  PASO 2: FORMULARIO CÓDIGO + NUEVA CLAVE 
-            <form onSubmit={handleChangePassword} className="space-y-5 animate-fade-in">
+            <form onSubmit={(e) => { e.preventDefault(); handleChangePassword(e); }} action="javascript:void(0);" className="space-y-5 animate-fade-in">
               <div>
                 <label className={AppStyles.label}>Código de 6 dígitos</label>
                 <Input
@@ -125,7 +125,7 @@ export const ForgotPassword = () => {
 
               {error && <div className={AppStyles.errorBox}>{error}</div>}
 
-              <Button type="submit" disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
+              <Button type="button" onClick={handleChangePassword} disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
                 {loading ? "VALIDANDO..." : "CAMBIAR CONTRASEÑA"}
               </Button>
             </form>
