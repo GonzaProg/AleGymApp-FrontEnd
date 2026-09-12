@@ -100,6 +100,21 @@ export const PagosApi = {
         return response.data;
     },
 
+    getDeudores: async (year: number, month: number): Promise<any[]> => {
+        const response = await api.get(`/pagos/deudores/${year}/${month}`);
+        return response.data;
+    },
+
+    exportDeudoresExcel: async (year: number, month: number): Promise<Blob> => {
+        const response = await api.get(`/pagos/deudores/${year}/${month}/export/excel`, { responseType: 'blob' });
+        return response.data;
+    },
+
+    exportDeudoresPDF: async (year: number, month: number): Promise<Blob> => {
+        const response = await api.get(`/pagos/deudores/${year}/${month}/export/pdf`, { responseType: 'blob' });
+        return response.data;
+    },
+
     revertirPago: async (pagoId: number) => {
         const response = await api.post('/pagos/revertir', { pagoId });
         return response.data;
