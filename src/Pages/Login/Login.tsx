@@ -75,7 +75,7 @@ export const Login = () => {
 
         {/* --- FORMULARIO DE REGISTRO --- */}
         {isRegistering ? (
-            <form onSubmit={(e) => { e.preventDefault(); handleRegister(e); }} action="javascript:void(0);" className="space-y-4 animate-fade-in mx-center">
+            <div className="space-y-4 animate-fade-in mx-center" onKeyDown={(e) => { if (e.key === 'Enter') handleRegister(e as any); }}>
                 
                 {/* Nombre y Apellido (Responsive) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -133,11 +133,11 @@ export const Login = () => {
                         Inicia Sesión aquí
                     </button>
                 </div>
-            </form>
+            </div>
         ) : (
             
         /* --- FORMULARIO DE LOGIN --- */
-            <form onSubmit={(e) => { e.preventDefault(); handleLogin(e); }} action="javascript:void(0);" className="space-y-6 animate-fade-in">
+            <div className="space-y-6 animate-fade-in" onKeyDown={(e) => { if (e.key === 'Enter') handleLogin(e as any); }}>
                 <div>
                     <label className={LoginStyles.label}>DNI</label> 
                     <Input 
@@ -234,7 +234,7 @@ export const Login = () => {
                         </div>
                     )}
                 </div>
-            </form>
+            </div>
         )}
       </Card>
 

@@ -51,7 +51,7 @@ export const ForgotPassword = () => {
             </div>
           ) : step === 2 ? (
             //  PASO 2: FORMULARIO DNI 
-            <form onSubmit={(e) => { e.preventDefault(); handleSendCode(e); }} action="javascript:void(0);" className="space-y-6 animate-fade-in">
+            <div className="space-y-6 animate-fade-in" onKeyDown={(e) => { if (e.key === 'Enter') handleSendCode(e as any); }}>
               <div>
                 <label className={AppStyles.label}>DNI</label>
                 <Input
@@ -77,10 +77,10 @@ export const ForgotPassword = () => {
                       Elegir otro método
                   </button>
               </div>
-            </form>
+            </div>
           ) : (
             //  PASO 2: FORMULARIO CÓDIGO + NUEVA CLAVE 
-            <form onSubmit={(e) => { e.preventDefault(); handleChangePassword(e); }} action="javascript:void(0);" className="space-y-5 animate-fade-in">
+            <div className="space-y-5 animate-fade-in" onKeyDown={(e) => { if (e.key === 'Enter') handleChangePassword(e as any); }}>
               <div>
                 <label className={AppStyles.label}>Código de 6 dígitos</label>
                 <Input
@@ -128,7 +128,7 @@ export const ForgotPassword = () => {
               <Button type="button" onClick={handleChangePassword} disabled={loading} className={`${AppStyles.btnPrimary} w-full`}>
                 {loading ? "VALIDANDO..." : "CAMBIAR CONTRASEÑA"}
               </Button>
-            </form>
+            </div>
           )}
 
           <div className="mt-8 text-center border-t border-white/10 pt-4">
