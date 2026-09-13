@@ -13,17 +13,10 @@ export const DebtorsList = ({ onBack }: DebtorsListProps) => {
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1; // 1-12
 
-    const [year, setYear] = useState(currentYear);
+    const year = currentYear;
     const [month, setMonth] = useState(currentMonth);
     const [debtors, setDebtors] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    const availableYears = Array.from(
-        { length: Math.max(0, currentYear - 2026 + 1) },
-        (_, i) => 2026 + i
-    ).reverse();
-
-    if (availableYears.length === 0) availableYears.push(2026);
 
     const mesesOptions = [
         { value: '1', label: 'Enero' },
@@ -90,7 +83,7 @@ export const DebtorsList = ({ onBack }: DebtorsListProps) => {
     return (
         <div className="w-full max-w-[95%] mx-auto space-y-6 animate-fade-in relative">
             {/* Header */}
-            <div className="bg-gray-800/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative">
+            <div className="bg-gray-800/40 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 relative z-20">
                 
                 {/* Decoración absolute */}
                 <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none">
@@ -109,7 +102,7 @@ export const DebtorsList = ({ onBack }: DebtorsListProps) => {
                             <UsersRound className="text-red-400" size={24} />
                             Lista de Deudores
                         </h2>
-                        <p className="text-gray-400 text-sm">Alumnos sin pagos registrados</p>
+                        <p className="text-gray-400 text-sm">Alumnos sin pagos registrados en los últimos <span className="text-red-400 font-bold">3 meses</span></p>
                     </div>
                 </div>
 
@@ -130,20 +123,11 @@ export const DebtorsList = ({ onBack }: DebtorsListProps) => {
                         <FileSpreadsheet className="w-5 h-5" />
                         <p className="pl-2">Excel</p>
                     </button>
-                    <div className="w-36">
+                    <div className="w-40">
                         <CustomSelect 
                             options={mesesOptions}
                             value={month.toString()}
                             onChange={(val) => setMonth(Number(val))}
-                            icon={<Calendar className="w-4 h-4" />}
-                            className="w-full"
-                        />
-                    </div>
-                    <div className="w-28">
-                        <CustomSelect 
-                            options={availableYears.map(y => ({ value: y.toString(), label: y.toString() }))}
-                            value={year.toString()}
-                            onChange={(val) => setYear(Number(val))}
                             icon={<Calendar className="w-4 h-4" />}
                             className="w-full"
                         />
