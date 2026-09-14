@@ -10,7 +10,12 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { notificaciones, unreadCount, markAsRead, refresh } = useNotificaciones();
   const { currentUser } = useAuthUser();
-  const { localLogoUrl } = useGymCachedImages(currentUser?.gym?.logoUrl, undefined);
+  const { localLogoUrl } = useGymCachedImages(
+    currentUser?.gym?.logoUrl, 
+    currentUser?.gym?.fondoInicioCelularUrl,
+    currentUser?.gym?.fechaModificacionLogo,
+    currentUser?.gym?.fechaModificacionFondo
+  );
   
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

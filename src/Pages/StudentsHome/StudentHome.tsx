@@ -69,7 +69,12 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const fondoGymUrlData = currentUser?.gym?.fondoInicioCelularUrl ? CloudinaryApi.getUrl(currentUser.gym.fondoInicioCelularUrl) : null;
 
     // Caché local de las imágenes del gym usando el nuevo hook
-    const { localLogoUrl: gymLogo, localFondoUrl: fondoGymUrl } = useGymCachedImages(gymLogoData, fondoGymUrlData);
+    const { localLogoUrl: gymLogo, localFondoUrl: fondoGymUrl } = useGymCachedImages(
+        gymLogoData, 
+        fondoGymUrlData,
+        currentUser?.gym?.fechaModificacionLogo,
+        currentUser?.gym?.fechaModificacionFondo
+    );
 
     const handlePagoMP = async (userPlanId: number) => {
         const planToPay = activePlans.find(p => p.userPlanId === userPlanId);
