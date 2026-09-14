@@ -4,7 +4,8 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { UserDetailView } from "./UserDetailView";
 import { YearlyPaymentMatrix } from "./YearlyPaymentMatrix";
 import { FullUserPaymentHistory } from "./FullUserPaymentHistory";
-import { Table } from "lucide-react";
+import { DebtorsList } from "./DebtorsList";
+import { Table, UsersRound } from "lucide-react";
 
 export const UsersManager = () => {
     const {
@@ -14,8 +15,12 @@ export const UsersManager = () => {
         selectedUser, setSelectedUser
     } = useUsersManager();
 
-    const [view, setView] = useState<'list' | 'matrix' | 'history'>('list');
+    const [view, setView] = useState<'list' | 'matrix' | 'history' | 'debtors'>('list');
     const [userForHistory, setUserForHistory] = useState<any>(null);
+
+    if (view === 'debtors') {
+        return <DebtorsList onBack={() => setView('list')} />;
+    }
 
     if (view === 'history' && userForHistory) {
         return <FullUserPaymentHistory user={userForHistory} onBack={() => setView('matrix')} />;
@@ -65,6 +70,15 @@ export const UsersManager = () => {
                         />
                     </div>
                 </div>
+
+                {/* Botón Lista de Deudores */}
+                <button 
+                    onClick={() => setView('debtors')}
+                    className="flex items-center gap-2 px-5 py-3 bg-red-600/20 hover:bg-red-600/40 border border-red-500/30 text-red-400 rounded-2xl transition-all font-bold text-sm group shadow-lg shadow-red-500/10"
+                >
+                    <UsersRound size={18} className="group-hover:scale-110 transition-transform" />
+                    <span>Deudores</span>
+                </button>
 
                 {/* Botón Matriz de Pagos de los Alumnos */}
                 <button 

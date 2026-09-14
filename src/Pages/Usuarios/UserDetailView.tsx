@@ -1,26 +1,60 @@
 import { AppStyles } from "../../Styles/AppStyles";
 import { Card } from "../../Components/UI/Card";
-import { type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
-import { Zap, FileText } from "lucide-react";
+import { UsuarioApi, type AlumnoDTO } from "../../API/Usuarios/UsuarioApi";
+import { Zap, FileText, Pencil, Check, X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { FullUserPaymentHistory } from "./FullUserPaymentHistory";
+import { showError } from "../../Helpers/Alerts";
 
-export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () => void }) => {
+export const UserDetailView = ({ user: initialUser, onBack }: { user: AlumnoDTO, onBack: () => void }) => {
+    const [user, setUser] = useState<AlumnoDTO>(initialUser);
+    
     const isPlanActuallyActive = (fecha: string, activo: boolean) => activo && new Date(fecha).setHours(23, 59, 59, 999) >= new Date().getTime();
     const hasActivePlan = user.userPlans?.some(up => isPlanActuallyActive(up.fechaVencimiento, up.activo));
     const [showHistory, setShowHistory] = useState(false);
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [editTelefono, setEditTelefono] = useState(user.telefono || '');
+    const [editGmail, setEditGmail] = useState(user.gmail || '');
+    const [saving, setSaving] = useState(false);
+
+    const handleSave = async () => {
+        if (editGmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editGmail)) {
+            showError("El correo electrónico no tiene un formato válido.");
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const res = await UsuarioApi.update(user.id, {
+                nombre: user.nombre,
+                apellido: user.apellido,
+                dni: user.dni,
+                fotoPerfil: user.fotoPerfil || '',
+                telefono: editTelefono,
+                gmail: editGmail,
+                fechaNacimiento: user.fechaNacimiento
+            });
+            setUser({ ...user, telefono: res.telefono, gmail: res.gmail });
+            setIsEditing(false);
+        } catch (error: any) {
+            showError(error.response?.data?.error || "Error al actualizar datos");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     if (showHistory) {
         return <FullUserPaymentHistory user={user} onBack={() => setShowHistory(false)} />;
     }
 
     return (
-        <div className="w-full max-w-5xl mx-auto mt-14 animate-fade-in-up">
+        <div className="w-full max-w-7xl mx-auto mt-14 animate-fade-in-up">
             <button onClick={onBack} className={`${AppStyles.btnBack} mb-8`}>← Volver a la lista</button>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* PERFIL IZQUIERDA */}
-                <Card className={AppStyles.glassCard}>
+                <Card className={AppStyles.glassCard.replace('p-8', 'p-4')}>
                     <div className="flex flex-col items-center">
                         <div className="w-32 h-32 rounded-full border-4 border-green-500/30 p-1 mb-4 shadow-[0_0_20px_rgba(34,197,94,0.2)]">
                             {user.fotoPerfil ? <img src={user.fotoPerfil} className="w-full h-full rounded-full object-cover" /> : <div className="w-full h-full bg-gray-800 rounded-full flex items-center justify-center text-4xl">{user.nombre[0]}</div>}
@@ -35,9 +69,77 @@ export const UserDetailView = ({ user, onBack }: { user: AlumnoDTO, onBack: () =
                         </span>
                         
                         <div className="w-full space-y-4 border-t border-white/5 pt-6">
-                            <div className="flex justify-between text-sm"><span className="text-gray-500">DNI</span><span className="text-white font-mono text-base">{user.dni}</span></div>
-                            <div className="flex justify-between text-sm"><span className="text-gray-500">Teléfono</span><span className="text-white text-base">{user.telefono || '-'}</span></div>
-                            <div className="flex justify-between text-sm"><span className="text-gray-500">Gmail</span><span className="text-white text-base">{user.gmail || '-'}</span></div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-500">DNI</span>
+                                <span className="text-white font-mono text-base">{user.dni}</span>
+                            </div>
+                            
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-500">Teléfono</span>
+                                {isEditing ? (
+                                    <div className="flex flex-col items-end">
+                                        <input 
+                                            type="tel"
+                                            value={editTelefono}
+                                            onChange={(e) => setEditTelefono(e.target.value.replace(/\D/g, ''))}
+                                            className={`${AppStyles.inputDark} w-40 text-right h-8 py-1 px-2`}
+                                            placeholder="Ej: 3445123456"
+                                        />
+                                        <span className="text-[11px] text-gray-500 mt-1">Sin espacios, ni 15, con caract.</span>
+                                    </div>
+                                ) : (
+                                    <span className="text-white text-base">{user.telefono || '-'}</span>
+                                )}
+                            </div>
+                            
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-500">Gmail</span>
+                                {isEditing ? (
+                                    <input 
+                                        type="email"
+                                        value={editGmail}
+                                        onChange={(e) => setEditGmail(e.target.value)}
+                                        className={`${AppStyles.inputDark} w-40 text-right h-8 py-1 px-2`}
+                                        placeholder="ejemplo@gmail.com"
+                                    />
+                                ) : (
+                                    <span className="text-white text-base">{user.gmail || '-'}</span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="w-full mt-4 flex justify-end">
+                            {isEditing ? (
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                        onClick={() => {
+                                            setIsEditing(false);
+                                            setEditTelefono(user.telefono || '');
+                                            setEditGmail(user.gmail || '');
+                                        }}
+                                        disabled={saving}
+                                        className="p-1.5 bg-gray-500/20 text-gray-400 hover:text-white rounded-lg transition-colors"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                    <button 
+                                        onClick={handleSave}
+                                        disabled={saving}
+                                        className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-lg transition-colors font-bold text-sm"
+                                    >
+                                        {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                                        Guardar
+                                    </button>
+                                </div>
+                            ) : (
+                                <button 
+                                    onClick={() => setIsEditing(true)}
+                                    className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-white transition-colors"
+                                >
+                                    <Pencil size={12} />
+                                    Editar Contacto
+                                </button>
+                            )}
                         </div>
 
                         <button 
