@@ -98,7 +98,7 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
             </div>
             
             {isOpen && (
-                <div className="absolute z-[100] w-full mt-2 max-h-52 overflow-y-auto scrollbar-none bg-gray-950 border border-white/20 rounded-xl shadow-2xl touch-pan-y animate-fade-in origin-top">
+                <div className={`absolute z-[100] w-full mt-2 max-h-52 ${AppStyles.customScrollbar} bg-gray-950 border border-white/20 rounded-xl shadow-2xl touch-pan-y animate-fade-in origin-top`}>
                     {filteredOptions.length > 0 ? (
                         filteredOptions.map(opt => (
                             <div 

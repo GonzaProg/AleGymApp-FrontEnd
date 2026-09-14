@@ -3,120 +3,207 @@ import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 
-const LOGO_FILENAME = 'gym_logo_cache';
-const FONDO_FILENAME = 'gym_fondo_cache';
-
 const KEY_LAST_LOGO_URL = 'gym_last_logo_url';
 const KEY_LAST_FONDO_URL = 'gym_last_fondo_url';
+const KEY_LAST_LOGO_DATE = 'gym_last_logo_date';
+const KEY_LAST_FONDO_DATE = 'gym_last_fondo_date';
+const KEY_LAST_LOGO_FILENAME = 'gym_last_logo_filename';
+const KEY_LAST_FONDO_FILENAME = 'gym_last_fondo_filename';
 
-export const useGymCachedImages = (logoUrlOnline: string | null | undefined, fondoUrlOnline: string | null | undefined) => {
+// Para evitar problemas de concurrencia ya que Navbar y StudentHome usan el hook simultáneamente
+let cachePromise: Promise<void> | null = null;
+
+export const useGymCachedImages = (
+    logoUrlOnline: string | null | undefined,
+    fondoUrlOnline: string | null | undefined,
+    fechaModificacionLogo?: string | Date | number | null,
+    fechaModificacionFondo?: string | Date | number | null
+) => {
     const [localLogoUrl, setLocalLogoUrl] = useState<string | null>(null);
     const [localFondoUrl, setLocalFondoUrl] = useState<string | null>(null);
     const [loadingImages, setLoadingImages] = useState(true);
 
     useEffect(() => {
         const cacheImages = async () => {
-             // Web Fallback Immediate
             if (!Capacitor.isNativePlatform()) {
-                setLocalLogoUrl(logoUrlOnline || null);
-                setLocalFondoUrl(fondoUrlOnline || null);
+                const logoDateStr = fechaModificacionLogo ? new Date(fechaModificacionLogo).getTime().toString() : '';
+                const fondoDateStr = fechaModificacionFondo ? new Date(fechaModificacionFondo).getTime().toString() : '';
+
+                setLocalLogoUrl(logoUrlOnline ? `${logoUrlOnline}${logoDateStr ? `?v=${logoDateStr}` : ''}` : null);
+                setLocalFondoUrl(fondoUrlOnline ? `${fondoUrlOnline}${fondoDateStr ? `?v=${fondoDateStr}` : ''}` : null);
                 setLoadingImages(false);
                 return;
             }
 
+            // Esperar si otro componente está procesando la caché
+            while (cachePromise) {
+                await cachePromise;
+            }
+
+            let resolver: () => void;
+            cachePromise = new Promise(resolve => { resolver = resolve; });
+
             try {
-                // LOGO LOGIC
+                // LOGICA LOGO
                 let finalLogo: string | null = null;
+                const newLogoDateStr = fechaModificacionLogo ? new Date(fechaModificacionLogo).toISOString() : 'none';
+
                 if (logoUrlOnline) {
                     const { value: lastLogoUrl } = await Preferences.get({ key: KEY_LAST_LOGO_URL });
-                    
-                    if (lastLogoUrl === logoUrlOnline) {
-                        // Already downloaded this exact URL, loading from cache
+                    const { value: lastLogoDate } = await Preferences.get({ key: KEY_LAST_LOGO_DATE });
+                    let { value: lastLogoFilename } = await Preferences.get({ key: KEY_LAST_LOGO_FILENAME });
+
+                    // Para limpiar el archivo viejo que usaba nombre estático si existe
+                    try { await Filesystem.deleteFile({ path: 'gym_logo_cache', directory: Directory.Data }); } catch (e) { }
+
+                    if (lastLogoUrl === logoUrlOnline && lastLogoDate === newLogoDateStr && lastLogoFilename) {
                         try {
-                            const file = await Filesystem.getUri({ directory: Directory.Data, path: LOGO_FILENAME });
-                            finalLogo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(logoUrlOnline)}`;
+                            const file = await Filesystem.getUri({ directory: Directory.Data, path: lastLogoFilename });
+                            finalLogo = Capacitor.convertFileSrc(file.uri);
                         } catch {
-                            // File not found physically
                             finalLogo = logoUrlOnline;
                         }
                     } else {
-                        // Needs to be downloaded
+                        const newFilename = `gym_logo_cache_${Date.now()}.png`;
                         try {
-                            try { await Filesystem.deleteFile({ path: LOGO_FILENAME, directory: Directory.Data }); } catch(e) {}
-                            
                             await Filesystem.downloadFile({
                                 url: logoUrlOnline,
-                                path: LOGO_FILENAME,
+                                path: newFilename,
                                 directory: Directory.Data
                             });
-                            
-                            const file = await Filesystem.getUri({ directory: Directory.Data, path: LOGO_FILENAME });
-                            finalLogo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(logoUrlOnline)}`;
+
+                            if (lastLogoFilename) {
+                                try { await Filesystem.deleteFile({ path: lastLogoFilename, directory: Directory.Data }); } catch (e) { }
+                            }
+
+                            const file = await Filesystem.getUri({ directory: Directory.Data, path: newFilename });
+                            finalLogo = Capacitor.convertFileSrc(file.uri);
+
                             await Preferences.set({ key: KEY_LAST_LOGO_URL, value: logoUrlOnline });
+                            await Preferences.set({ key: KEY_LAST_LOGO_DATE, value: newLogoDateStr });
+                            await Preferences.set({ key: KEY_LAST_LOGO_FILENAME, value: newFilename });
                         } catch (error) {
                             console.error("Error downloading logo", error);
-                            finalLogo = logoUrlOnline;
+                            if (lastLogoFilename) {
+                                try {
+                                    const file = await Filesystem.getUri({ directory: Directory.Data, path: lastLogoFilename });
+                                    finalLogo = Capacitor.convertFileSrc(file.uri);
+                                } catch {
+                                    finalLogo = logoUrlOnline;
+                                }
+                            } else {
+                                finalLogo = logoUrlOnline;
+                            }
                         }
                     }
-                } else {
-                    // Si no hay logo online, nos aseguramos de borrar rastros
-                    try { await Filesystem.deleteFile({ path: LOGO_FILENAME, directory: Directory.Data }); } catch(e) {}
+                } else if (logoUrlOnline === null) {
+                    let { value: lastLogoFilename } = await Preferences.get({ key: KEY_LAST_LOGO_FILENAME });
+                    if (lastLogoFilename) {
+                        try { await Filesystem.deleteFile({ path: lastLogoFilename, directory: Directory.Data }); } catch (e) { }
+                    }
                     await Preferences.remove({ key: KEY_LAST_LOGO_URL });
+                    await Preferences.remove({ key: KEY_LAST_LOGO_DATE });
+                    await Preferences.remove({ key: KEY_LAST_LOGO_FILENAME });
+                } else {
+                    // Si es undefined (probablemente aún no carga currentUser), intentamos mostrar el último logo guardado
+                    let { value: lastLogoFilename } = await Preferences.get({ key: KEY_LAST_LOGO_FILENAME });
+                    if (lastLogoFilename) {
+                        try {
+                            const file = await Filesystem.getUri({ directory: Directory.Data, path: lastLogoFilename });
+                            finalLogo = Capacitor.convertFileSrc(file.uri);
+                        } catch { }
+                    }
                 }
 
                 setLocalLogoUrl(finalLogo);
 
-                // FONDO LOGIC
+                // FONDO LOGICA
                 let finalFondo: string | null = null;
+                const newFondoDateStr = fechaModificacionFondo ? new Date(fechaModificacionFondo).toISOString() : 'none';
+
                 if (fondoUrlOnline) {
                     const { value: lastFondoUrl } = await Preferences.get({ key: KEY_LAST_FONDO_URL });
-                    
-                    if (lastFondoUrl === fondoUrlOnline) {
+                    const { value: lastFondoDate } = await Preferences.get({ key: KEY_LAST_FONDO_DATE });
+                    let { value: lastFondoFilename } = await Preferences.get({ key: KEY_LAST_FONDO_FILENAME });
+
+                    // Limpieza del archivo con nombre estático
+                    try { await Filesystem.deleteFile({ path: 'gym_fondo_cache', directory: Directory.Data }); } catch (e) { }
+
+                    if (lastFondoUrl === fondoUrlOnline && lastFondoDate === newFondoDateStr && lastFondoFilename) {
                         try {
-                            const file = await Filesystem.getUri({ directory: Directory.Data, path: FONDO_FILENAME });
-                            // Agregamos un cache-buster para evitar que el WebView use la versión vieja cacheada
-                            finalFondo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(fondoUrlOnline)}`;
+                            const file = await Filesystem.getUri({ directory: Directory.Data, path: lastFondoFilename });
+                            finalFondo = Capacitor.convertFileSrc(file.uri);
                         } catch {
                             finalFondo = fondoUrlOnline;
                         }
                     } else {
+                        const newFilename = `gym_fondo_cache_${Date.now()}.jpg`;
                         try {
-                            try { await Filesystem.deleteFile({ path: FONDO_FILENAME, directory: Directory.Data }); } catch(e) {}
-                            
                             await Filesystem.downloadFile({
                                 url: fondoUrlOnline,
-                                path: FONDO_FILENAME,
+                                path: newFilename,
                                 directory: Directory.Data
                             });
-                            
-                            const file = await Filesystem.getUri({ directory: Directory.Data, path: FONDO_FILENAME });
-                            finalFondo = Capacitor.convertFileSrc(file.uri) + `?v=${encodeURIComponent(fondoUrlOnline)}`;
+
+                            if (lastFondoFilename) {
+                                try { await Filesystem.deleteFile({ path: lastFondoFilename, directory: Directory.Data }); } catch (e) { }
+                            }
+
+                            const file = await Filesystem.getUri({ directory: Directory.Data, path: newFilename });
+                            finalFondo = Capacitor.convertFileSrc(file.uri);
+
                             await Preferences.set({ key: KEY_LAST_FONDO_URL, value: fondoUrlOnline });
+                            await Preferences.set({ key: KEY_LAST_FONDO_DATE, value: newFondoDateStr });
+                            await Preferences.set({ key: KEY_LAST_FONDO_FILENAME, value: newFilename });
                         } catch (error) {
                             console.error("Error downloading fondo", error);
-                            finalFondo = fondoUrlOnline;
+                            if (lastFondoFilename) {
+                                try {
+                                    const file = await Filesystem.getUri({ directory: Directory.Data, path: lastFondoFilename });
+                                    finalFondo = Capacitor.convertFileSrc(file.uri);
+                                } catch {
+                                    finalFondo = fondoUrlOnline;
+                                }
+                            } else {
+                                finalFondo = fondoUrlOnline;
+                            }
                         }
                     }
-                } else {
-                    try { await Filesystem.deleteFile({ path: FONDO_FILENAME, directory: Directory.Data }); } catch(e) {}
+                } else if (fondoUrlOnline === null) {
+                    let { value: lastFondoFilename } = await Preferences.get({ key: KEY_LAST_FONDO_FILENAME });
+                    if (lastFondoFilename) {
+                        try { await Filesystem.deleteFile({ path: lastFondoFilename, directory: Directory.Data }); } catch (e) { }
+                    }
                     await Preferences.remove({ key: KEY_LAST_FONDO_URL });
+                    await Preferences.remove({ key: KEY_LAST_FONDO_DATE });
+                    await Preferences.remove({ key: KEY_LAST_FONDO_FILENAME });
+                } else {
+                    // Si es undefined, intentar cargar de la caché local para no borrarlo por accidente
+                    let { value: lastFondoFilename } = await Preferences.get({ key: KEY_LAST_FONDO_FILENAME });
+                    if (lastFondoFilename) {
+                        try {
+                            const file = await Filesystem.getUri({ directory: Directory.Data, path: lastFondoFilename });
+                            finalFondo = Capacitor.convertFileSrc(file.uri);
+                        } catch { }
+                    }
                 }
 
                 setLocalFondoUrl(finalFondo);
 
             } catch (error) {
-                 console.error("Error general gestionando caché de imágenes", error);
-                 setLocalLogoUrl(logoUrlOnline || null);
-                 setLocalFondoUrl(fondoUrlOnline || null);
+                console.error("Error general gestionando caché de imágenes", error);
+                setLocalLogoUrl(logoUrlOnline || null);
+                setLocalFondoUrl(fondoUrlOnline || null);
             } finally {
+                if (resolver!) resolver();
+                cachePromise = null;
                 setLoadingImages(false);
             }
         };
 
-        // Al montar el custom hook con sus variables 
         cacheImages();
 
-    }, [logoUrlOnline, fondoUrlOnline]);
+    }, [logoUrlOnline, fondoUrlOnline, fechaModificacionLogo, fechaModificacionFondo]);
 
     return { localLogoUrl, localFondoUrl, loadingImages };
 };
