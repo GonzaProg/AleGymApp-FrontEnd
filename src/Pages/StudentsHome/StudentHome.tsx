@@ -16,6 +16,11 @@ import { AppLauncher } from '@capacitor/app-launcher';
 import { App as CapacitorApp } from '@capacitor/app';
 import { showError } from "../../Helpers/Alerts";
 import MpLogo from "../../assets/MP_RGB_HANDSHAKE_color_horizontal.svg";
+import Telaraña2 from "../../assets/Halloween/Telaraña2.svg";
+import Telaraña3 from "../../assets/Halloween/Telaraña3.svg";
+import TelarañaCompleta from "../../assets/Halloween/TelarañaCompleta.svg";
+import TelarañaEsquina from "../../assets/Halloween/TelarañaEsquina.svg";
+import TelarañaConAraña1 from "../../assets/Halloween/TelarañaConAraña1.png";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const [loadingMP, setLoadingMP] = useState<number | null>(null);
@@ -168,6 +173,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
                         return (
                             <div key={plan.userPlanId} className={`bg-black/50 p-5 rounded-3xl shadow-xl relative overflow-hidden group border border-white/5`}>
+                                <img src={TelarañaConAraña1} alt="" className="absolute top-0 right-0 w-20 h-20 opacity-80 pointer-events-none" />
                                 {/* Cabecera de la tarjeta */}
                                 <div className="flex items-center gap-4 mb-6">
                                     {gymLogo ? (
@@ -234,6 +240,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                         onClick={() => navigate('/dietas')}
                 className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} mb-8 relative overflow-hidden border-orange-500/20 shadow-lg cursor-pointer transition-transform hover:scale-[1.02] active:scale-95`}
             >
+                <img src={Telaraña3} alt="" className="absolute bottom-80 right-64 w-24 h-24 opacity-80 pointer-events-none" />
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
                 <div className="flex items-center justify-between mb-4 relative z-10">
                     <div className="flex items-center gap-2">
@@ -323,7 +330,8 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             {isAsistenciaHabilitada ? (
                 <>
                     {/* ACORDEÓN DE INFORMACIÓN */}
-                    <div className={AppStyles.glassCard.replace("p-8", "p-2").replace("bg-gray-900/80", "bg-black/20")}>
+                    <div className={AppStyles.glassCard.replace("p-8", "p-2").replace("bg-gray-900/80", "bg-black/20") + " relative overflow-hidden"}>
+                        <img src={TelarañaEsquina} alt="" className="absolute top-[-5px] left-[-17px] w-16 h-16 opacity-50 pointer-events-none transform -scale-x-100" />
                         <button 
                             onClick={() => setIsInfoOpen(!isInfoOpen)}
                             className="w-full p-2 flex items-center justify-between hover:bg-white/5 transition-colors rounded-2xl"
@@ -349,6 +357,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
                     {/* TARJETA DE CONCURRENCIA */}
                     <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50").replace("backdrop-blur-xl", "")} relative overflow-hidden border-green-500/30 shadow-lg shadow-green-900/10`}>
+                        <img src={TelarañaCompleta} alt="" className="absolute -top-6 -right-6 w-32 h-32 opacity-20 pointer-events-none" />
                         <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/30 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
                         
                         {/* BOTÓN COMPACTO DE ESCANEO */}
@@ -412,6 +421,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             <div className="px-4 space-y-6">
                 {/* FRASE MOTIVADORA DEL DÍA */}
             <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} relative overflow-hidden border-green-500/20 shadow-lg shadow-green-500/20`}>
+                <img src={Telaraña2} alt="" className="absolute bottom-[-32px] right-0 w-24 h-24 opacity-80 pointer-events-none" />
                 <div className="flex flex-col gap-4 relative z-10">
                     <div className="flex items-start gap-3">
                         <Quote className="w-5 h-5 text-blue-400 flex-shrink-0 opacity-80 mt-0.5" />

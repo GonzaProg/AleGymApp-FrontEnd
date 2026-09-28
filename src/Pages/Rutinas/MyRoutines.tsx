@@ -13,6 +13,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 
 import { createPortal } from "react-dom";
 import { Inbox, CloudDownload, CheckCircle, Download, Search, Dumbbell, ArrowLeft, Play, Activity, Hand, Info, Calendar, Edit2, Save, X } from "lucide-react";
+import FondoRutinasHalloween from "../../assets/Halloween/FondoRutinasHalloween.jpg";
 
 // Componente para renderizar miniaturas offline desde IndexedDB
 const OfflineThumbnail = ({ path, alt }: { path: string; alt: string }) => {
@@ -792,9 +793,14 @@ export const MyRoutines = () => {
                     <div 
                         key={key} 
                         onClick={() => setSelectedRoutine(rutina)} 
-                        className={MyRoutinesStyles.routineCard + " relative"}
+                        className={MyRoutinesStyles.routineCard + " relative overflow-hidden"}
                     >
-                      <div className={AppStyles.gradientDivider}></div>
+                        {/* FONDO HALLOWEEN INDIVIDUAL */}
+                        <div 
+                          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 pointer-events-none"
+                          style={{ backgroundImage: `url(${FondoRutinasHalloween})` }}
+                        />
+                        <div className="relative z-10 h-full flex flex-col">
 
                       {/* BOTONES SUPERIORES (Edición y Descarga) */}
                       <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
@@ -885,6 +891,7 @@ export const MyRoutines = () => {
                           <span className={MyRoutinesStyles.viewDetailBtn}>
                             VER DETALLE <Search className="w-5 h-5 inline-block ml-1" />
                           </span>
+                      </div>
                       </div>
                     </div>
                 );

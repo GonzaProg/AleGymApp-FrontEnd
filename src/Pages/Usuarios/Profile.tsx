@@ -8,6 +8,9 @@ import { ProfileStyles } from "../../Styles/ProfileStyles";
 import { formatearFechaUTC } from "../../Helpers/DateUtils";
 import { Camera, Edit2, Lock, LogOut, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import PerfilHalloween from "../../assets/Halloween/PerfilHalloween.jpg";
+import Telaraña3 from "../../assets/Halloween/Telaraña3.svg";
+import TelarañaConAraña1 from "../../assets/Halloween/TelarañaConAraña1.png";
+import TelarañaConAraña2 from "../../assets/Halloween/TelarañaConAraña2.png";
 
 interface ProfileProps {
   isMobile?: boolean; // Prop para diferenciar el contexto
@@ -213,7 +216,8 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
           </div>
 
           {/* --- CARD SEGURIDAD --- */}
-          <div className={AppStyles.glassCard + " p-6 md:p-8 bg-gray-900/10"}>
+          <div className={AppStyles.glassCard + " p-6 md:p-8 bg-gray-900/10 relative overflow-hidden"}>
+            <img src={TelarañaConAraña2} alt="" className="absolute -top-4 -right-2 w-24 h-24 opacity-80 pointer-events-none" />
             {!showPasswordSection ? (
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                   <div className="flex flex-col md:flex-row items-center gap-4">
@@ -249,7 +253,8 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
 
           {/* --- CARD ZONA DE PELIGRO (SOLO ALUMNO) --- */}
           {userData.rol === 'Alumno' && (
-            <div className={AppStyles.glassCard + " p-6 md:p-8 bg-red-900/10 border-red-500/20"}>
+            <div className={AppStyles.glassCard + " p-6 md:p-8 bg-red-900/10 border-red-500/20 relative overflow-hidden"}>
+                <img src={TelarañaConAraña1} alt="" className="absolute top-5 -left-8 w-24 h-24 opacity-70 pointer-events-none transform -scale-x-100" />
                 <div 
                   className="flex justify-between items-center cursor-pointer select-none"
                   onClick={() => setShowDangerZone(!showDangerZone)}
@@ -285,8 +290,9 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
 
           {/* --- CARD CERRAR SESIÓN (SOLO MOBILE/ALUMNO) --- */}
           {isMobile && (
-            <div className={AppStyles.glassCard + " p-8 bg-gray-900/10"}>                
-                <div className="flex justify-between items-center">
+            <div className={AppStyles.glassCard + " p-8 bg-gray-900/10 relative overflow-hidden"}>                
+                <img src={Telaraña3} alt="" className="absolute -top-5 -left-1 w-16 h-16 opacity-80 pointer-events-none" />
+                <div className="flex justify-between items-center relative z-10">
                     <div className="flex items-center gap-4">
                       <div className="bg-red-900/30 p-2 rounded-lg"><LogOut className="w-7 h-7 text-red-500" /></div>
                       <span className="font-bold text-gray-100 text-base block">Cerrar Sesión</span>
