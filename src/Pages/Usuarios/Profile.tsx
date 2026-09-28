@@ -7,7 +7,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
 import { formatearFechaUTC } from "../../Helpers/DateUtils";
 import { Camera, Edit2, Lock, LogOut, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
-import PerfilHalloween from "../../assets/PerfilHalloween.jpg";
+import PerfilHalloween from "../../assets/Halloween/PerfilHalloween.jpg";
 
 interface ProfileProps {
   isMobile?: boolean; // Prop para diferenciar el contexto

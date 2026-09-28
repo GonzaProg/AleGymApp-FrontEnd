@@ -5,8 +5,8 @@ import { useAuthUser } from "../../Hooks/Auth/useAuthUser";
 import { useGymCachedImages } from "../../Hooks/StudentsHome/useGymCachedImages";
 import { AppStyles } from "../../Styles/AppStyles";
 import { BellOff } from "lucide-react";
-import DosMurcielagos from "../../assets/DosMurcielagos.svg";
-import SombreroBruja from "../../assets/SombreroBruja.svg";
+import DosMurcielagos from "../../assets/Halloween/DosMurcielagos.svg";
+import SombreroBruja from "../../assets/Halloween/SombreroBruja.svg";
 
 export const NavbarSuperior = () => {
   const navigate = useNavigate();

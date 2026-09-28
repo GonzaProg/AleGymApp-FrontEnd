@@ -1,6 +1,6 @@
 import { Dumbbell, Medal, User } from "lucide-react";
-import Calabaza from "../../assets/Calabaza.svg";
-import Arana from "../../assets/Araña.svg";
+import Calabaza from "../../assets/Halloween/Calabaza.svg";
+import Arana from "../../assets/Halloween/Araña.svg";
 
 interface NavbarInferiorProps {
   activeTab: number;
