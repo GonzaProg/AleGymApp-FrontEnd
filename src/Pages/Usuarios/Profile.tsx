@@ -7,6 +7,7 @@ import { AppStyles } from "../../Styles/AppStyles";
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
 import { formatearFechaUTC } from "../../Helpers/DateUtils";
 import { Camera, Edit2, Lock, LogOut, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import PerfilHalloween from "../../assets/PerfilHalloween.jpg";
 
 interface ProfileProps {
   isMobile?: boolean; // Prop para diferenciar el contexto
@@ -56,9 +57,16 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
           {/* --- CARD PERFIL --- */}
           <div className="w-full backdrop-blur-xl bg-gray-900/10 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
             
-            <div className={ProfileStyles.coverGradient}></div>
+            {/* Fondo de Perfil (Halloween) */}
+            <div 
+              className={`${ProfileStyles.coverGradient}`}
+              style={{ backgroundImage: `url(${PerfilHalloween})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+            >
+              {/* Overlay para oscurecer un poco la imagen y que el avatar/texto destaque */}
+              <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}></div>
+            </div>
 
-            <div className="px-6 md:px-10 pb-10">
+            <div className="px-6 md:px-10 pb-10 relative z-10">
               <div className={ProfileStyles.avatarContainer}>
                 <div className={ProfileStyles.avatarWrapper}>
                   {avatarSrc ? (
