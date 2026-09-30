@@ -13,58 +13,52 @@ export const usePushNotifications = (currentUser: any) => {
       return;
     }
 
-    const registerPush = async () => {
+    const setupPush = async () => {
       try {
-        // 1. Pedir permisos
-        const permission = await PushNotifications.requestPermissions();
+        // 1. PRIMERO agregamos los Listeners (para no perdernos el evento si ocurre muy rápido)
+        await PushNotifications.addListener('registration', async (token: Token) => {
+          console.log('Push registration success, token:', token.value);
+          try {
+            await UsuarioApi.saveFcmToken(token.value);
+          } catch (error) {
+            console.error('Error guardando FCM token:', error);
+          }
+        });
 
-        if (permission.receive === 'granted') {
-          // 2. Registrar con Apple / Google para recibir tokens
+        await PushNotifications.addListener('registrationError', (error: any) => {
+          console.error('Error on push registration:', error);
+        });
+
+        await PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+          console.log('Push received:', notification);
+          if (refresh) refresh();
+        });
+
+        await PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
+          console.log('Push action performed:', notification);
+        });
+
+        // 2. Comprobamos permisos actuales
+        let permStatus = await PushNotifications.checkPermissions();
+
+        // 3. Si no los tenemos, los pedimos
+        if (permStatus.receive === 'prompt') {
+          permStatus = await PushNotifications.requestPermissions();
+        }
+
+        // 4. Si el permiso está concedido, registramos el dispositivo
+        if (permStatus.receive === 'granted') {
           await PushNotifications.register();
         } else {
-          console.log('Permisos de notificaciones push denegados');
+          console.log('Permisos de notificaciones push denegados por el usuario.');
         }
+
       } catch (error) {
-        console.error('Error registrando Push Notifications:', error);
+        console.error('Error configurando Push Notifications:', error);
       }
     };
 
-    // 3. Listeners
-    const addListeners = async () => {
-      // Registro exitoso, obtenemos el token
-      await PushNotifications.addListener('registration', async (token: Token) => {
-        console.log('Push registration success, token:', token.value);
-        try {
-          // Guardar el token en el backend
-          await UsuarioApi.saveFcmToken(token.value);
-        } catch (error) {
-          console.error('Error guardando FCM token:', error);
-        }
-      });
-
-      // Error en el registro
-      await PushNotifications.addListener('registrationError', (error: any) => {
-        console.error('Error on push registration:', error);
-      });
-
-      // Notificación recibida en primer plano (app abierta)
-      await PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-        console.log('Push received:', notification);
-        // Recargar las notificaciones in-app
-        if (refresh) {
-          refresh();
-        }
-      });
-
-      // Acción sobre la notificación (el usuario la toca en la barra)
-      await PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-        console.log('Push action performed:', notification);
-        // Podrías navegar a una pantalla específica aquí si es necesario
-      });
-    };
-
-    registerPush();
-    addListeners();
+    setupPush();
 
     // Limpieza
     return () => {

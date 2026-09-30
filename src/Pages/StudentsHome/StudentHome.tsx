@@ -16,7 +16,7 @@ import { AppLauncher } from '@capacitor/app-launcher';
 import { App as CapacitorApp } from '@capacitor/app';
 import { showError } from "../../Helpers/Alerts";
 import MpLogo from "../../assets/MP_RGB_HANDSHAKE_color_horizontal.svg";
-import Telaraña2 from "../../assets/Halloween/Telaraña2.svg";
+import Spiderman from "../../assets/Halloween/Spiderman.png";
 import Telaraña3 from "../../assets/Halloween/Telaraña3.svg";
 import TelarañaCompleta from "../../assets/Halloween/TelarañaCompleta.svg";
 import TelarañaEsquina from "../../assets/Halloween/TelarañaEsquina.svg";
@@ -420,8 +420,8 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             
             <div className="px-4 space-y-6">
                 {/* FRASE MOTIVADORA DEL DÍA */}
-            <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} relative overflow-hidden border-green-500/20 shadow-lg shadow-green-500/20`}>
-                <img src={Telaraña2} alt="" className="absolute bottom-[-32px] right-0 w-24 h-24 opacity-80 pointer-events-none" />
+            <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} relative overflow-visible border-green-500/20 shadow-lg shadow-green-500/20`}>
+                <img src={Spiderman} alt="" className="absolute bottom-[-95px] right-0 w-24 h-24 opacity-80 pointer-events-none" />
                 <div className="flex flex-col gap-4 relative z-10">
                     <div className="flex items-start gap-3">
                         <Quote className="w-5 h-5 text-blue-400 flex-shrink-0 opacity-80 mt-0.5" />
