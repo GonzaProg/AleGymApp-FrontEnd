@@ -5,8 +5,13 @@
  width="196.000000pt" height="167.000000pt" viewBox="0 0 196.000000 167.000000"
  preserveAspectRatio="xMidYMid meet">
 
+<defs>
+  <filter id="glowOrange" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="0" stdDeviation="60" flood-color="#ea580c" flood-opacity="0.9"/>
+  </filter>
+</defs>
 <g transform="translate(0.000000,167.000000) scale(0.100000,-0.100000)"
-fill="#000000" stroke="none">
+fill="#000000" stroke="none" filter="url(#glowOrange)">
 <path d="M635 1413 l-37 -48 30 -25 c16 -14 53 -46 83 -71 l54 -47 101 5 101
 6 -4 -79 c-3 -44 -8 -91 -13 -105 -9 -30 -221 -361 -253 -396 -11 -12 -37 -50
 -57 -85 l-38 -63 -164 -31 c-144 -27 -163 -33 -166 -51 -2 -11 9 -35 24 -53

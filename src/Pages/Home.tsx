@@ -18,6 +18,8 @@ import CalabazaHome4 from "../assets/Halloween/CalabazaHome4.svg";
 import CalabazaHome5 from "../assets/Halloween/CalabazaHome5.svg";
 import TelarañaHome1 from "../assets/Halloween/TelarañaHome1.svg";
 import TelarañaHome2 from "../assets/Halloween/TelarañaHome2.svg";
+import FondoInicioHomePC from "../assets/Halloween/FondoInicioHomePC.jpg";
+import FondoMenuLateralHomePC from "../assets/Halloween/FondoMenuLateralHomePC.jpg";
 
 // Hooks y Componentes
 import { useOptimizedHome } from "../Hooks/Home/useOptimizedHome";
@@ -176,8 +178,14 @@ export const Home = () => {
   if (isEntrenador || isAdmin) {
     const AdminDashboardWelcome = () => (
         <div className="animate-fade-in-up space-y-6 mt-20">
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+          <div 
+            className="p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden"
+            style={{ 
+              backgroundImage: `linear-gradient(to right, rgba(17, 24, 39, 0.8), rgba(31, 41, 55, 0.8)), url(${FondoInicioHomePC})`, 
+              backgroundSize: 'cover', 
+              backgroundPosition: 'center' 
+            }}
+          >
             <h2 className="text-3xl font-bold text-white relative z-10">
               Hola, <span className="text-green-400">{currentUser?.nombre}</span> 👋
             </h2>
@@ -245,7 +253,14 @@ export const Home = () => {
 
         <div className="flex h-screen overflow-hidden font-sans">
           <WhatsAppModal />
-          <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
+          <aside 
+            className="w-64 border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300 relative"
+            style={{
+              backgroundImage: `linear-gradient(to bottom, rgba(36, 25, 47, 0), rgba(36, 25, 47, 0)), url(${FondoMenuLateralHomePC})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
             <div className="flex-1 overflow-hidden flex flex-col">
               <div className="h-20 flex items-center px-6 border-b border-white/5 cursor-pointer shrink-0 group" onClick={() => handleSidebarClick("Inicio")}>
                 <span className="text-2xl font-bold">
@@ -404,9 +419,9 @@ export const Home = () => {
 // SidebarItem ahora recibe hasAlert para mostrar la luz roja
 const SidebarItem = ({ icon, label, active, onClick, hasAlert }: { icon: React.ReactNode, label: string, active: boolean, onClick: () => void, hasAlert?: boolean }) => {
   return (
-    <div onClick={onClick} className={`relative flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-green-500/10 text-green-400 border-r-2 border-green-500' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
-      <span className={`text-xl group-hover:scale-110 transition-transform ${active ? 'scale-110' : ''}`}>{icon}</span>
-      <span className="font-medium text-sm">{label}</span>
+    <div onClick={onClick} className={`relative flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group ${active ? 'bg-orange-500/10 border-r-2 border-orange-500' : 'hover:bg-white/5'}`}>
+      <span className={`text-xl group-hover:scale-110 transition-transform ${active ? 'scale-110 text-orange-500' : 'text-green-500 group-hover:text-green-400'}`}>{icon}</span>
+      <span className={`font-medium text-sm ${active ? 'text-orange-500' : 'text-gray-400 group-hover:text-white'}`}>{label}</span>
       
       {/* LA LUCECITA ROJA PARPADEANTE */}
       {hasAlert && (
