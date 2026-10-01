@@ -8,6 +8,17 @@ import "swiper/css";
 // @ts-ignore
 import "swiper/css/pagination";
 
+// HALLOWEEN
+import SombreroBruja from "../assets/Halloween/SombreroBruja.svg";
+import CerrarSesion from "../assets/Halloween/CerrarSesion.svg";
+import CalabazaHome1 from "../assets/Halloween/CalabazaHome1.svg";
+import CalabazaHome2 from "../assets/Halloween/CalabazaHome2.svg";
+import CalabazaHome3 from "../assets/Halloween/CalabazaHome3.svg";
+import CalabazaHome4 from "../assets/Halloween/CalabazaHome4.svg";
+import CalabazaHome5 from "../assets/Halloween/CalabazaHome5.svg";
+import TelarañaHome1 from "../assets/Halloween/TelarañaHome1.svg";
+import TelarañaHome2 from "../assets/Halloween/TelarañaHome2.svg";
+
 // Hooks y Componentes
 import { useOptimizedHome } from "../Hooks/Home/useOptimizedHome";
 import { useAlertasRecepcion } from "../Hooks/Asistencias/useAlertasRecepcion";
@@ -178,6 +189,13 @@ export const Home = () => {
             </p>
           </div>
           {metrics && <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />}
+        
+          <img src={CalabazaHome2} alt="Calabaza2" className="absolute bottom-28 left-[155px] w-24 h-24 z-8" />
+          <img src={CalabazaHome4} alt="Calabaza4" className="absolute bottom-10 left-[185px] w-32 h-32 z-10" />
+          <img src={CalabazaHome5} alt="Calabaza5" className="absolute bottom-5 left-42 w-48 h-48 z-12" />
+          <img src={CalabazaHome3} alt="Calabaza3" className="absolute bottom-6 right-8 w-30 h-30 z-10" />
+          <img src={CalabazaHome1} alt="Calabaza1" className="absolute bottom-10 right-40 w-24 h-24 z-10" />
+        
         </div>
     );
 
@@ -221,12 +239,17 @@ export const Home = () => {
 
     return (
       <BackgroundLayout>
+
+        <img src={TelarañaHome1} alt="Telaraña1" className="absolute -top-[28px] left-[256px] w-60 h-60 z-10 pointer-events-none" />
+        <img src={TelarañaHome2} alt="Telaraña2" className="absolute -bottom-2 -right-6 w-60 h-60 z-20 pointer-events-none" />
+
         <div className="flex h-screen overflow-hidden font-sans">
           <WhatsAppModal />
           <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
             <div className="flex-1 overflow-hidden flex flex-col">
               <div className="h-20 flex items-center px-6 border-b border-white/5 cursor-pointer shrink-0 group" onClick={() => handleSidebarClick("Inicio")}>
                 <span className="text-2xl font-bold">
+                  <img src={SombreroBruja} alt="Sombrero" className="absolute -top-1 left-1 w-12 h-12 z-10 -rotate-12" />
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#00AEEF] to-[#0071BC]">Gym</span>
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#FF8C00] to-[#d3932b]">Mate</span>
                 </span>
@@ -303,9 +326,9 @@ export const Home = () => {
             </div>
             <div className="shrink-0 bg-[#1a1225]">
               <WhatsAppStatus />
-              <div className="p-4">
+              <div className="p-3">
                 <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-medium text-sm">
-                  <span>{Icons.salir}</span> Cerrar Sesión
+                  <span><img src={CerrarSesion} alt="Cerrar Sesión" className="w-7 h7 object-contain drop-shadow-[0_0_5px_rgba(248,113,113,0.5)]" /></span> Cerrar Sesión
                 </button>
               </div>
             </div>
@@ -315,7 +338,7 @@ export const Home = () => {
               {renderAdminContent()}
             </div>
           </main>
-        </div>
+        </div>      
       </BackgroundLayout>
     );
   }
