@@ -4,6 +4,7 @@ import { showError, showSuccess } from "../../Helpers/Alerts";
 
 export const useNotificaciones = () => {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
+  const [gymNotificaciones, setGymNotificaciones] = useState<Notificacion[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -12,10 +13,23 @@ export const useNotificaciones = () => {
     try {
       const data = await NotificacionesApi.getMyNotifications();
       setNotificaciones(data);
-      // Contar no leídas
+      // Contar no leídas (solo de las que aplican)
       setUnreadCount(data.filter((n) => !n.leida).length);
     } catch (error) {
       console.error("Error cargando notificaciones", error);
+    }
+  }, []);
+
+  // Cargar notificaciones del gimnasio (Para entrenador/admin)
+  const fetchGymNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await NotificacionesApi.getGymNotifications();
+      setGymNotificaciones(data);
+    } catch (error) {
+      console.error("Error cargando notificaciones del gym", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -36,11 +50,12 @@ export const useNotificaciones = () => {
   };
 
   // Crear notificación (Broadcast)
-  const sendBroadcast = async (titulo: string, mensaje: string) => {
+  const sendBroadcast = async (titulo: string, mensaje: string, duracionDias?: number) => {
     setLoading(true);
     try {
-      await NotificacionesApi.broadcast(titulo, mensaje);
+      await NotificacionesApi.broadcast(titulo, mensaje, duracionDias);
       showSuccess("✅ Notificación enviada a los usuarios del gimnasio.");
+      await fetchGymNotifications();
       return true;
     } catch (error: any) {
       showError("❌ Error al enviar: " + (error.response?.data?.error || "Desconocido"));
@@ -51,17 +66,43 @@ export const useNotificaciones = () => {
   };
 
   // Crear notificación global (Broadcast Global - Solo Admin)
-  const sendBroadcastGlobal = async (titulo: string, mensaje: string) => {
+  const sendBroadcastGlobal = async (titulo: string, mensaje: string, duracionDias?: number) => {
     setLoading(true);
     try {
-      await NotificacionesApi.broadcastGlobal(titulo, mensaje);
+      await NotificacionesApi.broadcastGlobal(titulo, mensaje, duracionDias);
       showSuccess("✅ Notificación global enviada a todos los usuarios de la plataforma.");
+      await fetchGymNotifications();
       return true;
     } catch (error: any) {
       showError("❌ Error al enviar global: " + (error.response?.data?.error || "Desconocido"));
       return false;
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Activar/Desactivar
+  const toggleNotification = async (id: number) => {
+    try {
+      setGymNotificaciones(prev => prev.map(n => n.id === id ? { ...n, activa: !n.activa } : n));
+      await NotificacionesApi.toggleActiva(id);
+      showSuccess("Estado actualizado");
+    } catch (error) {
+      console.error("Error al cambiar estado", error);
+      fetchGymNotifications();
+      showError("Error al cambiar estado");
+    }
+  };
+
+  // Eliminar
+  const deleteNotification = async (id: number) => {
+    try {
+      await NotificacionesApi.deleteNotification(id);
+      setGymNotificaciones(prev => prev.filter(n => n.id !== id));
+      showSuccess("Notificación eliminada");
+    } catch (error) {
+      console.error("Error al eliminar", error);
+      showError("Error al eliminar");
     }
   };
 
@@ -73,11 +114,15 @@ export const useNotificaciones = () => {
 
   return {
     notificaciones,
+    gymNotificaciones,
     unreadCount,
     loading,
     markAsRead,
     sendBroadcast,
     sendBroadcastGlobal,
     refresh: fetchNotificaciones,
+    fetchGymNotifications,
+    toggleNotification,
+    deleteNotification
   };
 };

@@ -506,7 +506,7 @@ export const MyRoutines = () => {
             {/* TABS DE DÍAS (solo si es grupo) */}
             {esGrupo && (
                 <div 
-                    className="flex gap-2 mt-2 overflow-x-auto pb-1" 
+                    className="flex gap-2 mt-2 overflow-x-auto pb-1 px-1" 
                     style={{ scrollbarWidth: 'none' }}
                     onTouchStart={(e) => e.stopPropagation()}
                     onTouchMove={(e) => e.stopPropagation()}
@@ -515,7 +515,7 @@ export const MyRoutines = () => {
                         <button
                             key={index}
                             onClick={() => setSelectedDayIndex(index)}
-                            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
+                            className={`flex shrink-0 items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
                                 selectedDayIndex === index 
                                     ? 'bg-orange-500/20 text-orange-400 border border-orange-500/50 shadow-[0_0_10px_rgba(249,115,22,0.15)]' 
                                     : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
