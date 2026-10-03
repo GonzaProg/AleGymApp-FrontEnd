@@ -9,7 +9,7 @@ export const CreateNotification = () => {
   const { sendBroadcast, sendBroadcastGlobal, loading, gymNotificaciones, fetchGymNotifications, toggleNotification, deleteNotification } = useNotificaciones();
   const { isAdmin, currentUser } = useAuthUser();
   const [alcance, setAlcance] = useState<"gym" | "global">("gym");
-  const [form, setForm] = useState<{ titulo: string, mensaje: string, duracionDias: number | string }>({ titulo: "", mensaje: "", duracionDias: 7 });
+  const [form, setForm] = useState<{ titulo: string, mensaje: string, duracionDias: number | string }>({ titulo: "", mensaje: "", duracionDias: 3 });
 
   useEffect(() => {
     fetchGymNotifications();
@@ -20,7 +20,7 @@ export const CreateNotification = () => {
     if (!form.titulo.trim() || !form.mensaje.trim()) return;
 
     let exito = false;
-    const duracionFinal = typeof form.duracionDias === 'number' ? form.duracionDias : parseInt(form.duracionDias as string) || 7;
+    const duracionFinal = typeof form.duracionDias === 'number' ? form.duracionDias : parseInt(form.duracionDias as string) || 3;
 
     if (isAdmin && alcance === "global") {
       exito = await sendBroadcastGlobal(form.titulo, form.mensaje, duracionFinal);
@@ -29,7 +29,7 @@ export const CreateNotification = () => {
     }
 
     if (exito) {
-      setForm({ titulo: "", mensaje: "", duracionDias: 7 });
+      setForm({ titulo: "", mensaje: "", duracionDias: 3 });
     }
   };
 
