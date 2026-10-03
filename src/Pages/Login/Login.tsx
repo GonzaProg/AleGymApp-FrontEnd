@@ -20,6 +20,8 @@ export const Login = () => {
   // Estado para alternar vistas
   const [isRegistering, setIsRegistering] = useState(false);
   const [showGymCodeModal, setShowGymCodeModal] = useState(false);
+  const [areaCode, setAreaCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const navigate = useNavigate();
 
   // --- HOOK LOGIN ---
@@ -87,11 +89,37 @@ export const Login = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <Input name="dni" placeholder="DNI" type="number" value={formData.dni} onChange={handleChange} required className={LoginStyles.inputDark} />
-                        <span className="text-[15px] text-gray-400 mt-1 block ml-1">Sin puntos, ej: 11222333</span>
+                        <span className="text-[15px] text-gray-400 mt-1 block ml-1">Sin puntos, Ej: 11222333</span>
                     </div>
                     <div>
-                        <Input name="telefono" placeholder="Teléfono" type="tel" value={formData.telefono} onChange={handleChange} className={LoginStyles.inputDark} />
-                        <span className="text-[15px] text-gray-400 mt-1 block ml-1">Sin espacios, sin 15, con característica, ej: 3445123456</span>
+                        <div className="flex items-center gap-2">
+                            <span className= {'w-[4.5rem] text-center px-1 text-gray-400'} >+54</span>
+                            <Input 
+                                placeholder="Cód." 
+                                type="tel" 
+                                maxLength={4}
+                                value={areaCode} 
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                                    setAreaCode(val);
+                                    handleChange({ target: { name: 'telefono', value: `${val}${phoneNumber}` } } as any);
+                                }} 
+                                className={`${LoginStyles.inputDark.replace("p-3", "")} w-20 text-center`} 
+                            />
+                            <Input 
+                                placeholder="Número" 
+                                type="tel" 
+                                maxLength={6}
+                                value={phoneNumber} 
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                                    setPhoneNumber(val);
+                                    handleChange({ target: { name: 'telefono', value: `${areaCode}${val}` } } as any);
+                                }} 
+                                className={`${LoginStyles.inputDark} flex-1`} 
+                            />
+                        </div>
+                        <span className="text-[13px] text-gray-400 mt-1.5 block ml-1">Ej: +54 3445 458767</span>
                     </div>
                 </div>
                 
