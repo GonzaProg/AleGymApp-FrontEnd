@@ -5,7 +5,7 @@ interface BackgroundLayoutProps {
   className?: string;
 }
 
-// 1. NUEVO ICONO DE MANCUERNA (Estilo Outline/Líneas)
+// 1. ICONO MANCUERNA
 const DumbbellIcon = ({ style }: { style: React.CSSProperties }) => (
   <div style={style} className="text-white/50"> 
     <svg 
@@ -76,7 +76,7 @@ export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, cl
         
         {/* 2. MANCUERNAS PARPADEANTES DINÁMICAS */}
         <div style={styles.starsContainer}>
-          {/* USAMOS LA VARIABLE dumbbellCount EN LUGAR DE UN NÚMERO FIJO */}
+
           {[...Array(dumbbellCount)].map((_, i) => { 
             const randomSize = 20 + Math.random() * 25; 
             const randomRotation = Math.random() * 360;
@@ -93,7 +93,7 @@ export const BackgroundLayout: React.FC<BackgroundLayoutProps> = ({ children, cl
                   transform: `rotate(${randomRotation}deg)`,
                   animationDelay: `${Math.random() * 5}s`,
                   animationDuration: `${4 + Math.random() * 4}s`,
-                }} 
+                }}
               />
             )
           })}

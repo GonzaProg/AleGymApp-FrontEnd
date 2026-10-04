@@ -1,28 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNotificaciones } from "../../Hooks/Notificaciones/useNotificaciones";
 import { useAuthUser } from "../../Hooks/Auth/useAuthUser";
 import { AppStyles } from "../../Styles/AppStyles";
-import { Megaphone, Send, Globe, Building2 } from "lucide-react";
+import { showConfirmDelete } from "../../Helpers/Alerts";
+import { Megaphone, Send, Globe, Building2, Trash2, Power } from "lucide-react";
 
 export const CreateNotification = () => {
-  const { sendBroadcast, sendBroadcastGlobal, loading } = useNotificaciones();
+  const { sendBroadcast, sendBroadcastGlobal, loading, gymNotificaciones, fetchGymNotifications, toggleNotification, deleteNotification } = useNotificaciones();
   const { isAdmin, currentUser } = useAuthUser();
   const [alcance, setAlcance] = useState<"gym" | "global">("gym");
-  const [form, setForm] = useState({ titulo: "", mensaje: "" });
+  const [form, setForm] = useState<{ titulo: string, mensaje: string, duracionDias: number | string }>({ titulo: "", mensaje: "", duracionDias: 3 });
+
+  useEffect(() => {
+    fetchGymNotifications();
+  }, [fetchGymNotifications]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.titulo.trim() || !form.mensaje.trim()) return;
 
     let exito = false;
+    const duracionFinal = typeof form.duracionDias === 'number' ? form.duracionDias : parseInt(form.duracionDias as string) || 3;
+
     if (isAdmin && alcance === "global") {
-      exito = await sendBroadcastGlobal(form.titulo, form.mensaje);
+      exito = await sendBroadcastGlobal(form.titulo, form.mensaje, duracionFinal);
     } else {
-      exito = await sendBroadcast(form.titulo, form.mensaje);
+      exito = await sendBroadcast(form.titulo, form.mensaje, duracionFinal);
     }
 
     if (exito) {
-      setForm({ titulo: "", mensaje: "" });
+      setForm({ titulo: "", mensaje: "", duracionDias: 3 });
     }
   };
 
@@ -140,6 +147,24 @@ export const CreateNotification = () => {
                 </p>
               </div>
 
+              <div>
+                <label className={AppStyles.label}>
+                  Duración en el tablón (días)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="365"
+                  className={AppStyles.inputDark}
+                  value={form.duracionDias}
+                  onChange={(e) => setForm({ ...form, duracionDias: e.target.value === '' ? '' : parseInt(e.target.value) })}
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Días que la notificación será visible para los usuarios.
+                </p>
+              </div>
+
               <div className="pt-2 flex justify-end gap-3">
                 <button
                   type="submit"
@@ -164,6 +189,55 @@ export const CreateNotification = () => {
                 </button>
               </div>
             </form>
+          </div>
+          
+          {/* LISTA DE NOTIFICACIONES */}
+          <div className="mt-10 mb-20">
+            <h3 className="text-xl font-bold text-white mb-4">Notificaciones Enviadas</h3>
+            <div className="space-y-4">
+              {gymNotificaciones.length === 0 ? (
+                <p className="text-gray-400 text-center py-6 bg-black/20 rounded-xl border border-white/5">No hay notificaciones masivas enviadas.</p>
+              ) : (
+                gymNotificaciones.map(notif => (
+                  <div key={notif.id} className={`${AppStyles.glassCard} !p-4 flex items-center justify-between gap-4 border ${notif.activa ? 'border-green-500/30' : 'border-gray-500/30 opacity-70'}`}>
+                    <div className="flex-1">
+                      <h4 className="text-white font-bold mb-1 flex items-center gap-2">
+                        {notif.titulo}
+                        {!notif.activa && <span className="text-[10px] bg-gray-600/50 text-gray-300 px-2 py-0.5 rounded-full uppercase tracking-wider">Inactiva</span>}
+                      </h4>
+                      <p className="text-gray-400 text-sm whitespace-pre-wrap break-words">{notif.mensaje}</p>
+                      <p className="text-[10px] text-gray-500 mt-2">
+                        Creada: {new Date(notif.fechaCreacion).toLocaleDateString()} 
+                        {notif.fechaExpiracion && ` • Expira: ${new Date(notif.fechaExpiracion).toLocaleDateString()}`}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => toggleNotification(notif.id)}
+                        className={`p-2 rounded-xl transition-all ${notif.activa ? 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' : 'bg-green-500/10 text-green-400 hover:bg-green-500/20'}`}
+                        title={notif.activa ? "Desactivar del tablón" : "Activar en tablón"}
+                      >
+                        <Power className="w-5 h-5" />
+                      </button>
+                      
+                      <button 
+                        onClick={async () => {
+                          const result = await showConfirmDelete("¿Eliminar Notificación?", "¿Seguro que deseas eliminar esta notificación permanentemente?");
+                          if (result.isConfirmed) {
+                            deleteNotification(notif.id);
+                          }
+                        }}
+                        className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-xl transition-all"
+                        title="Eliminar permanentemente"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
     </div>

@@ -38,7 +38,7 @@ export const NavbarInferior = ({ activeTab, setActiveTab }: NavbarInferiorProps)
 
             {/* Puntito indicador verde */}
             {isActive && (
-              <span className="absolute -bottom-1 w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_8px_#22c55e] transition-all duration-300" />
+                <span className="absolute -bottom-1 w-1.5 h-1.5 bg-green-500 rounded-full shadow-[0_0_8px_#22c55e] transition-all duration-300" />
             )}
           </button>
         );

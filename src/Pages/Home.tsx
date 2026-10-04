@@ -167,6 +167,7 @@ export const Home = () => {
         <div className="animate-fade-in-up space-y-6 mt-20">
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+
             <h2 className="text-3xl font-bold text-white relative z-10">
               Hola, <span className="text-green-400">{currentUser?.nombre}</span> 👋
             </h2>
@@ -178,6 +179,7 @@ export const Home = () => {
             </p>
           </div>
           {metrics && <StatsGrid metrics={metrics} userRole={currentUser?.rol || ''} />}
+                
         </div>
     );
 
@@ -221,9 +223,11 @@ export const Home = () => {
 
     return (
       <BackgroundLayout>
+
         <div className="flex h-screen overflow-hidden font-sans">
           <WhatsAppModal />
           <aside className="w-64 bg-[#24192f99] border-r border-white/5 flex flex-col justify-between md:flex shrink-0 transition-all duration-300">
+
             <div className="flex-1 overflow-hidden flex flex-col">
               <div className="h-20 flex items-center px-6 border-b border-white/5 cursor-pointer shrink-0 group" onClick={() => handleSidebarClick("Inicio")}>
                 <span className="text-2xl font-bold">

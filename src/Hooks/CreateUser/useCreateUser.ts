@@ -58,7 +58,6 @@ export const useCreateUser = () => {
       const dataToSend: any = {
         ...formData,
         codigoGym: gymCode || undefined,
-        esCreacionAdmin: true
       };
 
       // No enviar fechaNacimiento si está vacío

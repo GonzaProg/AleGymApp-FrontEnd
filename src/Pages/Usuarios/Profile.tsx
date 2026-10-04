@@ -6,7 +6,7 @@ import { Button } from "../../Components/UI/Button";
 import { AppStyles } from "../../Styles/AppStyles"; 
 import { ProfileStyles } from "../../Styles/ProfileStyles"; 
 import { formatearFechaUTC } from "../../Helpers/DateUtils";
-import { Camera, Edit2, Lock, LogOut, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { Camera, Edit2, Lock, AlertTriangle, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 
 interface ProfileProps {
   isMobile?: boolean; // Prop para diferenciar el contexto
@@ -56,6 +56,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
           {/* --- CARD PERFIL --- */}
           <div className="w-full backdrop-blur-xl bg-gray-900/10 border border-white/10 rounded-3xl shadow-2xl overflow-hidden relative">
             
+            {/* Fondo de Perfil */}
             <div className={ProfileStyles.coverGradient}></div>
 
             <div className="px-6 md:px-10 pb-10">
@@ -204,8 +205,8 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
             </div>
           </div>
 
-          {/* --- CARD SEGURIDAD --- */}
-          <div className={AppStyles.glassCard + " p-6 md:p-8 bg-gray-900/10"}>
+          {/* CARD SEGURIDAD */}
+          <div className={AppStyles.glassCard + " p-6 md:p-8 bg-gray-900/10 relative overflow-hidden"}>
             {!showPasswordSection ? (
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                   <div className="flex flex-col md:flex-row items-center gap-4">
@@ -241,7 +242,7 @@ export const Profile = ({ isMobile = false }: ProfileProps) => {
 
           {/* --- CARD ZONA DE PELIGRO (SOLO ALUMNO) --- */}
           {userData.rol === 'Alumno' && (
-            <div className={AppStyles.glassCard + " p-6 md:p-8 bg-red-900/10 border-red-500/20"}>
+            <div className={AppStyles.glassCard + " p-6 md:p-8 bg-red-900/10 border-red-500/20 relative overflow-hidden"}>
                 <div 
                   className="flex justify-between items-center cursor-pointer select-none"
                   onClick={() => setShowDangerZone(!showDangerZone)}
