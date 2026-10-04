@@ -11,7 +11,6 @@ export interface CreateUserDTO {
     fechaNacimiento?: string;
     rol: string;
     codigoGym?: string; // Para vincular el usuario al gym local
-    esCreacionAdmin?: boolean; // Para enviar mensaje con datos de la cuenta por whatsapp
 }
 
 // DTO para el Login (Ahora incluye codigoGym)

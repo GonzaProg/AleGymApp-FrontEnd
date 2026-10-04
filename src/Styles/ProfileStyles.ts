@@ -1,6 +1,6 @@
 export const ProfileStyles = {
     // Header Decorativo
-    coverGradient: "h-36 bg-gradient-to-r from-green-900 to-blue-900/40 relative",
+    coverGradient: "h-36 relative",
     
     // Contenedor Foto
     avatarContainer: "relative flex justify-center -mt-20 mb-6",

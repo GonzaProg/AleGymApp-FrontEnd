@@ -4,8 +4,9 @@ import { Scanner } from '@yudiel/react-qr-scanner';
 import { AppStyles } from "../../Styles/AppStyles";
 import { useStudentHome } from "../../Hooks/StudentsHome/useStudentHome";
 import { useUserPlan } from "../../Hooks/Planes/useUserPlan";
+import { useNotificaciones } from "../../Hooks/Notificaciones/useNotificaciones";
 import { CloudinaryApi } from "../../Helpers/Cloudinary/Cloudinary";
-import { Camera, Info, Flame, Dumbbell, Quote, Handshake } from "lucide-react";
+import { Camera, Flame, Dumbbell, Quote, X, ChevronRight } from "lucide-react";
 import { useFraseMotivacional } from "../../Hooks/StudentsHome/useFraseMotivacional";
 import { useGymCachedImages } from "../../Hooks/StudentsHome/useGymCachedImages";
 import { useStudentDietas } from "../../Hooks/Dietas/useStudentDietas";
@@ -16,12 +17,37 @@ import { AppLauncher } from '@capacitor/app-launcher';
 import { App as CapacitorApp } from '@capacitor/app';
 import { showError } from "../../Helpers/Alerts";
 import MpLogo from "../../assets/MP_RGB_HANDSHAKE_color_horizontal.svg";
+import Spiderman from "../../assets/Halloween/Spiderman.png";
+import TelarañaHome3 from "../../assets/Halloween/TelarañaHome3.svg";
+import TelarañaCompleta from "../../assets/Halloween/TelarañaCompleta.svg";
+import TelarañaEsquina from "../../assets/Halloween/TelarañaEsquina.svg";
+import TelarañaConAraña1 from "../../assets/Halloween/TelarañaConAraña1.png";
+import TelarañaHome1 from "../../assets/Halloween/TelarañaHome1.svg";
+import CalabazaHome2 from "../../assets/Halloween/CalabazaHome2.svg";
 
 export const StudentHome = ({ currentUser }: { currentUser: any }) => {
     const [loadingMP, setLoadingMP] = useState<number | null>(null);
     const navigate = useNavigate();
-    const [isInfoOpen, setIsInfoOpen] = useState(false);
     
+    const { notificaciones, markAsRead } = useNotificaciones();
+    
+    const sortedNotificaciones = [...notificaciones].sort((a, b) => {
+        const getScore = (notif: any) => {
+            const isIndiv = notif.usuario != null;
+            if (isIndiv && !notif.leida) return 1;
+            if (!isIndiv) return 2;
+            return 3;
+        };
+        
+        const scoreA = getScore(a);
+        const scoreB = getScore(b);
+        
+        if (scoreA !== scoreB) {
+            return scoreA - scoreB;
+        }
+        return new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime();
+    });
+
     // Conectamos con nuestro nuevo Hook
     const { 
         concurrencia, loadingConcurrencia, isCheckingIn, handleCheckIn,
@@ -168,6 +194,7 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
 
                         return (
                             <div key={plan.userPlanId} className={`bg-black/50 p-5 rounded-3xl shadow-xl relative overflow-hidden group border border-white/5`}>
+                                <img src={TelarañaConAraña1} alt="" className="absolute top-0 right-0 w-20 h-20 opacity-80 pointer-events-none" />
                                 {/* Cabecera de la tarjeta */}
                                 <div className="flex items-center gap-4 mb-6">
                                     {gymLogo ? (
@@ -229,11 +256,125 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                     {/* ESPACIADOR PARA VER EL TEXTO DEL FONDO */}
                     {fondoGymUrl && <div className="h-40 md:h-40 pointer-events-none"></div>}
 
+                    {/* TABLÓN DE ANUNCIOS */}
+                    {sortedNotificaciones.length > 0 && (
+                        <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} mb-8 !p-4 border-white/5`}>
+                            <img src={TelarañaHome3} alt="" className="absolute -top-2 -right-2 w-24 h-24 pointer-events-none -rotate-90" />
+                            <div className="flex items-center justify-between mb-4 pr-2">
+                                <h3 className="text-white font-bold text-lg flex items-center gap-2">
+                                    <img src={CalabazaHome2} alt="" className="top-0 left-0 w-10 h-10 opacity-90 pointer-events-none" />
+                                    Tablón de Anuncios
+                                </h3>
+                                {sortedNotificaciones.length > 1 && (
+                                    <span className="text-[13px] text-gray-400 font-medium tracking-wider flex items-center gap-1">
+                                        Desliza <ChevronRight className="w-3 h-3" />
+                                    </span>
+                                )}
+                            </div>
+                            <div 
+                                className={`flex gap-4 mt-2 overflow-x-auto pb-2 snap-x snap-mandatory after:content-[''] after:w-2 after:flex-shrink-0 ${AppStyles.customScrollbar}`}
+                                style={{ scrollbarWidth: 'none' }}
+                                onTouchStart={(e) => e.stopPropagation()}
+                                onTouchMove={(e) => e.stopPropagation()}
+                            >
+                                {sortedNotificaciones.map(notif => (
+                                    <div key={notif.id} className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/60")} !p-4 relative overflow-hidden border-orange-500/20 shadow-lg min-w-[280px] w-[280px] sm:w-[320px] snap-center flex-shrink-0 flex flex-col`}>
+                                        {!notif.leida && <span className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)]"></span>}
+                                        <div className="flex justify-between items-start gap-4 mb-2">
+                                            <h4 className={`text-sm ${!notif.leida ? 'text-white font-bold' : 'text-gray-300 font-medium'}`}>{notif.titulo}</h4>
+                                            {!notif.leida && notif.usuario && (
+                                                <button 
+                                                    onClick={() => markAsRead(notif.id)}
+                                                    className="p-1.5 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 rounded-full transition-colors flex-shrink-0"
+                                                    title="Marcar como leída (Ocultar)"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-gray-400 leading-relaxed whitespace-pre-wrap break-words flex-1">{notif.mensaje}</p>
+                                        <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/5">
+                                            <span className="text-[10px] text-gray-600 block">{new Date(notif.fechaCreacion).toLocaleDateString()}</span>
+                                            {notif.usuario ? (
+                                                <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-semibold tracking-wider uppercase">Para ti</span>
+                                            ) : (
+                                                <span className="text-[10px] bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded-full font-semibold tracking-wider uppercase">General</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+            {/* CONDICIONAL: Solo mostramos la asistencia si el gimnasio la habilitó */}
+            {isAsistenciaHabilitada ? (
+                <>
+                    {/* TARJETA DE CONCURRENCIA */}
+                    <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} relative overflow-hidden border-green-500/30 shadow-green-900/10`}>
+                        <img src={TelarañaCompleta} alt="" className="absolute -top-6 -right-6 w-32 h-32 opacity-20 pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/30 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                        
+                        {/* BOTÓN COMPACTO DE ESCANEO */}
+                        <button 
+                            onClick={() => setIsScannerOpen(true)}
+                            disabled={isCheckingIn}
+                            title="Escanear QR"
+                            className="absolute top-3 right-3 z-30 p-2.5 bg-green-500 shadow-lg shadow-green-500/20 rounded-full hover:bg-green-400 active:scale-90 transition-all text-white border border-white/20"
+                        >
+                            <Camera className="w-5 h-5" />
+                        </button>
+                        
+                        <div className="relative z-10 flex items-start gap-4">
+                            <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/10 p-4 rounded-2xl flex-shrink-0 border border-green-500/30 shadow-inner">
+                                <Flame className="w-8 h-8 text-orange-500" />
+                            </div>
+                            
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="relative flex h-2.5 w-2.5">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                                    </span>
+                                    <h3 className="text-green-400 font-bold tracking-widest uppercase text-[10px]">En Vivo</h3>
+                                </div>
+                                
+                                {loadingConcurrencia ? (
+                                    <div className="animate-pulse flex flex-col gap-2 mb-2">
+                                        <div className="h-6 bg-white/10 rounded w-3/4"></div>
+                                        <div className="h-4 bg-white/5 rounded w-full"></div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-white font-medium text-lg leading-tight mb-2">
+                                            Hay aprox. <span className="font-black text-xl">{concurrencia} personas</span>.
+                                        </p>
+                                        <p className={`text-sm leading-relaxed font-semibold ${getMensajeConcurrencia(concurrencia || 0).color}`}>
+                                            {getMensajeConcurrencia(concurrencia || 0).texto}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                // SI EL MÓDULO ESTÁ DESACTIVADO, MOSTRAMOS UN MENSAJE DE MOTIVACIÓN
+                <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50").replace("backdrop-blur-xl", "")} text-center py-12 border-white/5 flex flex-col items-center`}>
+                    <Dumbbell className="w-16 h-16 text-white mb-6 animate-pulse" />
+                    <h3 className="text-2xl font-black text-white mb-2 tracking-wide">¡Vamos a entrenar!</h3>
+                    <p className="text-gray-400 text-sm max-w-xs mx-auto">
+                        Desliza hacia los costados para ver tus rutinas o superar tus récords personales.
+                    </p>
+                </div>
+                )}
+
                     {/* NUTRICIÓN */}
                     <div 
                         onClick={() => navigate('/dietas')}
-                className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} mb-8 relative overflow-hidden border-orange-500/20 shadow-lg cursor-pointer transition-transform hover:scale-[1.02] active:scale-95`}
+                className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} mb-8 relative overflow-hidden border-orange-500/20 cursor-pointer transition-transform hover:scale-[1.02] active:scale-95`}
             >
+                <img src={TelarañaHome1} alt="" className="absolute -top-6 left-0 w-48 h-48 opacity-80 pointer-events-none" />
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
                 <div className="flex items-center justify-between mb-4 relative z-10">
                     <div className="flex items-center gap-2">
@@ -319,91 +460,6 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
                 )}
             </div>
 
-            {/* CONDICIONAL: Solo mostramos la asistencia si el gimnasio la habilitó */}
-            {isAsistenciaHabilitada ? (
-                <>
-                    {/* ACORDEÓN DE INFORMACIÓN */}
-                    <div className={AppStyles.glassCard.replace("p-8", "p-2").replace("bg-gray-900/80", "bg-black/20")}>
-                        <button 
-                            onClick={() => setIsInfoOpen(!isInfoOpen)}
-                            className="w-full p-2 flex items-center justify-between hover:bg-white/5 transition-colors rounded-2xl"
-                        >
-                            <h3 className="text-blue-400 font-bold flex items-center gap-2 text-sm">
-                                <span><Info className="w-4 h-4" /></span> ¿Cómo funciona esto?
-                            </h3>
-                            <span className={`text-gray-400 transition-transform duration-300 ${isInfoOpen ? 'rotate-180' : ''}`}>
-                                ▼
-                            </span>
-                        </button>
-
-                        <div className={`transition-all duration-500 ease-in-out px-4 ${isInfoOpen ? 'max-h-[500px] opacity-100 pb-4' : 'max-h-0 opacity-0'}`}>
-                            <div className="pt-4 border-t border-white/10 text-gray-300 text-sm leading-relaxed">
-                                <p>
-                                    ¡Ayúdanos a mantener la información actualizada! <Handshake className="w-4 h-4 inline text-blue-400 mx-1" /><br/><br/>
-                                    Toca la <strong>"Camara Verde"</strong> cada vez que llegues al gimnasio.<br/><br/>
-                                    Esto nos permite calcular cuánta gente hay entrenando en tiempo real para que todos puedan planificar mejor sus horarios.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* TARJETA DE CONCURRENCIA */}
-                    <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50").replace("backdrop-blur-xl", "")} relative overflow-hidden border-green-500/30 shadow-lg shadow-green-900/10`}>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-green-500/30 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
-                        
-                        {/* BOTÓN COMPACTO DE ESCANEO */}
-                        <button 
-                            onClick={() => setIsScannerOpen(true)}
-                            disabled={isCheckingIn}
-                            title="Escanear QR"
-                            className="absolute top-3 right-3 z-30 p-2.5 bg-green-500 shadow-lg shadow-green-500/20 rounded-full hover:bg-green-400 active:scale-90 transition-all text-white border border-white/20"
-                        >
-                            <Camera className="w-5 h-5" />
-                        </button>
-                        
-                        <div className="relative z-10 flex items-start gap-4">
-                            <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/10 p-4 rounded-2xl flex-shrink-0 border border-green-500/30 shadow-inner">
-                                <Flame className="w-8 h-8 text-orange-500" />
-                            </div>
-                            
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className="relative flex h-2.5 w-2.5">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                                    </span>
-                                    <h3 className="text-green-400 font-bold tracking-widest uppercase text-[10px]">En Vivo</h3>
-                                </div>
-                                
-                                {loadingConcurrencia ? (
-                                    <div className="animate-pulse flex flex-col gap-2 mb-2">
-                                        <div className="h-6 bg-white/10 rounded w-3/4"></div>
-                                        <div className="h-4 bg-white/5 rounded w-full"></div>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <p className="text-white font-medium text-lg leading-tight mb-2">
-                                            Hay aprox. <span className="font-black text-xl">{concurrencia} personas</span>.
-                                        </p>
-                                        <p className={`text-sm leading-relaxed font-semibold ${getMensajeConcurrencia(concurrencia || 0).color}`}>
-                                            {getMensajeConcurrencia(concurrencia || 0).texto}
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </>
-            ) : (
-                // SI EL MÓDULO ESTÁ DESACTIVADO, MOSTRAMOS UN MENSAJE DE MOTIVACIÓN
-                <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50").replace("backdrop-blur-xl", "")} text-center py-12 border-white/5 flex flex-col items-center`}>
-                    <Dumbbell className="w-16 h-16 text-white mb-6 animate-pulse" />
-                    <h3 className="text-2xl font-black text-white mb-2 tracking-wide">¡Vamos a entrenar!</h3>
-                    <p className="text-gray-400 text-sm max-w-xs mx-auto">
-                        Desliza hacia los costados para ver tus rutinas o superar tus récords personales.
-                    </p>
-                </div>
-                )}
                 </>
             )}
                 </div> {/* Cierre de Contenido sobre el fondo */}
@@ -411,7 +467,9 @@ export const StudentHome = ({ currentUser }: { currentUser: any }) => {
             
             <div className="px-4 space-y-6">
                 {/* FRASE MOTIVADORA DEL DÍA */}
-            <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} relative overflow-hidden border-green-500/20 shadow-lg shadow-green-500/20`}>
+            <div className={`${AppStyles.glassCard.replace("bg-gray-900/80", "bg-black/50")} relative overflow-visible border-green-500/20 shadow-lg shadow-green-500/20`}>
+                <img src={TelarañaEsquina} alt="" className="absolute top-[-5px] left-[-17px] w-16 h-16 opacity-50 pointer-events-none transform -scale-x-100" />
+                <img src={Spiderman} alt="" className="absolute bottom-[-95px] right-0 w-24 h-24 opacity-80 pointer-events-none" />
                 <div className="flex flex-col gap-4 relative z-10">
                     <div className="flex items-start gap-3">
                         <Quote className="w-5 h-5 text-blue-400 flex-shrink-0 opacity-80 mt-0.5" />
